@@ -1,0 +1,8 @@
+*.py[co]
+*.pyo
+*~
+dist/
+MANIFEST
+.settings/
+tools.db
+
