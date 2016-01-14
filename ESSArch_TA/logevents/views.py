@@ -606,7 +606,7 @@ class ETAUploadView(ChunkedUploadView):
     def check_permissions(self, request):
         # Allow non authenticated users to make uploads
         pass
-        
+    print 'This function is called'    
     #def is_valid_chunked_upload(self, chunked_upload):
         
         #pass
