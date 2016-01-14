@@ -146,10 +146,10 @@ class BaseChunkedUpload(models.Model):
 
 class ETAstorage(FileSystemStorage):
     def __init__(self):
-        super(ETPstorage, self).__init__(location=MEDIA_ROOT)
+        super(ETAstorage, self).__init__(location=MEDIA_ROOT)
 
         
 class ETAupload(BaseChunkedUpload):
     
-    file = models.FileField(max_length=255, upload_to=alternative_filename,storage=ETPstorage()) 
+    file = models.FileField(max_length=255, upload_to=alternative_filename,storage=ETAstorage()) 
 
