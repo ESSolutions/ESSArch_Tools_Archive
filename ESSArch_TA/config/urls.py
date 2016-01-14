@@ -28,6 +28,7 @@ from django.conf import settings
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
+from logevents.views import ETAUploadView, ETAUploadCompleteView
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -83,6 +84,8 @@ urlpatterns = patterns('',
     # Log Events URLS:
     url(r'^logevents$', 'logevents.views.index'),
     url(r'^logevents/create$', 'logevents.views.createlog'),
+    url(r'^eta_upload/?$', ETAUploadView.as_view(), name='eta_chunked_upload'), 
+    url(r'^eta_upload_complete/(?P<ipid>[^&]*)$', ETAUploadCompleteView.as_view(), name='eta_chunked_upload_complete'),     
     url(r'^logevents/list$', 'logevents.views.listlog'),
     #url(r'^logevents/view/(?P<uuid>[^//]+)/(?P<creator>[^//]+)/(?P<system>[^//]+)/(?P<version>[^//]+)$', 'logevents.views.viewlog'),
 #    url(r'^logevents/view/(?P<uuid>[^//]+)/(?P<archivist_organization>[^//]+)/(?P<label>[^//]+)/(?P<startdate>[^//]+)/(?P<enddate>[^//]+)/(?P<iptype>[^//]+)/(?P<createdate>[^//]+)$', 'logevents.views.viewlog'),
