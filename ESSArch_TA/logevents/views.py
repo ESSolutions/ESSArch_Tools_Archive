@@ -32,7 +32,12 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import View
 import os, uuid, operator, re
 #from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
+from chunked_upload.settings import MAX_BYTES
+#from chunked_upload.views import ChunkedUploadBaseView
 from chunked_upload.models import ChunkedUpload
+from chunked_upload.response import Response
+from chunked_upload.constants import http_status, COMPLETE
+from chunked_upload.exceptions import ChunkedUploadError
 
 # import the logging library and get an instance of a logger
 import logging
