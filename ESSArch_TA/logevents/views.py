@@ -602,7 +602,7 @@ class ETAUploadView(ChunkedUploadView):
 
     model = ETAupload
     field_name = 'the_file'
-    print 'This function is called'
+    
     
     def check_permissions(self, request):
         # Allow non authenticated users to make uploads
