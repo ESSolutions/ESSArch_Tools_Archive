@@ -305,5 +305,8 @@ def createlog(request):
              }
         c.update(csrf(request))
         return render_to_response('logevents/create.html', c, context_instance=RequestContext(request) )
+        
+
+
 
             
