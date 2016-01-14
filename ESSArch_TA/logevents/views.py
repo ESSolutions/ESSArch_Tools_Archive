@@ -30,7 +30,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
 from django.contrib.auth.decorators import login_required
 from django.views.generic import View
-import os, uuid, operator
+import os, uuid, operator, re
 #from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
 from chunked_upload.models import ChunkedUpload
 
