@@ -38,6 +38,7 @@ from chunked_upload.models import ChunkedUpload
 from chunked_upload.response import Response
 from chunked_upload.constants import http_status, COMPLETE
 from chunked_upload.exceptions import ChunkedUploadError
+from models import ETAupload
 
 # import the logging library and get an instance of a logger
 import logging
