@@ -150,7 +150,7 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 # Always use forward slashes, even on Windows.
 # Don't forget to use absolute paths, not relative paths.
 if DEV:
-    STATICFILES_DIRS = "/ESSArch_Tools_Archive/static", 	# development
+    STATICFILES_DIRS = "/eta/static", 	# development
 else:
     STATICFILES_DIRS = os.path.join(SITE_ROOT, 'static'), 	# production
         
@@ -219,7 +219,9 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     'configuration',
-    'ip'
+    'ip',
+     'chunked_upload',
+    'logevents'
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )

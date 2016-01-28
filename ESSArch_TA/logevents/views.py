@@ -28,6 +28,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.utils.http import urlquote
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.views.generic import View
 import os, uuid, operator, re
@@ -39,6 +40,7 @@ from chunked_upload.response import Response
 from chunked_upload.constants import http_status, COMPLETE
 from chunked_upload.exceptions import ChunkedUploadError
 from models import ETAupload
+#from rest_framework import viewsets, mixins, permissions, views
 
 # import the logging library and get an instance of a logger
 import logging
@@ -318,7 +320,6 @@ def createlog(request):
 
 
 
-
 class ChunkedUploadBaseView(View):
     """
     Base view for the rest of chunked upload views.
@@ -326,6 +327,10 @@ class ChunkedUploadBaseView(View):
 
     # Has to be a ChunkedUpload subclass
     model = ChunkedUpload
+    
+    @csrf_exempt
+    def dispatch(self,  *args, **kwargs):
+        return super(ChunkedUploadBaseView, self).dispatch(*args, **kwargs)
 
     def get_queryset(self, request):
         """
@@ -333,8 +338,10 @@ class ChunkedUploadBaseView(View):
         By default, users can only continue uploading their own uploads.
         """
         queryset = self.model.objects.all()
+        '''
         if hasattr(request, 'user') and request.user.is_authenticated():
             queryset = queryset.filter(user=request.user)
+         '''   
         return queryset
 
     def validate(self, request):
@@ -395,11 +402,12 @@ class ChunkedUploadBaseView(View):
         """
         Handle POST requests.
         """
-        try:
-            self.check_permissions(request)
-            return self._post(request, *args, **kwargs)
-        except ChunkedUploadError as error:
-            return Response(error.data, status=error.status_code)
+        logger.info('A post request is being made')
+        #try:
+            #self.check_permissions(request)
+        return self._post(request, *args, **kwargs)
+        #except ChunkedUploadError as error:
+            #return Response(error.data, status=error.status_code)
 
 class ChunkedUploadView(ChunkedUploadBaseView):
     """
@@ -407,7 +415,7 @@ class ChunkedUploadView(ChunkedUploadBaseView):
     if the upload is interrupted.
     """
 
-    field_name = 'file'
+    field_name = 'the_file'
     content_range_header = 'HTTP_CONTENT_RANGE'
     content_range_pattern = re.compile(
         r'^bytes (?P<start>\d+)-(?P<end>\d+)/(?P<total>\d+)$'
@@ -443,7 +451,7 @@ class ChunkedUploadView(ChunkedUploadBaseView):
         chunked_upload = self.model(**attrs)
         # file starts empty
         chunked_upload.file.save(name='', content=ContentFile(''), save=save)
-
+        print 'checked upload created'
         return chunked_upload
 
     def is_valid_chunked_upload(self, chunked_upload):
@@ -470,6 +478,8 @@ class ChunkedUploadView(ChunkedUploadBaseView):
         }
 
     def _post(self, request, *args, **kwargs):
+        
+        logger.info('A post request to upload view is being made')
         chunk = request.FILES.get(self.field_name)
         if chunk is None:
             raise ChunkedUploadError(status=http_status.HTTP_400_BAD_REQUEST,
@@ -539,7 +549,7 @@ class ChunkedUploadCompleteView(ChunkedUploadBaseView):
 
     # I wouldn't recommend to turn off the md5 check, unless is really
     # impacting your performance. Proceed at your own risk.
-    do_md5_check = True  #False
+    do_md5_check = False  #True
 
     def on_completion(self, uploaded_file, request):
         """
@@ -569,6 +579,9 @@ class ChunkedUploadCompleteView(ChunkedUploadBaseView):
                                      detail='md5 checksum does not match')
 
     def _post(self, request, *args, **kwargs):
+        
+        logger.info('A post request is being made to complete view')
+        
         upload_id = request.POST.get('upload_id')
         md5 = request.POST.get('md5')
 
@@ -598,27 +611,29 @@ class ChunkedUploadCompleteView(ChunkedUploadBaseView):
         return Response(self.get_response_data(chunked_upload, request),
                         status=http_status.HTTP_200_OK)
 
-class ETAUploadView(ChunkedUploadView):
+
+
+class ETAUploadView( ChunkedUploadView):
 
     model = ETAupload
-    field_name = 'the_file'
+    #field_name = 'the_file'
     
     
     def check_permissions(self, request):
         # Allow non authenticated users to make uploads
-        pass
+        print 'permissions checked'
       
     #def is_valid_chunked_upload(self, chunked_upload):
         
         #pass
 
 '''  
-    def save(self, chunked_upload, request, new=False):
-        """
-        Method that calls save(). Overriding may be useful is save() needs
-        special args or kwargs.
-        """
-        pass
+    #def save(self, chunked_upload, request, new=False):
+    
+        #Method that calls save(). Overriding may be useful is save() needs
+        #special args or kwargs.
+        
+        #pass
 '''
 
 class ETAUploadCompleteView(ChunkedUploadCompleteView):
@@ -637,10 +652,14 @@ class ETAUploadCompleteView(ChunkedUploadCompleteView):
         # function_that_process_file(uploaded_file)
         #print uploaded_file.file
         #print 'filename: %s, type(file): %s' % (uploaded_file.name, type(uploaded_file.file))
-        
-        ipidfromkwargs = self.kwargs['ipid']
+        '''
+        #ipidfromkwargs = self.kwargs['ipid']
         ourip = get_object_or_404(InformationPackage, pk=ipidfromkwargs)
         ipcontentpath = ourip.directory + '/' + ourip.uuid + '/content/'
         print ipcontentpath
         shutil.move(uploaded_file.file.path,ipcontentpath)
+        
+        file_path = Path.objects.get(entity="path_ingest_reception").value
+        '''
+        print 'Upload complete'
         #pass                        

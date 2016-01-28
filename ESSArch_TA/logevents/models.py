@@ -40,7 +40,7 @@ from chunked_upload.constants import CHUNKED_UPLOAD_CHOICES, UPLOADING
 from config.settings import MEDIA_ROOT
 
 
-AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
+#AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 
 def generate_upload_id():
@@ -75,7 +75,7 @@ class BaseChunkedUpload(models.Model):
     status = models.PositiveSmallIntegerField(choices=CHUNKED_UPLOAD_CHOICES,
                                               default=UPLOADING)
     completed_on = models.DateTimeField(null=True, blank=True)
-    user = models.ForeignKey(AUTH_USER_MODEL, related_name='chunked_uploads', blank=True)
+    #user = models.ForeignKey(AUTH_USER_MODEL, related_name='chunked_uploads', blank=True)
     @property
     def expires_on(self):
         return self.created_on + EXPIRATION_DELTA
