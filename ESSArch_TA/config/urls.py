@@ -40,7 +40,7 @@ urlpatterns = patterns('',
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'} ),
     url(r'^admin/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'} ),
     url(r'^changepassword$', 'configuration.views.change_password'),
-    
+    url(r'^about$', 'configuration.views.sysinfo'),    
 
     #url(r'^configuration/logevents$', 'configuration.views.logevents'),
     url(r'^configuration/logevents/install_defaults$', 'configuration.views.installogdefaults'),
