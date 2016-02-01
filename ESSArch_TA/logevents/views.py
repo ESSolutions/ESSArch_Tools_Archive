@@ -26,12 +26,17 @@
 from django.template import Context, loader, RequestContext 
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.utils.http import urlquote
-from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.views.generic import View
 import os, uuid, operator, re
+
+from django.views.generic import View
+from django.shortcuts import render_to_response, get_object_or_404
+from django.core.files.base import ContentFile
+from django.utils import timezone
+from django.core.files.storage import FileSystemStorage
+
 #from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
 from chunked_upload.settings import MAX_BYTES
 #from chunked_upload.views import ChunkedUploadBaseView
@@ -338,10 +343,10 @@ class ChunkedUploadBaseView(View):
         By default, users can only continue uploading their own uploads.
         """
         queryset = self.model.objects.all()
-        '''
+        
         if hasattr(request, 'user') and request.user.is_authenticated():
             queryset = queryset.filter(user=request.user)
-         '''   
+            
         return queryset
 
     def validate(self, request):
@@ -613,7 +618,7 @@ class ChunkedUploadCompleteView(ChunkedUploadBaseView):
 
 
 
-class ETAUploadView( ChunkedUploadView):
+class ETAUploadView(ChunkedUploadView):
 
     model = ETAupload
     #field_name = 'the_file'
