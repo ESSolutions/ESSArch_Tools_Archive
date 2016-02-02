@@ -58,6 +58,13 @@ from configuration.models import Parameter, LogEvent, Path
 from newlogeventform import NewLogEventForm, NewLogFileForm
 import lib.utils as lu
 import lib.app_tools as lat
+from esscore.rest.uploadchunkedrestclient import UploadChunkedRestClient, UploadChunkedRestException
+import requests
+import  requests.packages
+from urlparse import urljoin
+import jsonpickle
+
+
 
 
 @login_required
@@ -626,11 +633,11 @@ class ETAUploadView(ChunkedUploadView):
     
     def check_permissions(self, request):
         # Allow non authenticated users to make uploads
-        print 'permissions checked'
+    
       
     #def is_valid_chunked_upload(self, chunked_upload):
         
-        #pass
+        pass
 
 '''  
     #def save(self, chunked_upload, request, new=False):
@@ -657,14 +664,23 @@ class ETAUploadCompleteView(ChunkedUploadCompleteView):
         # function_that_process_file(uploaded_file)
         #print uploaded_file.file
         #print 'filename: %s, type(file): %s' % (uploaded_file.name, type(uploaded_file.file))
-        '''
-        #ipidfromkwargs = self.kwargs['ipid']
-        ourip = get_object_or_404(InformationPackage, pk=ipidfromkwargs)
-        ipcontentpath = ourip.directory + '/' + ourip.uuid + '/content/'
-        print ipcontentpath
-        shutil.move(uploaded_file.file.path,ipcontentpath)
+        destination  = Path.objects.get(entity="path_ingest_reception").value
+
+        # Create a new information package folder ready for deliver
+        i = 1
+        while os.path.exists( os.path.join( destination, "ip%d"%i ) ):
+            i+=1
+        delivery_root = os.path.join( destination, "ip%d"%i )
+        os.makedirs(delivery_root)
+        shutil.move(uploaded_file.file.path,delivery_root)
+
         
-        file_path = Path.objects.get(entity="path_ingest_reception").value
-        '''
-        print 'Upload complete'
-        #pass                        
+def _initialize_requests_session(ruser, rpass, cert_verify=True, disable_warnings=False):
+    if disable_warnings == True:
+        from requests.packages.urllib3.exceptions import InsecureRequestWarning, InsecurePlatformWarning
+        requests.packages.urllib3.disable_warnings(InsecurePlatformWarning)
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    requests_session = requests.Session()
+    requests_session.verify = cert_verify
+    requests_session.auth = (ruser, rpass)
+    return requests_session        

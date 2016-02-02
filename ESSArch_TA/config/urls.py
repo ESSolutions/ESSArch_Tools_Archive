@@ -25,10 +25,10 @@
 from django.conf.urls import patterns, include, url, handler404
 from django.views.generic import DetailView, ListView
 from django.conf import settings
-
+from logevents.views import ETAUploadView, ETAUploadCompleteView
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
-from logevents.views import ETAUploadView, ETAUploadCompleteView
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
