@@ -29,7 +29,7 @@ from django.utils.http import urlquote
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-import os, uuid, operator, re
+import os, uuid, operator, re, shutil
 
 from django.views.generic import View
 from django.shortcuts import render_to_response, get_object_or_404
@@ -64,7 +64,7 @@ import  requests.packages
 from urlparse import urljoin
 import jsonpickle
 
-
+ipuuid = 'not defined'
 
 
 @login_required
@@ -656,6 +656,43 @@ class ETAUploadCompleteView(ChunkedUploadCompleteView):
         # Allow non authenticated users to make uploads
         pass
 
+    def _post(self, request, *args, **kwargs):
+        
+        logger.info('A post request is being made to complete view')
+        
+        upload_id = request.POST.get('upload_id')
+        md5 = request.POST.get('md5')
+        global ipuuid
+        ipuuid = request.POST.get('ipuuid')
+        print 'complete ipuuid'
+        print ipuuid
+        
+        error_msg = None
+        if self.do_md5_check:
+            if not upload_id or not md5:
+                error_msg = "Both 'upload_id' and 'md5' are required"
+        elif not upload_id:
+            error_msg = "'upload_id' is required"
+        if error_msg:
+            raise ChunkedUploadError(status=http_status.HTTP_400_BAD_REQUEST,
+                                     detail=error_msg)
+
+        chunked_upload = get_object_or_404(self.get_queryset(request),
+                                           upload_id=upload_id)
+
+        self.validate(request)
+        self.is_valid_chunked_upload(chunked_upload)
+        if self.do_md5_check:
+            self.md5_check(chunked_upload, md5)
+
+        chunked_upload.status = COMPLETE
+        chunked_upload.completed_on = timezone.now()
+        self._save(chunked_upload)
+        self.on_completion(chunked_upload.get_uploaded_file(), request)
+
+        return Response(self.get_response_data(chunked_upload, request),
+                        status=http_status.HTTP_200_OK)
+
     def on_completion(self, uploaded_file, request):
         # Do something with the uploaded file. E.g.:
         # * Store the uploaded file on another model:
@@ -664,15 +701,31 @@ class ETAUploadCompleteView(ChunkedUploadCompleteView):
         # function_that_process_file(uploaded_file)
         #print uploaded_file.file
         #print 'filename: %s, type(file): %s' % (uploaded_file.name, type(uploaded_file.file))
-        destination  = Path.objects.get(entity="path_ingest_reception").value
-
+        print 'final ipuuid'
+        print ipuuid
+  
+        destination  = Path.objects.get(entity="path_ingest_reception").value + '/eft'
+        print 'destination path'
+        print destination
         # Create a new information package folder ready for deliver
-        i = 1
-        while os.path.exists( os.path.join( destination, "ip%d"%i ) ):
-            i+=1
-        delivery_root = os.path.join( destination, "ip%d"%i )
-        os.makedirs(delivery_root)
-        shutil.move(uploaded_file.file.path,delivery_root)
+        ippath = os.path.join( destination, ipuuid)
+        print 'ippath'
+        print ippath
+        if os.path.exists(ippath):
+            print 'path exists'
+            shutil.move(uploaded_file.file.path,ippath)
+            print 'file moved'
+            
+        else:
+            print 'path vill be created'
+            os.makedirs(ippath)
+            print 'file will be moved'
+            shutil.move(uploaded_file.file.path,ippath)
+            print 'file moved'
+            
+        
+
+
 
         
 def _initialize_requests_session(ruser, rpass, cert_verify=True, disable_warnings=False):
