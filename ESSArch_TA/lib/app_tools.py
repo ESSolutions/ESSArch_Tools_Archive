@@ -38,7 +38,11 @@ from configuration.models import LogEvent, Parameter, SchemaProfile, Path, IPPar
 import mets_eARD as m 
 import utils, ESSMD, ESSPGM
 import tarfile
-
+from esscore.rest.uploadchunkedrestclient import UploadChunkedRestClient, UploadChunkedRestException
+import requests
+import  requests.packages
+from urlparse import urljoin
+import jsonpickle
 ###############################################
 "Agent list for site profile SE"
 """
@@ -486,7 +490,7 @@ def prepareIP( agent, contextdata ):
             #ObjectPath = contextdata["sourceroot"]
             ObjectPath = contextdata["iplocation"]
             checksumtype_default = checksumalgoritm
-            METS_ObjectPath = filename
+            METS_ObjectPath = filenamePath.objects.get(entity="path_ingest_reception").value 
             errno, result, reslist = DiffCheck_IP(ObjectIdentifierValue, ObjectPath, METS_ObjectPath, TimeZone, checksumtype_default)
             result_sum = len(reslist[0]) + len(reslist[1]) + len(reslist[2]) + len(reslist[3]) + len(reslist[4]) + len(reslist[5])
             if result_sum != len(reslist[0]):
@@ -536,59 +540,74 @@ def prepareIP( agent, contextdata ):
         contextdata["iptype"] = context["ip_type"]
         contextdata["createdate"] = context["ip_createdate"]
 
-        # create aic_uuid
-        try :
-            aic_uuid = context["aic_uuid"]
-        except:
-            aic_uuid = str(uuid.uuid1())
-                
-        # create ip_uuid
-        if context["ip_uuid"][:5] == 'UUID:' or context["ip_uuid"][:5] == 'RAID:' : 
-            ip_uuid = context["ip_uuid"][5:]
-        else :
-            ip_uuid = context["ip_uuid"]
+        if Parameter.objects.get(entity= 'upload_to_EPP').value == False:
+    
+            # create aic_uuid
+            try :
+                aic_uuid = context["aic_uuid"]
+            except:
+                aic_uuid = str(uuid.uuid1())
+                    
+            # create ip_uuid
+            if context["ip_uuid"][:5] == 'UUID:' or context["ip_uuid"][:5] == 'RAID:' : 
+                ip_uuid = context["ip_uuid"][5:]
+            else :
+                ip_uuid = context["ip_uuid"]
+    
+            # create AIC_UUID directory
+            root = createAICdirectory( logfilepath, aic_uuid )
+    
+            # create IP_UUID directory
+            iproot = createIPdirectory( root, ip_uuid )
+            #iproot = createIPdirectory( root, ip_uuid, site_profile )
+            
+            # copy specfile from source to destination
+            src_specfile = filename
+            dst_specfile = root+'/'+templatefile_pspec
+            #shutil.copy(src_specfile, dst_specfile)
+            shutil.move(src_specfile, dst_specfile)
+    
+            # copy IP from source to destination
+            if site_profile == 'SE':
+                #src_ipfile = contextdata["sourceroot"]+'/'+ip_uuid+'.tar'
+                src_ipfile = contextdata["iplocation"]+'/'+ip_uuid+'.tar'
+                dst_ipfile = root+'/'+ip_uuid +'/content/'+ip_uuid+'.tar'
+                dst1_ipfile = reception+'/'+ip_uuid+'.tar'
+                shutil.copy(src_ipfile, dst_ipfile)
+                shutil.copy(src_ipfile, dst1_ipfile)
+    
+            # copy IP from source to destination
+            if site_profile == 'NO':
+                #src_ipfile = contextdata["sourceroot"]+'/'+ip_uuid+'.tar'
+                src_ipfile = contextdata["iplocation"]+'/'+ip_uuid+'.tar'
+                dst_ipfile = root+'/'+ip_uuid +'/content/'+ip_uuid+'.tar'
+                dst1_ipfile = reception+'/'+ip_uuid+'.tar'
+                shutil.copy(src_ipfile, dst_ipfile)
+                shutil.copy(src_ipfile, dst1_ipfile)
+    	    # unpack IP at prepare area
+    	    #tar = tarfile.open(dst1_ipfile)
+    	    #tar.extractall(path=reception)
+    	    #tar.close()
+     
+            # Initial event for preparation of IP in zone2
 
-        # create AIC_UUID directory
-        root = createAICdirectory( logfilepath, aic_uuid )
-
-        # create IP_UUID directory
-        iproot = createIPdirectory( root, ip_uuid )
-        #iproot = createIPdirectory( root, ip_uuid, site_profile )
-        
-        # copy specfile from source to destination
-        src_specfile = filename
-        dst_specfile = root+'/'+templatefile_pspec
-        #shutil.copy(src_specfile, dst_specfile)
-        shutil.move(src_specfile, dst_specfile)
-
-        # copy IP from source to destination
-        if site_profile == 'SE':
-            #src_ipfile = contextdata["sourceroot"]+'/'+ip_uuid+'.tar'
-            src_ipfile = contextdata["iplocation"]+'/'+ip_uuid+'.tar'
-            dst_ipfile = root+'/'+ip_uuid +'/content/'+ip_uuid+'.tar'
-            dst1_ipfile = reception+'/'+ip_uuid+'.tar'
-            shutil.copy(src_ipfile, dst_ipfile)
-            shutil.copy(src_ipfile, dst1_ipfile)
-
-        # copy IP from source to destination
-        if site_profile == 'NO':
-            #src_ipfile = contextdata["sourceroot"]+'/'+ip_uuid+'.tar'
-            src_ipfile = contextdata["iplocation"]+'/'+ip_uuid+'.tar'
-            dst_ipfile = root+'/'+ip_uuid +'/content/'+ip_uuid+'.tar'
-            dst1_ipfile = reception+'/'+ip_uuid+'.tar'
-            shutil.copy(src_ipfile, dst_ipfile)
-            shutil.copy(src_ipfile, dst1_ipfile)
-	    # unpack IP at prepare area
-	    #tar = tarfile.open(dst1_ipfile)
-	    #tar.extractall(path=reception)
-	    #tar.close()
-
-        # Initial event for preparation of IP in zone2
+         
+        else:
+            print 'upload'
+            print context["ip_uuid"]
+            uploadlink = Parameter.objects.get(entity='preservation_organization_url').value
+            ruser = Parameter.objects.get(entity='preservation_organization_receiver').value
+            rpass = ruser                   
+            requests_session =  _initialize_requests_session(ruser, rpass, cert_verify=False, disable_warnings=True)           
+            uploadclient = UploadChunkedRestClient(requests_session,uploadlink)                
+            src_file = os.path.join(context["iplocation"],context["filename"])
+            uploadclient.upload(src_file, context["ip_uuid"])
+            
+           
         eventType = 20000   # type of event
         eventDetail = 'Created log circular'  # event detail
         state = "Received"  # state
-        progress = 100  # progress  
-
+        progress = 100  # progress                              
         ##### zone2 end #####
                     
     # creation timestamp regardless zone
@@ -650,7 +669,16 @@ def prepareIP( agent, contextdata ):
     # return status
     return ip, 0, "Ok"
 
-
+'''request sessions for upload client'''
+def _initialize_requests_session(ruser, rpass, cert_verify=True, disable_warnings=False):
+    if disable_warnings == True:
+        from requests.packages.urllib3.exceptions import InsecureRequestWarning, InsecurePlatformWarning
+        requests.packages.urllib3.disable_warnings(InsecurePlatformWarning)
+        requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+    requests_session = requests.Session()
+    requests_session.verify = cert_verify
+    requests_session.auth = (ruser, rpass)
+    return requests_session
 
 ###############################################
 "Create information package (IP)"

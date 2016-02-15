@@ -47,6 +47,7 @@ urlpatterns = patterns('',
     url(r'^configuration/logevents/install_defaultschemas$', 'configuration.views.installdefaultschemaprofiles'),
     url(r'^configuration/logevents/install_defaultparameters$', 'configuration.views.installdefaultparameters'),
     url(r'^configuration/logevents/install_defaultusers$', 'configuration.views.createdefaultusers'),
+    url(r'^upload$', 'logevents.views.upload'),
     #url(r'^configuration/logevents/install_defaultadditionalmetadata$', 'configuration.views.installAdditionalMetadata'),
     #url(r'^configuration/logevents/add$', 'configuration.views.newlogevent'),
     #url(r'^configuration/logevents/(?P<eventId>\d+)$', 'configuration.views.editlogevent' ),
@@ -95,6 +96,7 @@ urlpatterns = patterns('',
     url(r'^logevents/view/(?P<uuid>[^//]+)/(?P<archivist_organization>[^//]+)/(?P<label>[^//]+)/(?P<iptype>[^//]+)/(?P<createdate>[^//]+)$', 'logevents.views.viewlog'),    url(r'^logevents/out$', 'logevents.views.listlog'),
     #url(r'^logevents/view$', 'logevents.views.viewlog'),
 #    url(r'^logevents/(?P<id>\d+)$', 'logevents.views.viewlog'), ##
+    url(r'^upload$', 'logevents.views.upload'),
         
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),

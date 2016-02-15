@@ -737,3 +737,13 @@ def _initialize_requests_session(ruser, rpass, cert_verify=True, disable_warning
     requests_session.verify = cert_verify
     requests_session.auth = (ruser, rpass)
     return requests_session        
+
+
+
+
+@login_required
+def upload(request):
+    # Get current site_profile and zone
+    t = loader.get_template('logevents/upload.html')
+    c = RequestContext(request)
+    return HttpResponse(t.render(c))

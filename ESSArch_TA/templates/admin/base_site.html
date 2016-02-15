@@ -89,13 +89,19 @@
 	</ul>
     </li>
     {% endif %}
+    <li>
+        <a href="#vertical" class="sf-with-ul" title="Upload" >{% trans 'UPLOAD' %}</a>
+        <ul>
+			<li><a href="/upload">Upload IPs</a></li>
+		</ul>
+	</li>  
 	<li>
-            <a href="#vertical" class="sf-with-ul" title="Help" >{% trans 'HELP' %}</a>
-            <ul>
-                <li><a href="/about">About</a></li>
-            </ul>
-            </li>   
-            </ul>
+		<a href="#vertical" class="sf-with-ul" title="Help" >{% trans 'HELP' %}</a>
+		<ul>
+			<li><a href="/about">About</a></li>
+		</ul>
+	</li>       
+    </ul>
 </div>
 {% endblock %}
 
