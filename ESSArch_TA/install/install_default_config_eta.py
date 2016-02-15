@@ -63,7 +63,8 @@ def installdefaultparameters(): # default config parameters
              'preservation_descriptionfile':'premis.xml',
              'ip_logfile':'log.xml',
              'mimetypes_definition':'mime.types',
-             'preservation_organization_url':'www.essolutions.se',
+             'preservation_organization_url':'archive.xxx',
+             'preservation_organization_receiver':'repp',
              'preservation_email_receiver':'receiver@archive.xxx',
              }
 
@@ -77,7 +78,8 @@ def installdefaultparameters(): # default config parameters
               'preservation_descriptionfile':'premis.xml',
               'ip_logfile':'log.xml',
               'mimetypes_definition':'mime.types',
-              'preservation_organization_url':'www.essolutions.se',
+              'preservation_organization_url':'archive.xxx',
+              'preservation_organization_receiver':'repp',
               'preservation_email_receiver':'receiver@archive.xxx',
               }
 
@@ -145,6 +147,16 @@ def createdefaultusers(): # default users, groups and permissions
     mygroup.permissions.clear()
     mygroup.permissions = [can_add_log_entry, can_change_log_entry, can_delete_log_entry, can_view_log_menu]
     
+    # create ETA reciever for file upload
+    try:
+        myuser = User.objects.get(username='reta')
+    except User.DoesNotExist:
+        myuser = User.objects.create_user('reta', 'reta@essolution.se', 'reta')
+    mygroup, created = Group.objects.get_or_create(name='Zone2')
+    myuser.groups.add(mygroup)
+    mygroup.permissions.clear()
+    mygroup.permissions = [can_add_log_entry, can_change_log_entry, can_delete_log_entry, can_view_log_menu]
+
     return 0
     
 
