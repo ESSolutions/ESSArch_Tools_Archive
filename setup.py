@@ -46,7 +46,7 @@ if __name__ == '__main__':
     cmdclass=versioneer.get_cmdclass()
     cmdclass.update({'install': my_install})
     setup(
-        name='ESSArch_TP',
+        name='ESSArch_TA',
         version=versioneer.get_version(),
         description='ESSArch Tools Producer',
         author='Bjorn Skog',

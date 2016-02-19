@@ -47,7 +47,7 @@ if DEV:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3', 	# Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': SITE_ROOT+'/tools_dev.db', 		# development path to database file if using sqlite3.
+            'NAME': '/ESSArch/eta/tools_dev.db', 		# development path to database file if using sqlite3.
             'USER': '',                      		# Not used with sqlite3.
             'PASSWORD': '',                  		# Not used with sqlite3.
             'HOST': '',                      		# Set to empty string for localhost. Not used with sqlite3.
@@ -58,7 +58,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3', 	# Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': SITE_ROOT+'/tools.db',      	# production path to database file if using sqlite3.
+            'NAME': '/ESSArch/eta/tools.db',      	# production path to database file if using sqlite3.
             'USER': '',                             	# Not used with sqlite3.
             'PASSWORD': '',                         	# Not used with sqlite3.
             'HOST': '',                             	# Set to empty string for localhost. Not used with sqlite3.
@@ -220,8 +220,10 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'configuration',
     'ip',
-     'chunked_upload',
-    'logevents'
+    'chunked_upload',
+    'logevents',
+    'receive',
+    'transfer',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
@@ -365,6 +367,6 @@ LOGGING = {
 }
 
 try:
-    from local_settings import *
+    from local_eta_settings import *
 except ImportError, exp:
     pass

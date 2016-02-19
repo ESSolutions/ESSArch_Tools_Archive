@@ -95,6 +95,9 @@ def listlog(request):
     # if zone3 add user home directories to path etccontrolarea/create.html
     if zone == 'zone3' :
         logfilepath = logfilepath +'/'+ str(request.user)
+    elif zone == 'zone2':
+        logfilepath = Path.objects.get(entity="path_ingest_reception").value
+        print 'logfilepath: %s' % logfilepath
         
     # need to search through all log files to find the one that we want
     templatefile_log = Parameter.objects.get(entity="ip_logfile").value
@@ -152,6 +155,9 @@ def viewlog(request, uuid, archivist_organization, label, iptype, createdate):
     # if zone3 add user home directories to path etc
     if zone == 'zone3' :
         logfilepath = logfilepath +'/'+ str(request.user)
+    elif zone == 'zone2':
+        logfilepath = Path.objects.get(entity="path_ingest_reception").value
+        print 'logfilepath: %s' % logfilepath
     
     # need to search through all log files to find the one that we want
     templatefile_log = Parameter.objects.get(entity="ip_logfile").value
@@ -294,7 +300,8 @@ def createlog(request):
                     logger.error(why)
                     c = { 'message': why }
                     c.update(csrf(request))
-		    logger.error('Could not prepare package IP %s and create log file at gate %s' % (ip.label,ip.directory))
+                    #logger.error('Could not prepare package IP %s and create log file at gate %s' % (ip.label,ip.directory))
+                    logger.error('Could not prepare package IP %s and create log file at gate' % (fil[ "ip_label" ]))
                     return render_to_response('status.html', c, context_instance=RequestContext(request) )
                 else:
                     logger.info('Successfully prepared package IP %s and created log file at gate' % ip.label)

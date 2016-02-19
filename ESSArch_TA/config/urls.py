@@ -32,6 +32,10 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    # Receive URLs:
+    url(r'^receive/', include('receive.urls')),
+    url(r'^transfer/', include('transfer.urls')),
+    
     # Configuration URLS:
     url(r'^$', 'configuration.views.index', name='home'),
     #url(r'^logout$', 'configuration.views.logout_view'),

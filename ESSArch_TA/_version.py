@@ -14,8 +14,8 @@ git_full = "$Format:%H$"
 
 # these strings are filled in when 'setup.py versioneer' creates _version.py
 tag_prefix = ""
-parentdir_prefix = "ESSArch_EPP-"
-versionfile_source = "ESSArch_EPP/_version.py"
+parentdir_prefix = "ESSArch_TA-"
+versionfile_source = "ESSArch_TA/_version.py"
 
 import os, sys, re, subprocess, errno
 

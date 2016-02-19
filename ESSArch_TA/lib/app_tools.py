@@ -30,6 +30,7 @@ import os, sys, pytz, datetime, uuid, mimetypes, stat, hashlib, tarfile, time, s
 
 # import the logging library and get an instance of a logger
 import logging
+from jobtastic.states import PROGRESS
 logger = logging.getLogger('code.exceptions')
 
 # own models etc
@@ -395,6 +396,297 @@ def prepareIP( agent, contextdata ):
     site_profile, zone = getSiteZone()
 
     # get template files
+    templatefile_log = Parameter.objects.get(entity="ip_logfile").value
+    templatefile_cspec = Parameter.objects.get(entity="content_descriptionfile").value
+    templatefile_pspec = Parameter.objects.get(entity="package_descriptionfile").value
+    
+    # need to find out path to log files
+    logfilepath = getLogFilePath()
+
+    ##### zone1 #####
+    
+    # create related metadata for zone1
+    if zone == 'zone1' :
+
+        # get data from form
+        try:
+            destinationroot = contextdata["destinationroot"]
+        except:
+            destinationroot = getLogFilePath()
+
+        # Create a new information package folder
+        i = 1
+        while os.path.exists( os.path.join( destinationroot, "ip%d"%i ) ):
+            i+=1
+        root = os.path.join( destinationroot, "ip%d"%i )
+        os.makedirs( root )
+
+        # create IP_UUID sub-folder for the IP
+        ip_uuid =  str( uuid.uuid1())
+        iproot = createIPdirectory(root, ip_uuid)
+        #iproot = createIPdirectory(root, ip_uuid, site_profile)
+
+        # package info type
+        contextdata["iptype"] = 'SIP'
+
+        # create aic_uuid for zone1
+        aic_uuid = ""
+        
+        # initial event for preparation of IP in zone1
+        eventType = 10000   # type of event
+        eventDetail = 'Log circular created'  # event detail
+        state = "Prepared"  # state
+        progress = 100  # progress  
+
+        ##### zone1 end #####
+    
+    ##### zone2 start #####
+
+    # create related metadata for zone2
+    if zone == 'zone2':
+
+        # path to reception
+        reception = Path.objects.get(entity="path_ingest_prepare").value
+
+        # keep track of error descriptions etc
+        status_list = []
+        error_list = []
+        status_code = 0
+
+        # parse context from specification file
+        #filename = contextdata["sourceroot"]+'/'+templatefile_pspec
+        filename = contextdata["filename"]
+        if os.path.exists(filename):
+            context = ParseSpecFile(filename)
+        else:
+            status_code = 201
+            error_list.append('Package description file %s does not exist' % filename)
+            return 1, status_code, error_list
+        
+        # if asked for validate inner mets-file
+        if contextdata["package_description"] == 'Yes':
+            XMLSchema = SchemaProfile.objects.get(entity='mets_schemalocation').value
+            errno, why = validate(FILENAME=filename, XMLSchema=XMLSchema)
+            if errno:
+                status_code = 202
+                error_list.append('Could not validate package description file %s Reason: %s' % (filename, why))
+            else:
+                status_list.append('Successfully validated package description file %s' % filename)
+                
+        # if asked for validate logical and physical representation of objects 
+        if contextdata["package_content"] == 'Yes':
+            # define checksum algoritm, timezone etc
+            if site_profile == 'SE' :
+                checksumtype = 1 # MD5
+                checksumalgoritm = 'MD5'
+                TimeZone = 'Europe/Stockholm'
+                
+            if  site_profile == 'NO' : 
+                checksumtype = 2 # SHA256
+                checksumalgoritm = 'SHA-256'
+                TimeZone = 'Europe/Stockholm'
+                
+            ObjectIdentifierValue = context['ip_uuid']  
+            #ObjectPath = contextdata["sourceroot"]
+            ObjectPath = contextdata["iplocation"]
+            checksumtype_default = checksumalgoritm
+            METS_ObjectPath = filename
+            errno, result, reslist = DiffCheck_IP(ObjectIdentifierValue, ObjectPath, METS_ObjectPath, TimeZone, checksumtype_default)
+            result_sum = len(reslist[0]) + len(reslist[1]) + len(reslist[2]) + len(reslist[3]) + len(reslist[4]) + len(reslist[5])
+            if result_sum != len(reslist[0]):
+                status_code = 203
+                error_list.append('Physical files mismatch the logical representation of content description file %s Reason: %s' % (METS_ObjectPath, result[0]))
+            else:
+                status_list.append('Physical files match the logical representation of content description file %s' % METS_ObjectPath)
+ 
+        # TODO dev validation
+        # if asked for validate delivery type specification file
+        #if contextdata["deliverytype_description"] == 'Yes':
+        #    # parse deliverytype from spec file
+        #    if context["deliverytype"] == "ERMS":
+        #        XMLSchema = SchemaProfile.objects.get(entity='erms_schemalocation').value
+        #    if context["deliverytype"] == "Personnel":
+        #        XMLSchema = SchemaProfile.objects.get(entity='personnel_schemalocation').value
+        #    
+        #     validate spec file
+        #    errno, why = validate(FILENAME=filename, XMLSchema=XMLSchema)
+        #    if errno:
+        #        status_code = 204
+        #        error_list.append('Could not validate package description file %s Reason: %s' % (filename, why))
+        #    else:
+        #        status_list.append('Successfully validated package description file %s' % filename)
+
+        # if we had any errors log them
+        if status_code == 0:
+            for stat in status_list:
+                logger.info(stat)
+        else: 
+            for err in error_list:
+                logger.error(err)
+            return 1, status_code, error_list
+       
+        # need to search through all log files to find any duplicates
+        loglist = getLogFiles(logfilepath, templatefile_log)
+        for log in loglist:
+            if log["uuid"] == context["ip_uuid"] :
+                raise Http404
+
+        # package info
+        #contextdata["creator"] = context["ip_creator"]
+        contextdata["archivist_organization"] = context["ip_archivist_organization"]
+        contextdata["label"] = context["ip_label"]
+        #contextdata["startdate"] = context["ip_startdate"]
+        #contextdata["enddate"] = context["ip_enddate"]
+        contextdata["iptype"] = context["ip_type"]
+        contextdata["createdate"] = context["ip_createdate"]
+
+        # create ip_uuid
+        if context["ip_uuid"][:5] == 'UUID:' or context["ip_uuid"][:5] == 'RAID:' : 
+            ip_uuid = context["ip_uuid"][5:]
+        else :
+            ip_uuid = context["ip_uuid"]
+
+        remote_server_string = Parameter.objects.get(entity='preservation_organization_receiver').value
+        remote_server = remote_server_string.split(',')
+        if len(remote_server) == 3:
+            remote_flag = True
+        else:
+            remote_flag = False
+        
+        if not remote_flag:
+            # create aic_uuid
+            try :
+                aic_uuid = context["aic_uuid"]
+            except:
+                aic_uuid = str(uuid.uuid1())
+    
+            # create AIC_UUID directory
+            root = createAICdirectory( logfilepath, aic_uuid )
+    
+            # create IP_UUID directory
+            iproot = createIPdirectory( root, ip_uuid )
+            
+            # copy specfile from source to destination
+            src_specfile = filename
+            dst_specfile = root+'/'+templatefile_pspec
+            #shutil.copy(src_specfile, dst_specfile)
+            shutil.move(src_specfile, dst_specfile)
+    
+            # copy IP from source to destination
+            if site_profile == 'SE':
+                #src_ipfile = contextdata["sourceroot"]+'/'+ip_uuid+'.tar'
+                src_ipfile = contextdata["iplocation"]+'/'+ip_uuid+'.tar'
+                dst_ipfile = root+'/'+ip_uuid +'/content/'+ip_uuid+'.tar'
+                dst1_ipfile = reception+'/'+ip_uuid+'.tar'
+                shutil.copy(src_ipfile, dst_ipfile)
+                shutil.copy(src_ipfile, dst1_ipfile)
+    
+            # copy IP from source to destination
+            if site_profile == 'NO':
+                #src_ipfile = contextdata["sourceroot"]+'/'+ip_uuid+'.tar'
+                src_ipfile = contextdata["iplocation"]+'/'+ip_uuid+'.tar'
+                dst_ipfile = root+'/'+ip_uuid +'/content/'+ip_uuid+'.tar'
+                dst1_ipfile = reception+'/'+ip_uuid+'.tar'
+                shutil.copy(src_ipfile, dst_ipfile)
+                shutil.copy(src_ipfile, dst1_ipfile)
+    	    # unpack IP at prepare area
+    	    #tar = tarfile.open(dst1_ipfile)
+    	    #tar.extractall(path=reception)
+    	    #tar.close()
+     
+            # Initial event for preparation of IP in zone2
+            contextdata["aic_uuid"] = aic_uuid         
+        else:
+            print 'upload ip_uuid: %s' % ip_uuid
+            # init uploadclient
+            base_url, ruser, rpass = remote_server
+            upload_rest_endpoint = urljoin(base_url, '/api/create_gatearea_upload')        
+            requests_session =  _initialize_requests_session(ruser, rpass, cert_verify=False, disable_warnings=True)           
+            uploadclient = UploadChunkedRestClient(requests_session, upload_rest_endpoint)                
+            # upload specification file
+            src_file = os.path.join(contextdata["iplocation"],contextdata["filename"])
+            uploadclient.upload(src_file, ipuuid=ip_uuid)
+
+        eventType = 20000   # type of event
+        eventDetail = 'Created log circular'  # event detail
+        state = "Received"  # state
+        progress = 100  # progress                              
+        ##### zone2 end #####
+                    
+    # creation timestamp regardless zone
+    create_time = utils.creation_time('Europe/Stockholm')
+            
+    # common package info regardless zone
+    contextdata["site_profile"] = site_profile
+    contextdata["ip_uuid"] = ip_uuid
+    contextdata["createdate"] = create_time
+    contextdata["creation_time"] = create_time
+    
+    # schema profile regardless zone
+    contextdata["premis_namespace"] = SchemaProfile.objects.get(entity='premis_namespace').value 
+    contextdata["xsi_namespace"] = SchemaProfile.objects.get(entity='xsi_namespace').value
+    contextdata["xlink_namespace"] = SchemaProfile.objects.get(entity='xlink_namespace').value
+    contextdata["premis_schemalocation"] = SchemaProfile.objects.get(entity='premis_schemalocation').value
+    contextdata["premis_version"] = SchemaProfile.objects.get(entity='premis_version').value
+
+    # event regardless zone
+    contextdata["eventIdentifierValue"] = str(uuid.uuid1())  # create unique event_uuid
+#    contextdata["eventType"] = LogEvent.objects.get(eventType=eventType).eventType  # event code 
+#    contextdata["eventDetail"] = LogEvent.objects.get(eventType=eventType).eventDetail  # event detail
+    contextdata["eventType"] = eventType  # event code 
+    contextdata["eventDetail"] = eventDetail  # event detail
+    contextdata["eventOutcome"] = 0  # status = Ok 
+    contextdata["eventOutcomeDetailNote"] = "Success to create logfile"  # comments
+    contextdata["linkingAgentIdentifierValue"] = agent   # agent e.q user str(request.user) 
+    contextdata["linkingObjectIdentifierValue"] = ip_uuid  # ipuuid
+                
+    # render template logfile
+    t = loader.get_template( "xml/"+templatefile_log )
+  
+    # create log.xml and place it in IP folder
+    if not remote_flag:
+        logfilename = os.path.join(iproot, templatefile_log)
+    else:
+        logfilename = os.path.join(contextdata["iplocation"], templatefile_log)
+    logXML = open( logfilename, "w" )
+    
+    if remote_flag:
+        # upload log file
+        uploadclient.upload(logfilename, ipuuid=ip_uuid)
+        
+    # write context to logfile
+    c = Context(contextdata)
+    logXML.write( t.render( c ).encode( "utf-8" ) )
+    logXML.close()
+ 
+    # everything is created in the filesystem, so now we create
+    # a database entry for this IP
+    ip = InformationPackage( archivist_organization = contextdata["archivist_organization"],
+                             label = contextdata["label"],
+                             #startdate = contextdata["startdate"],
+                             #enddate = contextdata["enddate"],
+                             createdate = contextdata["createdate"],
+                             iptype = contextdata["iptype"],
+                             uuid = ip_uuid,
+                             directory = root,
+                             site_profile = site_profile,
+                             state = state,
+                             zone = zone,
+                             progress = progress )
+    ip.save()
+        
+    # return status
+    return ip, 0, "Ok"
+
+def receiveIP( agent, contextdata ):
+    version = 'ET090'
+    logger.debug('%s Entered receiveIP' % version) # debug info
+    logger.info('Receive IP') # info for logfile
+    
+    # get current site_profile and zone
+    site_profile, zone = getSiteZone()
+
+    # get template files
     parameters = Parameter.objects.all()
     templatefile_log = parameters.get(entity="ip_logfile").value
     templatefile_cspec = parameters.get(entity="content_descriptionfile").value
@@ -490,7 +782,7 @@ def prepareIP( agent, contextdata ):
             #ObjectPath = contextdata["sourceroot"]
             ObjectPath = contextdata["iplocation"]
             checksumtype_default = checksumalgoritm
-            METS_ObjectPath = filenamePath.objects.get(entity="path_ingest_reception").value 
+            METS_ObjectPath = filename
             errno, result, reslist = DiffCheck_IP(ObjectIdentifierValue, ObjectPath, METS_ObjectPath, TimeZone, checksumtype_default)
             result_sum = len(reslist[0]) + len(reslist[1]) + len(reslist[2]) + len(reslist[3]) + len(reslist[4]) + len(reslist[5])
             if result_sum != len(reslist[0]):
@@ -540,26 +832,32 @@ def prepareIP( agent, contextdata ):
         contextdata["iptype"] = context["ip_type"]
         contextdata["createdate"] = context["ip_createdate"]
 
-        if Parameter.objects.get(entity= 'upload_to_EPP').value == False:
-    
+        # create ip_uuid
+        if context["ip_uuid"][:5] == 'UUID:' or context["ip_uuid"][:5] == 'RAID:' : 
+            ip_uuid = context["ip_uuid"][5:]
+        else :
+            ip_uuid = context["ip_uuid"]
+        
+        '''
+        remote_server_string = Parameter.objects.get(entity='preservation_organization_receiver').value
+        remote_server = remote_server_string.split(',')
+        if len(remote_server) == 3:
+            remote_flag = True
+        else:
+            remote_flag = False
+        
+        if not remote_flag:
             # create aic_uuid
             try :
                 aic_uuid = context["aic_uuid"]
             except:
                 aic_uuid = str(uuid.uuid1())
-                    
-            # create ip_uuid
-            if context["ip_uuid"][:5] == 'UUID:' or context["ip_uuid"][:5] == 'RAID:' : 
-                ip_uuid = context["ip_uuid"][5:]
-            else :
-                ip_uuid = context["ip_uuid"]
     
             # create AIC_UUID directory
             root = createAICdirectory( logfilepath, aic_uuid )
     
             # create IP_UUID directory
             iproot = createIPdirectory( root, ip_uuid )
-            #iproot = createIPdirectory( root, ip_uuid, site_profile )
             
             # copy specfile from source to destination
             src_specfile = filename
@@ -584,26 +882,24 @@ def prepareIP( agent, contextdata ):
                 dst1_ipfile = reception+'/'+ip_uuid+'.tar'
                 shutil.copy(src_ipfile, dst_ipfile)
                 shutil.copy(src_ipfile, dst1_ipfile)
-    	    # unpack IP at prepare area
-    	    #tar = tarfile.open(dst1_ipfile)
-    	    #tar.extractall(path=reception)
-    	    #tar.close()
+            # unpack IP at prepare area
+            #tar = tarfile.open(dst1_ipfile)
+            #tar.extractall(path=reception)
+            #tar.close()
      
             # Initial event for preparation of IP in zone2
-
-         
+            contextdata["aic_uuid"] = aic_uuid
         else:
-            print 'upload'
-            print context["ip_uuid"]
-            uploadlink = Parameter.objects.get(entity='preservation_organization_url').value
-            ruser = Parameter.objects.get(entity='preservation_organization_receiver').value
-            rpass = ruser                   
+            print 'upload ip_uuid: %s' % ip_uuid
+            # init uploadclient
+            base_url, ruser, rpass = remote_server
+            upload_rest_endpoint = urljoin(base_url, '/api/create_gatearea_upload')        
             requests_session =  _initialize_requests_session(ruser, rpass, cert_verify=False, disable_warnings=True)           
-            uploadclient = UploadChunkedRestClient(requests_session,uploadlink)                
-            src_file = os.path.join(context["iplocation"],context["filename"])
-            uploadclient.upload(src_file, context["ip_uuid"])
-            
-           
+            uploadclient = UploadChunkedRestClient(requests_session, upload_rest_endpoint)                
+            # upload specification file
+            src_file = os.path.join(contextdata["iplocation"],contextdata["filename"])
+            uploadclient.upload(src_file, ipuuid=ip_uuid)
+        '''
         eventType = 20000   # type of event
         eventDetail = 'Created log circular'  # event detail
         state = "Received"  # state
@@ -615,8 +911,9 @@ def prepareIP( agent, contextdata ):
             
     # common package info regardless zone
     contextdata["site_profile"] = site_profile
-    contextdata["aic_uuid"] = aic_uuid
     contextdata["ip_uuid"] = ip_uuid
+    aic_uuid = str(uuid.uuid1())
+    contextdata["aic_uuid"] = aic_uuid
     contextdata["createdate"] = create_time
     contextdata["creation_time"] = create_time
     
@@ -642,9 +939,17 @@ def prepareIP( agent, contextdata ):
     t = loader.get_template( "xml/"+templatefile_log )
   
     # create log.xml and place it in IP folder
-    logfilename = os.path.join( iproot, templatefile_log )
+    #if not remote_flag:
+    #    logfilename = os.path.join(iproot, templatefile_log)
+    #else:
+    #    logfilename = os.path.join(contextdata["iplocation"], templatefile_log)
+    logfilename = os.path.join(contextdata["iplocation"], templatefile_log)
     logXML = open( logfilename, "w" )
-
+    
+    #if remote_flag:
+    #    # upload log file
+    #    uploadclient.upload(logfilename, ipuuid=ip_uuid)
+        
     # write context to logfile
     c = Context(contextdata)
     logXML.write( t.render( c ).encode( "utf-8" ) )
@@ -659,11 +964,116 @@ def prepareIP( agent, contextdata ):
                              createdate = contextdata["createdate"],
                              iptype = contextdata["iptype"],
                              uuid = ip_uuid,
-                             directory = root,
+                             directory = contextdata["iplocation"],
                              site_profile = site_profile,
                              state = state,
                              zone = zone,
                              progress = progress )
+    ip.save()
+        
+    # return status
+    return ip, 0, "Ok"
+
+def transferIP( agent, contextdata ):
+    version = 'ET090'
+    logger.debug('%s Entered transferIP' % version) # debug info
+    logger.info('Transfer IP') # info for logfile
+    
+    # get current site_profile and zone
+    site_profile, zone = getSiteZone()
+
+    # get template files
+    parameters = Parameter.objects.all()
+    ip_logfile = parameters.get(entity="ip_logfile").value
+    package_descriptionfile = parameters.get(entity="package_descriptionfile").value
+    
+    # get paths
+    path_gate_reception = Path.objects.get(entity="path_gate_reception").value
+    path_ingest_prepare = Path.objects.get(entity="path_ingest_prepare").value
+    
+    # keep track of error descriptions etc
+    status_list = []
+    error_list = []
+    status_code = 0
+
+    # parse context from specification file
+    pspec_filepath = contextdata["filename"]
+    if os.path.exists(pspec_filepath):
+        context = ParseSpecFile(pspec_filepath)
+    else:
+        status_code = 201
+        error_list.append('Package description file %s does not exist' % pspec_filepath)
+        return 1, status_code, error_list
+   
+    # get ip_uuid
+    if context["ip_uuid"][:5] == 'UUID:' or context["ip_uuid"][:5] == 'RAID:' : 
+        ip_uuid = context["ip_uuid"][5:]
+    else :
+        ip_uuid = context["ip_uuid"]
+
+    # get or create aic_uuid
+    try :
+        aic_uuid = context["aic_uuid"]
+    except:
+        aic_uuid = str(uuid.uuid4())
+    
+    # set flag to transfer local or remote
+    remote_server_string = Parameter.objects.get(entity='preservation_organization_receiver').value
+    remote_server = remote_server_string.split(',')
+    if len(remote_server) == 3:
+        remote_flag = True
+    else:
+        remote_flag = False
+    
+    if site_profile == 'SE' or site_profile == 'NO':
+        src_ipfilepath = os.path.join(contextdata["iplocation"], '%s.tar' % ip_uuid)
+        src_logfilepath = os.path.join(contextdata["iplocation"], ip_logfile)
+    
+    if not remote_flag:
+        # create AIC_UUID directory
+        aic_rootpath = createAICdirectory(path_gate_reception, aic_uuid)
+
+        # create IP_UUID directory
+        ip_rootpath = createIPdirectory(aic_rootpath, ip_uuid)
+        
+        # copy specfile from source to destination
+        dst_psspec_filepath = os.path.join(aic_rootpath, package_descriptionfile)
+        shutil.copy(pspec_filepath, dst_psspec_filepath)
+        #shutil.move(pspec_filepath, dst_psspec_filepath)
+
+        # copy IP from source to destination
+        if site_profile == 'SE' or site_profile == 'NO':
+            dst_ipfilepath = os.path.join(os.path.join(ip_rootpath, 'content'), '%s.tar' % ip_uuid)
+            dst1_ipfilepath = os.path.join(path_ingest_prepare, '%s.tar' % ip_uuid)
+            shutil.copy(src_ipfilepath, dst_ipfilepath)
+            shutil.copy(src_ipfilepath, dst1_ipfilepath)
+
+        # copy log file to destination
+        dst_logfilename = os.path.join(ip_rootpath, ip_logfile)
+        shutil.copy(src_logfilepath, dst_logfilename)
+    else:
+        print 'upload ip_uuid: %s' % ip_uuid
+        # init uploadclient
+        base_url, ruser, rpass = remote_server
+        upload_rest_endpoint = urljoin(base_url, '/api/create_gatearea_upload')        
+        requests_session =  _initialize_requests_session(ruser, rpass, cert_verify=False, disable_warnings=True)           
+        uploadclient = UploadChunkedRestClient(requests_session, upload_rest_endpoint)                
+        # upload specification file
+        uploadclient.upload(pspec_filepath, ipuuid=ip_uuid)
+        # upload IP file
+        uploadclient.upload(src_ipfilepath, ipuuid=ip_uuid)
+        # upload log file
+        uploadclient.upload(src_logfilepath, ipuuid=ip_uuid)
+
+    #eventType = 20000   # type of event
+    #eventDetail = 'Created log circular'  # event detail
+    state = "Transmitted"  # state
+    progress = 100  # progress                              
+    
+    # Update database entry for this IP
+    ip = InformationPackage.objects.get(uuid=ip_uuid)
+    ip.state = state
+    ip.progress = progress
     ip.save()
         
     # return status

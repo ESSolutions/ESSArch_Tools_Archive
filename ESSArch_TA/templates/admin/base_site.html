@@ -1,32 +1,21 @@
 {% extends "admin/base.html" %}
+{% load staticfiles %}
 {% load i18n %}
+{% load url from future %}
 
 {% block title %}
 {% trans 'ESSArch Tools for Archive' %}
 {% endblock %}
 
 {% block extrastyle %}
-<link rel="stylesheet" href="/static/esstools.css" type="text/css" media="all" />
-<link rel="stylesheet" href="/static/superfish.css" type="text/css" media="all" />
-<link rel="stylesheet" href="/static/jstree/dist/themes/default/style.min.css" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<link rel="stylesheet" href="/static/superfish.css" type="text/css" media="all" />
+	{% block app-extra-style %}{% endblock %}
+	<link rel="stylesheet" href="/static/esstools.css" type="text/css" media="all" />
 {% endblock %}
 
 {% block extrahead %}
-<script type="text/javascript" src="/static/admin/js/core.js"></script>
-<script type="text/javascript" src="/static/jquery-1.7.2.min.js"></script>
-<!--<script type="text/javascript" src="/static/jquery/jquery-1.11.3.js"></script> -->
-<!-- <script type="text/javascript" src="/static/jquery/jquery-migrate-1.2.1.min.js"></script> -->
-<script type="text/javascript" src="/static/hoverIntent.js"></script>
-<script type="text/javascript" src="/static/superfish.js"></script>
-<script type="text/javascript" src="/static/jstree/dist/jstree.min.js"></script>
-<script type="text/javascript">
-(function($) {
-    $(document).ready(function(){
-        $('ul.sf-menu').superfish();
-    });
-})(jQuery);
-</script>
-
+	{% block app-extrahead %}{% endblock %}
 {% endblock %}
 
 
@@ -51,50 +40,43 @@
 {% endif %}
 
 <div id="smenu">
-	<ul id="contents" class="sf-menu"> 
-	{% if perms.ip.Can_view_ip_menu %}
+	<ul id="contents" class="sf-menu">
 	<li>
-		<a href="#vertical" class="sf-with-ul" title="Manage information packages etc .." >{% trans 'INFORMATION PACKAGE' %}</a>
-		<ul>
-	          {#<li><a href="/prepare/new">Prepare IP</a></li>#}
-	          {#<li><a href="/create">Create IP</a></li>#}
-	          <li><a href="/create/view">Create IP</a></li>
-	      	  <li><a href="/deliver">Deliver IP</a></li>
-		</ul>
-    </li>
-	{% endif %}
-	<li>
-		<a href="#vertical" class="sf-with-ul" title="Manage logevents etc .." >{% trans 'LOG EVENTS' %}</a>
+		<a href="#vertical" class="sf-with-ul" title="Receive information packages etc .." >{% trans 'RECEIVE' %}</a>
     	<ul>
-	          <li><a href="/logevents/list" title="View and add log events" >View log events</a></li>
-			{% if perms.configuration.Can_view_log_menu %}  
-              <li><a href="/logevents/create" title="Receive IP" >Receive IP</a></li>
-			{% endif %}	    
+			<li><a href="/receive/receiveiplist/" title="List information packages to receive" >Receive IP</a></li>
+			{#<li><a href="/upload">Upload IP</a></li>#}
+	    </ul>
+	</li>
+	<li>
+		<a href="#vertical" class="sf-with-ul" title="Manage events etc .." >{% trans 'EVENTS' %}</a>
+    	<ul>
+			<li><a href="/logevents/list" title="View and add log events" >Events IP</a></li>
+	    </ul>
+	</li>
+	<li>
+		<a href="#vertical" class="sf-with-ul" title="Transfer information packages etc .." >{% trans 'TRANSFER' %}</a>
+    	<ul>
+			<li><a href="/transfer/transferiplist/" title="List information packages to transfer" >Transfer IP</a></li>
 	    </ul>
 	</li>
     {% if user.is_staff %}  
     <li> 
-	<a href="/admin" class="sf-with-ul" title="Administrate ESSArch Tools etc .." >MANAGEMENT</a>
-	<ul>
-          <li><a href="/admin/ip/informationpackage/">Information Packages</a></li>
-          <li><a href="/admin/configuration">Configuration</a></li>
-          {#<li><a href="/admin/configuration/parameter/">Parameters</a></li>#}
-          {#<li><a href="/admin/configuration/logevent/">Log Event Types</a></li>#}
-          {#<li><a href="/admin/configuration/schemaprofile/">Schema Profiles</a></li>#}
-          {#<li><a href="/configuration/logevents/install_defaultparameters"><i>Install Default Parameters</a></i></li>#}
-          {#<li><a href="/configuration/logevents/install_defaultadditionalmetadata"><i>Install Default Additional Metadata</a></i></li>#}
-	      {#<li><a href="/configuration/logevents/install_defaultusers"><i>Install Default Users</a></i></li>#}
-          {#<li><a href="/configuration/logevents/install_defaultschemas"><i>Install Default Schema Profiles</a></i></li>#}
-          {#<li><a href="/configuration/logevents/install_defaults"><i>Install Default Log Events</a></i></li>#}
-	</ul>
+		<a href="/admin" class="sf-with-ul" title="Administrate ESSArch Tools etc .." >MANAGEMENT</a>
+		<ul>
+			<li><a href="/admin/ip/informationpackage/">Information Packages</a></li>
+			<li><a href="/admin/configuration">Configuration</a></li>
+			{#<li><a href="/admin/configuration/parameter/">Parameters</a></li>#}
+			{#<li><a href="/admin/configuration/logevent/">Log Event Types</a></li>#}
+			{#<li><a href="/admin/configuration/schemaprofile/">Schema Profiles</a></li>#}
+			{#<li><a href="/configuration/logevents/install_defaultparameters"><i>Install Default Parameters</a></i></li>#}
+			{#<li><a href="/configuration/logevents/install_defaultadditionalmetadata"><i>Install Default Additional Metadata</a></i></li>#}
+			{#<li><a href="/configuration/logevents/install_defaultusers"><i>Install Default Users</a></i></li>#}
+			{#<li><a href="/configuration/logevents/install_defaultschemas"><i>Install Default Schema Profiles</a></i></li>#}
+			{#<li><a href="/configuration/logevents/install_defaults"><i>Install Default Log Events</a></i></li>#}
+		</ul>
     </li>
     {% endif %}
-    <li>
-        <a href="#vertical" class="sf-with-ul" title="Upload" >{% trans 'UPLOAD' %}</a>
-        <ul>
-			<li><a href="/upload">Upload IPs</a></li>
-		</ul>
-	</li>  
 	<li>
 		<a href="#vertical" class="sf-with-ul" title="Help" >{% trans 'HELP' %}</a>
 		<ul>
@@ -105,7 +87,32 @@
 </div>
 {% endblock %}
 
-{% block breadcrumbs %} <br/> {% endblock %}
+<!--
+{% block breadcrumbs %} 
+	<br/> 
+{% endblock %}
+-->
 
+{% block content %}
+    <div id="main-container" class="container">
+    {% block container %}{% endblock %}
+    </div>
+{% endblock %}
 
+{% block extra-script %}
+	<script type="text/javascript" src="/static/admin/js/core.js"></script>
+	<script type="text/javascript" src="/static/jquery-1.7.2.min.js"></script>
+	<!--<script type="text/javascript" src="/static/jquery/jquery-1.11.3.js"></script> -->
+	<!-- <script type="text/javascript" src="/static/jquery/jquery-migrate-1.2.1.min.js"></script> -->
+	<script type="text/javascript" src="/static/hoverIntent.js"></script>
+	<script type="text/javascript" src="/static/superfish.js"></script>
+	<script type="text/javascript">
+		(function($) {
+		    $(document).ready(function(){
+		        $('ul.sf-menu').superfish();
+		    });
+		})(jQuery);
+	</script>
 
+    {% block app-extra-script %}{% endblock %}
+{% endblock %}
