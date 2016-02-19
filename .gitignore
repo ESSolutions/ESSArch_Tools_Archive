@@ -2,6 +2,7 @@
 *.pyo
 *~
 dist/
+ESSArch_TA.egg-info/
 MANIFEST
 .settings/
 tools.db

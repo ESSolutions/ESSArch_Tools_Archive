@@ -48,7 +48,7 @@ if __name__ == '__main__':
     setup(
         name='ESSArch_TA',
         version=versioneer.get_version(),
-        description='ESSArch Tools Producer',
+        description='ESSArch Tools Archive',
         author='Bjorn Skog',
         author_email='info@essolutions.se',
         url='http://www.essolutions.se',
