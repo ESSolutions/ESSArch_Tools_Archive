@@ -55,7 +55,7 @@ def installdefaultparameters(): # default config parameters
 
     # set default parameters according to site_profile SE
     if site_profile == "SE" :
-       dct = {
+        dct = {
              'site_profile':site_profile,
              'zone': zone ,
              'package_descriptionfile':'info.xml',
