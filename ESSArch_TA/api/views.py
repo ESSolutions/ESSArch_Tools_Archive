@@ -30,7 +30,7 @@ import os.path
 import shutil
 from django.views.generic.base import TemplateView
 from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, login_required
 from django.conf import settings
 from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
 from configuration.models import (
@@ -45,7 +45,7 @@ from rest_framework import permissions, views
 class ReceptionUploadView(TemplateView):
     template_name = 'api/reception_upload.html'
 
-    @method_decorator(permission_required('essarch.change_ingestqueue'))
+    @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(ReceptionUploadView, self).dispatch( *args, **kwargs)
 
@@ -91,19 +91,13 @@ class CreateReceptionUploadCompleteView(views.APIView, ChunkedUploadCompleteView
 
         # Create a new information package folder ready for deliver
         ip_path = os.path.join( eft_path, ip_uuid)
-        print 'ippath'
-        print ip_path
+        dest_file_path = os.path.join(ip_path, chunked_upload.filename)
+
         if os.path.exists(ip_path):
-            print 'path exists'
-            shutil.move(tmp_file_path, ip_path)
-            print 'file moved'
-            
+            shutil.move(tmp_file_path, dest_file_path)
         else:
-            print 'path vill be created'
             os.makedirs(ip_path)
-            print 'file will be moved'
-            shutil.move(tmp_file_path, ip_path)
-            print 'file moved'
+            shutil.move(tmp_file_path, dest_file_path)
 
         chunked_upload.delete(delete_file=True)
 

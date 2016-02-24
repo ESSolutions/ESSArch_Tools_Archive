@@ -1,6 +1,4 @@
 {% extends 'admin/base_site.html' %}
-{% load dictionary_extras %}
-{% load js staticfiles%}
 {% load url from future %}
 
 {% block server-side-base %}active{% endblock %}
@@ -19,14 +17,13 @@
 {% endblock %}
 
 {% block app-extra-script %}
-	<!--  {% js "api/js/jquery.js" %} -->
-	{% js "api/js/jquery.ui.widget.js" %}
-	<!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
-	{% js "api/js/jquery.iframe-transport.js" %}
-	<!-- The basic File Upload plugin -->
-	{% js "api/js/jquery.fileupload.js" %}
-	<!-- Calculate md5 -->
-	{% js "api/js/spark-md5.js" %}
+        <script type="text/javascript" src="/static/api/js/jquery.ui.widget.js"></script>
+        <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+        <script type="text/javascript" src="/static/api/js/jquery.iframe-transport.js"></script>
+        <!-- The basic File Upload plugin -->
+        <script type="text/javascript" src="/static/api/js/jquery.fileupload.js"></script>
+        <!-- Calculate md5 -->
+        <script type="text/javascript" src="/static/api/js/spark-md5.js"></script>
 	
   <script type="text/javascript">
     var md5 = "",
