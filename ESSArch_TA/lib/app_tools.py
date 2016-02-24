@@ -1011,12 +1011,6 @@ def transferIP( agent, contextdata ):
     else :
         ip_uuid = context["ip_uuid"]
 
-    # get or create aic_uuid
-    try :
-        aic_uuid = context["aic_uuid"]
-    except:
-        aic_uuid = str(uuid.uuid4())
-    
     # set flag to transfer local or remote
     remote_server_string = Parameter.objects.get(entity='preservation_organization_receiver').value
     remote_server = remote_server_string.split(',')
@@ -1028,6 +1022,13 @@ def transferIP( agent, contextdata ):
     if site_profile == 'SE' or site_profile == 'NO':
         src_ipfilepath = os.path.join(contextdata["iplocation"], '%s.tar' % ip_uuid)
         src_logfilepath = os.path.join(contextdata["iplocation"], ip_logfile)
+
+    # get or create aic_uuid
+    try :
+        ip_metadata = getLogMetadata(src_logfilepath)
+        aic_uuid = ip_metadata['aic_object']
+    except:
+        aic_uuid = str(uuid.uuid4())
     
     if not remote_flag:
         # create AIC_UUID directory
@@ -1052,18 +1053,19 @@ def transferIP( agent, contextdata ):
         dst_logfilename = os.path.join(ip_rootpath, ip_logfile)
         shutil.copy(src_logfilepath, dst_logfilename)
     else:
-        print 'upload ip_uuid: %s' % ip_uuid
+        path = os.path.join(aic_uuid, ip_uuid)
+        print 'upload path: %s' % path
         # init uploadclient
         base_url, ruser, rpass = remote_server
         upload_rest_endpoint = urljoin(base_url, '/api/create_gatearea_upload')        
         requests_session =  _initialize_requests_session(ruser, rpass, cert_verify=False, disable_warnings=True)           
         uploadclient = UploadChunkedRestClient(requests_session, upload_rest_endpoint)                
         # upload specification file
-        uploadclient.upload(pspec_filepath, ipuuid=ip_uuid)
+        uploadclient.upload(pspec_filepath, path=path)
         # upload IP file
-        uploadclient.upload(src_ipfilepath, ipuuid=ip_uuid)
+        uploadclient.upload(src_ipfilepath, path=path)
         # upload log file
-        uploadclient.upload(src_logfilepath, ipuuid=ip_uuid)
+        uploadclient.upload(src_logfilepath, path=path)
 
     #eventType = 20000   # type of event
     #eventDetail = 'Created log circular'  # event detail
