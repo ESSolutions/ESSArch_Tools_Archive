@@ -32,11 +32,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Receive URLs:
-    url(r'^receive/', include('receive.urls')),
-    url(r'^transfer/', include('transfer.urls')),
-    
-    # Configuration URLS:
+    # Standard URLS:
     url(r'^$', 'configuration.views.index', name='home'),
     #url(r'^logout$', 'configuration.views.logout_view'),
     url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}),
@@ -44,8 +40,14 @@ urlpatterns = patterns('',
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'} ),
     url(r'^admin/logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'} ),
     url(r'^changepassword$', 'configuration.views.change_password'),
+    
+    # URLS to include:
+    url(r'^receive/', include('receive.urls')),
+    url(r'^transfer/', include('transfer.urls')),
+    url(r'^api/', include('api.urls')),
+    
+    # Configuration URLS:
     url(r'^about$', 'configuration.views.sysinfo'),    
-
     #url(r'^configuration/logevents$', 'configuration.views.logevents'),
     url(r'^configuration/logevents/install_defaults$', 'configuration.views.installogdefaults'),
     url(r'^configuration/logevents/install_defaultschemas$', 'configuration.views.installdefaultschemaprofiles'),
@@ -96,10 +98,10 @@ urlpatterns = patterns('',
     url(r'^eta_upload_complete/?$', ETAUploadCompleteView.as_view(), name='eta_chunked_upload_complete'),     
     url(r'^logevents/list$', 'logevents.views.listlog'),
     #url(r'^logevents/view/(?P<uuid>[^//]+)/(?P<creator>[^//]+)/(?P<system>[^//]+)/(?P<version>[^//]+)$', 'logevents.views.viewlog'),
-#    url(r'^logevents/view/(?P<uuid>[^//]+)/(?P<archivist_organization>[^//]+)/(?P<label>[^//]+)/(?P<startdate>[^//]+)/(?P<enddate>[^//]+)/(?P<iptype>[^//]+)/(?P<createdate>[^//]+)$', 'logevents.views.viewlog'),
+    #url(r'^logevents/view/(?P<uuid>[^//]+)/(?P<archivist_organization>[^//]+)/(?P<label>[^//]+)/(?P<startdate>[^//]+)/(?P<enddate>[^//]+)/(?P<iptype>[^//]+)/(?P<createdate>[^//]+)$', 'logevents.views.viewlog'),
     url(r'^logevents/view/(?P<uuid>[^//]+)/(?P<archivist_organization>[^//]+)/(?P<label>[^//]+)/(?P<iptype>[^//]+)/(?P<createdate>[^//]+)$', 'logevents.views.viewlog'),    url(r'^logevents/out$', 'logevents.views.listlog'),
     #url(r'^logevents/view$', 'logevents.views.viewlog'),
-#    url(r'^logevents/(?P<id>\d+)$', 'logevents.views.viewlog'), ##
+    #url(r'^logevents/(?P<id>\d+)$', 'logevents.views.viewlog'), ##
     url(r'^upload$', 'logevents.views.upload'),
         
     # Uncomment the next line to enable the admin:

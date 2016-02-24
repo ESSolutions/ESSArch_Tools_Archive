@@ -195,6 +195,17 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     #'django.core.context_processors.request',
 )
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        #'rest_framework_filters.backends.DjangoFilterBackend',
+        'rest_framework.filters.DjangoFilterBackend',
+    ),
+}
+
 ROOT_URLCONF = 'config.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
@@ -224,6 +235,7 @@ INSTALLED_APPS = (
     'logevents',
     'receive',
     'transfer',
+    'api',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
