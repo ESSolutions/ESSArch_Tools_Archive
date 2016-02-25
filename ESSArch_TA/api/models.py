@@ -95,13 +95,13 @@ class BaseChunkedUpload(models.Model):
     class Meta:
         abstract = True
 
-from django.db import ProgrammingError
+from django.db import ProgrammingError, OperationalError
 from configuration.models import Path
 
 # GateareUpload
 try:
     Reception_upload_root =  Path.objects.get(entity='path_ingest_reception').value
-except (Path.DoesNotExist, ProgrammingError) as e:
+except (Path.DoesNotExist, ProgrammingError, OperationalError) as e:
     Reception_upload_root = settings.MEDIA_ROOT
 
 def Reception_filename(instance, filename):
