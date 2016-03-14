@@ -1,4 +1,4 @@
-# ETA (ESSArch tools archive)
+# ETA (ESSArch Tools Archive)
 
 SIP receiving tools for archives.
 
@@ -109,7 +109,7 @@ Add the following rows to /home/arch/.bash_profile:
 ### ETA installation script
 
     Change to user "arch" with the following command.
-    # su  arch
+    # su - arch
 
     Download and extract ESSArch_TA_install tarfile.
     [arch@server ~]$ wget http://xxx.xxx.xxx.xxx/ESSArch_TA_installer_xxxxxxxxxxxx.tar.gz
@@ -118,7 +118,7 @@ Add the following rows to /home/arch/.bash_profile:
     [arch@server ~]$ ./install
     
     The installation of ESSArch is now running and dependent on hardware configuration, the installation may take some time. To see details of the installation progress please start a new terminal window and run the following command.
-    [arch@server ~]$ tail f /ESSArch/install.log
+    [arch@server ~]$ tail -f /ESSArch/install.log
     
     When installation is finished, search in the log file /ESSArch/install.log for any unexpected errors indicating failure of installation of any modules.
 
@@ -129,7 +129,7 @@ ESSArch is designed to be AMQP (Advanced Message Queuing Protocol) independent. 
 Follow the instructions below in order to install RabbitMQ required by ESSArch.
 
     Please run the following commands as root user.
-    # rpm i /ESSArch/install/packages/rabbitmq-server.rpm
+    # rpm -i /ESSArch/install/packages/rabbitmq-server.rpm
     # chkconfig rabbitmq-server on
     # service rabbitmq-server start
 
@@ -233,7 +233,7 @@ By default, for test purpose, the installation has configured the following user
 
 | **Username** | **Password** | **Role/Permissions** |
 | --- | --- | --- |
-| usr1 | usr1 | prepare, create, submit |
+| usr2 | usr2 | receive, events, transfer |
 | admin | admin | admin |
 
 ## Important files to backup
@@ -244,22 +244,22 @@ Everything in the file area /ESSArch should be backed up before and after config
 
 Areas that need to be backed up to an external "backup system" daily is the following:
 
-- --/ESSArch/eta
-- --/ESSArch/backups_mysql
-- --/ESSArch/config
-- --/ESSArch/log
-- --/ESSArch/data
+- /ESSArch/eta
+- /ESSArch/backups_mysql
+- /ESSArch/config
+- /ESSArch/log
+- /ESSArch/data
 
 ##Events and log information
 
 Different types of events are logged both in physical files and tables in ESSArch database. Log entries are tagged with the log level - Debug, Critical, Error, Warning, Info. These log levels can be felt by the ETA's system logs:
 
-/ESSArch/log
-/ESSArch/log/celerybeat.log
-/ESSArch/log/celery_worker1.log
-/ESSArch/log/httpd_access.log
-/ESSArch/log/httpd_error.log
-/ESSArch/log/httpd_ssl_request.log
+- /ESSArch/log
+- /ESSArch/log/celerybeat.log
+- /ESSArch/log/celery_worker1.log
+- /ESSArch/log/httpd_access.log
+- /ESSArch/log/httpd_error.log
+- /ESSArch/log/httpd_ssl_request.log
 
 # Service och support
 
