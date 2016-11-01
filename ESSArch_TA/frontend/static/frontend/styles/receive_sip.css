@@ -28,7 +28,6 @@ width: 100%;
 }
 .list-view {
     max-height: 330px;
-    overflow-y: scroll;
     border-style: solid;
     border-color: #666;
     border-radius: 15px;

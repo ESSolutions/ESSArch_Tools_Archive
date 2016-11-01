@@ -34,18 +34,8 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                 }],
             }
         })
-        .state('home.receiveSip', {
-            url: 'receive-SIP',
-            templateUrl: '/static/frontend/views/receive_sip.html',
-            controller: 'IpApprovalCtrl as vm',
-            resolve: {
-                authenticated: ['djangoAuth', function(djangoAuth){
-                    return djangoAuth.authenticationStatus();
-                }],
-            }
-        })
         .state('home.reception', {
-            url: '/reception',
+            url: 'reception',
             templateUrl: '/static/frontend/views/receive_sip_reception.html',
             controller: 'ReceptionCtrl as vm',
             resolve: {
@@ -55,7 +45,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
             }
         })
         .state('home.qualityControl', {
-            url: '/quality-control',
+            url: 'quality-control',
             templateUrl: '/static/frontend/views/receive_sip_quality_control.html',
             controller: 'QualityControlCtrl as vm',
             resolve: {
@@ -65,7 +55,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
             }
         })
         .state('home.catalogue', {
-            url: '/catalogue',
+            url: 'catalogue',
             templateUrl: '/static/frontend/views/receive_sip_catalogue.html',
             controller: 'CatalogueCtrl as vm',
             resolve: {
@@ -75,7 +65,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
             }
         })
         .state('home.transferSip', {
-            url: '/transfer-SIP',
+            url: 'transfer-SIP',
             templateUrl: '/static/frontend/views/receive_sip_transfer_sip.html',
             controller: 'TransferSipCtrl as vm',
             resolve: {

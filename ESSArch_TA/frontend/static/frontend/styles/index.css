@@ -232,3 +232,8 @@ body.modal-open[style] {
 .glyphicon.glyphicon-question-sign {
     font-size: 20px;
 }
+.list-view-table {
+    max-height: 330px;
+    overflow-y: scroll;
+    margin: 5px;
+}
