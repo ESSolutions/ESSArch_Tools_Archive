@@ -1,6 +1,6 @@
 #!/usr/bin/env /ESSArch/python27/bin/python
 # -*- coding: UTF-8 -*-
-'''
+"""
     ESSArch Tools - ESSArch is an Electronic Preservation Platform
     Copyright (C) 2005-2013  ES Solutions AB
 
@@ -20,7 +20,7 @@
     Contact information:
     Web - http://www.essolutions.se
     Email - essarch@essolutions.se
-'''
+"""
 
 from django.contrib import admin
 import os
@@ -28,11 +28,13 @@ import os
 # own models ets
 from ip.models import InformationPackage
 
-"An action for admin operations on IP"
-###############################################
+
 def deleteIP(modeladmin, request, queryset):
+    """
+    An action for admin operations on IP
+    """
     # if we have selected entryn
-    if queryset.count() :
+    if queryset.count():
         # delete files and directorys
         for obj in queryset:
             #ip_creator = "%s" % obj.creator
@@ -53,28 +55,48 @@ def deleteIP(modeladmin, request, queryset):
                 if not os.listdir(obj.directory):
                     os.rmdir(obj.directory)
                     break
-            
-            modeladmin.message_user(request, "Successfully deleted archivist organization '%s's archive '%s' in database and in directory '%s'" % (obj.archivist_organization, obj.label, obj.directory ))
 
-    # delete db entry    
+            modeladmin.message_user(request, "Successfully deleted archivist organization '%s's archive '%s' in database and in directory '%s'" % (obj.archivist_organization, obj.label, obj.directory))
+
+    # delete db entry
     queryset.delete()
-    
+
 deleteIP.short_description = "Delete selected ip from DB and FS"
 
-class IPAdmin( admin.ModelAdmin ):
-    #list_display = ( 'creator','system','version', 'uuid', 'site_profile',  'state' )
-#    list_display = ( 'creator','label', 'createdate', 'startdate', 'enddate', 'iptype', 'uuid', 'site_profile',  'state', 'zone' )
-#    search_fields = ( 'creator', )
-#   list_display = ( 'archivist_organization','label', 'createdate', 'startdate', 'enddate', 'iptype', 'uuid', 'site_profile',  'state', 'zone' )
-    list_display = ( 'archivist_organization','label', 'createdate', 'iptype', 'uuid', 'site_profile',  'state', 'zone' )
-    search_fields = ( 'archivist_organization', )
-    actions = [deleteIP]
-    readonly_fields = ('uuid',)
-#    fields = ( 'archivist_organization','label', 'createdate', 'startdate', 'enddate', 'iptype', 'uuid', 'directory', 'site_profile', 'state', 'zone', 'progress')
-    fields = ( 'archivist_organization','label', 'createdate', 'iptype', 'uuid', 'directory', 'site_profile', 'state', 'zone', 'progress')
-    list_filter = ('archivist_organization', 'state', 'zone')
-#    fields = ( 'creator','label', 'createdate', 'startdate', 'enddate', 'iptype', 'uuid', 'directory', 'site_profile', 'state', 'zone', 'progress')
-#    list_filter = ('creator', 'state', 'zone')
 
-admin.site.register( InformationPackage, IPAdmin )
+class IPAdmin(admin.ModelAdmin):
+    """
+    Informaion Package
+    """
+    list_display = ('ArchivistOrganization', 'Label', 'CreateDate', 'id', 'ObjectSize', 'ObjectNumItems', 'ObjectPath', 'State')
+    search_fields = ('ArchivistOrganization',)
+    readonly_fields = ('id',)
+    list_filter = ('ArchivistOrganization', 'Label')
+    #fields = ('entity', 'value')
+    fieldsets = (
+                (None,{
+                   'classes': ('wide'),
+                   'fields': (
+                              'id',
+                              'Label',
+                              'Content',
+                              'Responsible',
+                              'CreateDate',
+                              'State',
+                              'Status',
+                              'ObjectSize',
+                              'ObjectNumItems',
+                              'ObjectPath',
+                              'Startdate',
+                              'Enddate',
+                              'OAIStype',
+                              'SubmissionAgreement',
+                              'ArchivalInstitution',
+                              'ArchivistOrganization',
+                              'ArchivalType',
+                              'ArchivalLocation',
+                             )}),
+               )
+
+admin.site.register(InformationPackage, IPAdmin)
 
