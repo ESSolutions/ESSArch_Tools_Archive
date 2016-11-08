@@ -1,6 +1,8 @@
-import os, shutil
+import glob, os, shutil
 
 from django_filters.rest_framework import DjangoFilterBackend
+
+from lxml import etree
 
 from rest_framework import filters, status
 from rest_framework.decorators import detail_route
@@ -8,6 +10,7 @@ from rest_framework.response import Response
 
 from ESSArch_Core.configuration.models import (
     EventType,
+    Path,
 )
 
 from ESSArch_Core.ip.models import (
@@ -71,6 +74,29 @@ class ArchivalLocationViewSet(viewsets.ModelViewSet):
     """
     queryset = ArchivalLocation.objects.all()
     serializer_class = ArchivalLocationSerializer
+
+class InformationPackageReceptionViewSet(viewsets.ViewSet):
+    def list(self, request, format=None):
+        path = Path.objects.get(entity="path_ingest_reception").value
+        ips = []
+
+        for xmlfile in glob.glob(os.path.join(path, "*.xml")):
+            ip = {}
+            doc = etree.parse(xmlfile)
+            root = doc.getroot()
+
+            try:
+                ip['id'] = root.get('OBJID').split(':')[1]
+            except:
+                ip['id'] = root.get('OBJID')
+
+            ip['label'] = root.get('LABEL')
+            ip['create date'] = root.find("{*}metsHdr").get('CREATEDATE')
+
+            ips.append(ip)
+
+        return Response(ips)
+
 
 class InformationPackageViewSet(viewsets.ModelViewSet):
     """

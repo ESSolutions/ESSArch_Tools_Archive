@@ -33,6 +33,7 @@ from ip.views import (
     ArchivalLocationViewSet,
     EventIPViewSet,
     InformationPackageViewSet,
+    InformationPackageReceptionViewSet,
 )
 
 from preingest.views import (
@@ -59,6 +60,7 @@ router.register(r'archivist-organizations', ArchivistOrganizationViewSet)
 router.register(r'archival-types', ArchivalTypeViewSet)
 router.register(r'archival-locations', ArchivalLocationViewSet)
 router.register(r'information-packages', InformationPackageViewSet)
+router.register(r'ip-reception', InformationPackageReceptionViewSet, base_name="ip-reception")
 router.register(r'steps', ProcessStepViewSet)
 router.register(r'tasks', ProcessTaskViewSet)
 router.register(r'events', EventIPViewSet)
