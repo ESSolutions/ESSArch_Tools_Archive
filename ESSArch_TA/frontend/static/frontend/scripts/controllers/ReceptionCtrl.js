@@ -1,4 +1,4 @@
-angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate) {
+angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig) {
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
@@ -15,12 +15,13 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     this.callServer = function callServer(tableState) {
     $scope.tableState = tableState;
 
+        var sorting = tableState.sort;
         var pagination = tableState.pagination;
         var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
         var number = pagination.number;  // Number of entries showed per page.
         var pageNumber = start/number+1;
 
-        Resource.getIpPage(start, number, pageNumber, tableState, $scope.selectedIp).then(function (result) {
+        Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.selectedIp, sorting).then(function (result) {
             ctrl.displayedIps = result.data;
             tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
         });
@@ -40,12 +41,16 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $scope.selectedIp = row;
         }
     };
-
+    $scope.createIp = function(ip) {
+        $http({
+            method: 'POST',
+            url: appConfig.djangoUrl+"ip-reception/"+ip.id+"/create-ip/"
+        }).then(function(response) {
+            console.log(response)
+        });
+    };
     $scope.ipTableClick = function(row) {
         $scope.ip = row;
-        listViewService.getSa(row.SubmissionAgreement).then(function(sa) {
-            $scope.currentSa = sa;
-        });
         $scope.fileListCollection = listViewService.getFileList(row);
     }
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');

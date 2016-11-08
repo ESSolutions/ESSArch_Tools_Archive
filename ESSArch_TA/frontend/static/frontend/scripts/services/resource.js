@@ -31,27 +31,36 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
         });
 	}
     //Get data for IP table
-    function getIpPage(start, number, pageNumber, params, selected) {
-        return listViewService.getListViewData(pageNumber, number).then(function(value) {
+    function getIpPage(start, number, pageNumber, params, selected, sort, state) {
+        var sortString = sort.predicate;
+        if(sort.reverse) {
+            sortString = "-"+sortString;
+        }
+        return listViewService.getListViewData(pageNumber, number, $rootScope.navigationFilter, sortString, state).then(function(value) {
             var ipCollection = value.data;
             ipCollection.forEach(function(ip) {
                 if(selected.id == ip.id) {
                     ip.class = "selected";
                 }
             });
-            /*
-            console.log("ipCollection: ");
-            console.log(ipCollection);
-
-            var filtered = params.search.predicateObject ? $filter('filter')(ipCollection, params.search.predicateObject) : ipCollection;
-
-            if (params.sort.predicate) {
-                filtered = $filter('orderBy')(filtered, params.sort.predicate, params.sort.reverse);
-            }
-
-            var result = filtered.slice(start, start + number);
-            */
-
+            return {
+                data: ipCollection,
+                numberOfPages: Math.ceil(value.count / number)
+            };
+        });
+	}
+    function getReceptionIps(start, number, pageNumber, params, selected, sort) {
+        var sortString = sort.predicate;
+        if(sort.reverse) {
+            sortString = "-"+sortString;
+        }
+        return listViewService.getReceptionIps(pageNumber, number, sortString).then(function(value) {
+            var ipCollection = value.data;
+            ipCollection.forEach(function(ip) {
+                if(selected.id == ip.id) {
+                    ip.class = "selected";
+                }
+            });
             return {
                 data: ipCollection,
                 numberOfPages: Math.ceil(value.count / number)
@@ -62,6 +71,7 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
 	return {
 		getEventPage: getEventPage,
         getIpPage: getIpPage,
+        getReceptionIps: getReceptionIps,
 	};
 
 });

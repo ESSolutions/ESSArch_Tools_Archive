@@ -17,7 +17,9 @@ body.modal-open[style] {
     content: '\25B2';
     position: relative;
 }
-
+.content-wrapper {
+    margin-top: 47px;
+}
 .st-sort-descent:before {
     content: '\25BC';
     position: relative;
@@ -33,8 +35,7 @@ body.modal-open[style] {
     font-size: 13px;
 }
 .modal::-webkit-scrollbar {
-    width: 0 !important; /*removes the scrollbar but still scrollable*/
-    /* reference: http://stackoverflow.com/a/26500272/2259400 */
+    width: 0 !important;
 }
 .body-wrapper {
     display: flex;
@@ -49,7 +50,7 @@ body.modal-open[style] {
 }
 .logo-search-user-admin-wrapper {
     display: flex;
-    display: -webkit-flex
+    display: -webkit-flex;
     width: 100%;
     height: 50px;
 }
@@ -62,6 +63,10 @@ body.modal-open[style] {
 .logo h2 {
     font-size: 28pt;
     line-height: 0;
+}
+.logo h3 {
+    margin-top: 12px;
+    margin-bottom: 12px;
 }
 .search {
     display: flex;
@@ -207,10 +212,10 @@ body.modal-open[style] {
     -webkit-flex-direction: row;
     -webkit-flex-wrap: wrap;
     height: 48px;
+    padding-bottom: 5px;
 }
 .sub-menu > button {
     border-radius: 5px;
-    margin-top: 5px;
     margin-right: 5px;
     margin-left: 5px;
 }
@@ -232,8 +237,21 @@ body.modal-open[style] {
 .glyphicon.glyphicon-question-sign {
     font-size: 20px;
 }
+.status-tree-grid {
+    max-height: 550px;
+    overflow-y: scroll;
+    padding: 5px;
+    margin: 5px;
+}
 .list-view-table {
     max-height: 330px;
     overflow-y: scroll;
     margin: 5px;
+}
+.well-sm {
+    padding: 0px;
+}
+.info-wrapper {
+    width: 75%;
+    margin-left: 10px;
 }

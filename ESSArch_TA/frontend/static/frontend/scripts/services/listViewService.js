@@ -1,14 +1,41 @@
-angular.module('myApp').factory('listViewService', function ($q, $http, $state, $log, appConfig) {
+angular.module('myApp').factory('listViewService', function ($q, $http, $state, $log, appConfig, $rootScope, $filter) {
     //Go to Given state
     function changePath(state) {
         $state.go(state);
     }
     //Gets data for list view i.e information packages
-    function getListViewData(pageNumber, pageSize) {
+    function getListViewData(pageNumber, pageSize, sortString) {
         var promise = $http({
             method: 'GET',
             url: appConfig.djangoUrl+'information-packages/',
-            params: {page: pageNumber, page_size: pageSize}
+            params: {
+                page: pageNumber,
+                page_size: pageSize,
+                ordering: sortString
+            }
+        })
+        .then(function successCallback(response) {
+            count = response.headers('Count');
+            if (count == null) {
+                count = response.data.length;
+            }
+            return {
+                count: count,
+                data: response.data
+            };
+        }, function errorCallback(response){
+        });
+        return promise;
+    }
+    function getReceptionIps(pageNumber, pageSize, sortString) {
+        var promise = $http({
+            method: 'GET',
+            url: appConfig.djangoUrl+'ip-reception/',
+            params: {
+                page: pageNumber,
+                page_size: pageSize,
+                ordering: sortString
+            }
         })
         .then(function successCallback(response) {
             count = response.headers('Count');
@@ -24,7 +51,7 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
         return promise;
     }
     //Get data for status view. child steps and tasks
-    function getStatusViewData(ip){
+    function getStatusViewData(ip, expandedNodes){
         var promise = $http({
             method: 'GET',
             url: ip.url + 'steps',
@@ -32,25 +59,27 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
             steps = response.data;
             steps.forEach(function(step){
                 step.children = getChildSteps(step.child_steps);
+                step.time_created = $filter('date')(step.time_created, "yyyy-MM-dd HH:mm:ss");
                 step.tasks.forEach(function(task){
                     task.label = task.name;
-                    task.time_created = task.time_started;
+                    task.time_created = $filter('date')(task.time_started, "yyyy-MM-dd HH:mm:ss");
                     task.isTask = true;
                 });
                 step.children = step.children.concat(step.tasks);
             });
+            steps = setExpanded(steps, expandedNodes);
             return steps;
         });
         return promise;
     }
     //Prepare the data for tree view in status view
-    function getTreeData(row) {
+    function getTreeData(row, expandedNodes) {
         var promise = $http({
             method: 'GET',
             url: row.url,
         }).then(function(response){
             ip = response.data;
-            return getStatusViewData(ip);
+            return getStatusViewData(ip, expandedNodes);
         });
         return promise;
     }
@@ -136,24 +165,72 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
         })
         .then(function successCallback(response) {
             sas = response.data;
-            var tempProfiles = [];
+            saProfile.profiles = [];
             saProfile.profileObjects = sas;
             sas.forEach(function (sa) {
-                tempProfiles.push(sa);
-                sa.information_packages.forEach(function (informationPackage) {
-                    if(informationPackage == ip.url){
-                        saProfile.profile = sa;
-                        saProfile.profile.includedProfiles = [];
-                    }
-                });
+                saProfile.profiles.push(sa);
+                if (ip.SubmissionAgreement == sa.url){
+                    saProfile.profile = sa;
+                    saProfile.locked = ip.SubmissionAgreementLocked;
+                }
             });
-            saProfile.profiles = tempProfiles;
             return saProfile;
         }, function errorCallback(response){
             alert(response.status);
         });
         return promise;
     }
+
+    function getProfileByTypeFromSA(sa, type){
+        return sa['profile_' + type];
+    }
+
+    function getProfileByTypeFromIP(ip, type){
+        return ip['profile_' + type];
+    }
+
+    function findProfileByUrl(url, profiles){
+        var p = null;
+
+        profiles.forEach(function(profile){
+            if (profile.url == url){
+                p = profile;
+            }
+        });
+
+        return p;
+    }
+
+    function createProfileObj(type, profiles, sa, ip){
+        var required = false;
+        var locked = false;
+        var url = null;
+
+        p = getProfileByTypeFromIP(ip, type);
+        if (p) {
+            url_from_ip = p.profile;
+            url = url_from_ip;
+            locked = p.LockedBy ? true : false;
+        }
+        p = getProfileByTypeFromSA(sa, type);
+        if (p){
+            required = true;
+            if (url == null) {
+                url = p.profile;
+            }
+        }
+        active = findProfileByUrl(url, profiles);
+        checked = active == null ? false : true
+
+        return {
+            active: active,
+            checked: checked,
+            required: required,
+            profiles: profiles,
+            locked: locked
+        };
+    }
+
     //Returns an array consisting of profile objects for an SA
     function getSelectCollection(sa, ip) {
         if(sa == null) {
@@ -164,44 +241,103 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
         return getIp(ip.url).then(function(value) {
             ip = value;
             if(sa.id != null) {
-                var selectRowCollapse = [];
-                getProfiles("transfer_project", sa.profile_transfer_project, selectRowCollapse, sa, ip).then(function(value) {
-                    selectRowCollapse = value;
+                var selectRowCollapse = {};
+                var type = 'transfer_project';
+
+                return getProfiles(type).then(function(profiles) {
+                    selectRowCollapse[type] = createProfileObj(
+                        type, profiles, sa, ip
+                    );
+                    return selectRowCollapse
+                }).then(function(selectRowCollapse){
+                    type = 'content_type';
+                    return getProfiles(type).then(function(profiles) {
+                        selectRowCollapse[type] = createProfileObj(
+                            type, profiles, sa, ip
+                        );
+                        return selectRowCollapse
+                    });
+                }).then(function(selectRowCollapse){
+                    type = 'data_selection';
+                    return getProfiles(type).then(function(profiles) {
+                        selectRowCollapse[type] = createProfileObj(
+                            type, profiles, sa, ip
+                        );
+                        return selectRowCollapse
+                    });
+                }).then(function(selectRowCollapse){
+                    type = 'classification';
+                    return getProfiles(type).then(function(profiles) {
+                        selectRowCollapse[type] = createProfileObj(
+                            type, profiles, sa, ip
+                        );
+                        return selectRowCollapse
+                    });
+                }).then(function(selectRowCollapse){
+                    type = 'import';
+                    return getProfiles(type).then(function(profiles) {
+                        selectRowCollapse[type] = createProfileObj(
+                            type, profiles, sa, ip
+                        );
+                        return selectRowCollapse
+                    });
+                }).then(function(selectRowCollapse){
+                    type = 'submit_description';
+                    return getProfiles(type).then(function(profiles) {
+                        selectRowCollapse[type] = createProfileObj(
+                            type, profiles, sa, ip
+                        );
+                        return selectRowCollapse
+                    });
+                }).then(function(selectRowCollapse){
+                    type = 'sip';
+                    return getProfiles(type).then(function(profiles) {
+                        selectRowCollapse[type] = createProfileObj(
+                            type, profiles, sa, ip
+                        );
+                        return selectRowCollapse
+                    });
+                }).then(function(selectRowCollapse){
+                    type = 'aip';
+                    return getProfiles(type).then(function(profiles) {
+                        selectRowCollapse[type] = createProfileObj(
+                            type, profiles, sa, ip
+                        );
+                        return selectRowCollapse
+                    });
+                }).then(function(selectRowCollapse){
+                    type = 'dip';
+                    return getProfiles(type).then(function(profiles) {
+                        selectRowCollapse[type] = createProfileObj(
+                            type, profiles, sa, ip
+                        );
+                        return selectRowCollapse
+                    });
+                }).then(function(selectRowCollapse){
+                    type = 'workflow';
+                    return getProfiles(type).then(function(profiles) {
+                        selectRowCollapse[type] = createProfileObj(
+                            type, profiles, sa, ip
+                        );
+                        return selectRowCollapse
+                    });
+                }).then(function(selectRowCollapse){
+                    type = 'preservation_metadata';
+                    return getProfiles(type).then(function(profiles) {
+                        selectRowCollapse[type] = createProfileObj(
+                            type, profiles, sa, ip
+                        );
+                        return selectRowCollapse
+                    });
+                }).then(function(selectRowCollapse){
+                    type = 'event';
+                    return getProfiles(type).then(function(profiles) {
+                        selectRowCollapse[type] = createProfileObj(
+                            type, profiles, sa, ip
+                        );
+                        return selectRowCollapse
+                    });
                 });
-                getProfiles("content_type", sa.profile_content_type, selectRowCollapse, sa, ip).then(function(value) {
-                    selectRowCollapse = value;
-                });
-                getProfiles("data_selection", sa.profile_data_selection, selectRowCollapse ,sa, ip).then(function(value) {
-                    selectRowCollapse = value;
-                });
-                getProfiles("classification", sa.profile_classification, selectRowCollapse, sa, ip).then(function(value) {
-                    selectRowCollapse = value;
-                });
-                getProfiles("import", sa.profile_import, selectRowCollapse, sa, ip).then(function(value) {
-                    selectRowCollapse = value;
-                });
-                getProfiles("submit_description", sa.profile_submit_description, selectRowCollapse, sa, ip).then(function(value) {
-                    selectRowCollapse = value;
-                });
-                getProfiles("sip", sa.profile_sip, selectRowCollapse, sa, ip).then(function(value) {
-                    selectRowCollapse = value;
-                });
-                getProfiles("aip", sa.profile_aip, selectRowCollapse, sa, ip).then(function(value) {
-                    selectRowCollapse = value;
-                });
-                getProfiles("dip", sa.profile_dip, selectRowCollapse, sa, ip).then(function(value) {
-                    selectRowCollapse = value;
-                });
-                getProfiles("workflow", sa.profile_workflow, selectRowCollapse, sa, ip).then(function(value) {
-                    selectRowCollapse = value;
-                });
-                getProfiles("preservation_metadata", sa.profile_preservation_metadata, selectRowCollapse, sa, ip).then(function(value) {
-                    selectRowCollapse = value;
-                });
-                getProfiles("event", sa.profile_event, selectRowCollapse, sa, ip).then(function(value) {
-                    selectRowCollapse = value;
-                });
-                return selectRowCollapse;
             }
         })
     };
@@ -250,93 +386,48 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
     /*******************/
     /*HELPER FUNCTIONS*/
     /*****************/
-    //Gets all profiles of a specific profile type for an IP
-    function getProfiles(type, profileArray, selectRowCollapse, sa, ip){
-        if(profileArray.active == null || angular.isUndefined(profileArray)){
-            var deferred = $q.defer();
-            deferred.resolve([]);
-            return deferred.promise;
-        }
-        getProfile(profileArray.active.id, true, selectRowCollapse, sa, ip).then(function(value) {
-            selectRowcollapse = value;
+    function setExpanded(steps, expandedNodes) {
+        expandedNodes.forEach(function(node) {
+            steps.forEach(function(step) {
+                if(step.id == node.id) {
+                    step.expanded = true;
+                }
+                if(step.children != null){
+                    if(step.children.length > 0){
+                        setExpanded(step.children, expandedNodes);
+                    }
+                }
+            });
         });
-        profileArray.profiles.forEach(function(profile) {
-            if(profile.id != profileArray.active.id){
-                getProfile(profile.id, false, selectRowCollapse, sa, ip).then(function(value) {
-                    selectRowcollapse = value;
-                });
-            }
+        return steps;
 
-        });
+    }
+    //Gets all profiles of a specific profile type for an IP
+    function getProfiles(type){
         var promise = $http({
             method: 'GET',
             url: appConfig.djangoUrl+"profiles",
             params: {type: type}
         })
         .then(function successCallback(response) {
-            var tempProfileArray = response.data;
-            for(i=0;i<profileArray.profiles.length;i++){
-                for(j=0;j<tempProfileArray.length;j++){
-                    if(tempProfileArray[j].id == profileArray.profiles[i].id){
-                        tempProfileArray.splice(j,1);
-                    }
-                }
-            }
-            for(i=0;i<tempProfileArray.length;i++){
-                getProfile(response.data[i].id, false, selectRowCollapse, sa, ip).then(function(value) {
-                    selectRowCollection = value;
-                });
-            }
-            return selectRowCollapse;
+            return response.data;
         }, function errorCallback(response){
             alert(response.status);
         });
         return promise;
     };
-    //Returns profile given profile id
-    function getProfile(profile_id, defaultProfile, selectRowCollapse, saProfile, ip) {
-        var promise = $http({
-            method: 'GET',
-            url: appConfig.djangoUrl + "profiles/" + profile_id
-        })
-        .then(function successCallback(response) {
-            var newProfileType = true;
-            for(i=0; i<selectRowCollapse.length;i++){
-                if(selectRowCollapse[i].profile_type == response.data.profile_type){
-                    newProfileType = false;
-                    selectRowCollapse[i].profiles.push(response.data);
-                    if(defaultProfile){
-                        response.data.defaultProfile = true;
-                        selectRowCollapse[i].profile = response.data;
-                    }
-                    break;
-                } else {
-                    newProfileType = true;
-                }
+
+    //Checks if a given sa is locked to a given ip
+    function saLocked(sa, ip) {
+        locked = false;
+        ip.locks.forEach(function (lock) {
+            if(lock.submission_agreement == sa.url){
+                locked = true;
             }
-            if(newProfileType){
-                var tempProfileObject = {
-                    profile_label: response.data.profile_type.toUpperCase(),
-                    profile_type: response.data.profile_type,
-                    profile: {},
-                    profiles: [
-                        response.data
-                    ],
-                    checked: true,
-                };
-                if(defaultProfile){
-                        response.data.defaultProfile = true;
-                    tempProfileObject.profile = response.data;
-                }
-                tempProfileObject = profileLocked(tempProfileObject, saProfile.url, ip.locks);
-                selectRowCollapse.push(tempProfileObject);
-                return selectRowCollapse;;
-            }
-        }, function errorCallback(response){
-            alert(response.status);
         });
-        return promise;
-    };
+        return locked;
+    }
+
     //Checks if a profile is locked
     function profileLocked(profileObject, sa, locks) {
         profileObject.locked = false;
@@ -349,7 +440,8 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
     }
     //Return child steps list and corresponding tasks on all levels of child steps
     function getChildSteps(childSteps) {
-        childSteps.forEach(function(child){
+        var stepsToRemove = [];
+        childSteps.forEach(function(child, idx){
             child.child_steps = getChildSteps(child.child_steps);
             child.tasks.forEach(function(task){
                 task.user = child.user;
@@ -359,12 +451,13 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
 
             child.children = child.child_steps.concat(child.tasks);
             if(child.children.length == 0){
-                child.icons = {
-                    iconLeaf: "glyphicon glyphicon-alert"
-                };
+                stepsToRemove.push(idx);
             }
             child.isCollapsed = false;
             child.tasksCollapsed = true;
+        });
+        stepsToRemove.forEach(function(idx){
+            childSteps.splice(idx, 1);
         });
         return childSteps;
     }
@@ -383,6 +476,7 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
         getSa: getSa,
         getFileList, getFileList,
         getStructure: getStructure,
+        getReceptionIps: getReceptionIps
     };
 
 });

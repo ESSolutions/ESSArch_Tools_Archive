@@ -15,7 +15,7 @@ width: 100%;
 }
 .content-wrapper > div {
     margin-bottom: 10px;
-    margin-left: 10px;
+    margin-left: 5px;
 }
 .search-prepare-wrapper {
     display: flex;
@@ -27,7 +27,7 @@ width: 100%;
     margin-left: 10px;
 }
 .list-view {
-    max-height: 330px;
+    max-height: 300px;
     border-style: solid;
     border-color: #666;
     border-radius: 15px;
@@ -35,7 +35,7 @@ width: 100%;
     display: -webkit-flex;
     flex-direction: column;
     -webkit-flex-direction: column;
-    margin-top: 8px;
+    margin-top: 0px;
     position: relative;
 }
 .progress {
@@ -105,13 +105,6 @@ width: 100%;
     padding-bottom: 0;
     font-size: 13px;
 }
-td {
-    margin: 0;
-    height: 40px;
-    padding-top: 3px;
-    padding-bottom: 8px;
-}
-
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
     padding-top: 4px;
     padding-bottom: 8px;
@@ -119,7 +112,6 @@ td {
 }
 .status-view {
     max-height: 550px;
-    overflow-y: scroll;
 }
 /*.status-view treecontrol {
     font-size: 20px;
@@ -233,8 +225,8 @@ input[type="checkbox"] {
     flex-direction: row;
     -webkit-flex-direction: row;
     width: 100%;
-     justify-content: space-between;
-    -webkit-justify-content: space-between;
+     justify-content: flex-end;
+    -webkit-justify-content: flex-end;
     margin-left: 10px;
 }
 .events-footer {
@@ -275,10 +267,10 @@ input[type="checkbox"] {
 .validator-choices .formly {
     display: flex;
     display: -webkit-flex;
-    flex-direction: column;
-    -webkit-flex-direction: column;
+    flex-direction: row;
+    -webkit-flex-direction: row;
 
 }
 .validator-choices .formly select {
-    width: 30%;
+    width: 170px;
 }
