@@ -106,8 +106,10 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
     @detail_route(methods=['post'], url_path='create-ip')
     def create_ip(self, request, pk=None):
-        path = Path.objects.get(entity="path_ingest_reception").value
-        ipobj = self.parseFile(os.path.join(path, "%s.xml" % pk))
+        reception = Path.objects.get(entity="path_ingest_reception").value
+        prepare = Path.objects.get(entity="path_ingest_prepare").value
+
+        ipobj = self.parseFile(os.path.join(reception, "%s.xml" % pk))
 
         ip = InformationPackage.objects.create(
             id=pk, Label=ipobj.get("label"), CreateDate=ipobj.get("create_date")
@@ -116,6 +118,10 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ip.CreateDate = ipobj.get("create_date")
         ip.save()
 
+        src = os.path.join(reception, "%s.tar" % pk)
+        dst = os.path.join(prepare, "%s.tar" % pk)
+
+        shutil.copy(src, dst)
 
         return Response("IP Created")
 
