@@ -45,7 +45,8 @@ from preingest.views import (
 
 from profiles.views import (
     ProfileViewSet,
-    ProfileLockViewSet,
+    ProfileSAViewSet,
+    ProfileIPViewSet,
     SubmissionAgreementViewSet,
 )
 
@@ -64,7 +65,8 @@ router.register(r'events', EventIPViewSet)
 router.register(r'event-types', EventTypeViewSet)
 router.register(r'submission-agreements', SubmissionAgreementViewSet)
 router.register(r'profiles', ProfileViewSet)
-router.register(r'profile-locks', ProfileLockViewSet)
+router.register(r'profile-sa', ProfileSAViewSet)
+router.register(r'profile-ip', ProfileIPViewSet)
 router.register(r'agents', AgentViewSet)
 router.register(r'parameters', ParameterViewSet)
 router.register(r'paths', PathViewSet)
@@ -75,8 +77,7 @@ urlpatterns = [
     url(r'^api/', include(router.urls)),
     url(r'^accounts/changepassword', auth_views.password_change, {'post_change_redirect': '/'} ),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^template/', include('templateMaker.urls')),
-    url(r'^demo/', include('demo.urls')),
+    url(r'^template/', include('ESSArch_Core.xml.ProfileMaker.urls')),
     url(r'^accounts/login/$', auth_views.login),
     url(r'^rest-auth/', include('rest_auth.urls')),
     url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),

@@ -2,20 +2,22 @@ from __future__ import absolute_import
 
 import hashlib, os, shutil, tarfile, urllib, zipfile
 
+from collections import Counter
+
 from django.conf import settings
 
-from demo.xmlGenerator import XMLGenerator
+from ESSArch_Core.xml.Generator.xmlGenerator import XMLGenerator
 
 from fido.fido import Fido
 
 from lxml import etree
 
-from configuration.models import Path
-from preingest.dbtask import DBTask
-from ip.models import InformationPackage
-from preingest.models import ProcessStep, ProcessTask
+from ESSArch_Core.configuration.models import Path
+from ESSArch_Core.WorkflowEngine.dbtask import DBTask
+from ESSArch_Core.ip.models import InformationPackage
+from ESSArch_Core.WorkflowEngine.models import ProcessStep, ProcessTask
 
-from preingest.util import getSchemas
+from ESSArch_Core.util import getSchemas
 
 class PrepareIP(DBTask):
     event_type = 10100
@@ -37,7 +39,7 @@ class PrepareIP(DBTask):
         ip = InformationPackage.objects.create(
             Label=label,
             Responsible=responsible,
-            State="PREPARING",
+            State="Preparing",
             OAIStype="SIP",
         )
 
@@ -258,56 +260,57 @@ class AppendEvents(DBTask):
     """
 
     def run(self, filename="", events={}):
-        for event in events:
-            inputD = {
-                "path": filename,
-                "elementToAppendTo": "premis",
-                "template": {
-                    "-name": "event",
+        generator = XMLGenerator()
+        template = {
+            "-name": "event",
+            "-min": 1,
+            "-max": 1,
+            "-allowEmpty": 1,
+            "-namespace": "premis",
+            "-children": [
+                {
+                    "-name": "eventIdentifier",
                     "-min": 1,
                     "-max": 1,
                     "-allowEmpty": 1,
                     "-namespace": "premis",
                     "-children": [
                         {
-                            "-name": "eventIdentifier",
+                            "-name": "eventIdentifierType",
+                            "-min": 1,
+                            "-max": 1,
+                            "-namespace": "premis",
+                            "#content": [{"var":"eventIdentifierType"}]
+                        },{
+                            "-name": "eventIdentifierValue",
                             "-min": 1,
                             "-max": 1,
                             "-allowEmpty": 1,
                             "-namespace": "premis",
-                            "-children": [
-                                {
-                                    "-name": "eventIdentifierType",
-                                    "-min": 1,
-                                    "-max": 1,
-                                    "-namespace": "premis",
-                                    "#content": [{"var":"eventIdentifierType"}]
-                                },{
-                                    "-name": "eventIdentifierValue",
-                                    "-min": 1,
-                                    "-max": 1,
-                                    "-allowEmpty": 1,
-                                    "-namespace": "premis",
-                                    "#content": [{"var": "eventIdentifierValue"}]
-                                },
-                            ]
+                            "#content": [{"var": "eventIdentifierValue"}]
                         },
-                        {
-                            "-name": "eventType",
-                            "-min": 1,
-                            "-max": 1,
-                            "-allowEmpty": 1,
-                            "-namespace": "premis",
-                            "#content": [{"var": "eventType"}]
-                        },
-                        {
-                            "-name": "eventDateTime",
-                            "-min": 1,
-                            "-max": 1,
-                            "-allowEmpty": 1,
-                            "-namespace": "premis",
-                            "#content": [{"var": "eventDateTime"}]
-                        },
+                    ]
+                },
+                {
+                    "-name": "eventType",
+                    "-min": 1,
+                    "-max": 1,
+                    "-allowEmpty": 1,
+                    "-namespace": "premis",
+                    "#content": [{"var": "eventType"}]
+                },
+                {
+                    "-name": "eventDateTime",
+                    "-min": 1,
+                    "-max": 1,
+                    "-allowEmpty": 1,
+                    "-namespace": "premis",
+                    "#content": [{"var": "eventDateTime"}]
+                },
+                {
+                    "-name": "eventDetailInformation",
+                    "-namespace": "premis",
+                    "-children": [
                         {
                             "-name": "eventDetail",
                             "-min": 1,
@@ -316,106 +319,111 @@ class AppendEvents(DBTask):
                             "-namespace": "premis",
                             "#content": [{"var": "eventDetail"}]
                         },
+                    ]
+                },
+                {
+                    "-name": "eventOutcomeInformation",
+                    "-min": 1,
+                    "-max": 1,
+                    "-allowEmpty": 1,
+                    "-namespace": "premis",
+                    "-children": [
                         {
-                            "-name": "eventOutcomeInformation",
+                            "-name": "eventOutcome",
                             "-min": 1,
                             "-max": 1,
                             "-allowEmpty": 1,
                             "-namespace": "premis",
-                            "-children": [
-                                {
-                                    "-name": "eventOutcome",
-                                    "-min": 1,
-                                    "-max": 1,
-                                    "-allowEmpty": 1,
-                                    "-namespace": "premis",
-                                    "#content": [{"var":"eventOutcome"}]
-                                },
-                                {
-                                    "-name": "eventOutcomeDetail",
-                                    "-min": 1,
-                                    "-max": 1,
-                                    "-allowEmpty": 1,
-                                    "-namespace": "premis",
-                                    "-children": [
-                                        {
-                                            "-name": "eventOutcomeDetailNote",
-                                            "-min": 1,
-                                            "-max": 1,
-                                            "-allowEmpty": 1,
-                                            "-namespace": "premis",
-                                            "#content": [{"var":"eventOutcomeDetailNote"}]
-                                        },
-                                    ]
-                                },
-                            ]
+                            "#content": [{"var":"eventOutcome"}]
                         },
                         {
-                            "-name": "linkingAgentIdentifier",
+                            "-name": "eventOutcomeDetail",
                             "-min": 1,
                             "-max": 1,
                             "-allowEmpty": 1,
                             "-namespace": "premis",
                             "-children": [
                                 {
-                                    "-name": "linkingAgentIdentifierType",
-                                    "-min": 1,
-                                    "-max": 1,
-                                    "-namespace": "premis",
-                                    "#content": [{"var":"linkingAgentIdentifierType"}]
-                                },
-                                {
-                                    "-name": "linkingAgentIdentifierValue",
+                                    "-name": "eventOutcomeDetailNote",
                                     "-min": 1,
                                     "-max": 1,
                                     "-allowEmpty": 1,
                                     "-namespace": "premis",
-                                    "#content": [{"var": "linkingAgentIdentifierValue"}]
-                                },
-                            ]
-                        },
-                        {
-                            "-name": "linkingObjectIdentifier",
-                            "-min": 1,
-                            "-max": 1,
-                            "-allowEmpty": 1,
-                            "-namespace": "premis",
-                            "-children": [
-                                {
-                                    "-name": "linkingObjectIdentifierType",
-                                    "-min": 1,
-                                    "-max": 1,
-                                    "-namespace": "premis",
-                                    "#content": [{"var":"linkingObjectIdentifierType"}]
-                                },
-                                {
-                                    "-name": "linkingObjectIdentifierValue",
-                                    "-min": 1,
-                                    "-max": 1,
-                                    "-allowEmpty": 1,
-                                    "-namespace": "premis",
-                                    "#content": [{"var": "linkingObjectIdentifierValue"}]
+                                    "#content": [{"var":"eventOutcomeDetailNote"}]
                                 },
                             ]
                         },
                     ]
                 },
-                "data": {
-                    "eventIdentifierType": "SE/RA",
-                    "eventIdentifierValue": str(event.id),
-                    "eventType": str(event.eventType.eventType),
-                    "eventDateTime": str(event.eventDateTime),
-                    "eventDetail": event.eventDetail,
-                    "eventOutcome": event.eventOutcome,
-                    "eventOutcomeDetailNote": event.eventOutcomeDetailNote,
-                    "linkingAgentIdentifierType": "SE/RA",
-                    "linkingAgentIdentifierValue": "admin",
-                    "linkingObjectIdentifierType": "SE/RA",
-                    "linkingObjectIdentifierValue": str(event.linkingObjectIdentifierValue.id),
-                }
+                {
+                    "-name": "linkingAgentIdentifier",
+                    "-min": 1,
+                    "-max": 1,
+                    "-allowEmpty": 1,
+                    "-namespace": "premis",
+                    "-children": [
+                        {
+                            "-name": "linkingAgentIdentifierType",
+                            "-min": 1,
+                            "-max": 1,
+                            "-namespace": "premis",
+                            "#content": [{"var":"linkingAgentIdentifierType"}]
+                        },
+                        {
+                            "-name": "linkingAgentIdentifierValue",
+                            "-min": 1,
+                            "-max": 1,
+                            "-allowEmpty": 1,
+                            "-namespace": "premis",
+                            "#content": [{"var": "linkingAgentIdentifierValue"}]
+                        },
+                    ]
+                },
+                {
+                    "-name": "linkingObjectIdentifier",
+                    "-min": 1,
+                    "-max": 1,
+                    "-allowEmpty": 1,
+                    "-namespace": "premis",
+                    "-children": [
+                        {
+                            "-name": "linkingObjectIdentifierType",
+                            "-min": 1,
+                            "-max": 1,
+                            "-namespace": "premis",
+                            "#content": [{"var":"linkingObjectIdentifierType"}]
+                        },
+                        {
+                            "-name": "linkingObjectIdentifierValue",
+                            "-min": 1,
+                            "-max": 1,
+                            "-allowEmpty": 1,
+                            "-namespace": "premis",
+                            "#content": [{"var": "linkingObjectIdentifierValue"}]
+                        },
+                    ]
+                },
+            ]
+        }
+
+        for event in events:
+
+            data = {
+                "eventIdentifierType": "SE/RA",
+                "eventIdentifierValue": str(event.id),
+                "eventType": str(event.eventType.eventType),
+                "eventDateTime": str(event.eventDateTime),
+                "eventDetail": event.eventDetail,
+                "eventOutcome": event.eventOutcome,
+                "eventOutcomeDetailNote": event.eventOutcomeDetailNote,
+                "linkingAgentIdentifierType": "SE/RA",
+                "linkingAgentIdentifierValue": "admin",
+                "linkingObjectIdentifierType": "SE/RA",
+                "linkingObjectIdentifierValue": str(event.linkingObjectIdentifierValue.id),
             }
 
-            appendXML(inputD)
+            generator.insert(filename, "premis", template, data)
+
         self.set_progress(100, total=100)
 
     def undo(self, filename="", events={}):
@@ -468,7 +476,7 @@ class CopySchemas(DBTask):
 
 
 class ValidateFiles(DBTask):
-    def run(self, ip, mets_path):
+    def run(self, ip, mets_path, validate_fileformat=True, validate_integrity=True):
         metsdoc = etree.ElementTree(file=mets_path)
 
         root = metsdoc.getroot()
@@ -485,36 +493,39 @@ class ValidateFiles(DBTask):
             parent_step=self.taskobj.processstep
         )
 
-        for f in metsdoc.findall('.//mets:file', nsmap):
-            filename = f.find('mets:FLocat', nsmap).get('{%s}href' % nsmap['xlink'])
-            filename = os.path.join(ip_prepare_path, filename)
-            fileformat = f.get("{%s}FILEFORMATNAME" % nsmap['ext'])
-            checksum = f.get("CHECKSUM")
+        if any([validate_fileformat, validate_integrity]):
+            for f in metsdoc.findall('.//mets:file', nsmap):
+                filename = f.find('mets:FLocat', nsmap).get('{%s}href' % nsmap['xlink'])
+                filename = os.path.join(ip_prepare_path, filename)
+                fileformat = f.get("{%s}FILEFORMATNAME" % nsmap['ext'])
+                checksum = f.get("CHECKSUM")
 
-            step.tasks.add(ProcessTask.objects.create(
-                name="preingest.tasks.ValidateFileFormat",
-                params={
-                    "filename": filename,
-                    "fileformat": fileformat,
-                },
-                information_package=ip
-            ))
+                if validate_fileformat and fileformat is not None:
+                    step.tasks.add(ProcessTask.objects.create(
+                        name="preingest.tasks.ValidateFileFormat",
+                        params={
+                            "filename": filename,
+                            "fileformat": fileformat,
+                        },
+                        information_package=ip
+                    ))
 
-            step.tasks.add(ProcessTask.objects.create(
-                name="preingest.tasks.ValidateIntegrity",
-                params={
-                    "filename": filename,
-                    "checksum": checksum,
-                },
-                information_package=ip
-            ))
+                if validate_integrity:
+                    step.tasks.add(ProcessTask.objects.create(
+                        name="preingest.tasks.ValidateIntegrity",
+                        params={
+                            "filename": filename,
+                            "checksum": checksum,
+                        },
+                        information_package=ip
+                    ))
 
 
         self.set_progress(100, total=100)
 
         step.run()
 
-    def undo(self, ip, mets_path):
+    def undo(self, ip, mets_path, validate_fileformat=True, validate_integrity=True):
         pass
 
 class ValidateFileFormat(DBTask):
@@ -574,7 +585,12 @@ class ValidateLogicalPhysicalRepresentation(DBTask):
     event_type = 10262
 
     """
-    Validates the logical and physical representation of objects
+    Validates the logical and physical representation of objects.
+
+    The comparison checks if the lists contains the same elements (though not
+    the order of the elements).
+
+    See http://stackoverflow.com/a/7829388/1523238
     """
 
     def run(self, ip=None, mets_path=None):
@@ -600,7 +616,7 @@ class ValidateLogicalPhysicalRepresentation(DBTask):
 
         for root, dirs, files in os.walk(objpath):
             for f in files:
-                filename = os.path.join(root, str(f))
+                filename = os.path.join(root, f)
 
                 if filename != mets_path:
                     physical_files.append(filename)
@@ -609,7 +625,7 @@ class ValidateLogicalPhysicalRepresentation(DBTask):
         print "physical: %s" % physical_files
 
         self.set_progress(100, total=100)
-        assert logical_files == physical_files, "the physical representation is not valid"
+        assert Counter(logical_files) == Counter(physical_files), "the physical representation is not valid"
 
     def undo(self, ip=None, mets_path=None):
         pass
@@ -724,13 +740,14 @@ class SubmitSIP(DBTask):
     event_type = 10300
 
     def run(self, ip=None):
+        srcdir = Path.objects.get(entity="path_preingest_reception").value
         reception = Path.objects.get(entity="path_ingest_reception").value
 
-        src = ip.ObjectPath + ".tar"
+        src = os.path.join(srcdir, str(ip.pk) + ".tar")
         dst = os.path.join(reception, str(ip.pk) + ".tar")
         shutil.copyfile(src, dst)
 
-        src = ip.ObjectPath + ".xml"
+        src = os.path.join(srcdir, str(ip.pk) + ".xml")
         dst = os.path.join(reception, str(ip.pk) + ".xml")
         shutil.copyfile(src, dst)
 

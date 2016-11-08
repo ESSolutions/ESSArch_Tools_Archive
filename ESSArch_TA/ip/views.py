@@ -1,12 +1,16 @@
-from rest_framework import status
+import os, shutil
+
+from django_filters.rest_framework import DjangoFilterBackend
+
+from rest_framework import filters, status
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 
-from configuration.models import (
+from ESSArch_Core.configuration.models import (
     EventType,
 )
 
-from ip.models import (
+from ESSArch_Core.ip.models import (
     ArchivalInstitution,
     ArchivistOrganization,
     ArchivalType,
@@ -15,13 +19,18 @@ from ip.models import (
     EventIP
 )
 
+from ESSArch_Core.profiles.models import (
+    Profile,
+)
+
+from ip.filters import InformationPackageFilter
+
 from ip.serializers import (
     ArchivalInstitutionSerializer,
     ArchivistOrganizationSerializer,
     ArchivalTypeSerializer,
     ArchivalLocationSerializer,
     InformationPackageSerializer,
-    InformationPackageDetailSerializer,
     EventIPSerializer,
 )
 
@@ -69,12 +78,26 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     """
     queryset = InformationPackage.objects.all()
     serializer_class = InformationPackageSerializer
+    filter_backends = (
+        filters.OrderingFilter, DjangoFilterBackend,
+    )
+    ordering_fields = ('Label', 'Responsible', 'CreateDate', 'State',)
+    filter_class = InformationPackageFilter
 
-    def get_serializer_class(self):
-        if self.action == 'list':
-            return InformationPackageSerializer
+    def get_queryset(self):
+        queryset = self.queryset
 
-        return InformationPackageDetailSerializer
+        other = self.request.query_params.get('other')
+
+        if other is not None:
+            queryset = queryset.filter(
+                ArchivalInstitution=None,
+                ArchivistOrganization=None,
+                ArchivalType=None,
+                ArchivalLocation=None
+            )
+
+        return queryset
 
     def create(self, request):
         """
@@ -100,6 +123,26 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
         prepare_ip(label, responsible).run()
         return Response({"status": "Prepared IP"})
+
+    def destroy(self, request, pk=None):
+        ip = InformationPackage.objects.get(pk=pk)
+
+        try:
+            shutil.rmtree(ip.ObjectPath)
+        except:
+            pass
+
+        try:
+            os.remove(ip.ObjectPath + ".tar")
+        except:
+            pass
+
+        try:
+            os.remove(ip.ObjectPath + ".zip")
+        except:
+            pass
+
+        return super(InformationPackageViewSet, self).destroy(request, pk=pk)
 
     @detail_route()
     def events(self, request, pk=None):
@@ -133,8 +176,17 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         Returns:
             None
         """
+
+        validators = request.data.get('validators', {})
+
         try:
-            InformationPackage.objects.get(pk=pk).create()
+            InformationPackage.objects.get(pk=pk).create(
+                validate_xml_file=validators.get('validate_xml_file', False),
+                validate_file_format=validators.get('validate_file_format', False),
+                validate_integrity=validators.get('validate_integrity', False),
+                validate_logical_physical_representation=validators.get('validate_logical_physical_representation', False),
+            )
+
             return Response({'status': 'creating ip'})
         except InformationPackage.DoesNotExist:
             return Response(
@@ -157,6 +209,33 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         self.get_object().submit()
         return Response({'status': 'submitting ip'})
 
+    @detail_route(methods=['put'], url_path='change-profile')
+    def change_profile(self, request, pk=None):
+        ip = self.get_object()
+        new_profile = Profile.objects.get(pk=request.data["new_profile"])
+
+        ip.change_profile(new_profile)
+
+        return Response({
+            'status': 'updating IP (%s) with new profile (%s)' % (
+                ip.pk, new_profile
+            )
+        })
+
+    @detail_route(methods=['post'], url_path='unlock-profile')
+    def unlock_profile(self, request, pk=None):
+        ip = self.get_object()
+        ptype = request.data.get("type")
+
+        if ptype:
+            ip.unlock_profile(ptype)
+            return Response({
+                'status': 'unlocking profile with type "%s" in IP "%s"' % (
+                    ptype, ip.pk
+                )
+            })
+
+        return Response()
 
 class EventIPViewSet(viewsets.ModelViewSet):
     """
