@@ -76,26 +76,48 @@ class ArchivalLocationViewSet(viewsets.ModelViewSet):
     serializer_class = ArchivalLocationSerializer
 
 class InformationPackageReceptionViewSet(viewsets.ViewSet):
-    def list(self, request, format=None):
+    def parseFile(self, path):
+        ip = {}
+        doc = etree.parse(path)
+        root = doc.getroot()
+
+        try:
+            ip['id'] = root.get('OBJID').split(':')[1]
+        except:
+            ip['id'] = root.get('OBJID')
+
+        ip['label'] = root.get('LABEL')
+        ip['create_date'] = root.find("{*}metsHdr").get('CREATEDATE')
+
+        return ip
+
+    def list(self, request):
         path = Path.objects.get(entity="path_ingest_reception").value
         ips = []
 
         for xmlfile in glob.glob(os.path.join(path, "*.xml")):
-            ip = {}
-            doc = etree.parse(xmlfile)
-            root = doc.getroot()
-
-            try:
-                ip['id'] = root.get('OBJID').split(':')[1]
-            except:
-                ip['id'] = root.get('OBJID')
-
-            ip['label'] = root.get('LABEL')
-            ip['create date'] = root.find("{*}metsHdr").get('CREATEDATE')
-
-            ips.append(ip)
+            ips.append(self.parseFile(xmlfile))
 
         return Response(ips)
+
+    def retrieve(self, request, pk=None):
+        path = Path.objects.get(entity="path_ingest_reception").value
+        return Response(self.parseFile(os.path.join(path, "%s.xml" % pk)))
+
+    @detail_route(methods=['post'], url_path='create-ip')
+    def create_ip(self, request, pk=None):
+        path = Path.objects.get(entity="path_ingest_reception").value
+        ipobj = self.parseFile(os.path.join(path, "%s.xml" % pk))
+
+        ip = InformationPackage.objects.create(
+            id=pk, Label=ipobj.get("label"), CreateDate=ipobj.get("create_date")
+        )
+
+        ip.CreateDate = ipobj.get("create_date")
+        ip.save()
+
+
+        return Response("IP Created")
 
 
 class InformationPackageViewSet(viewsets.ModelViewSet):
