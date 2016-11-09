@@ -14,7 +14,7 @@ angular.module('myApp').controller('LoginCtrl', function ($scope, $location, myS
                     djangoAuth.profile().then(function(data){
                         $rootScope.auth = data;
                     });
-                    $state.go('home.myPage');
+                    $state.go('home.reception');
                 },function(data){
                     // error case
                     $scope.errors = data;
