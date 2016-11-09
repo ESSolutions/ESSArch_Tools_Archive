@@ -112,10 +112,10 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ipobj = self.parseFile(os.path.join(reception, "%s.xml" % pk))
 
         ip = InformationPackage.objects.create(
-            id=pk, Label=ipobj.get("label"), CreateDate=ipobj.get("create_date")
+            id=pk, Label=ipobj.get("Label")
         )
 
-        ip.CreateDate = ipobj.get("create_date")
+        ip.CreateDate = ipobj.get("CreateDate")
         ip.save()
 
         src = os.path.join(reception, "%s.tar" % pk)
