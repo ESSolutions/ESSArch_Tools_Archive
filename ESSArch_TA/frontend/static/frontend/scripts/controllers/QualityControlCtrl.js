@@ -37,7 +37,9 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
             $scope.selectedIp = row;
         }
     };
-
+    $scope.getListViewData = function() {
+        vm.callServer($scope.tableState);
+    };
     $scope.ipTableClick = function(row) {
         $scope.ip = row;
     }

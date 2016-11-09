@@ -46,8 +46,12 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             method: 'POST',
             url: appConfig.djangoUrl+"ip-reception/"+ip.id+"/create-ip/"
         }).then(function(response) {
+            $scope.getListViewData();
             console.log(response)
         });
+    };
+    $scope.getListViewData = function() {
+        vm.callServer($scope.tableState);
     };
     $scope.ipTableClick = function(row) {
         $scope.ip = row;

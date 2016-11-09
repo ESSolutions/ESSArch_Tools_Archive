@@ -45,6 +45,9 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
     $scope.ipTableClick = function(row) {
         $scope.ip = row;
     }
+    $scope.getListViewData = function() {
+        vm.callServer($scope.tableState);
+    };
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
     $scope.submitDescription = $translate.instant('SUBMITDESCRIPTION');
     $scope.package = $translate.instant('PACKAGE');
