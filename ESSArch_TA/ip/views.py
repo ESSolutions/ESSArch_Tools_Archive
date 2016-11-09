@@ -22,6 +22,10 @@ from ESSArch_Core.ip.models import (
     EventIP
 )
 
+from ESSArch_Core.WorkflowEngine.models import (
+    ProcessTask
+)
+
 from ESSArch_Core.profiles.models import (
     Profile,
 )
@@ -181,6 +185,35 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         shutil.copy(src, dst)
 
         return Response("IP Transferred")
+
+    @detail_route(methods=['post'], url_path='validate')
+    def validate(self, request, pk=None):
+        ip = self.get_object()
+
+        prepare = Path.objects.get(entity="path_ingest_prepare").value
+        xmlfile = os.path.join(prepare, "%s.xml" % pk)
+
+        ProcessTask.objects.create(
+            name="preingest.tasks.ValidateXMLFile",
+            params={
+                "xml_filename": xmlfile
+            },
+            information_package=ip
+        ).run()
+
+        ProcessTask.objects.create(
+            name="preingest.tasks.ValidateFiles",
+            params={
+                "ip": ip,
+                "mets_path": xmlfile,
+                "validate_fileformat": True,
+                "validate_integrity": True,
+            },
+            processstep_pos=0,
+            information_package=ip
+        ).run()
+
+        return Response("Validating IP")
 
     def create(self, request):
         """
