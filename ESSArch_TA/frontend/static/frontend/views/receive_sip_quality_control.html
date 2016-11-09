@@ -10,6 +10,9 @@
     <div class="content-wrapper">
         <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'">
         </div>
+        <div>
+            <button ng-if="selectedIp.id != ''" class="btn btn-info" ng-click="validateSip(ip)">{{'QUALITYCONTROL' | translate}}</button>
+        </div>
         <!--
         <uib-tabset active="activeTab">
             <uib-tab ng-repeat="t in tabsEditView" heading="{{t.label}}">

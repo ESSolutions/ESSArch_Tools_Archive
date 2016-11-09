@@ -41,7 +41,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $scope.selectedIp = row;
         }
     };
-    $scope.createIp = function(ip) {
+    $scope.receiveSip = function(ip) {
         $http({
             method: 'POST',
             url: appConfig.djangoUrl+"ip-reception/"+ip.id+"/create-ip/"

@@ -30,7 +30,7 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
                 ip.class = "";
             }
         });
-        if(row.id == $scope.selectedIp.id && !$scope.select && !$scope.statusShow && !$scope.eventShow){
+        if(row.id == $scope.selectedIp.id){
             $scope.selectedIp = {id: "", class: ""};
         } else {
             row.class = "selected";
@@ -42,6 +42,10 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
     };
     $scope.ipTableClick = function(row) {
         $scope.ip = row;
+    }
+    $scope.validateSip = function(ip) {
+        console.log("running validation");
+        $scope.getListViewData();
     }
 
             $scope.packageDescription = $translate.instant('PACKAGEDESCRIPTION');
