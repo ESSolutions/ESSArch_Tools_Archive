@@ -131,7 +131,10 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         src = os.path.join(reception, "%s.tar" % pk)
         dst = os.path.join(prepare, "%s.tar" % pk)
+        shutil.copy(src, dst)
 
+        src = os.path.join(reception, "%s.xml" % pk)
+        dst = os.path.join(prepare, "%s.xml" % pk)
         shutil.copy(src, dst)
 
         return Response("IP Created")
