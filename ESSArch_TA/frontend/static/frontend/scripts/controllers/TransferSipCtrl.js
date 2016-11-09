@@ -34,7 +34,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
                 ip.class = "";
             }
         });
-        if(row.id == $scope.selectedIp.id){
+        if(row.id == $scope.selectedIp.id && !$scope.select && !$scope.statusShow && !$scope.eventShow){
             $scope.selectedIp = {id: "", class: ""};
         } else {
             row.class = "selected";
@@ -49,8 +49,13 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
         vm.callServer($scope.tableState);
     };
     $scope.transferSip = function(ip) {
-        console.log("Transferring sip to epp reception");
-        $scope.getListViewData();
+        $http({
+            method: 'POST',
+            url: ip.url+"transfer/"
+        }).then(function(response) {
+            console.log(response);
+            $scope.getListViewData();
+        });
     }
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
     $scope.submitDescription = $translate.instant('SUBMITDESCRIPTION');
