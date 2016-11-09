@@ -12,8 +12,6 @@
         </div>
         <div>
             <button ng-if="selectedIp.id != ''" class="btn btn-info" ng-click="validateSip(ip)">{{'VALIDATE' | translate}}</button>
-            <button ng-if="selectedIp.id != ''" class="btn btn-info" ng-click="stateClicked(ip)">{{'STATE' | translate}}</button>
-            <button ng-if="selectedIp.id != ''" class="btn btn-info" ng-click="eventsClick(ip)">{{'EVENTS' | translate}}</button>
         </div>
         <div ng-if="statusShow || eventShow"class="events-status-wrapper">
             <div ng-include src="'static/frontend/views/event_table.html'"></div>

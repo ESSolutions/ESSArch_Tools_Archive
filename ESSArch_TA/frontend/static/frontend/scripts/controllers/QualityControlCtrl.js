@@ -61,7 +61,6 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
      });
      $rootScope.$on('$stateChangeStart', function() {
          $interval.cancel(stateInterval);
-         $interval.cancel(listViewInterval);
      });
 
 //Get data for status view
