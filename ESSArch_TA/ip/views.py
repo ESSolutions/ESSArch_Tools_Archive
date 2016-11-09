@@ -167,6 +167,21 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    @detail_route(methods=['post'], url_path='transfer')
+    def transfer(self, request, pk=None):
+        srcdir = Path.objects.get(entity="path_ingest_prepare").value
+        dstdir = Path.objects.get(entity="path_gate_reception").value
+
+        src = os.path.join(srcdir, "%s.tar" % pk)
+        dst = os.path.join(dstdir, "%s.tar" % pk)
+        shutil.copy(src, dst)
+
+        src = os.path.join(srcdir, "%s.xml" % pk)
+        dst = os.path.join(dstdir, "%s.xml" % pk)
+        shutil.copy(src, dst)
+
+        return Response("IP Transferred")
+
     def create(self, request):
         """
         Prepares a new information package (IP) using the following tasks:
