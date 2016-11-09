@@ -188,6 +188,8 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
     @detail_route(methods=['post'], url_path='transfer')
     def transfer(self, request, pk=None):
+        ip = self.get_object()
+
         srcdir = Path.objects.get(entity="path_ingest_prepare").value
         dstdir = Path.objects.get(entity="path_gate_reception").value
 
@@ -198,6 +200,47 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         src = os.path.join(srcdir, "%s.xml" % pk)
         dst = os.path.join(dstdir, "%s.xml" % pk)
         shutil.copy(src, dst)
+
+        event_profile = ip.get_profile('event')
+        info = event_profile.specification_data
+        info["_OBJID"] = str(pk)
+        info["_LABEL"] = ip.Label
+
+        events_path = os.path.join(dstdir, "%s_ipevents.xml" % pk)
+        filesToCreate = {
+            events_path: event_profile.specification
+        }
+
+        step = ProcessStep.objects.create(
+            name="Transfer SIP",
+            information_package=ip
+        )
+
+        step.tasks.add(
+            ProcessTask.objects.create(
+                name="preingest.tasks.GenerateXML",
+                params={
+                    "info": info,
+                    "filesToCreate": filesToCreate,
+                },
+                processstep_pos=0,
+                information_package=ip
+            )
+        )
+
+        step.tasks.add(
+            ProcessTask.objects.create(
+                name="preingest.tasks.AppendEvents",
+                params={
+                    "filename": events_path,
+                    "events": ip.events.all(),
+                },
+                processstep_pos=1,
+                information_package=ip
+            )
+        )
+
+        step.run()
 
         return Response("IP Transferred")
 
