@@ -23,6 +23,7 @@ from ESSArch_Core.ip.models import (
 )
 
 from ESSArch_Core.WorkflowEngine.models import (
+    ProcessStep,
     ProcessTask
 )
 
@@ -193,25 +194,33 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         prepare = Path.objects.get(entity="path_ingest_prepare").value
         xmlfile = os.path.join(prepare, "%s.xml" % pk)
 
-        ProcessTask.objects.create(
-            name="preingest.tasks.ValidateXMLFile",
-            params={
-                "xml_filename": xmlfile
-            },
+        step = ProcessStep.objects.create(
+            name="Validation",
             information_package=ip
-        ).run()
+        )
 
-        ProcessTask.objects.create(
-            name="preingest.tasks.ValidateFiles",
-            params={
-                "ip": ip,
-                "mets_path": xmlfile,
-                "validate_fileformat": True,
-                "validate_integrity": True,
-            },
-            processstep_pos=0,
-            information_package=ip
-        ).run()
+        step.tasks.add(
+            ProcessTask.objects.create(
+                name="preingest.tasks.ValidateXMLFile",
+                params={
+                    "xml_filename": xmlfile
+                },
+                information_package=ip
+            ),
+            ProcessTask.objects.create(
+                name="preingest.tasks.ValidateFiles",
+                params={
+                    "ip": ip,
+                    "mets_path": xmlfile,
+                    "validate_fileformat": True,
+                    "validate_integrity": True,
+                },
+                processstep_pos=0,
+                information_package=ip
+            )
+        )
+
+        step.run()
 
         return Response("Validating IP")
 
