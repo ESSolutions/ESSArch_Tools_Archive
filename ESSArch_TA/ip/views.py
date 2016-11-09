@@ -86,8 +86,8 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         except:
             ip['id'] = root.get('OBJID')
 
-        ip['label'] = root.get('LABEL')
-        ip['create_date'] = root.find("{*}metsHdr").get('CREATEDATE')
+        ip['Label'] = root.get('LABEL')
+        ip['CreateDate'] = root.find("{*}metsHdr").get('CREATEDATE')
 
         return ip
 
