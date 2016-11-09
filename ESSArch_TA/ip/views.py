@@ -41,6 +41,10 @@ from preingest.serializers import (
     ProcessStepSerializer,
 )
 
+from preingest.pagination import (
+    LinkHeaderPagination
+)
+
 from ip.steps import (
     prepare_ip,
 )
@@ -99,6 +103,11 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             ip = self.parseFile(xmlfile)
             if not InformationPackage.objects.filter(id=ip['id']).exists():
                 ips.append(self.parseFile(xmlfile))
+
+        paginator = LinkHeaderPagination()
+        page = paginator.paginate_queryset(ips, request)
+        if page is not None:
+            return paginator.get_paginated_response(page)
 
         return Response(ips)
 
