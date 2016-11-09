@@ -1,5 +1,7 @@
 import glob, os, shutil
 
+from django.core import serializers
+
 from django_filters.rest_framework import DjangoFilterBackend
 
 from lxml import etree
@@ -29,6 +31,7 @@ from ESSArch_Core.WorkflowEngine.models import (
 
 from ESSArch_Core.profiles.models import (
     Profile,
+    ProfileIP
 )
 
 from ip.filters import InformationPackageFilter
@@ -132,7 +135,6 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         )
 
         ip.CreateDate = ipobj.get("CreateDate")
-        ip.save()
 
         src = os.path.join(reception, "%s.tar" % pk)
         dst = os.path.join(prepare, "%s.tar" % pk)
@@ -141,6 +143,18 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         src = os.path.join(reception, "%s.xml" % pk)
         dst = os.path.join(prepare, "%s.xml" % pk)
         shutil.copy(src, dst)
+
+        with open(os.path.join(reception, "%s_event_profile.json" % pk)) as f:
+            json_str = f.read()
+            for p in serializers.deserialize("json", json_str):
+                p.save()
+
+                ProfileIP.objects.create(
+                    profile=p.object,
+                    ip=ip
+                )
+
+        ip.save()
 
         return Response("IP Created")
 
