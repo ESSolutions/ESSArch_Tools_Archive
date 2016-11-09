@@ -172,6 +172,7 @@ def installDefaultPaths(): # default paths
     dct = {
           'path_mimetypes_definitionfile':'/ESSArch/config/mime.types',
           'path_definitions':'/ESSArch/etp/env',
+          'path_gate_reception':'/ESSArch/data/gate/reception',
           'path_preingest_prepare':'/ESSArch/data/etp/prepare',
           'path_preingest_reception':'/ESSArch/data/etp/reception',
           'path_ingest_reception':'/ESSArch/data/eta/reception/eft',
