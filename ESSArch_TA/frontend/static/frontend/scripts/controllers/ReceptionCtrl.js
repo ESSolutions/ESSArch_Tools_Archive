@@ -28,26 +28,32 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     };
     //Make ip selected and add class to visualize
     vm.displayedIps=[];
+    $scope.selected = [];
     $scope.selectIp = function(row) {
-        vm.displayedIps.forEach(function(ip) {
-            if(ip.id == $scope.selectedIp.id){
-                ip.class = "";
-            }
-        });
-        if(row.id == $scope.selectedIp.id && !$scope.select && !$scope.statusShow && !$scope.eventShow){
-            $scope.selectedIp = {id: "", class: ""};
+        if(row.class == "selected"){
+            row.class = "";
+            $scope.selected.forEach(function(ip, idx) {
+                if(ip.id === row.id){
+                    $scope.selected.splice(idx,1);
+                }
+
+            });
+            console.log($scope.selected);
         } else {
             row.class = "selected";
-            $scope.selectedIp = row;
-        }
+            $scope.selected.push(row);
+            console.log($scope.selected);
+       }
     };
-    $scope.receiveSip = function(ip) {
-        $http({
-            method: 'POST',
-            url: appConfig.djangoUrl+"ip-reception/"+ip.id+"/create-ip/"
-        }).then(function(response) {
-            $scope.getListViewData();
-            console.log(response)
+    $scope.receiveSip = function(ips) {
+        ips.forEach(function(ip) {
+            $http({
+                method: 'POST',
+                url: appConfig.djangoUrl+"ip-reception/"+ip.id+"/create-ip/"
+            }).then(function(response) {
+                $scope.getListViewData();
+                console.log(response)
+            });
         });
     };
     $scope.getListViewData = function() {

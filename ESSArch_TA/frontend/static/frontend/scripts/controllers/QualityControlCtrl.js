@@ -44,8 +44,12 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
         $scope.ip = row;
     }
     $scope.validateSip = function(ip) {
-        console.log("running validation");
-        $scope.getListViewData();
+        $http({
+            method: 'POST',
+            url: ip.url+"validate/"
+        }).then(function(response) {
+            $scope.getListViewData();
+        });
     }
 
             $scope.packageDescription = $translate.instant('PACKAGEDESCRIPTION');
