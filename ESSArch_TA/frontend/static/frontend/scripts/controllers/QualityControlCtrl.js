@@ -1,5 +1,10 @@
 angular.module('myApp').controller('QualityControlCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval) {
+    /*
+     * Status view data
+     */
+
     $scope.statusShow = false;
+    $scope.eventShow = false;
     $scope.tree_data = [];
     $translate(['LABEL', 'RESPONSIBLE', 'DATE', 'STATE', 'STATUS']).then(function(translations) {
         $scope.responsible = translations.RESPONSIBLE;
@@ -39,6 +44,7 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
          if($scope.statusShow && $scope.ip == row){
              $scope.statusShow = false;
          } else {
+             $scope.eventShow = false;
              $scope.statusShow = true;
              $scope.statusViewUpdate(row);
          }
@@ -79,6 +85,29 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
         }
         listViewService.getTreeData(row, expandedNodes).then(function(value) {
             $scope.tree_data = value;
+        });
+    };
+    /*
+     * EVENTS
+     */
+    $scope.eventsClick = function (row) {
+        if($scope.eventShow && $scope.ip == row){
+            $scope.eventShow = false;
+            $rootScope.stCtrl = null;
+        } else {
+            if($rootScope.stCtrl) {
+                $rootScope.stCtrl.pipe();
+            }
+            getEventlogData();
+            $scope.eventShow = true;
+            $scope.statusShow = false;
+        }
+        $scope.ip = row;
+        $rootScope.ip = row;
+    };
+    function getEventlogData() {
+        listViewService.getEventlogData().then(function(value){
+            $scope.statusNoteCollection = value;
         });
     };
     /*******************************************/
