@@ -1,4 +1,86 @@
-angular.module('myApp').controller('QualityControlCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate) {
+angular.module('myApp').controller('QualityControlCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval) {
+    $scope.statusShow = false;
+    $scope.tree_data = [];
+    $translate(['LABEL', 'RESPONSIBLE', 'DATE', 'STATE', 'STATUS']).then(function(translations) {
+        $scope.responsible = translations.RESPONSIBLE;
+        $scope.label = translations.LABEL;
+        $scope.date = translations.DATE;
+        $scope.state = translations.STATE;
+        $scope.status = translations.STATUS;
+        $scope.expanding_property = {
+            field: "name",
+            displayName: $scope.label,
+        };
+        $scope.col_defs = [
+        {
+            field: "user",
+            displayName: $scope.responsible,
+        },
+        {
+            field: "time_created",
+            displayName: $scope.date
+        },
+        {
+            field: "status",
+            displayName: $scope.state,
+        },
+        {
+            field: "progress",
+            displayName: $scope.status,
+            cellTemplate: "<uib-progressbar ng-click=\"taskStepUndo(row.branch)\" class=\"progress\" value=\"row.branch[col.field]\" type=\"success\"><b>{{row.branch[col.field]+\"%\"}}</b></uib-progressbar>"
+        },
+        {
+            cellTemplate: "<a ng-click=\"treeControl.scope.taskStepUndo(row.branch)\" ng-if=\"(row.branch.status == 'SUCCESS' || row.branch.status == 'FAILURE') && !row.branch.undone && !row.branch.undo_type\" style=\"color: #a00\">{{'UNDO' | translate}}</a></br ><a ng-click=\"treeControl.scope.taskStepRedo(row.branch)\" ng-if=\"row.branch.undone\"style=\"color: #0a0\">{{'REDO' | translate}}</a>"
+        }
+        ];
+    });
+     var stateInterval;
+     $scope.stateClicked = function(row){
+         if($scope.statusShow && $scope.ip == row){
+             $scope.statusShow = false;
+         } else {
+             $scope.statusShow = true;
+             $scope.statusViewUpdate(row);
+         }
+         $scope.ip = row;
+         $rootScope.ip = row;
+     };
+     $scope.$watch(function(){return $scope.statusShow;}, function(newValue, oldValue) {
+         if(newValue) {
+             $interval.cancel(stateInterval);
+             stateInterval = $interval(function(){$scope.statusViewUpdate($scope.ip)}, 10000);
+        } else {
+            $interval.cancel(stateInterval);
+        }
+     });
+     $rootScope.$on('$stateChangeStart', function() {
+         $interval.cancel(stateInterval);
+         $interval.cancel(listViewInterval);
+     });
+
+//Get data for status view
+     function checkExpanded(nodes) {
+         var ret = [];
+         nodes.forEach(function(node) {
+             if(node.expanded == true) {
+                ret.push({id: node.id, name: node.name});
+            }
+            if(node.children && node.children.length > 0) {
+                ret = ret.concat(checkExpanded(node.children));
+            }
+        });
+        return ret;
+    }
+    //Update status view data
+    $scope.statusViewUpdate = function(row){
+        var expandedNodes = [];
+        if($scope.tree_data != []) {
+            expandedNodes = checkExpanded($scope.tree_data);
+        }
+        listViewService.getTreeData(row, expandedNodes).then(function(value) {
+            $scope.tree_data = value;
+        });
+    };
     /*******************************************/
     /*Piping and Pagination for List-view table*/
     /*******************************************/
