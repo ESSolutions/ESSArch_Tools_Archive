@@ -96,7 +96,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ips = []
 
         for xmlfile in glob.glob(os.path.join(path, "*.xml")):
-            ips.append(self.parseFile(xmlfile))
+            ip = self.parseFile(xmlfile)
+            if not InformationPackage.objects.filter(id=ip['id']).exists():
+                ips.append(self.parseFile(xmlfile))
 
         return Response(ips)
 
