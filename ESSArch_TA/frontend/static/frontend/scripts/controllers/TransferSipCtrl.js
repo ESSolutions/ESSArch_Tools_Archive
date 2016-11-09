@@ -44,9 +44,6 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
 
     $scope.ipTableClick = function(row) {
         $scope.ip = row;
-        listViewService.getSa(row.SubmissionAgreement).then(function(sa) {
-            $scope.currentSa = sa;
-        });
     }
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
     $scope.submitDescription = $translate.instant('SUBMITDESCRIPTION');

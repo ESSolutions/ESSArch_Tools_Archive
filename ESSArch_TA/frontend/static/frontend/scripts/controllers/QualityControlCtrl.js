@@ -40,9 +40,6 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
 
     $scope.ipTableClick = function(row) {
         $scope.ip = row;
-        listViewService.getSa(row.SubmissionAgreement).then(function(sa) {
-            $scope.currentSa = sa;
-        });
     }
 
             $scope.packageDescription = $translate.instant('PACKAGEDESCRIPTION');

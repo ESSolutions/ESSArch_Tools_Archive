@@ -7,7 +7,7 @@ angular.module('myApp').controller('TabsCtrl', function TabsCtrl($state, $scope,
     $scope.qualityControl = $translate.instant('QUALITYCONTROL');
     $scope.transferSip = $translate.instant('TRANSFERSIP');
     $scope.tabs = [
-    { link: 'home.myPage', label: $scope.myPage },
+    //{ link: 'home.myPage', label: $scope.myPage },
     { link: 'home.reception', label: $scope.reception },
     { link: 'home.qualityControl', label: $scope.qualityControl },
     { link: 'home.transferSip', label : $scope.transferSip },

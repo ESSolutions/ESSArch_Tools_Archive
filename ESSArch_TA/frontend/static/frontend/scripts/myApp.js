@@ -94,7 +94,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                 }],
             }
         });
-        $urlRouterProvider.otherwise('/');
+        $urlRouterProvider.otherwise('/reception');
     })
 .config(['$httpProvider', function($httpProvider, $rootScope) {
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
