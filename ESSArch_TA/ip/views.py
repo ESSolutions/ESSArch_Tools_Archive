@@ -240,6 +240,110 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             )
         )
 
+        spec = {
+            "-name": "object",
+            "-namespace": "premis",
+            "-children": [
+                {
+                    "-name": "objectIdentifier",
+                    "-namespace": "premis",
+                    "-children": [
+                        {
+                            "-name": "objectIdentifierType",
+                            "-namespace": "premis",
+                            "#content": [{"var": "FIDType"}],
+                            "-children": []
+                        },
+                        {
+                            "-name": "objectIdentifierValue",
+                            "-namespace": "premis",
+                            "#content": [{"text":"ID"},{"var": "FID"}],
+                            "-children": []
+                        }
+                    ]
+                },
+                {
+                    "-name": "objectCharacteristics",
+                    "-namespace": "premis",
+                    "-children": [
+                        {
+                            "-name": "format",
+                            "-namespace": "premis",
+                            "-children": [
+                                {
+                                    "-name": "formatDesignation",
+                                    "-namespace": "premis",
+                                    "-children": [
+                                        {
+                                            "-name": "formatName",
+                                            "-namespace": "premis",
+                                            "#content": [{"var": "FFormatName"}],
+                                            "-children": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "-name": "storage",
+                    "-namespace": "premis",
+                    "-children": [
+                        {
+                            "-name": "contentLocation",
+                            "-namespace": "premis",
+                            "-children": [
+                                {
+                                    "-name": "contentLocationType",
+                                    "-namespace": "premis",
+                                    "#content": [{"var": "FLocationType"}],
+                                    "-children": []
+                                },
+                                {
+                                    "-name": "contentLocationValue",
+                                    "-namespace": "premis",
+                                    "#content": [{"text": "file:///"},{"var": "FName"}],
+                                    "-children": []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "-attr": [
+                {
+                  "-name": "type",
+                  '-namespace': 'xsi',
+                  "-req": "1",
+                  "#content": [{"text":"premis:file"}]
+                }
+            ],
+        }
+
+        info = {
+            'FIDType': "UUID",
+            'FID': "%s" % str(ip.pk),
+            'FFormatName': 'TAR',
+            'FLocationType': 'URI',
+            'FName': ip.ObjectPath,
+        }
+
+        step.tasks.add(
+            ProcessTask.objects.create(
+                name="preingest.tasks.InsertXML",
+                params={
+                    "filename": events_path,
+                    "elementToAppendTo": "premis",
+                    "spec": spec,
+                    "info": info,
+                    "index": 0
+                },
+                processstep_pos=2,
+                information_package=ip
+            )
+        )
+
         step.run()
 
         return Response("IP Transferred")
