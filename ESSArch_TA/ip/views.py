@@ -204,7 +204,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         event_profile = ip.get_profile('event')
         info = event_profile.specification_data
         info["_OBJID"] = str(pk)
-        info["_LABEL"] = ip.Label
+        info["_OBJLABEL"] = ip.Label
 
         events_path = os.path.join(dstdir, "%s_ipevents.xml" % pk)
         filesToCreate = {
