@@ -10,8 +10,9 @@
     <div class="content-wrapper">
         <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'">
         </div>
-        <div>
-            <button ng-if="selectedIp.id != ''" class="btn btn-info" ng-click="validateSip(ip)">{{'VALIDATE' | translate}}</button>
+        <div ng-if="selectedIp.id != ''">
+            <div ng-include src="'static/frontend/views/validator_choices.html'"></div>
+            <button class="btn btn-info" ng-click="validateSip(ip)">{{'VALIDATE' | translate}}</button>
         </div>
         <div ng-if="statusShow || eventShow"class="events-status-wrapper">
             <div ng-include src="'static/frontend/views/event_table.html'"></div>

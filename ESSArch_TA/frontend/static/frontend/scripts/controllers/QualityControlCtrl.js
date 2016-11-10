@@ -189,7 +189,8 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
     $scope.validateSip = function(ip) {
         $http({
             method: 'POST',
-            url: ip.url+"validate/"
+            url: ip.url+"validate/",
+            data: {validators: vm.validatorModel}
         }).then(function(response) {
             $scope.getListViewData();
         });
@@ -224,4 +225,52 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
         }
     ];
     $scope.colspan = 6;
+
+    $scope.yes = $translate.instant('YES');
+    $scope.no = $translate.instant('NO');
+    vm.validatorModel = {
+
+    };
+    vm.validatorFields = [
+    {
+        "templateOptions": {
+            "type": "text",
+            "label": $translate.instant('VALIDATEFILEFORMAT'),
+            "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+        },
+        "defaultValue": true,
+        "type": "select",
+        "key": "validate_file_format",
+    },
+    {
+        "templateOptions": {
+            "type": "text",
+            "label": $translate.instant('VALIDATEXMLFILE'),
+            "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+        },
+        "defaultValue": true,
+        "type": "select",
+        "key": "validate_xml_file",
+    },
+    {
+        "templateOptions": {
+            "type": "text",
+            "label": $translate.instant('VALIDATELOGICALPHYSICALREPRESENTATION'),
+            "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+        },
+        "defaultValue": true,
+        "type": "select",
+        "key": "validate_logical_physical_representation",
+    },
+    {
+        "templateOptions": {
+            "type": "text",
+            "label": $translate.instant('VALIDATEINTEGRITY'),
+            "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+        },
+        "defaultValue": true,
+        "type": "select",
+        "key": "validate_integrity",
+    }
+    ];
 });
