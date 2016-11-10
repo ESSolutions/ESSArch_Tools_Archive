@@ -1,6 +1,9 @@
-angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig) {
+angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval) {
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
+    });
+    $rootScope.$on('$stateChangeStart', function() {
+        $interval.cancel(listViewInterval);
     });
     /*******************************************/
     /*Piping and Pagination for List-view table*/
@@ -59,6 +62,14 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     $scope.getListViewData = function() {
         vm.callServer($scope.tableState);
     };
+    var listViewInterval;
+    function updateListViewConditional() {
+        $interval.cancel(listViewInterval);
+        listViewInterval = $interval(function() {
+            $scope.getListViewData();
+        }, 4000);
+    };
+    updateListViewConditional();
     $scope.ipTableClick = function(row) {
         $scope.ip = row;
         $scope.fileListCollection = listViewService.getFileList(row);

@@ -1,6 +1,9 @@
-angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate) {
+angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval) {
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
+    });
+    $rootScope.$on('$stateChangeStart', function() {
+        $interval.cancel(listViewInterval);
     });
     /*******************************************/
     /*Piping and Pagination for List-view table*/
@@ -48,6 +51,15 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
     $scope.getListViewData = function() {
         vm.callServer($scope.tableState);
     };
+    var listViewInterval;
+    function updateListViewConditional() {
+        $interval.cancel(listViewInterval);
+        listViewInterval = $interval(function() {
+            $scope.getListViewData();
+        }, 4000);
+    };
+    updateListViewConditional();
+
     $scope.transferSip = function(ip) {
         $http({
             method: 'POST',

@@ -45,6 +45,7 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
              $scope.statusShow = false;
          } else {
              $scope.eventShow = false;
+             $scope.validateShow = false;
              $scope.statusShow = true;
              $scope.statusViewUpdate(row);
          }
@@ -61,6 +62,7 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
      });
      $rootScope.$on('$stateChangeStart', function() {
          $interval.cancel(stateInterval);
+        $interval.cancel(listViewInterval);
      });
 
 //Get data for status view
@@ -99,6 +101,7 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
             }
             getEventlogData();
             $scope.eventShow = true;
+            $scope.validateShow = false;
             $scope.statusShow = false;
         }
         $scope.ip = row;
@@ -183,8 +186,19 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
     $scope.getListViewData = function() {
         vm.callServer($scope.tableState);
     };
+    var listViewInterval;
+    function updateListViewConditional() {
+        $interval.cancel(listViewInterval);
+        listViewInterval = $interval(function() {
+            $scope.getListViewData();
+        }, 4000);
+    };
+    updateListViewConditional();
     $scope.ipTableClick = function(row) {
         $scope.ip = row;
+        $scope.statusShow = false;
+        $scope.eventShow = false;
+        $scope.validateShow = !$scope.validateShow;
     }
     $scope.validateSip = function(ip) {
         $http({
