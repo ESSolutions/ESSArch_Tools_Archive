@@ -257,7 +257,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                         {
                             "-name": "objectIdentifierValue",
                             "-namespace": "premis",
-                            "#content": [{"text":"ID"},{"var": "FID"}],
+                            "#content": [{"var": "FID"}],
                             "-children": []
                         }
                     ]
