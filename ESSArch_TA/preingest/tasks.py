@@ -483,9 +483,8 @@ class ValidateFiles(DBTask):
         nsmap = {k:v for k,v in root.nsmap.iteritems() if k}
 
         prepare_path = Path.objects.get(
-            entity="path_preingest_prepare"
+            entity="path_ingest_prepare"
         ).value
-        ip_prepare_path = os.path.join(prepare_path, str(ip.pk))
 
         step = ProcessStep.objects.create(
             name="Validate Files",
@@ -496,8 +495,11 @@ class ValidateFiles(DBTask):
         if any([validate_fileformat, validate_integrity]):
             for f in metsdoc.findall('.//mets:file', nsmap):
                 filename = f.find('mets:FLocat', nsmap).get('{%s}href' % nsmap['xlink'])
-                filename = os.path.join(ip_prepare_path, filename)
-                fileformat = f.get("{%s}FILEFORMATNAME" % nsmap['ext'])
+                filename = os.path.join(prepare_path, filename)
+                try:
+                    fileformat = f.get("{%s}FILEFORMATNAME" % nsmap['ext'])
+                except KeyError:
+                    fileformat = None
                 checksum = f.get("CHECKSUM")
 
                 if validate_fileformat and fileformat is not None:
