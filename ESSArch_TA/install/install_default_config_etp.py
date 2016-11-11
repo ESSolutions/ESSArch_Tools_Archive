@@ -202,6 +202,7 @@ def installDefaultEventTypes(): # default events
         'Validate file format for %s against %s': '20260',
         'Validate XML file %s': '20261',
         'Validate checksum for %s using %s against %s': '20263',
+        'Update IP status of %s': '20280',
         'Delivery registered': '20300',
         'Delivery registered in journal system': '20400',
         'Delivery registered in archival information system': '20500',
