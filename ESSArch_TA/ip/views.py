@@ -131,7 +131,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ipobj = self.parseFile(os.path.join(reception, "%s.xml" % pk))
 
         ip = InformationPackage.objects.create(
-            id=pk, Label=ipobj.get("Label")
+            id=pk, Label=ipobj.get("Label"), State="Received"
         )
 
         ip.CreateDate = ipobj.get("CreateDate")
@@ -340,6 +340,18 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     "index": 0
                 },
                 processstep_pos=2,
+                information_package=ip
+            )
+        )
+
+        step.tasks.add(
+            ProcessTask.objects.create(
+                name="preingest.tasks.UpdateIPStatus",
+                params={
+                    "ip": ip,
+                    "status": "Transferred",
+                },
+                processstep_pos=3,
                 information_package=ip
             )
         )
