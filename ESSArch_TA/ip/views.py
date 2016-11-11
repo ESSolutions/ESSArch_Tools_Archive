@@ -303,7 +303,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                                 {
                                     "-name": "contentLocationValue",
                                     "-namespace": "premis",
-                                    "#content": [{"text": "file:///"},{"var": "FName"}],
+                                    "#content": [{"text": "file:///%s.tar" % pk}],
                                     "-children": []
                                 }
                             ]
