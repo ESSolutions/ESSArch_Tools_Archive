@@ -13,15 +13,16 @@
             <tr>
                 <th class="clickable" st-sort="Label" class="column-label">{{'LABEL' | translate}}</th>
                 <th class="clickable" st-sort="CreateDate" st-sort-default="reverse" class="column-label">{{'DATE' | translate}}</th>
-                <th ng-if="'home.qualityControl' | isState" class="clickable" class="column-label">{{'STATUS' | translate}}</th>
+                <th ng-if="('home.qualityControl' | isState) || ('home.transferSip' | isState)" class="clickable" class="column-label">{{'STATUS' | translate}}</th>
                 <th ng-if="'home.qualityControl' | isState" class="clickable" class="column-label">{{'EVENTS' | translate}}</th>
             </tr>
         </thead>
         <tbody>
             <tr ng-class="row.class" ng-repeat="row in vm.displayedIps" class="table-item">
                 <td class="clickable" ng-click="selectIp(row);ipTableClick(row)">{{row.Label}}</td>
-                <td class="clickable" ng-click="ipRowClick(row)">{{row.CreateDate | date:"yyyy-MM-dd HH:mm:ss"}}</td>
-                <td ng-if="'home.qualityControl' | isState" class="clickable" ng-click="selectIp(row);stateClicked(row)"><a href="">{{'STATUS' | translate}}</a></td>
+                <td  ng-click="ipRowClick(row)">{{row.CreateDate | date:"yyyy-MM-dd HH:mm:ss"}}</td>
+                <td ng-if="'home.qualityControl' | isState" class="clickable" ng-click="selectIp(row);stateClicked(row)"><a href="">{{row.State}}</a></td>
+                <td ng-if="'home.transferSip' | isState"><p>{{row.State}}</p></td>
                 <td ng-if="'home.qualityControl' | isState" class="clickable" ng-click="selectIp(row);eventsClick(row)"><a href="">{{'EVENTS' | translate}}</a></td>
             </tr>
         </tbody>
