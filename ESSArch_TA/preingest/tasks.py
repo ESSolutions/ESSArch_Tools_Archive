@@ -531,7 +531,7 @@ class ValidateFiles(DBTask):
         pass
 
 class ValidateFileFormat(DBTask):
-    event_type = 10260
+    event_type = 20260
 
     """
     Validates the format (PREFORMA, jhove, droid, etc.) of the given file
@@ -558,7 +558,7 @@ class ValidateFileFormat(DBTask):
 
 
 class ValidateXMLFile(DBTask):
-    event_type = 10261
+    event_type = 20261
 
     """
     Validates (using LXML) an XML file using a specified schema file
@@ -637,7 +637,7 @@ class ValidateLogicalPhysicalRepresentation(DBTask):
 
 
 class ValidateIntegrity(DBTask):
-    event_type = 10263
+    event_type = 20263
 
     def run(self, filename=None, checksum=None, block_size=65536, algorithm=hashlib.sha256):
         """
