@@ -40,7 +40,7 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
             };
         });
 	}
-    function getReceptionIps(start, number, pageNumber, params, selected, sort) {
+    function getReceptionIps(start, number, pageNumber, params, selected, checked, sort) {
         var sortString = sort.predicate;
         if(sort.reverse) {
             sortString = "-"+sortString;
@@ -48,6 +48,12 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
         return listViewService.getReceptionIps(pageNumber, number, sortString).then(function(value) {
             var ipCollection = value.data;
             ipCollection.forEach(function(ip) {
+                ip.checked = false;
+                checked.forEach(function(checkedIp) {
+                    if(ip.id == checkedIp.id) {
+                        ip.checked = true;
+                    }
+                });
                 if(selected.id == ip.id) {
                     ip.class = "selected";
                 }

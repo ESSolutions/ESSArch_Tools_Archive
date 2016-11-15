@@ -24,7 +24,7 @@
                 </tr>
             </tfoot>
         </table>
-        <div class="events-footer">
+        <div ng-if="!('home.reception' | isState)" class="events-footer">
             <form class="events-form" ng-submit="addEvent(ip, statusNote, signature)">
                 <div class="form-group">
                     <label>{{'EVENTTYPE' | translate}}</label>

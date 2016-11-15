@@ -171,31 +171,31 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         var number = pagination.number;  // Number of entries showed per page.
         var pageNumber = start/number+1;
 
-        Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.selectedIp, sorting).then(function (result) {
-            ctrl.displayedIps = result.data;
+        Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.selectedIp, $scope.includedIps, sorting).then(function (result) {
+            vm.displayedIps = result.data;
             tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
         });
     };
     //Make ip selected and add class to visualize
     vm.displayedIps=[];
     $scope.selected = [];
-    $scope.selectIp = function(row) {
-        if(row.class == "selected"){
-            row.class = "";
-            $scope.selected.forEach(function(ip, idx) {
-                if(ip.id === row.id){
-                    $scope.selected.splice(idx,1);
-                }
-
-            });
-            console.log($scope.selected);
+        $scope.selectIp = function(row) {
+        vm.displayedIps.forEach(function(ip) {
+            if(ip.id == $scope.selectedIp.id){
+                ip.class = "";
+            }
+        });
+        if(row.id == $scope.selectedIp.id && !$scope.select && !$scope.statusShow && !$scope.eventShow){
+            $scope.selectedIp = {id: "", class: ""};
         } else {
             row.class = "selected";
-            $scope.selected.push(row);
-            console.log($scope.selected);
-       }
+            $scope.selectedIp = row;
+        }
     };
     $scope.receiveSip = function(ips) {
+        if(ips == []) {
+            return;
+        }
         ips.forEach(function(ip) {
             $http({
                 method: 'POST',
@@ -206,6 +206,26 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             });
         });
     };
+    $scope.includeIp = function(row) {
+        console.log("include ip function")
+        console.log(row)
+        var temp = true;
+        $scope.includedIps.forEach(function(included) {
+
+            if(included.id == row.id) {
+                $scope.includedIps.splice($scope.includedIps.indexOf(row), 1);
+                temp = false;
+            }
+        });
+        if(temp) {
+            $scope.includedIps.push(row);
+        }
+        if($scope.includedIps == []) {
+            $scope.receiveShow = true;
+        } else {
+            $scope.receiveShow = false;
+        }
+    }
     $scope.getListViewData = function() {
         vm.callServer($scope.tableState);
     };
@@ -219,7 +239,9 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     updateListViewConditional();
     $scope.ipTableClick = function(row) {
         $scope.ip = row;
-        $scope.fileListCollection = listViewService.getFileList(row);
+        $scope.statusShow = false;
+        $scope.eventShow = false;
+        //$scope.fileListCollection = listViewService.getFileList(row);
     }
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
     $scope.submitDescription = $translate.instant('SUBMITDESCRIPTION');

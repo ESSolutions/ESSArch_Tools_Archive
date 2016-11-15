@@ -189,6 +189,8 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
     };
 
     $scope.ipTableClick = function(row) {
+        $scope.statusShow = false;
+        $scope.eventShow = false;
         $scope.ip = row;
     }
     $scope.getListViewData = function() {
