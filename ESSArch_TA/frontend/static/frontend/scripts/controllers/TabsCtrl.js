@@ -9,7 +9,7 @@ angular.module('myApp').controller('TabsCtrl', function TabsCtrl($state, $scope,
     $scope.tabs = [
     //{ link: 'home.myPage', label: $scope.myPage },
     { link: 'home.reception', label: $scope.reception },
-    { link: 'home.qualityControl', label: $scope.qualityControl },
+    //{ link: 'home.qualityControl', label: $scope.qualityControl },
     { link: 'home.transferSip', label : $scope.transferSip },
     ];
     $scope.is_active = function(tab) {

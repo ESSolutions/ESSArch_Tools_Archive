@@ -6,6 +6,7 @@ body {
     margin: 0px auto;
     max-width: 1440px;
     min-width: 1024px;
+    overflow: auto;
 }
 body.modal-open {
     overflow: auto;
@@ -50,6 +51,8 @@ body.modal-open[style] {
     border-style: solid;
     border-radius: 1px;
     background-color: white;
+    min-height: 1131px;
+    height: 100%;
 }
 .logo-search-user-admin-wrapper {
     display: flex;
@@ -241,14 +244,10 @@ body.modal-open[style] {
     font-size: 20px;
 }
 .status-tree-grid {
-    max-height: 550px;
-    overflow-y: scroll;
     padding: 5px;
     margin: 5px;
 }
 .list-view-table {
-    max-height: 330px;
-    overflow-y: scroll;
     margin: 5px;
 }
 .well-sm {

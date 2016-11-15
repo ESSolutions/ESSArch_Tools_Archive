@@ -257,4 +257,52 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         }
     ];
     $scope.colspan = 6;
+    $scope.yes = $translate.instant('YES');
+    $scope.no = $translate.instant('NO');
+    vm.validatorModel = {
+
+    };
+    vm.validatorFields = [
+    {
+        "templateOptions": {
+            "type": "text",
+            "label": $translate.instant('VALIDATEFILEFORMAT'),
+            "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+        },
+        "defaultValue": true,
+        "type": "select",
+        "key": "validate_file_format",
+    },
+    {
+        "templateOptions": {
+            "type": "text",
+            "label": $translate.instant('VALIDATEXMLFILE'),
+            "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+        },
+        "defaultValue": true,
+        "type": "select",
+        "key": "validate_xml_file",
+    },
+    {
+        "templateOptions": {
+            "type": "text",
+            "label": $translate.instant('VALIDATELOGICALPHYSICALREPRESENTATION'),
+            "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+        },
+        "defaultValue": true,
+        "type": "select",
+        "key": "validate_logical_physical_representation",
+    },
+    {
+        "templateOptions": {
+            "type": "text",
+            "label": $translate.instant('VALIDATEINTEGRITY'),
+            "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+        },
+        "defaultValue": true,
+        "type": "select",
+        "key": "validate_integrity",
+    }
+    ];
+
 });
