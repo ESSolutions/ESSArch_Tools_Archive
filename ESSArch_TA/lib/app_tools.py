@@ -1003,7 +1003,7 @@ def transferIP( agent, contextdata ):
     else:
         status_code = 201
         error_list.append('Package description file %s does not exist' % pspec_filepath)
-        return 1, status_code, error_list
+        return None, status_code, error_list
    
     # get ip_uuid
     if context["ip_uuid"][:5] == 'UUID:' or context["ip_uuid"][:5] == 'RAID:' : 
@@ -1031,11 +1031,19 @@ def transferIP( agent, contextdata ):
         aic_uuid = str(uuid.uuid4())
     
     if not remote_flag:
-        # create AIC_UUID directory
-        aic_rootpath = createAICdirectory(path_gate_reception, aic_uuid)
-
-        # create IP_UUID directory
-        ip_rootpath = createIPdirectory(aic_rootpath, ip_uuid)
+        try:
+            # create AIC_UUID directory
+            aic_rootpath = createAICdirectory(path_gate_reception, aic_uuid)
+    
+            # create IP_UUID directory
+            ip_rootpath = createIPdirectory(aic_rootpath, ip_uuid)
+        except OSError as e:
+            status_code = 99
+            if e.errno == 17:
+                error_list.append('AIC or IP directory %s already exists for ip_uuid: %s' % (e.filename, ip_uuid))
+            else:
+                error_list.append('Problem to create AIC or IP directory for ip_uuid: %s, error: %s' % (ip_uuid, repr(e)))
+            return None, status_code, error_list
         
         # copy specfile from source to destination
         dst_psspec_filepath = os.path.join(aic_rootpath, package_descriptionfile)
