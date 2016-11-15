@@ -725,7 +725,7 @@ class CreateZIP(DBTask):
         return [zipname, dirname]
 
 class UpdateIPStatus(DBTask):
-    event_type = 10280
+    event_type = 20280
 
     def run(self, ip=None, status=None):
         ip.State = status
