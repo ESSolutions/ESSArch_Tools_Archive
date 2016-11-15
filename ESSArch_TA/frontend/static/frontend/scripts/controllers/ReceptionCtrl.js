@@ -5,6 +5,153 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     $rootScope.$on('$stateChangeStart', function() {
         $interval.cancel(listViewInterval);
     });
+    $scope.includedIps = [];
+    $scope.receiveShow = false;
+    $scope.validateShow = false;
+    $scope.statusShow = false;
+    $scope.eventShow = false;
+ $scope.tree_data = [];
+    $translate(['LABEL', 'RESPONSIBLE', 'DATE', 'STATE', 'STATUS']).then(function(translations) {
+        $scope.responsible = translations.RESPONSIBLE;
+        $scope.label = translations.LABEL;
+        $scope.date = translations.DATE;
+        $scope.state = translations.STATE;
+        $scope.status = translations.STATUS;
+        $scope.expanding_property = {
+            field: "name",
+            displayName: $scope.label,
+        };
+        $scope.col_defs = [
+        {
+            field: "user",
+            displayName: $scope.responsible,
+        },
+        {
+            field: "time_created",
+            displayName: $scope.date
+        },
+        {
+            field: "status",
+            displayName: $scope.state,
+        },
+        {
+            field: "progress",
+            displayName: $scope.status,
+            cellTemplate: "<uib-progressbar ng-click=\"taskStepUndo(row.branch)\" class=\"progress\" value=\"row.branch[col.field]\" type=\"success\"><b>{{row.branch[col.field]+\"%\"}}</b></uib-progressbar>"
+        },
+        {
+            cellTemplate: "<a ng-click=\"treeControl.scope.taskStepUndo(row.branch)\" ng-if=\"(row.branch.status == 'SUCCESS' || row.branch.status == 'FAILURE') && !row.branch.undone && !row.branch.undo_type\" style=\"color: #a00\">{{'UNDO' | translate}}</a></br ><a ng-click=\"treeControl.scope.taskStepRedo(row.branch)\" ng-if=\"row.branch.undone\"style=\"color: #0a0\">{{'REDO' | translate}}</a>"
+        }
+        ];
+    });
+     var stateInterval;
+     $scope.stateClicked = function(row){
+         if($scope.statusShow && $scope.ip == row){
+             $scope.statusShow = false;
+         } else {
+             $scope.eventShow = false;
+             $scope.validateShow = false;
+             $scope.statusShow = true;
+             $scope.statusViewUpdate(row);
+         }
+         $scope.ip = row;
+         $rootScope.ip = row;
+     };
+     $scope.$watch(function(){return $scope.statusShow;}, function(newValue, oldValue) {
+         if(newValue) {
+             $interval.cancel(stateInterval);
+             stateInterval = $interval(function(){$scope.statusViewUpdate($scope.ip)}, 10000);
+        } else {
+            $interval.cancel(stateInterval);
+        }
+     });
+     $rootScope.$on('$stateChangeStart', function() {
+         $interval.cancel(stateInterval);
+        $interval.cancel(listViewInterval);
+     });
+
+//Get data for status view
+     function checkExpanded(nodes) {
+         var ret = [];
+         nodes.forEach(function(node) {
+             if(node.expanded == true) {
+                ret.push({id: node.id, name: node.name});
+            }
+            if(node.children && node.children.length > 0) {
+                ret = ret.concat(checkExpanded(node.children));
+            }
+        });
+        return ret;
+    }
+    //Update status view data
+    $scope.statusViewUpdate = function(row){
+        var expandedNodes = [];
+        if($scope.tree_data != []) {
+            expandedNodes = checkExpanded($scope.tree_data);
+        }
+        listViewService.getTreeData(row, expandedNodes).then(function(value) {
+            $scope.tree_data = value;
+        });
+    };
+    /*
+     * EVENTS
+     */
+    $scope.eventsClick = function (row) {
+        if($scope.eventShow && $scope.ip == row){
+            $scope.eventShow = false;
+            $rootScope.stCtrl = null;
+        } else {
+            if($rootScope.stCtrl) {
+                $rootScope.stCtrl.pipe();
+            }
+            getEventlogData();
+            $scope.eventShow = true;
+            $scope.validateShow = false;
+            $scope.statusShow = false;
+        }
+        $scope.ip = row;
+        $rootScope.ip = row;
+    };
+    function getEventlogData() {
+        listViewService.getEventlogData().then(function(value){
+            $scope.statusNoteCollection = value;
+        });
+    };
+
+ $scope.currentStepTask = {id: ""}
+    //Click funciton for steps and tasks
+     $scope.stepTaskClick = function(branch) {
+         if(branch.isTask){
+             $http({
+                 method: 'GET',
+                 url: branch.url
+             }).then(function(response){
+                 console.log(response.data)
+                 $scope.currentStepTask = response.data;
+                 $scope.taskInfoModal();
+             }, function(response) {
+                 response.status;
+             });
+         }
+     };
+    //Creates and shows modal with task information
+    $scope.taskInfoModal = function () {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'static/frontend/views/task_info_modal.html',
+            scope: $scope,
+            controller: 'ModalInstanceCtrl',
+            controllerAs: '$ctrl'
+        });
+        modalInstance.result.then(function (data, $ctrl) {
+        }, function () {
+            $log.info('modal-component dismissed at: ' + new Date());
+        });
+    }
+
+
     /*******************************************/
     /*Piping and Pagination for List-view table*/
     /*******************************************/

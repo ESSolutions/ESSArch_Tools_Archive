@@ -10,8 +10,16 @@
     <div class="content-wrapper">
         <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'">
         </div>
+        <div ng-if="validateShow">
+            <div ng-include src="'static/frontend/views/validator_choices.html'"></div>
+            <button class="btn btn-info" ng-click="validateSip(ip)">{{'VALIDATE' | translate}}</button>
+        </div>
+        <div ng-if="statusShow || eventShow" class="events-status-wrapper">
+            <div ng-include src="'static/frontend/views/event_table.html'"></div>
+            <div ng-if="statusShow" class="status-view" ng-include src="'static/frontend/views/status_tree_view.html'"></div>
+        </div>
         <div>
-            <button ng-if="selected != []"class="btn btn-info" ng-click="receiveSip(selected)">{{'RECEIVESIP' | translate}}</button>
+            <button class="btn btn-info receive-button" ng-click="receiveSip(includedIps)">{{'RECEIVESIP' | translate}}</button>
         </div>
         <!--
             <uib-tabset active="activeTab">

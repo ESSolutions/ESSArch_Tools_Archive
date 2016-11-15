@@ -10,8 +10,12 @@
     <div class="content-wrapper">
         <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'">
         </div>
+        <div ng-if="statusShow || eventShow"class="events-status-wrapper">
+            <div ng-include src="'static/frontend/views/event_table.html'"></div>
+            <div ng-if="statusShow" class="status-view" ng-include src="'static/frontend/views/status_tree_view.html'"></div>
+        </div>
         <div>
-            <button ng-if="selectedIp.id != ''" class="btn btn-info" ng-click="transferSip(ip)">{{'TRANSFERSIP' | translate}}</button>
+            <button ng-if="selectedIp.id != ''" class="btn btn-info transfer-sip-button" ng-click="transferSip(ip)">{{'TRANSFERSIP' | translate}}</button>
         </div>
         <!--
         <uib-tabset active="activeTab">

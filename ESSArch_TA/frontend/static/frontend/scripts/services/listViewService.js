@@ -118,7 +118,6 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
                 data: response.data
             };
         }, function errorCallback(response){
-            alert(response.status);
         });
         return promise;
     }
