@@ -22,6 +22,7 @@ angular.module('myApp').controller('AngularTreeCtrl', function AngularTreeCtrl($
         { "name" : "Archivist organization", "children" : [
             ]}
         ];
+        /*
         $scope.ArchivalType = [
         { "name" : "Archival type", "children" : [
         ]}
@@ -30,6 +31,7 @@ angular.module('myApp').controller('AngularTreeCtrl', function AngularTreeCtrl($
         { "name" : "Archival location", "children" : [
         ]}
         ];
+        */
         $scope.other = [
         { "name" : "other", "children" : [
         ]}
@@ -47,7 +49,7 @@ angular.module('myApp').controller('AngularTreeCtrl', function AngularTreeCtrl($
             }).then(function(response) {
                 $scope.ArchivistOrganization[0].children = response.data;
             });
-            $http({
+          /*  $http({
                 method: 'GET',
                 url: appConfig.djangoUrl+"archival-types/"
             }).then(function(response) {
@@ -59,6 +61,7 @@ angular.module('myApp').controller('AngularTreeCtrl', function AngularTreeCtrl($
             }).then(function(response) {
                 $scope.ArchivalLocation[0].children = response.data;
             });
+            */
         }
         $scope.loadNavigation();
         $rootScope.navigationFilter = {

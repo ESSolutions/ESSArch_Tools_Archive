@@ -204,6 +204,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
                     validators: vm.validatorModel
                 }
             }).then(function(response) {
+                $scope.includedIps = [];
                 $scope.getListViewData();
                 console.log(response)
             });

@@ -24,7 +24,7 @@
 
                     <div class="checkbox table-col">
                         <label>
-                            <input type="checkbox" ng-model="row.checked" ng-change="includeIp(row)">
+                            <input ng-disabled="row.State == 'Receiving'" type="checkbox" ng-model="row.checked" ng-change="includeIp(row)">
                             </input>
                         </label>
                     </div>
