@@ -167,7 +167,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
         var number = pagination.number;  // Number of entries showed per page.
         var pageNumber = start/number+1;
 
-        Resource.getIpPage(start, number, pageNumber, tableState, $scope.selectedIp, sorting, "Received, Transferring, Transferred").then(function (result) {
+        Resource.getIpPage(start, number, pageNumber, tableState, $scope.selectedIp, sorting, "Received,Transferring,Transferred").then(function (result) {
             ctrl.displayedIps = result.data;
             tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
         });
