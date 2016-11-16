@@ -100,6 +100,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         ip['Label'] = root.get('LABEL')
         ip['CreateDate'] = root.find("{*}metsHdr").get('CREATEDATE')
+        ip['State'] = "At reception"
 
         return ip
 
