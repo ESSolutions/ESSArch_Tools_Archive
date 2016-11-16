@@ -122,9 +122,8 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         serializer.is_valid()
         ips.extend(serializer.data)
 
-        ordering = request.query_params.get('ordering')
-
         try:
+            ordering = request.query_params.get('ordering', '')
             reverse = ordering.startswith('-')
             ordering = remove_prefix(ordering, '-')
             ips = sorted(ips, key=lambda k: k[ordering], reverse=reverse)
