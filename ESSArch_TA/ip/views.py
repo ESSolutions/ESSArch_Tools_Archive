@@ -144,35 +144,103 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
     @detail_route(methods=['post'], url_path='create-ip')
     def create_ip(self, request, pk=None):
         reception = Path.objects.get(entity="path_ingest_reception").value
-        ip = self.parseFile(os.path.join(reception, "%s.xml" % pk))
+        xmlfile = os.path.join(reception, "%s.xml" % pk)
+        ipdata = self.parseFile(xmlfile)
+
+        ip = InformationPackage.objects.create(
+            id=pk, Label=ipdata["Label"], State="Receiving",
+        )
+        ip.CreateDate = ipdata["CreateDate"]
+        ip.save()
+
         step = ProcessStep.objects.create(
             name="Receive SIP",
+            information_package=ip
         )
 
-        t1 = ProcessTask.objects.create(
-            name="preingest.tasks.ReceiveSIP",
-            params={
-                "id": ip["id"],
-                "label": ip["Label"],
-                "create_date": ip["CreateDate"],
-                "step": step,
-            },
-            processstep_pos=0,
+        validators = request.data.get('validators', {})
+        if validators:
+            validation_step = ProcessStep.objects.create(
+                name="Validate"
+            )
+
+            if validators.get('validate_xml_file', False):
+                validation_step.tasks.add(
+                    ProcessTask.objects.create(
+                        name="preingest.tasks.ValidateXMLFile",
+                        params={
+                            "xml_filename": xmlfile
+                        },
+                        information_package=ip
+                    )
+                )
+
+            val_format = validators.get("validate_file_format", False)
+            val_integrity = validators.get("validate_integrity", False)
+
+            if val_format or val_integrity:
+                validation_step.tasks.add(
+                    ProcessTask.objects.create(
+                        name="preingest.tasks.ValidateFiles",
+                        params={
+                            "ip": ip,
+                            "rootdir": reception,
+                            "xmlfile": xmlfile,
+                            "validate_fileformat": val_format,
+                            "validate_integrity": val_integrity
+                        },
+                        information_package=ip
+                    )
+                )
+
+            files = []
+            tarfile = os.path.join(reception, "%s.tar" % pk)
+            zipfile = os.path.join(reception, "%s.zip" % pk)
+
+            if os.path.isfile(tarfile):
+                files.append(tarfile)
+
+            if os.path.isfile(zipfile):
+                files.append(zipfile)
+
+            if validators.get('validate_logical_physical_representation'):
+                validation_step.tasks.add(
+                    ProcessTask.objects.create(
+                        name="preingest.tasks.ValidateLogicalPhysicalRepresentation",
+                        params={
+                            "files": files,
+                            "xmlfile": xmlfile,
+                        },
+                        information_package=ip
+                    )
+                )
+
+        receive_step = ProcessStep.objects.create(
+            name="Receive",
         )
 
-        t2 = ProcessTask.objects.create(
-            name="preingest.tasks.UpdateIPStatus",
-            params={
-                "status": "Received",
-            },
-            result_params={
-                "ip": t1.pk
-            },
-            processstep_pos=1,
-            information_package_id=ip["id"]
+        receive_step.tasks.add(
+            ProcessTask.objects.create(
+                name="preingest.tasks.ReceiveSIP",
+                params={
+                    "ip": ip,
+                },
+                information_package=ip,
+                processstep_pos=0,
+            ),
+            ProcessTask.objects.create(
+                name="preingest.tasks.UpdateIPStatus",
+                params={
+                    "status": "Received",
+                    "ip": ip
+                },
+                information_package=ip,
+                processstep_pos=1,
+            )
         )
+        receive_step.save()
 
-        step.tasks = [t1, t2]
+        step.child_steps.add(validation_step, receive_step)
         step.save()
         step.run()
 
