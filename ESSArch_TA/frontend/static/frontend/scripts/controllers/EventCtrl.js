@@ -10,17 +10,14 @@ angular.module('myApp').controller('EventCtrl', ['Resource', '$scope', '$rootSco
                     $scope.selected.splice(i,1);
                 }
             }
-            console.log($scope.selected);
         } else {
             row.class = "selected";
             $scope.selected.push(row);
-            console.log($scope.selected);
         }
     };
     $scope.addEvent = function(ip, eventType, eventDetail) {
         listViewService.addEvent(ip, eventType, eventDetail).then(function(value) {
             $rootScope.stCtrl.pipe();
-            console.log(value);
         });
     }
     //Get data from rest api for event table
