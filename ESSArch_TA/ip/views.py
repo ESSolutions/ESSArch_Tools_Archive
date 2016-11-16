@@ -34,6 +34,8 @@ from ESSArch_Core.profiles.models import (
     ProfileIP
 )
 
+from ESSArch_Core.util import remove_prefix
+
 from ip.filters import InformationPackageFilter
 
 from ip.serializers import (
@@ -119,6 +121,15 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         )
         serializer.is_valid()
         ips.extend(serializer.data)
+
+        ordering = request.query_params.get('ordering')
+
+        try:
+            reverse = ordering.startswith('-')
+            ordering = remove_prefix(ordering, '-')
+            ips = sorted(ips, key=lambda k: k[ordering], reverse=reverse)
+        except KeyError:
+            pass
 
         paginator = LinkHeaderPagination()
         page = paginator.paginate_queryset(ips, request)
