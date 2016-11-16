@@ -199,7 +199,10 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         ips.forEach(function(ip) {
             $http({
                 method: 'POST',
-                url: appConfig.djangoUrl+"ip-reception/"+ip.id+"/create-ip/"
+                url: appConfig.djangoUrl+"ip-reception/"+ip.id+"/create-ip/",
+                data: {
+                    validators: vm.validatorModel
+                }
             }).then(function(response) {
                 $scope.getListViewData();
                 console.log(response)
@@ -207,8 +210,6 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         });
     };
     $scope.includeIp = function(row) {
-        console.log("include ip function")
-        console.log(row)
         var temp = true;
         $scope.includedIps.forEach(function(included) {
 
