@@ -5,6 +5,7 @@ import hashlib, os, shutil, tarfile, urllib, zipfile
 from collections import Counter
 
 from django.conf import settings
+from django.core import serializers
 
 from ESSArch_Core.essxml.Generator.xmlGenerator import XMLGenerator
 
@@ -15,6 +16,7 @@ from lxml import etree
 from ESSArch_Core.configuration.models import Path
 from ESSArch_Core.WorkflowEngine.dbtask import DBTask
 from ESSArch_Core.ip.models import InformationPackage
+from ESSArch_Core.profiles.models import ProfileIP
 from ESSArch_Core.WorkflowEngine.models import ProcessStep, ProcessTask
 
 from ESSArch_Core.util import getSchemas
@@ -146,6 +148,52 @@ class CreatePhysicalModel(DBTask):
             dirname = os.path.join(root, k)
             shutil.rmtree(dirname)
 
+
+class ReceiveSIP(DBTask):
+    event_type = 20100
+
+    def run(self, id=None, label=None, create_date=None, step=None):
+        ip = InformationPackage.objects.create(
+            id=id,
+            Label=label,
+            State="Receiving",
+        )
+        ip.CreateDate = create_date
+        ip.save()
+
+        self.taskobj.information_package = ip
+        self.taskobj.save()
+
+        if step is not None:
+            step.information_package = ip
+            step.save()
+
+        reception = Path.objects.get(entity="path_ingest_reception").value
+        prepare = Path.objects.get(entity="path_ingest_prepare").value
+
+        src = os.path.join(reception, "%s.tar" % ip.pk)
+        dst = os.path.join(prepare, "%s.tar" % ip.pk)
+        shutil.copy(src, dst)
+
+        src = os.path.join(reception, "%s.xml" % ip.pk)
+        dst = os.path.join(prepare, "%s.xml" % ip.pk)
+        shutil.copy(src, dst)
+
+        with open(os.path.join(reception, "%s_event_profile.json" % ip.pk)) as f:
+            json_str = f.read()
+            for p in serializers.deserialize("json", json_str):
+                p.save()
+
+                ProfileIP.objects.create(
+                    profile=p.object,
+                    ip=ip
+                )
+
+        self.set_progress(100, total=100)
+        return ip
+
+    def undo(self, id=None, label=None, create_date=None, step=None):
+        pass
 
 class CalculateChecksum(DBTask):
     event_type = 10210

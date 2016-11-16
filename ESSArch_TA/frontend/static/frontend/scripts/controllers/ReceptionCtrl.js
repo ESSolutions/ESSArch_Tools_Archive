@@ -1,4 +1,4 @@
-angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval) {
+angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal) {
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
@@ -171,7 +171,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         var number = pagination.number;  // Number of entries showed per page.
         var pageNumber = start/number+1;
 
-        Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.selectedIp, $scope.includedIps, sorting).then(function (result) {
+        Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.selectedIp, $scope.includedIps, sorting, "Receiving").then(function (result) {
             vm.displayedIps = result.data;
             tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
         });

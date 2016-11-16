@@ -4,14 +4,15 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
         $state.go(state);
     }
     //Gets data for list view i.e information packages
-    function getListViewData(pageNumber, pageSize, sortString) {
+    function getListViewData(pageNumber, pageSize, sortString, state) {
         var promise = $http({
             method: 'GET',
             url: appConfig.djangoUrl+'information-packages/',
             params: {
                 page: pageNumber,
                 page_size: pageSize,
-                ordering: sortString
+                ordering: sortString,
+                state: state
             }
         })
         .then(function successCallback(response) {
@@ -27,14 +28,15 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
         });
         return promise;
     }
-    function getReceptionIps(pageNumber, pageSize, sortString) {
+    function getReceptionIps(pageNumber, pageSize, sortString, state) {
         var promise = $http({
             method: 'GET',
             url: appConfig.djangoUrl+'ip-reception/',
             params: {
                 page: pageNumber,
                 page_size: pageSize,
-                ordering: sortString
+                ordering: sortString,
+                state: state
             }
         })
         .then(function successCallback(response) {

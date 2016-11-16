@@ -22,12 +22,12 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
         });
 	}
     //Get data for IP table
-    function getIpPage(start, number, pageNumber, params, selected, sort) {
+    function getIpPage(start, number, pageNumber, params, selected, sort, state) {
         var sortString = sort.predicate;
         if(sort.reverse) {
             sortString = "-"+sortString;
         }
-        return listViewService.getListViewData(pageNumber, number, $rootScope.navigationFilter, sortString).then(function(value) {
+        return listViewService.getListViewData(pageNumber, number, sortString, state).then(function(value) {
             var ipCollection = value.data;
             ipCollection.forEach(function(ip) {
                 if(selected.id == ip.id) {
@@ -40,12 +40,12 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
             };
         });
 	}
-    function getReceptionIps(start, number, pageNumber, params, selected, checked, sort) {
+    function getReceptionIps(start, number, pageNumber, params, selected, checked, sort, state) {
         var sortString = sort.predicate;
         if(sort.reverse) {
             sortString = "-"+sortString;
         }
-        return listViewService.getReceptionIps(pageNumber, number, sortString).then(function(value) {
+        return listViewService.getReceptionIps(pageNumber, number, sortString, state).then(function(value) {
             var ipCollection = value.data;
             ipCollection.forEach(function(ip) {
                 ip.checked = false;

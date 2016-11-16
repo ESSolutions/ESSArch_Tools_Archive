@@ -113,6 +113,13 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             if not InformationPackage.objects.filter(id=ip['id']).exists():
                 ips.append(self.parseFile(xmlfile))
 
+        from_db = InformationPackage.objects.filter(State='Receiving')
+        serializer = InformationPackageSerializer(
+            data=from_db, many=True, context={'request': request}
+        )
+        serializer.is_valid()
+        ips.extend(serializer.data)
+
         paginator = LinkHeaderPagination()
         page = paginator.paginate_queryset(ips, request)
         if page is not None:
@@ -127,38 +134,39 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
     @detail_route(methods=['post'], url_path='create-ip')
     def create_ip(self, request, pk=None):
         reception = Path.objects.get(entity="path_ingest_reception").value
-        prepare = Path.objects.get(entity="path_ingest_prepare").value
-
-        ipobj = self.parseFile(os.path.join(reception, "%s.xml" % pk))
-
-        ip = InformationPackage.objects.create(
-            id=pk, Label=ipobj.get("Label"), State="Received"
+        ip = self.parseFile(os.path.join(reception, "%s.xml" % pk))
+        step = ProcessStep.objects.create(
+            name="Receive SIP",
         )
 
-        ip.CreateDate = ipobj.get("CreateDate")
+        t1 = ProcessTask.objects.create(
+            name="preingest.tasks.ReceiveSIP",
+            params={
+                "id": ip["id"],
+                "label": ip["Label"],
+                "create_date": ip["CreateDate"],
+                "step": step,
+            },
+            processstep_pos=0,
+        )
 
-        src = os.path.join(reception, "%s.tar" % pk)
-        dst = os.path.join(prepare, "%s.tar" % pk)
-        shutil.copy(src, dst)
+        t2 = ProcessTask.objects.create(
+            name="preingest.tasks.UpdateIPStatus",
+            params={
+                "status": "Received",
+            },
+            result_params={
+                "ip": t1.pk
+            },
+            processstep_pos=1,
+            information_package_id=ip["id"]
+        )
 
-        src = os.path.join(reception, "%s.xml" % pk)
-        dst = os.path.join(prepare, "%s.xml" % pk)
-        shutil.copy(src, dst)
+        step.tasks = [t1, t2]
+        step.save()
+        step.run()
 
-        with open(os.path.join(reception, "%s_event_profile.json" % pk)) as f:
-            json_str = f.read()
-            for p in serializers.deserialize("json", json_str):
-                p.save()
-
-                ProfileIP.objects.create(
-                    profile=p.object,
-                    ip=ip
-                )
-
-        ip.save()
-
-        return Response("IP Created")
-
+        return Response("IP Received")
 
 class InformationPackageViewSet(viewsets.ModelViewSet):
     """
