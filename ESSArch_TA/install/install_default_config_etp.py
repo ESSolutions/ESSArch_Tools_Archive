@@ -199,6 +199,9 @@ def installDefaultEventTypes(): # default events
     dct = {
         'Delivery received': '20100',
         'Delivery checked': '20200',
+        'Generate XML files: %s': '20230',
+        'Append events to %s': '20240',
+        'Download from %s to %s': '20250',
         'Validate file format for %s against %s': '20260',
         'Validate XML file %s': '20261',
         'Validate logical representation in %s against physical representation at %s': '20262',

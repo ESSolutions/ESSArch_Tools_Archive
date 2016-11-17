@@ -257,7 +257,7 @@ class IdentifyFileFormat(DBTask):
         return [filename]
 
 class GenerateXML(DBTask):
-    event_type = 10230
+    event_type = 20230
 
     """
     Generates the XML using the specified data and folder, and adds the XML to
@@ -296,7 +296,7 @@ class InsertXML(DBTask):
         pass
 
 class AppendEvents(DBTask):
-    event_type = 10240
+    event_type = 20240
 
     """
     """
@@ -475,7 +475,7 @@ class AppendEvents(DBTask):
         return [filename]
 
 class CopySchemas(DBTask):
-    event_type = 10250
+    event_type = 20250
 
     """
     Copies the schema to a specified (?) location
