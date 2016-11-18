@@ -668,9 +668,6 @@ class ValidateLogicalPhysicalRepresentation(DBTask):
         for f in files:
             physical_files.add(os.path.basename(f))
 
-        print "logical: %s" % logical_files
-        print "physical: %s" % physical_files
-
         assert logical_files == physical_files, "the logical representation differs from the physical"
         self.set_progress(100, total=100)
 
