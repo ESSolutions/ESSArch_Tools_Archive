@@ -97,5 +97,6 @@
     "VALIDATE": "Validera",
     "YES": "Ja",
     "NO": "Nej",
-    "TRACEBACK": "Traceback"
+    "TRACEBACK": "Traceback",
+    "NOTAVAILABLEINTHISVIEW": "Inte tillgänglig i denna vy"
 }

@@ -260,3 +260,6 @@ body.modal-open[style] {
 .param-value {
     word-break: break-word;
 }
+.global-search {
+    width: 400px;
+}

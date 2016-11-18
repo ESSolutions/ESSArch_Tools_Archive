@@ -97,6 +97,6 @@
     "VALIDATE": "Validate",
     "YES": "Yes",
     "NO": "No",
-    "TRACEBACK": "Traceback"
-
+    "TRACEBACK": "Traceback",
+    "NOTAVAILABLEINTHISVIEW": "Not available in this view"
 }
