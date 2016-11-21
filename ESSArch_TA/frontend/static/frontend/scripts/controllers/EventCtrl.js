@@ -1,6 +1,9 @@
-angular.module('myApp').controller('EventCtrl', ['Resource', '$scope', '$rootScope', 'listViewService', function (service, $scope, $rootScope, listViewService) {
+angular.module('myApp').controller('EventCtrl', ['Resource', '$scope', '$rootScope', 'listViewService','$interval','appConfig', function (service, $scope, $rootScope, listViewService, $interval, appConfig) {
     $scope.selected = [];
     $scope.displayed = [];
+    $rootScope.$on('$stateChangeStart', function() {
+        $interval.cancel(eventInterval);
+    });
     //Event click funciton
     $scope.eventClick = function(row) {
         if(row.class == "selected"){
@@ -20,6 +23,14 @@ angular.module('myApp').controller('EventCtrl', ['Resource', '$scope', '$rootSco
             $rootScope.stCtrl.pipe();
         });
     }
+    var eventInterval;
+    function updateEvents() {
+        $interval.cancel(eventInterval);
+        eventInterval = $interval(function() {
+            $rootScope.stCtrl.pipe();
+        }, appConfig.eventInterval);
+    }
+    updateEvents();
     //Get data from rest api for event table
     $scope.eventPipe = function(tableState, ctrl) {
         $rootScope.stCtrl = ctrl;

@@ -101,7 +101,11 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 }])
 .constant('appConfig', {
-    djangoUrl: "/api/"
+    djangoUrl: "/api/",
+    ipInterval: 10000, //ms
+    ipIdleInterval: 60000, //ms
+    stateInterval: 10000, //ms
+    eventInterval: 10000 //ms
 })
 .service('myService', function($location, PermPermissionStore) {
         this.changePath = function(state) {

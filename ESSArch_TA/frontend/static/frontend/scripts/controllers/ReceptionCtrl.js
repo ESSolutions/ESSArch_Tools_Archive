@@ -2,9 +2,6 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
-    $rootScope.$on('$stateChangeStart', function() {
-        $interval.cancel(listViewInterval);
-    });
     $scope.includedIps = [];
     $scope.receiveShow = false;
     $scope.validateShow = false;
@@ -60,14 +57,14 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
      $scope.$watch(function(){return $scope.statusShow;}, function(newValue, oldValue) {
          if(newValue) {
              $interval.cancel(stateInterval);
-             stateInterval = $interval(function(){$scope.statusViewUpdate($scope.ip)}, 10000);
+             stateInterval = $interval(function(){$scope.statusViewUpdate($scope.ip)}, appConfig.stateInterval);
         } else {
             $interval.cancel(stateInterval);
         }
      });
      $rootScope.$on('$stateChangeStart', function() {
          $interval.cancel(stateInterval);
-        $interval.cancel(listViewInterval);
+         $interval.cancel(listViewInterval);
      });
 
 //Get data for status view
@@ -85,12 +82,14 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     }
     //Update status view data
     $scope.statusViewUpdate = function(row){
+        $scope.statusLoading = true;
         var expandedNodes = [];
         if($scope.tree_data != []) {
             expandedNodes = checkExpanded($scope.tree_data);
         }
         listViewService.getTreeData(row, expandedNodes).then(function(value) {
             $scope.tree_data = value;
+            $scope.statusLoading = false;
         });
     };
     /*
@@ -163,7 +162,8 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
 
     //Get data according to ip table settings and populates ip table
     this.callServer = function callServer(tableState) {
-    $scope.tableState = tableState;
+        $scope.ipLoading = true;
+        $scope.tableState = tableState;
 
         var sorting = tableState.sort;
         var pagination = tableState.pagination;
@@ -174,6 +174,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.selectedIp, $scope.includedIps, sorting, "Receiving").then(function (result) {
             vm.displayedIps = result.data;
             tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
+            $scope.ipLoading = false;
         });
     };
     //Make ip selected and add class to visualize
@@ -236,7 +237,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         $interval.cancel(listViewInterval);
         listViewInterval = $interval(function() {
             $scope.getListViewData();
-        }, 4000);
+        }, appConfig.ipInterval);
     };
     updateListViewConditional();
     $scope.ipTableClick = function(row) {
