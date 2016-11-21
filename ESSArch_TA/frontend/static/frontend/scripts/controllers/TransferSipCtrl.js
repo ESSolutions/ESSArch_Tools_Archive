@@ -28,7 +28,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             field: "status",
             displayName: $scope.state,
         },
-        , appConfig{
+        {
             field: "progress",
             displayName: $scope.status,
             cellTemplate: "<uib-progressbar ng-click=\"taskStepUndo(row.branch)\" class=\"progress\" value=\"row.branch[col.field]\" type=\"success\"><b>{{row.branch[col.field]+\"%\"}}</b></uib-progressbar>"
