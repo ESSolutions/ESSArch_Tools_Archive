@@ -190,7 +190,7 @@ class ReceiveSIP(DBTask):
         pass
 
 class CalculateChecksum(DBTask):
-    event_type = 10210
+    event_type = 20210
 
     def run(self, filename=None, block_size=65536, algorithm='SHA-256'):
         """
@@ -225,7 +225,7 @@ class CalculateChecksum(DBTask):
         return [filename]
 
 class IdentifyFileFormat(DBTask):
-    event_type = 10220
+    event_type = 20220
 
     def handle_matches(self, fullname, matches, delta_t, matchtype=''):
         f, sigName = matches[-1]
@@ -269,7 +269,10 @@ class GenerateXML(DBTask):
             filesToCreate, info
         )
 
-        generator.generate(folderToParse=folderToParse)
+        generator.generate(
+            folderToParse=folderToParse,
+            ip=self.taskobj.information_package
+        )
 
         self.set_progress(100, total=100)
 
@@ -583,6 +586,7 @@ class ValidateFileFormat(DBTask):
             params={
                 "filename": filename,
             },
+            information_package=self.taskobj.information_package
         )
 
         res = t.run_eagerly()
