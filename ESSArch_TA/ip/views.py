@@ -117,7 +117,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             if not InformationPackage.objects.filter(id=ip['id']).exists():
                 ips.append(self.parseFile(xmlfile))
 
-        from_db = InformationPackage.objects.filter(State='Receiving')
+        from_db = InformationPackage.objects.filter(State='Receiving').prefetch_related(
+            Prefetch('profileip_set', to_attr='profiles'),
+        )
         serializer = InformationPackageSerializer(
             data=from_db, many=True, context={'request': request}
         )
