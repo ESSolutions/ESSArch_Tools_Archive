@@ -19,7 +19,7 @@ from ESSArch_Core.ip.models import InformationPackage
 from ESSArch_Core.profiles.models import ProfileIP
 from ESSArch_Core.WorkflowEngine.models import ProcessStep, ProcessTask
 
-from ESSArch_Core.util import getSchemas, get_value_from_path, remove_prefix
+from ESSArch_Core.util import alg_from_str, getSchemas, get_value_from_path, remove_prefix
 
 class PrepareIP(DBTask):
     event_type = 10100
@@ -192,7 +192,7 @@ class ReceiveSIP(DBTask):
 class CalculateChecksum(DBTask):
     event_type = 10210
 
-    def run(self, filename=None, block_size=65536, algorithm=hashlib.sha256):
+    def run(self, filename=None, block_size=65536, algorithm='SHA-256'):
         """
         Calculates the checksum for the given file, one chunk at a time
 
@@ -205,7 +205,7 @@ class CalculateChecksum(DBTask):
             The hexadecimal digest of the checksum
         """
 
-        hash_val = algorithm()
+        hash_val = alg_from_str(algorithm)()
 
         with open(filename, 'r') as f:
             while True:
@@ -218,10 +218,10 @@ class CalculateChecksum(DBTask):
         self.set_progress(100, total=100)
         return hash_val.hexdigest()
 
-    def undo(self, filename=None, block_size=65536, algorithm=hashlib.sha256):
+    def undo(self, filename=None, block_size=65536, algorithm='SHA-256'):
         pass
 
-    def get_event_args(self, filename=None, block_size=65536, algorithm=hashlib.sha256):
+    def get_event_args(self, filename=None, block_size=65536, algorithm='SHA-256'):
         return [filename]
 
 class IdentifyFileFormat(DBTask):
@@ -539,6 +539,7 @@ class ValidateFiles(DBTask):
 
                     fformat = get_value_from_path(f, props.get("format"))
                     checksum = get_value_from_path(f, props.get("checksum"))
+                    algorithm = get_value_from_path(f, props.get("checksumtype"))
 
                     if validate_fileformat and fformat is not None:
                         step.tasks.add(ProcessTask.objects.create(
@@ -556,6 +557,7 @@ class ValidateFiles(DBTask):
                             params={
                                 "filename": os.path.join(rootdir, fpath),
                                 "checksum": checksum,
+                                "algorithm": algorithm,
                             },
                             information_package=ip
                         ))
@@ -680,7 +682,7 @@ class ValidateLogicalPhysicalRepresentation(DBTask):
 class ValidateIntegrity(DBTask):
     event_type = 20263
 
-    def run(self, filename=None, checksum=None, block_size=65536, algorithm=hashlib.sha256):
+    def run(self, filename=None, checksum=None, block_size=65536, algorithm='SHA-256'):
         """
         Validates the integrity(checksum) for the given file
         """
@@ -701,10 +703,10 @@ class ValidateIntegrity(DBTask):
 
         assert digest == checksum, "checksum for %s is not valid" % filename
 
-    def undo(self, filename=None,checksum=None,  block_size=65536, algorithm=hashlib.sha256):
+    def undo(self, filename=None,checksum=None,  block_size=65536, algorithm='SHA-256'):
         pass
 
-    def get_event_args(self, filename=None,checksum=None,  block_size=65536, algorithm=hashlib.sha256):
+    def get_event_args(self, filename=None,checksum=None,  block_size=65536, algorithm='SHA-256'):
         return [filename, algorithm, checksum]
 
 
