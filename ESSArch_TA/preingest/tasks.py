@@ -19,7 +19,7 @@ from ESSArch_Core.ip.models import InformationPackage
 from ESSArch_Core.profiles.models import ProfileIP
 from ESSArch_Core.WorkflowEngine.models import ProcessStep, ProcessTask
 
-from ESSArch_Core.util import alg_from_str, getSchemas, get_value_from_path, remove_prefix
+from ESSArch_Core.util import alg_from_str, getSchemas, get_value_from_path, remove_prefix, win_to_posix
 
 class PrepareIP(DBTask):
     event_type = 10100
@@ -69,6 +69,8 @@ class PrepareIP(DBTask):
     def undo(self, label="", responsible={}, step=None):
         pass
 
+    def event_outcome_success(self, label="", responsible={}, step=None):
+        return "Prepared IP with label '%s'" % label
 
 class CreateIPRootDir(DBTask):
     event_type = 10110
@@ -111,6 +113,8 @@ class CreateIPRootDir(DBTask):
         path = self.create_path(information_package.pk)
         shutil.rmtree(path)
 
+    def event_outcome_success(self, information_package=None):
+        return "Created root directory for IP '%s'" % information_package.pk
 
 class CreatePhysicalModel(DBTask):
     event_type = 10115
@@ -148,11 +152,13 @@ class CreatePhysicalModel(DBTask):
             dirname = os.path.join(root, k)
             shutil.rmtree(dirname)
 
+    def event_outcome_success(self, structure={}, root=""):
+        return "Created physical model for IP '%s'" % self.taskobj.information_package.pk
 
 class ReceiveSIP(DBTask):
     event_type = 20100
 
-    def run(self, ip=None, label=None, create_date=None):
+    def run(self, ip=None):
         reception = Path.objects.get(entity="path_ingest_reception").value
         prepare = Path.objects.get(entity="path_ingest_prepare").value
 
@@ -186,8 +192,11 @@ class ReceiveSIP(DBTask):
         self.set_progress(100, total=100)
         return ip
 
-    def undo(self, id=None, label=None, create_date=None):
+    def undo(self, ip=None):
         pass
+
+    def event_outcome_success(self, ip=None):
+        return "Received IP '%s' with label '%s'" % (ip.pk, ip.Label)
 
 class CalculateChecksum(DBTask):
     event_type = 20210
@@ -221,8 +230,8 @@ class CalculateChecksum(DBTask):
     def undo(self, filename=None, block_size=65536, algorithm='SHA-256'):
         pass
 
-    def get_event_args(self, filename=None, block_size=65536, algorithm='SHA-256'):
-        return [filename]
+    def event_outcome_success(self, filename=None, block_size=65536, algorithm='SHA-256'):
+        return "Created checksum for %s with %s" % (filename, algorithm)
 
 class IdentifyFileFormat(DBTask):
     event_type = 20220
@@ -253,8 +262,8 @@ class IdentifyFileFormat(DBTask):
     def undo(self, filename=None):
         pass
 
-    def get_event_args(self, filename=None):
-        return [filename]
+    def event_outcome_success(self, filename=None, block_size=65536, algorithm='SHA-256'):
+        return "Identified foramt of %s" % filename
 
 class GenerateXML(DBTask):
     event_type = 20230
@@ -280,8 +289,9 @@ class GenerateXML(DBTask):
         for f, template in filesToCreate.iteritems():
             os.remove(f)
 
-    def get_event_args(self, info={}, filesToCreate={}, folderToParse=None):
-        return [", ".join(filesToCreate.keys())]
+    def event_outcome_success(self, info={}, filesToCreate={}, folderToParse=None, algorithm='SHA-256'):
+        return "Generated %s" % ", ".join(filesToCreate.keys())
+
 
 class InsertXML(DBTask):
     """
@@ -297,6 +307,9 @@ class InsertXML(DBTask):
 
     def undo(self, filename=None, elementToAppendTo=None, spec={}, info={}, index=None):
         pass
+
+    def event_outcome_success(self, filename=None, elementToAppendTo=None, spec={}, info={}, index=None):
+        return "Inserted XML to element %s in %s" % (elementToAppendTo, filename)
 
 class AppendEvents(DBTask):
     event_type = 20240
@@ -458,13 +471,13 @@ class AppendEvents(DBTask):
                 "eventIdentifierValue": str(event.id),
                 "eventType": str(event.eventType.eventType),
                 "eventDateTime": str(event.eventDateTime),
-                "eventDetail": event.eventDetail,
+                "eventDetail": event.eventType.eventDetail,
                 "eventOutcome": event.eventOutcome,
                 "eventOutcomeDetailNote": event.eventOutcomeDetailNote,
                 "linkingAgentIdentifierType": "SE/RA",
-                "linkingAgentIdentifierValue": "admin",
+                "linkingAgentIdentifierValue": event.linkingAgentIdentifierValue,
                 "linkingObjectIdentifierType": "SE/RA",
-                "linkingObjectIdentifierValue": str(event.linkingObjectIdentifierValue.id),
+                "linkingObjectIdentifierValue": str(event.linkingObjectIdentifierValue.ObjectIdentifierValue),
             }
 
             generator.insert(filename, "premis", template, data)
@@ -474,8 +487,8 @@ class AppendEvents(DBTask):
     def undo(self, filename="", events={}):
         pass
 
-    def get_event_args(self, filename="", events={}):
-        return [filename]
+    def event_outcome_success(self, filename="", events={}):
+        return "Appended events to %s" % filename
 
 class CopySchemas(DBTask):
     event_type = 20250
@@ -515,9 +528,9 @@ class CopySchemas(DBTask):
     def undo(self, schema={}, root=None, structure=None):
         pass
 
-    def get_event_args(self, schema={}, root=None, structure=None):
+    def event_outcome_success(self, schema={}, root=None, structure=None):
         src, dst = self.createSrcAndDst(schema, root, structure)
-        return [src, dst]
+        return "Copied schemas from %s to %s" % src, dst
 
 
 class ValidateFiles(DBTask):
@@ -572,6 +585,8 @@ class ValidateFiles(DBTask):
     def undo(self, ip=None, xmlfile=None, validate_fileformat=True, validate_integrity=True, rootdir=""):
         pass
 
+    def event_outcome_success(self, ip, xmlfile, validate_fileformat=True, validate_integrity=True, rootdir=""):
+        return "Validated files in %s" % xmlfile
 
 class ValidateFileFormat(DBTask):
     event_type = 20260
@@ -597,8 +612,8 @@ class ValidateFileFormat(DBTask):
     def undo(self, filename=None, fileformat=None):
         pass
 
-    def get_event_args(self, filename=None, fileformat=None):
-        return [filename, fileformat]
+    def event_outcome_success(self, filename=None, fileformat=None):
+        return "Validated format of %s to be %s" % (filename, fileformat)
 
 
 class ValidateXMLFile(DBTask):
@@ -623,8 +638,8 @@ class ValidateXMLFile(DBTask):
     def undo(self, xml_filename=None, schema_filename=None):
         pass
 
-    def get_event_args(self, xml_filename=None, schema_filename=None):
-        return [xml_filename]
+    def event_outcome_success(self, xml_filename=None, schema_filename=None):
+        return "Validated %s against schema" % xml_filename
 
 
 class ValidateLogicalPhysicalRepresentation(DBTask):
@@ -680,8 +695,8 @@ class ValidateLogicalPhysicalRepresentation(DBTask):
     def undo(self, dirname=None, files=[], xmlfile=None):
         pass
 
-    def get_event_args(self, dirname=None, files=[], xmlfile=None):
-        return [xmlfile, dirname]
+    def event_outcome_success(self, dirname=None, files=[], xmlfile=None):
+        return "Validated logical and physical structure of %s and %s" % (xmlfile, dirname)
 
 class ValidateIntegrity(DBTask):
     event_type = 20263
@@ -710,8 +725,8 @@ class ValidateIntegrity(DBTask):
     def undo(self, filename=None,checksum=None,  block_size=65536, algorithm='SHA-256'):
         pass
 
-    def get_event_args(self, filename=None,checksum=None,  block_size=65536, algorithm='SHA-256'):
-        return [filename, algorithm, checksum]
+    def event_outcome_success(self, filename=None, checksum=None, block_size=65536, algorithm='SHA-256'):
+        return "Validated integrity of %s against %s with %s" % (filename, checksum, algorithm)
 
 
 class CreateTAR(DBTask):
@@ -736,9 +751,8 @@ class CreateTAR(DBTask):
     def undo(self, dirname=None, tarname=None):
         pass
 
-    def get_event_args(self, dirname=None, tarname=None):
-        return [tarname, dirname]
-
+    def event_outcome_success(self, dirname=None, tarname=None):
+        return "Created %s from %s" % (tarname, dirname)
 
 class CreateZIP(DBTask):
     event_type = 10271
@@ -768,8 +782,8 @@ class CreateZIP(DBTask):
     def undo(self, dirname=None, zipname=None):
         pass
 
-    def get_event_args(self, dirname=None, zipname=None):
-        return [zipname, dirname]
+    def event_outcome_success(self, dirname=None, zipname=None):
+        return "Created %s from %s" % (zipname, dirname)
 
 class UpdateIPStatus(DBTask):
     event_type = 20280
@@ -782,8 +796,8 @@ class UpdateIPStatus(DBTask):
     def undo(self, ip=None, status=None):
         pass
 
-    def get_event_args(self, ip=None, status=None):
-        return [ip.Label]
+    def event_outcome_success(self, ip=None, status=None):
+        return "Updated status of %s" % (ip.pk)
 
 class SubmitSIP(DBTask):
     event_type = 10300
@@ -804,3 +818,6 @@ class SubmitSIP(DBTask):
 
     def undo(self, ip=None):
         pass
+
+    def event_outcome_success(self, ip=None):
+        return "Submitted %s" % (ip.pk)
