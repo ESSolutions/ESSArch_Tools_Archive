@@ -178,7 +178,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             if val_format or val_integrity:
                 validation_step.tasks.add(
                     ProcessTask.objects.create(
-                        name="preingest.tasks.ValidateFiles",
+                        name="ESSArch_Core.tasks.ValidateFiles",
                         params={
                             "ip": ip,
                             "rootdir": reception,
@@ -430,7 +430,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
         step.tasks.add(
             ProcessTask.objects.create(
-                name="preingest.tasks.InsertXML",
+                name="ESSArch_Core.tasks.InsertXML",
                 params={
                     "filename": events_path,
                     "elementToAppendTo": "premis",
@@ -480,7 +480,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                 information_package=ip
             ),
             ProcessTask.objects.create(
-                name="preingest.tasks.ValidateFiles",
+                name="ESSArch_Core.tasks.ValidateFiles",
                 params={
                     "ip": ip,
                     "mets_path": xmlfile,
