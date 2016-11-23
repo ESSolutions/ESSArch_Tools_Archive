@@ -1,8 +1,6 @@
 from __future__ import absolute_import
 
-import hashlib, os, shutil, tarfile, urllib, zipfile
-
-from collections import Counter
+import os, shutil, urllib
 
 from django.conf import settings
 from django.core import serializers
@@ -15,145 +13,15 @@ from lxml import etree
 
 from ESSArch_Core.configuration.models import Path
 from ESSArch_Core.WorkflowEngine.dbtask import DBTask
-from ESSArch_Core.ip.models import InformationPackage
 from ESSArch_Core.profiles.models import ProfileIP
 from ESSArch_Core.WorkflowEngine.models import ProcessStep, ProcessTask
 
-from ESSArch_Core.util import alg_from_str, getSchemas, get_value_from_path, remove_prefix, win_to_posix
-
-class PrepareIP(DBTask):
-    event_type = 10100
-
-    def run(self, label="", responsible={}, step=None):
-        """
-        Prepares a new information package
-
-        Args:
-            label: The label of the IP to prepare
-            responsible: The responsible user of the IP to prepare
-            step: The step to connect the IP to
-
-        Returns:
-            The id of the created information package
-        """
-
-
-        ip = InformationPackage.objects.create(
-            Label=label,
-            Responsible=responsible,
-            State="Preparing",
-            OAIStype="SIP",
-        )
-
-        prepare_path = Path.objects.get(
-            entity="path_preingest_prepare"
-        ).value
-
-        ip.objectPath = os.path.join(
-            prepare_path,
-            str(ip.pk)
-        )
-        ip.save()
-
-        self.taskobj.information_package = ip
-        self.taskobj.save()
-
-        if step is not None:
-            s = ProcessStep.objects.get(pk=step)
-            ip.steps.add(s)
-
-        self.set_progress(100, total=100)
-
-        return ip
-
-    def undo(self, label="", responsible={}, step=None):
-        pass
-
-    def event_outcome_success(self, label="", responsible={}, step=None):
-        return "Prepared IP with label '%s'" % label
-
-class CreateIPRootDir(DBTask):
-    event_type = 10110
-
-    def create_path(self, information_package_id):
-        prepare_path = Path.objects.get(
-            entity="path_preingest_prepare"
-        ).value
-
-        return os.path.join(
-            prepare_path,
-            str(information_package_id)
-        )
-
-    def run(self, information_package=None):
-        """
-        Creates the IP root directory
-
-        Args:
-            information_package_id: The id of the information package the
-            directory will be created for
-
-        Returns:
-            None
-        """
-
-        self.taskobj.information_package = information_package
-        self.taskobj.save()
-
-        path = self.create_path(str(information_package.pk))
-        os.makedirs(path)
-
-        information_package.ObjectPath = path
-        information_package.save()
-
-        self.set_progress(100, total=100)
-        return information_package
-
-    def undo(self, information_package=None):
-        path = self.create_path(information_package.pk)
-        shutil.rmtree(path)
-
-    def event_outcome_success(self, information_package=None):
-        return "Created root directory for IP '%s'" % information_package.pk
-
-class CreatePhysicalModel(DBTask):
-    event_type = 10115
-
-    def run(self, structure={}, root=""):
-        """
-        Creates the IP physical model based on a logical model.
-
-        Args:
-            structure: A dict specifying the logical model.
-            root: The root dictionary to be used
-        """
-
-        root = os.path.join(settings.BASE_DIR, str(root))
-
-        for content in structure:
-            if content.get('type') == 'folder':
-                name = content.get('name')
-                dirname = os.path.join(root, name)
-                os.makedirs(dirname)
-
-                self.run(content.get('children', []), dirname)
-
-        self.set_progress(1, total=1)
-
-    def undo(self, structure={}, root=""):
-        root = os.path.join(settings.BASE_DIR, str(root))
-
-        if root:
-            shutil.rmtree(root)
-            return
-
-        for k, v in structure.iteritems():
-            k = str(k)
-            dirname = os.path.join(root, k)
-            shutil.rmtree(dirname)
-
-    def event_outcome_success(self, structure={}, root=""):
-        return "Created physical model for IP '%s'" % self.taskobj.information_package.pk
+from ESSArch_Core.util import (
+    alg_from_str,
+    getSchemas,
+    get_value_from_path,
+    remove_prefix
+)
 
 class ReceiveSIP(DBTask):
     event_type = 20100
@@ -728,63 +596,6 @@ class ValidateIntegrity(DBTask):
     def event_outcome_success(self, filename=None, checksum=None, block_size=65536, algorithm='SHA-256'):
         return "Validated integrity of %s against %s with %s" % (filename, checksum, algorithm)
 
-
-class CreateTAR(DBTask):
-    event_type = 10270
-
-    """
-    Creates a TAR file from the specified directory
-
-    Args:
-        dirname: The directory to create a TAR from
-        tarname: The name of the tar file
-    """
-
-    def run(self, dirname=None, tarname=None):
-        base_dir = os.path.basename(os.path.normpath(dirname))
-
-        with tarfile.TarFile(tarname, 'w') as new_tar:
-            new_tar.add(dirname, base_dir)
-
-        self.set_progress(100, total=100)
-
-    def undo(self, dirname=None, tarname=None):
-        pass
-
-    def event_outcome_success(self, dirname=None, tarname=None):
-        return "Created %s from %s" % (tarname, dirname)
-
-class CreateZIP(DBTask):
-    event_type = 10271
-
-    """
-    Creates a ZIP file from the specified directory
-
-    Args:
-        dirname: The directory to create a ZIP from
-        zipname: The name of the zip file
-    """
-
-    def run(self, dirname=None, zipname=None):
-        with zipfile.ZipFile(zipname, 'w') as new_zip:
-            for root, dirs, files in os.walk(dirname):
-                for d in dirs:
-                    filepath = os.path.join(root, d)
-                    arcname = filepath[len(dirname) + 1:]
-                    new_zip.write(filepath, arcname)
-                for f in files:
-                    filepath = os.path.join(root, f)
-                    arcname = filepath[len(dirname) + 1:]
-                    new_zip.write(filepath, arcname)
-
-        self.set_progress(100, total=100)
-
-    def undo(self, dirname=None, zipname=None):
-        pass
-
-    def event_outcome_success(self, dirname=None, zipname=None):
-        return "Created %s from %s" % (zipname, dirname)
-
 class UpdateIPStatus(DBTask):
     event_type = 20280
 
@@ -798,26 +609,3 @@ class UpdateIPStatus(DBTask):
 
     def event_outcome_success(self, ip=None, status=None):
         return "Updated status of %s" % (ip.pk)
-
-class SubmitSIP(DBTask):
-    event_type = 10300
-
-    def run(self, ip=None):
-        srcdir = Path.objects.get(entity="path_preingest_reception").value
-        reception = Path.objects.get(entity="path_ingest_reception").value
-
-        src = os.path.join(srcdir, str(ip.pk) + ".tar")
-        dst = os.path.join(reception, str(ip.pk) + ".tar")
-        shutil.copyfile(src, dst)
-
-        src = os.path.join(srcdir, str(ip.pk) + ".xml")
-        dst = os.path.join(reception, str(ip.pk) + ".xml")
-        shutil.copyfile(src, dst)
-
-        self.set_progress(100, total=100)
-
-    def undo(self, ip=None):
-        pass
-
-    def event_outcome_success(self, ip=None):
-        return "Submitted %s" % (ip.pk)

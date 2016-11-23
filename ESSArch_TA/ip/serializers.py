@@ -9,8 +9,6 @@ from ESSArch_Core.ip.models import (
     InformationPackage
 )
 
-from preingest.serializers import ProcessStepSerializer
-
 from profiles.serializers import (
     ProfileIPSerializer,
 )

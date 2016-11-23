@@ -1,7 +1,5 @@
 import glob, os, shutil
 
-from django.core import serializers
-
 from django.db.models import Prefetch
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -32,7 +30,6 @@ from ESSArch_Core.WorkflowEngine.models import (
 
 from ESSArch_Core.profiles.models import (
     Profile,
-    ProfileIP
 )
 
 from ESSArch_Core.util import remove_prefix
@@ -55,10 +52,6 @@ from preingest.serializers import (
 
 from preingest.pagination import (
     LinkHeaderPagination
-)
-
-from ip.steps import (
-    prepare_ip,
 )
 
 from rest_framework import viewsets
@@ -502,31 +495,6 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         step.run()
 
         return Response("Validating IP")
-
-    def create(self, request):
-        """
-        Prepares a new information package (IP) using the following tasks:
-
-        1. Creates a new IP in the database.
-
-        2. Creates a directory in the prepare directory with the name set to
-        the id of the new IP.
-
-        3. Creates an event in the database connected to the IP and with the
-        detail "Prepare IP".
-
-        Args:
-
-        Returns:
-            None
-        """
-
-
-        label = request.data.get('label', None)
-        responsible = self.request.user.username or "Anonymous user"
-
-        prepare_ip(label, responsible).run()
-        return Response({"status": "Prepared IP"})
 
     def destroy(self, request, pk=None):
         ip = InformationPackage.objects.get(pk=pk)
