@@ -15,7 +15,7 @@
             <div ng-if="statusShow" class="status-view" ng-include src="'static/frontend/views/status_tree_view.html'"></div>
         </div>
         <div>
-            <button ng-if="selectedIp.id != '' && selectedIp.State != 'Transferred'" class="btn btn-info transfer-sip-button" ng-click="transferSip(ip)">{{'TRANSFERSIP' | translate}}</button>
+            <button ng-if="selectedIp.id != '' && selectedIp.State != 'Transferred' && selectedIp.State != 'Transferring'" class="btn btn-info transfer-sip-button" ng-click="transferSip(ip)">{{'TRANSFERSIP' | translate}}</button>
         </div>
         <!--
         <uib-tabset active="activeTab">
