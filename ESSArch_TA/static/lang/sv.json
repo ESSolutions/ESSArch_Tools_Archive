@@ -98,5 +98,7 @@
     "YES": "Ja",
     "NO": "Nej",
     "TRACEBACK": "Traceback",
-    "NOTAVAILABLEINTHISVIEW": "Inte tillgänglig i denna vy"
+    "NOTAVAILABLEINTHISVIEW": "Inte tillgänglig i denna vy",
+    "STARTED": "Startade",
+    "DONE": "Färdig"
 }

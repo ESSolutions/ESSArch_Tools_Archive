@@ -98,5 +98,7 @@
     "YES": "Yes",
     "NO": "No",
     "TRACEBACK": "Traceback",
-    "NOTAVAILABLEINTHISVIEW": "Not available in this view"
+    "NOTAVAILABLEINTHISVIEW": "Not available in this view",
+    "STARTED": "Started",
+    "DONE": "Done"
 }
