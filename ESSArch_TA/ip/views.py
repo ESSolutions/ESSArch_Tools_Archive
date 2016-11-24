@@ -317,12 +317,24 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
         step.tasks.add(
             ProcessTask.objects.create(
+                name="preingest.tasks.UpdateIPStatus",
+                params={
+                    "ip": ip,
+                    "status": "Transferring",
+                },
+                processstep_pos=10,
+                information_package=ip
+            )
+        )
+
+        step.tasks.add(
+            ProcessTask.objects.create(
                 name="preingest.tasks.GenerateXML",
                 params={
                     "info": info,
                     "filesToCreate": filesToCreate,
                 },
-                processstep_pos=0,
+                processstep_pos=20,
                 information_package=ip
             )
         )
@@ -334,7 +346,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     "filename": events_path,
                     "events": ip.events.all(),
                 },
-                processstep_pos=1,
+                processstep_pos=30,
                 information_package=ip
             )
         )
@@ -438,7 +450,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     "info": info,
                     "index": 0
                 },
-                processstep_pos=2,
+                processstep_pos=40,
                 information_package=ip
             )
         )
@@ -450,7 +462,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     "ip": ip,
                     "status": "Transferred",
                 },
-                processstep_pos=3,
+                processstep_pos=50,
                 information_package=ip
             )
         )
