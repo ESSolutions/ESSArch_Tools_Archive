@@ -230,5 +230,5 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             templateUrl: "static/frontend/views/reception_delivery_description.html"
         },
     ];
-    $scope.colspan = 6;
+    $scope.colspan = 5;
 });
