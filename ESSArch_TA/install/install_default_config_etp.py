@@ -197,6 +197,7 @@ def installDefaultEventTypes(): # default events
 
     # create events dictionaries
     dct = {
+        'Other': '20000',
         'Delivery received': '20100',
         'Delivery checked': '20200',
         'Calculate checksum': '20210',
