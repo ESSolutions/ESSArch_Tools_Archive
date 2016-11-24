@@ -19,7 +19,7 @@ body.modal-open[style] {
     position: relative;
 }
 .content-wrapper {
-    margin-top: 47px;
+    margin-top: 10px;
 }
 .st-sort-descent:before {
     content: '\25BC';
