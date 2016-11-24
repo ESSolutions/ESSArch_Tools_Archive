@@ -21,7 +21,7 @@ class ReceiveSIP(DBTask):
 
     def run(self, ip=None):
         reception = Path.objects.get(entity="path_ingest_reception").value
-        prepare = Path.objects.get(entity="path_ingest_prepare").value
+        prepare = Path.objects.get(entity="path_ingest_work").value
 
         tarfile = os.path.join(reception, "%s.tar" % ip.pk)
         zipfile = os.path.join(reception, "%s.zip" % ip.pk)

@@ -286,7 +286,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     def transfer(self, request, pk=None):
         ip = self.get_object()
 
-        srcdir = Path.objects.get(entity="path_ingest_prepare").value
+        srcdir = Path.objects.get(entity="path_ingest_work").value
         dstdir = Path.objects.get(entity="path_gate_reception").value
 
         if os.path.isfile(os.path.join(srcdir, "%s.tar" % pk)):
@@ -478,7 +478,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     def validate(self, request, pk=None):
         ip = self.get_object()
 
-        prepare = Path.objects.get(entity="path_ingest_prepare").value
+        prepare = Path.objects.get(entity="path_ingest_work").value
         xmlfile = os.path.join(prepare, "%s.xml" % pk)
 
         step = ProcessStep.objects.create(
