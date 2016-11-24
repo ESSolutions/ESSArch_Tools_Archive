@@ -144,8 +144,11 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         xmlfile = os.path.join(reception, "%s.xml" % pk)
         ipdata = self.parseFile(xmlfile)
 
+        responsible = self.request.user.username or "Anonymous user"
+
         ip = InformationPackage.objects.create(
             id=pk, Label=ipdata["Label"], State="Receiving",
+            Responsible=responsible,
         )
         ip.CreateDate = ipdata["CreateDate"]
         ip.save()
