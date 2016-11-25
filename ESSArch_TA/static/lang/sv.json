@@ -37,7 +37,7 @@
     "CREATED": "Skapad",
     "SIZE": "Storlek",
     "STATUSNOTE": "Statusanteckning",
-    "COMMENT": "kommentar",
+    "COMMENT": "Kommentar",
     "APPROVEDTOSUBMIT": "godkänd för att skicka",
     "SELECTONE": "Välj en",
     "LOCKED": "Låst",
@@ -84,6 +84,7 @@
     "ADD": "Lägg till",
     "UPDATE": "Uppdatera",
     "MAPSTRUCTURE": "Mappstruktur",
+    "OUTCOME": "Resultat",
     "REMOVE": "Ta bort",
     "NAME": "Namn",
     "TYPE": "Typ",
@@ -100,5 +101,7 @@
     "TRACEBACK": "Traceback",
     "NOTAVAILABLEINTHISVIEW": "Inte tillgänglig i denna vy",
     "STARTED": "Startade",
-    "DONE": "Färdig"
+    "DONE": "Färdig",
+    "APPROVEDTORECEIVE": "Godkänd att ta emot",
+    "AGENT": "Agent"
 }

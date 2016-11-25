@@ -71,6 +71,7 @@
     "FINALIZE": "Finalize",
     "CATALOGUE": "Catalogue",
     "TRANSFERSIP": "Transfer SIP",
+    "OUTCOME": "Outcome",
     "DELIVERYDESCRIPTION":"Delivery Description",
     "PACKAGE": "Package",
     "PACKAGEDESCRIPTION": "Package description",
@@ -100,5 +101,7 @@
     "TRACEBACK": "Traceback",
     "NOTAVAILABLEINTHISVIEW": "Not available in this view",
     "STARTED": "Started",
-    "DONE": "Done"
+    "DONE": "Done",
+    "APPROVEDTORECEIVE": "Approved to receive",
+    "AGENT": "Agent"
 }

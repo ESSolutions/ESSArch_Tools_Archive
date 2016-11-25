@@ -219,6 +219,19 @@ input[type="checkbox"] {
     -webkit-justify-content: flex-end;
     margin-left: 10px;
 }
+.receive-sip-eventlog-form {
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    width: 100%;
+     justify-content: flex-end;
+    -webkit-justify-content: flex-end;
+    margin-left: 10px;
+}
+.receive-sip-eventlog-form .checkbox {
+    margin-right: 5px;
+}
 .events-footer {
     display: flex;
     display: -webkit-flex;
@@ -277,3 +290,4 @@ input[type="checkbox"] {
 .transfer-sip-button {
     float: right;
 }
+
