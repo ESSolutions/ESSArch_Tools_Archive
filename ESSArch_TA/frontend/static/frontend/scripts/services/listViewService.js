@@ -479,7 +479,7 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
         prepareIp: prepareIp,
         getIp: getIp,
         getSa: getSa,
-        getFileList, getFileList,
+        getFileList: getFileList,
         getStructure: getStructure,
         getReceptionIps: getReceptionIps
     };
