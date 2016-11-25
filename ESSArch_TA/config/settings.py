@@ -187,7 +187,6 @@ STATICFILES_DIRS = (
 
 # Celery settings
 BROKER_URL = 'amqp://guest:guest@localhost:5672/eta'
-CELERY_RESULT_BACKEND = 'amqp://'
 CELERY_IMPORTS = ('preingest.tasks', 'preingest.tests.tasks',)
 
 try:
