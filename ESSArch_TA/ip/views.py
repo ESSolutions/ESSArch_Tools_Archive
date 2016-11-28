@@ -163,9 +163,10 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         )
 
         validators = request.data.get('validators', {})
-        if validators:
+        if any(validators.itervalues()):
             validation_step = ProcessStep.objects.create(
-                name="Validate"
+                name="Validate",
+                parent_step=step
             )
 
             if validators.get('validate_xml_file', False):
@@ -244,7 +245,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         )
         receive_step.save()
 
-        step.child_steps.add(validation_step, receive_step)
+        step.child_steps.add(receive_step)
         step.save()
         step.run()
 
