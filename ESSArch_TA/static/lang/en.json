@@ -95,6 +95,8 @@
     "VALIDATEXMLFILE": "Validate XML file",
     "VALIDATELOGICALPHYSICALREPRESENTATION": "Validate logical physical representation",
     "VALIDATEINTEGRITY": "Validate Integrity",
+    "ARCHIVISTORGANIZATION": "Archivist organization",
+    "ARCHIVALINSTITUTION": "Archival institution",
     "VALIDATE": "Validate",
     "YES": "Yes",
     "NO": "No",

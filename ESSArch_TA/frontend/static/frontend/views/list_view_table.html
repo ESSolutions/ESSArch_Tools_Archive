@@ -9,16 +9,20 @@
                         <input ng-if="!('home.reception' | isState)" st-search="" class="form-control global-search" placeholder="{{'GLOBALSEARCH' | translate}}" type="text"/>
                     </div>
                 </th>
-                <th colspan="3">
+                <th colspan="5">
                     <span style="float: right; margin-bottom: 5px;" ng-click="getListViewData()" class="clickable glyphicon glyphicon-refresh" ng-class="{'glyphicon-refresh-animate': ipLoading }"></span>
                 </th>
             </tr>
             <tr>
                 <th ng-if="'home.reception' | isState" class="clickable" class="column-label"></th>
                 <th class="clickable" st-sort="Label" class="column-label">{{'LABEL' | translate}}</th>
+                <th class="clickable" st-sort="Responsible" class="column-label">{{'RESPONSIBLE' | translate}}</th>
+                <th class="clickable" st-sort="Responsible" class="column-label">{{'ARCHIVISTORGANIZATION' | translate}}</th>
                 <th class="clickable" st-sort="CreateDate" st-sort-default="reverse" class="column-label">{{'DATE' | translate}}</th>
-                <th class="clickable" class="column-label">{{'STATUS' | translate}}</th>
+                <th class="clickable" class="column-label">{{'STATE' | translate}}</th>
                 <th class="clickable" class="column-label">{{'EVENTS' | translate}}</th>
+                <th class="clickable" class="column-label">{{'STATUS' | translate}}</th>
+                <th ng-if="!('home.reception' | isState)" class="clickable" class="column-label">{{'DELETE' | translate}}</th>
             </tr>
         </thead>
         <tbody>
@@ -33,6 +37,8 @@
                     </div>
                 </td>
                 <td class="clickable" ng-click="selectIp(row);ipTableClick(row)">{{row.Label}}</td>
+                <td class="clickable" ng-click="ipRowClick(row)">{{row.Responsible}}</td>
+                <td class="clickable">{{row.ArchivistOrganization.name}}</td>
                 <td  ng-click="ipRowClick(row)">{{row.CreateDate | date:"yyyy-MM-dd HH:mm:ss"}}</td>
                 <td ng-if="row.State != 'At reception'"class="clickable" ng-click="stateClicked(row);selectIp(row)">
                     <a href="">{{row.State}}</a>
@@ -41,6 +47,12 @@
                     <span href="">{{row.State}}</span>
                 </td>
                 <td class="clickable" ng-click="eventsClick(row);selectIp(row)"><a ng-if="row.State != 'At reception'" href="">{{'EVENTS' | translate}}</a></td>
+                <td>
+                    <uib-progressbar class="progress" value="row.status" type="success"><b>{{row.status | number : 0}}%</b></uib-progressbar>
+                </td>
+                <td ng-if="!('home.reception' | isState)" ng-click="ipRowClick(row)">
+                    <button ng-hide="row.State == 'Creating' || row.State == 'Submitting'" ng-click="removeIpModal(row)" class="glyphicon glyphicon-remove"></button>
+                </td>
             </tr>
         </tbody>
         <tfoot>

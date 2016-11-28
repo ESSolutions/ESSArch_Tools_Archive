@@ -259,7 +259,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             templateUrl: "static/frontend/views/reception_package.html"
         }
     ];
-    $scope.colspan = 6;
+    $scope.colspan = 8;
     $scope.yes = $translate.instant('YES');
     $scope.no = $translate.instant('NO');
     vm.validatorModel = {
