@@ -294,3 +294,6 @@ body.modal-open[style] {
     from { -moz-transform: rotate(0deg);}
     to { -moz-transform: rotate(360deg);}
 }
+.pagination {
+    margin: 5px 0;
+}
