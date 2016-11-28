@@ -1,6 +1,6 @@
 from django.db.models import Prefetch
 
-from profiles.serializers import (
+from ESSArch_Core.profiles.serializers import (
     ProfileSerializer,
     ProfileSASerializer,
     ProfileIPSerializer,

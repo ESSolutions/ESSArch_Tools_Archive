@@ -13,7 +13,7 @@ from ESSArch_Core.ip.models import (
 
 from ESSArch_Core.serializers import DynamicHyperlinkedModelSerializer
 
-from profiles.serializers import (
+from ESSArch_Core.profiles.serializers import (
     ProfileIPSerializer,
 )
 
