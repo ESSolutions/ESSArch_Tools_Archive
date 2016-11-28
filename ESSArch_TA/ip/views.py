@@ -1,5 +1,7 @@
 import glob, os, shutil
 
+from celery import states as celery_states
+
 from django.db.models import Prefetch
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -98,6 +100,8 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ip['Label'] = root.get('LABEL')
         ip['CreateDate'] = root.find("{*}metsHdr").get('CREATEDATE')
         ip['State'] = "At reception"
+        ip['status'] = 100.0
+        ip['step_state'] = celery_states.SUCCESS
 
         return ip
 
