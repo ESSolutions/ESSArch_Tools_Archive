@@ -212,6 +212,8 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         });
     };
     $scope.includeIp = function(row) {
+        $scope.statusShow = false;
+        $scope.eventShow = false;
         var temp = true;
         $scope.includedIps.forEach(function(included) {
 
@@ -259,7 +261,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             templateUrl: "static/frontend/views/reception_package.html"
         }
     ];
-    $scope.colspan = 8;
+    $scope.colspan = 9;
     $scope.yes = $translate.instant('YES');
     $scope.no = $translate.instant('NO');
     vm.validatorModel = {

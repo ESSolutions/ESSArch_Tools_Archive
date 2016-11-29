@@ -230,7 +230,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             templateUrl: "static/frontend/views/reception_delivery_description.html"
         },
     ];
-    $scope.colspan = 9;
+    $scope.colspan = 10;
     $scope.removeIpModal = function (ipObject) {
         var modalInstance = $uibModal.open({
             animation: true,
