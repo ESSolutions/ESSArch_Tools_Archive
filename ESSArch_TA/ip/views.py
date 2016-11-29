@@ -1,4 +1,4 @@
-import glob, os, shutil
+import errno, glob, os, shutil
 
 from celery import states as celery_states
 
@@ -518,21 +518,26 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         ip = InformationPackage.objects.get(pk=pk)
+        path = ip.ObjectPath
 
         try:
-            shutil.rmtree(ip.ObjectPath)
-        except:
-            pass
+            shutil.rmtree(path)
+        except OSError as e:
+            if e.errno == errno.ENOTDIR:
+                work = Path.objects.get(entity="path_ingest_work").value
+                reception = Path.objects.get(entity="path_gate_reception").value
 
-        try:
-            os.remove(ip.ObjectPath + ".tar")
-        except:
-            pass
+                for fl in glob.glob(os.path.join(work, unicode(ip.pk) + "*")):
+                    try:
+                        os.remove(fl)
+                    except:
+                        raise
 
-        try:
-            os.remove(ip.ObjectPath + ".zip")
-        except:
-            pass
+                for fl in glob.glob(os.path.join(reception, unicode(ip.pk) + "*")):
+                    try:
+                        os.remove(fl)
+                    except:
+                        raise
 
         return super(InformationPackageViewSet, self).destroy(request, pk=pk)
 
