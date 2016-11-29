@@ -4,14 +4,14 @@
         <select class="form-control items-per-page"  ng-model="itemsPerPage" ng-options="x for x in [5,10,20,25,50]"></select>
         <table st-table="displayed" st-pipe="eventPipe" class="table table-striped">
           <thead>
-                <tr>
-                    <th class="clickable" st-sort="eventDetail">{{'EVENTTYPE' | translate}}</th>
-                    <th class="clickable" st-sort="eventDetail">{{'COMMENT' | translate}}</th>
-                    <th class="clickable" st-sort="eventDetail">{{'OUTCOME' | translate}}</th>
-                    <th class="clickable" st-sort="eventDetail">{{'AGENT' | translate}}</th>
-                    <th class="clickable" st-sort-default="reverse" st-sort="eventDateTime">{{'EVENTTIME' | translate}}</th>
-                </tr>
-            </thead>
+              <tr>
+                  <th class="clickable" st-sort="eventDetail">{{'EVENTTYPE' | translate}}</th>
+                  <th class="clickable" st-sort="eventOutcomeDetailNote">{{'COMMENT' | translate}}</th>
+                  <th class="clickable" st-sort="eventOutcome">{{'OUTCOME' | translate}}</th>
+                  <th class="clickable" st-sort="linkingAgentIdentifierValue">{{'AGENT' | translate}}</th>
+                  <th class="clickable" st-sort-default="reverse" st-sort="eventDateTime">{{'EVENTTIME' | translate}}</th>
+              </tr>
+          </thead>
             <tbody>
                 <tr ng-class="row.class" ng-click="eventClick(row)" ng-repeat="row in displayed">
                     <td>{{row.eventDetail}}</td>
