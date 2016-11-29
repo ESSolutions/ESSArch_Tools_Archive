@@ -309,5 +309,21 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         "key": "validate_integrity",
     }
     ];
-
+    $scope.tracebackModal = function (profiles) {
+        $scope.profileToSave = profiles;
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'static/frontend/views/task_traceback_modal.html',
+            scope: $scope,
+            size: 'lg',
+            controller: 'ModalInstanceCtrl',
+            controllerAs: '$ctrl'
+        })
+        modalInstance.result.then(function (data) {
+        }, function () {
+            $log.info('modal-component dismissed at: ' + new Date());
+        });
+    }
 });

@@ -104,6 +104,10 @@
     "NOTAVAILABLEINTHISVIEW": "Inte tillgänglig i denna vy",
     "STARTED": "Startade",
     "DONE": "Färdig",
+    "SUCCESS": "Slutförd",
+    "FAILURE": "Fel",
+    "INPROGRESS": "Evalueras",
     "APPROVEDTORECEIVE": "Godkänd att ta emot",
+    "SEETRACEBACK": "Se traceback",
     "AGENT": "Agent"
 }

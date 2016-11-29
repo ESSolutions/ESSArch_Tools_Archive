@@ -102,6 +102,10 @@
     "NOTAVAILABLEINTHISVIEW": "Not available in this view",
     "STARTED": "Started",
     "DONE": "Done",
+    "SUCCESS": "Success",
+    "FAILURE": "Failure",
+    "INPROGRESS": "In progress",
     "APPROVEDTORECEIVE": "Approved to receive",
+    "SEETRACEBACK": "See traceback",
     "AGENT": "Agent"
 }
