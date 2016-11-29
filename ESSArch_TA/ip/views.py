@@ -290,23 +290,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['post'], url_path='transfer')
     def transfer(self, request, pk=None):
         ip = self.get_object()
-
-        srcdir = Path.objects.get(entity="path_ingest_work").value
         dstdir = Path.objects.get(entity="path_gate_reception").value
-
-        if os.path.isfile(os.path.join(srcdir, "%s.tar" % pk)):
-            src = os.path.join(srcdir, "%s.tar" % pk)
-            dst = os.path.join(dstdir, "%s.tar" % pk)
-            shutil.copy(src, dst)
-
-        if os.path.isfile(os.path.join(srcdir, "%s.zip" % pk)):
-            src = os.path.join(srcdir, "%s.zip" % pk)
-            dst = os.path.join(dstdir, "%s.zip" % pk)
-            shutil.copy(src, dst)
-
-        src = os.path.join(srcdir, "%s.xml" % pk)
-        dst = os.path.join(dstdir, "%s.xml" % pk)
-        shutil.copy(src, dst)
 
         event_profile = ip.get_profile('event')
         info = event_profile.specification_data
@@ -331,6 +315,17 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     "status": "Transferring",
                 },
                 processstep_pos=10,
+                information_package=ip
+            )
+        )
+
+        step.tasks.add(
+            ProcessTask.objects.create(
+                name="preingest.tasks.TransferSIP",
+                params={
+                    "ip": ip,
+                },
+                processstep_pos=15,
                 information_package=ip
             )
         )

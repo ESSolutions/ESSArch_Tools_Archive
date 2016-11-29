@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-import os, shutil
+import os, shutil, string
 
 from django.conf import settings
 from django.core import serializers
@@ -61,6 +61,37 @@ class ReceiveSIP(DBTask):
 
     def event_outcome_success(self, ip=None):
         return "Received IP '%s' with label '%s'" % (ip.pk, ip.Label)
+
+class TransferSIP(DBTask):
+    event_type = 20900
+
+    def run(self, ip=None):
+        workdir = Path.objects.get(entity="path_ingest_work").value
+        srcdir = Path.objects.get(entity="path_ingest_reception").value
+        dstdir = Path.objects.get(entity="path_gate_reception").value
+
+        src = string.replace(ip.ObjectPath, workdir, srcdir, 1)
+        dst = string.replace(ip.ObjectPath, workdir, dstdir, 1)
+        shutil.copy(src, dst)
+
+        ip.ObjectPath = dst
+        ip.save(update_fields=['ObjectPath'])
+
+        self.set_progress(50, total=100)
+
+        src = os.path.join(srcdir, "%s.xml" % ip.pk)
+        dst = os.path.join(dstdir, "%s.xml" % ip.pk)
+        shutil.copy(src, dst)
+
+        self.set_progress(100, total=100)
+
+        return ip.ObjectPath
+
+    def undo(self, ip=None):
+        pass
+
+    def event_outcome_success(self, ip=None):
+        return "Transferred IP '%s' with label '%s'" % (ip.pk, ip.Label)
 
 class CalculateChecksum(tasks.CalculateChecksum):
     event_type = 20210

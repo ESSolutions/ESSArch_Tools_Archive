@@ -216,6 +216,7 @@ def installDefaultEventTypes(): # default events
         'Delivery receipt sent': '20600',
         'Virus control done': '20700',
         'Delivery ready for hand over': '20800',
+        'Transferring delivery': '20900',
     }
 
     # create according to model with two fields
