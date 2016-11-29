@@ -36,6 +36,9 @@ class ReceiveSIP(DBTask):
             dst = os.path.join(prepare, "%s.zip" % ip.pk)
             shutil.copy(src, dst)
 
+        ip.ObjectPath = dst
+        ip.save(update_fields=['ObjectPath'])
+
         src = os.path.join(reception, "%s.xml" % ip.pk)
         dst = os.path.join(prepare, "%s.xml" % ip.pk)
         shutil.copy(src, dst)
