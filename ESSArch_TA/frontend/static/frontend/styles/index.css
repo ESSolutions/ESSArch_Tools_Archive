@@ -294,6 +294,12 @@ body.modal-open[style] {
     from { -moz-transform: rotate(0deg);}
     to { -moz-transform: rotate(360deg);}
 }
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    vertical-align: middle;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    line-height: 1;
+}
 .step-state {
     padding-top: 0 !important;
 }
