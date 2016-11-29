@@ -20,6 +20,7 @@
                 <th class="clickable" st-sort="Responsible" class="column-label">{{'ARCHIVISTORGANIZATION' | translate}}</th>
                 <th class="clickable" st-sort="CreateDate" st-sort-default="reverse" class="column-label">{{'DATE' | translate}}</th>
                 <th class="clickable" class="column-label">{{'STATE' | translate}}</th>
+                <th class="clickable" class="column-label"></th>
                 <th class="clickable" class="column-label">{{'EVENTS' | translate}}</th>
                 <th class="clickable" class="column-label">{{'STATUS' | translate}}</th>
                 <th ng-if="!('home.reception' | isState)" class="clickable" class="column-label">{{'DELETE' | translate}}</th>
@@ -45,6 +46,11 @@
                 </td>
                 <td ng-if="row.State == 'At reception'">
                     <span href="">{{row.State}}</span>
+                </td>
+                <td class="step-state">
+                    <div ng-if="row.step_state == 'SUCCESS'" class="step-state-success"><b>{{'SUCCESS' | translate}}</b></div>
+                    <div ng-if="row.step_state == 'FAILURE'" class="step-state-failure"><b>{{'FAILURE' | translate}}</b></div>
+                    <div ng-if="row.step_state != 'SUCCESS' && row.step_state !='FAILURE'" class="step-state-in-progress"><b>{{'INPROGRESS' | translate}}</b></div>
                 </td>
                 <td class="clickable" ng-click="eventsClick(row);selectIp(row)"><a ng-if="row.State != 'At reception'" href="">{{'EVENTS' | translate}}</a></td>
                 <td>
