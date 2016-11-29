@@ -14,7 +14,7 @@ angular.module('myApp').controller('CatalogueCtrl', function($http, $scope, $roo
 
         var pagination = tableState.pagination;
         var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
-        var number = pagination.number;  // Number of entries showed per page.
+        var number = pagination.number || ctrl.itemsPerPage;  // Number of entries showed per page.
         var pageNumber = start/number+1;
 
         Resource.getIpPage(start, number, pageNumber, tableState, $scope.selectedIp).then(function (result) {
