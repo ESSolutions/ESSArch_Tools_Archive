@@ -567,7 +567,10 @@ class EventIPViewSet(viewsets.ModelViewSet):
     filter_backends = (
         filters.OrderingFilter, DjangoFilterBackend,
     )
-    ordering_fields = ('id', 'eventDetail', 'eventDateTime')
+    ordering_fields = (
+        'id', 'eventType', 'eventOutcomeDetailNote', 'eventOutcome',
+        'linkingAgentIdentifierValue', 'eventDateTime',
+    )
 
     def create(self, request):
         """
