@@ -56,7 +56,7 @@
                 <td>
                     <uib-progressbar class="progress" value="row.status" type="success"><b>{{row.status | number : 0}}%</b></uib-progressbar>
                 </td>
-                <td ng-if="!('home.reception' | isState)" ng-click="ipRowClick(row)">
+                <td ng-click="ipRowClick(row)">
                     <button ng-hide="row.State == 'Creating' || row.State == 'Submitting'" ng-click="removeIpModal(row)" class="glyphicon glyphicon-remove"></button>
                 </td>
             </tr>

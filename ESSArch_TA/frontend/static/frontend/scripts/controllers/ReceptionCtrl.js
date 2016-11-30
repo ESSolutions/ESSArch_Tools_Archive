@@ -326,4 +326,36 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $log.info('modal-component dismissed at: ' + new Date());
         });
     }
+    $scope.removeIpModal = function (ipObject) {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'static/frontend/views/remove-ip-modal.html',
+            controller: 'ModalInstanceCtrl',
+            controllerAs: '$ctrl'
+        })
+        modalInstance.result.then(function (data) {
+            $scope.removeIp(ipObject);
+        }, function () {
+            $log.info('modal-component dismissed at: ' + new Date());
+        });
+    }
+    //Remove and ip
+    $scope.removeIp = function (ipObject) {
+        $http({
+            method: 'DELETE',
+            url: appConfig.djangoUrl+"information-packages/"+ipObject.id
+        }).then(function() {
+            console.log("ip removed");
+            vm.displayedIps.splice(vm.displayedIps.indexOf(ipObject), 1);
+            $scope.edit = false;
+            $scope.select = false;
+            $scope.eventlog = false;
+            $scope.eventShow = false;
+            $scope.statusShow = false;
+
+        });
+    }
+
 });
