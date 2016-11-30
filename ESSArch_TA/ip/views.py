@@ -512,29 +512,26 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         return Response("Validating IP")
 
     def destroy(self, request, pk=None):
-        ip = InformationPackage.objects.get(pk=pk)
-        path = ip.ObjectPath
+        reception = Path.objects.get(entity="path_ingest_reception").value
+        path = os.path.join(reception, unicode(pk))
 
         try:
             shutil.rmtree(path)
         except OSError as e:
-            if e.errno == errno.ENOTDIR:
-                work = Path.objects.get(entity="path_ingest_work").value
-                reception = Path.objects.get(entity="path_gate_reception").value
+            if e.errno in [errno.ENOENT, errno.ENOTDIR]:
+                pass
+            raise
+        finally:
+            for fl in glob.glob(path + "*"):
+                try:
+                    os.remove(fl)
+                except:
+                    raise
 
-                for fl in glob.glob(os.path.join(work, unicode(ip.pk) + "*")):
-                    try:
-                        os.remove(fl)
-                    except:
-                        raise
-
-                for fl in glob.glob(os.path.join(reception, unicode(ip.pk) + "*")):
-                    try:
-                        os.remove(fl)
-                    except:
-                        raise
-
-        return super(InformationPackageViewSet, self).destroy(request, pk=pk)
+            if InformationPackage.objects.filter(pk=pk).exists():
+                return super(InformationPackageViewSet, self).destroy(request, pk=pk)
+            else:
+                return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route()
     def events(self, request, pk=None):
