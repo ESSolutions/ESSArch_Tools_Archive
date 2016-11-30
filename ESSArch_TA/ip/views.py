@@ -34,7 +34,11 @@ from ESSArch_Core.profiles.models import (
     Profile,
 )
 
-from ESSArch_Core.util import remove_prefix
+from ESSArch_Core.util import (
+    creation_date,
+    timestamp_to_datetime,
+    remove_prefix
+)
 
 from ip.filters import InformationPackageFilter
 
@@ -106,13 +110,29 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         return ip
 
     def list(self, request):
-        path = Path.objects.get(entity="path_ingest_reception").value
+        reception = Path.objects.get(entity="path_ingest_reception").value
+        uip = Path.objects.get(entity="path_ingest_unidentified").value
         ips = []
 
-        for xmlfile in glob.glob(os.path.join(path, "*.xml")):
-            ip = self.parseFile(xmlfile)
-            if not InformationPackage.objects.filter(id=ip['id']).exists():
-                ips.append(self.parseFile(xmlfile))
+        for container_file in glob.glob(os.path.join(reception, "*.tar")) + glob.glob(os.path.join(reception, "*.zip")):
+            no_ext = os.path.splitext(container_file)[0]
+            xmlfile = no_ext + ".xml"
+
+            if os.path.isfile(xmlfile):
+                ip = self.parseFile(xmlfile)
+                if not InformationPackage.objects.filter(id=ip['id']).exists():
+                    ips.append(ip)
+
+        for container_file in glob.glob(os.path.join(uip, "*.tar")) + glob.glob(os.path.join(uip, "*.zip")):
+            ip = {
+                'Label': os.path.basename(container_file),
+                'CreateDate': str(timestamp_to_datetime(creation_date(container_file)).isoformat()),
+                'State': 'Unidentified',
+                'status': 0,
+                'step_state': celery_states.SUCCESS,
+            }
+            ips.append(ip)
+
 
         from_db = InformationPackage.objects.filter(State='Receiving').prefetch_related(
             Prefetch('profileip_set', to_attr='profiles'),

@@ -176,6 +176,7 @@ def installDefaultPaths(): # default paths
           'path_preingest_prepare':'/ESSArch/data/etp/prepare',
           'path_preingest_reception':'/ESSArch/data/etp/reception',
           'path_ingest_reception':'/ESSArch/data/eta/reception/eft',
+          'path_ingest_unidentified':'/ESSArch/data/eta/uip',
           'path_ingest_work':'/ESSArch/data/eta/work',
           }
 
