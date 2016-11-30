@@ -357,5 +357,190 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
 
         });
     }
+    $scope.editUnidentifiedIp = true;
 
+    vm.modelUnidentifiedIp = {
+        "agentname1": "ESS",
+        "agentname2": "HR Employed",
+        "agentname3": "5.0.34",
+        "agentname4": "Noark 5",
+        "agentname5": "Government X, Dep Y",
+        "agentname6": "Government X, Archival Dep",
+        "agentname7": "Gene Simmons",
+        "agentname8": "Government X system type",
+        "agentname9": "Government X, Service Dep",
+        "agentname10": "Lita Ford",
+        "agentname11": "Government X, Legal Dep",
+        "agentname12": "National Archives of X",
+        "SUBMISSIONAGREEMENT": "RA 13-2011/5329; 2012-04-12",
+        "STARTDATE": "2012-01-01",
+        "ENDDATE": "2012-12-30",
+        "MetsLABEL": "Package label",
+        "MetsHdrRECORDSTATUS": "NEW"
+    };
+
+    vm.fieldsUnidentifiedIp = [
+        //list all fields
+    {
+        "type": "input",
+        "key": "agentname1",
+        "templateOptions": {
+            "type": "text",
+            "label": "Archivist Organization"
+        }
+    },
+    {
+        "type": "input",
+        "key": "agentname2",
+        "templateOptions": {
+            "type": "text",
+            "label": "Archivist Software"
+        }
+    },
+    {
+        "type": "input",
+        "key": "agentname3",
+        "templateOptions": {
+            "type": "text",
+            "label": "Archivist Software"
+        }
+    },
+    {
+        "type": "input",
+        "key": "agentname4",
+        "templateOptions": {
+            "type": "text",
+            "label": "Archivist Software"
+        }
+    },
+    {
+        "type": "input",
+        "key": "agentname5",
+        "templateOptions": {
+            "type": "text",
+            "label": "Creator Organization"
+        }
+    },
+    {
+        "type": "input",
+        "key": "agentname6",
+        "templateOptions": {
+            "type": "text",
+            "label": "Producer Organization"
+        }
+    },
+    {
+        "type": "input",
+        "key": "agentname7",
+        "templateOptions": {
+            "type": "text",
+            "label": "Producer Individual"
+        }
+    },
+    {
+        "type": "input",
+        "key": "agentname8",
+        "templateOptions": {
+            "type": "text",
+            "label": "Producer Software"
+        }
+    },
+    {
+        "type": "input",
+        "key": "agentname9",
+        "templateOptions": {
+            "type": "text",
+            "label": "Submitter Organization"
+        }
+    },
+    {
+        "type": "input",
+        "key": "agentname10",
+        "templateOptions": {
+            "type": "text",
+            "label": "Submitter Individual"
+        }
+    },
+    {
+        "type": "input",
+        "key": "agentname11",
+        "templateOptions": {
+            "type": "text",
+            "label": "IPOwner Individual"
+        }
+    },
+    {
+        "type": "input",
+        "key": "agentname12",
+        "templateOptions": {
+            "type": "text",
+            "label": "Preservation Organization"
+        }
+    },
+    {
+        "type": "input",
+        "key": "SUBMISSIONAGREEMENT",
+        "templateOptions": {
+            "type": "text",
+            "label": "Submission Agreement"
+        }
+    },
+    {
+        "type": "input",
+        "key": "STARTDATE",
+        "templateOptions": {
+            "type": "text",
+            "label": "Start data"
+        }
+    },
+    {
+        "type": "input",
+        "key": "ENDDATE",
+        "templateOptions": {
+            "type": "text",
+            "label": "End date"
+        }
+    },
+    {
+        "type": "input",
+        "key": "MetsLABEL",
+        "templateOptions": {
+            "type": "text",
+            "label": "Mets Label"
+        }
+    },
+    {
+        "type": "input",
+        "key": "MetsHdrRECORDSTATUS",
+        "templateOptions": {
+            "type": "text",
+            "label": "Record Status"
+        }
+    },
+    ];
+    $scope.prepareUnidentifiedIp = false;
+    $scope.showPrepareUnidentified = function(ip) {
+        if(ip == $scope.ip) {
+            $scope.prepareUnidentifiedIp = false;
+        }else {
+            $scope.ip = ip;
+            $scope.prepareUnidentifiedIp = true;
+            $scope.statusShow = false;
+            $scope.eventShow = false;
+        }
+    }
+    $scope.identifyIp = function(ip) {
+        console.log(vm.modelUnidentifiedIp);
+        $http({
+            method: 'POST',
+            url: appConfig.djangoUrl+'information-packages/'+ip.Label+'/identify-ip/',
+            data: {specification_data: vm.modelUnidentifiedIp}
+        }).then(function(response) {
+            $scope.prepareUnidentifiedIp = false;
+            $timeout(function(){
+                $scope.getListViewData();
+                $scope.updateListViewConditional();
+            }, 1000);
+        });
+    };
 });

@@ -85,7 +85,9 @@ width: 100%;
     width: 15%;
 }
 .select-view {
-    margin: 5px;
+    border-style: solid;
+    border-color: #666;
+    border-radius: 15px;
     padding: 5px;
 }
 .select-view > .checkbox {
@@ -191,15 +193,16 @@ input[type="checkbox"] {
 }
 .eventlog-view .signature {
 }
-.edit-view .formly {
+.edit-unidentified-ip {
+}
+.edit-unidentified-ip .formly {
     display: flex;
     display: -webkit-flex;
     flex-direction: row;
     -webkit-flex-direction: row;
     flex-wrap: wrap;
     -webkit-flex-wrap: wrap;
-    justify-content: space-between;
-    -webkit-justify-content: space-between;
+    padding: 5px;
     width: 100%;
 }
 .eventlog-form {

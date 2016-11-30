@@ -44,11 +44,11 @@
                 <td ng-if="row.State != 'At reception' && row.State != 'Unidentified'"class="clickable" ng-click="stateClicked(row);selectIp(row)">
                     <a href="">{{row.State}}</a>
                 </td>
-                <td ng-if="row.State == 'Unidentified'"class="clickable" ng-click="selectIp(row)">
-                    <a href="">{{row.State}}</a>
-                </td>
                 <td ng-if="row.State == 'At reception'">
                     <span href="">{{row.State}}</span>
+                </td>
+                <td ng-if="row.State == 'Unidentified'">
+                    <a ng-click="showPrepareUnidentified(row);selectIp(row)">{{row.State}}</a>
                 </td>
                 <td class="step-state">
                     <div ng-if="row.step_state == 'SUCCESS'" class="step-state-success"><b>{{'SUCCESS' | translate}}</b></div>
