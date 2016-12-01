@@ -336,3 +336,7 @@ body.modal-open[style] {
 .pagination {
     margin: 5px 0;
 }
+.info-wrapper {
+    width: 100%;
+    margin-left: 10px;
+}

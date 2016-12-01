@@ -34,6 +34,15 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                 }],
             }
         })
+        .state('home.info', {
+            url: 'info',
+            templateUrl: '/static/frontend/views/info_page.html',
+            resolve: {
+                authenticated: ['djangoAuth', function(djangoAuth){
+                    return djangoAuth.authenticationStatus();
+                }],
+            }
+        })
         .state('home.reception', {
             url: 'reception',
             templateUrl: '/static/frontend/views/receive_sip_reception.html',
@@ -94,7 +103,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                 }],
             }
         });
-        $urlRouterProvider.otherwise('/reception');
+        $urlRouterProvider.otherwise('info');
     })
 .config(['$httpProvider', function($httpProvider, $rootScope) {
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
