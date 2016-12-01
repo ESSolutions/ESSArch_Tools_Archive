@@ -89,6 +89,15 @@
                     ],
                     "-name": "CREATEDATE",
                     "-req": 1
+                },
+                {
+                    "#content": [
+                        {
+                            "var": "RECORDSTATUS"
+                        }
+                    ],
+                    "-name": "RECORDSTATUS",
+                    "-req": 1
                 }
             ],
             "-children": [

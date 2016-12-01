@@ -1,4 +1,4 @@
-angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal) {
+angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout) {
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
@@ -360,30 +360,30 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     $scope.editUnidentifiedIp = true;
 
     vm.modelUnidentifiedIp = {
-        "agentname1": "ESS",
-        "agentname2": "HR Employed",
-        "agentname3": "5.0.34",
-        "agentname4": "Noark 5",
-        "agentname5": "Government X, Dep Y",
-        "agentname6": "Government X, Archival Dep",
-        "agentname7": "Gene Simmons",
-        "agentname8": "Government X system type",
-        "agentname9": "Government X, Service Dep",
-        "agentname10": "Lita Ford",
-        "agentname11": "Government X, Legal Dep",
-        "agentname12": "National Archives of X",
+        "archivist": "ESS",
+        "creator": "Government X, Dep Y",
+        "submitter_organization": "Government X, Archival Dep",
+        "submitter_individual": "Gene Simmons",
+        "producer_organization": "Government X system type",
+        "producer_individual": "Government X, Service Dep",
+        "ipowner": "Lita Ford",
+        "preservation_organization": "Government X, Legal Dep",
+        "systemname": "National Archives of X",
+        "systemversion": "National Archives of X Version",
+        "systemtype": "National Archives of X Type",
         "SUBMISSIONAGREEMENT": "RA 13-2011/5329; 2012-04-12",
         "STARTDATE": "2012-01-01",
         "ENDDATE": "2012-12-30",
-        "MetsLABEL": "Package label",
-        "MetsHdrRECORDSTATUS": "NEW"
+        "LABEL": "Package label",
+        "RECORDSTATUS": "NEW",
+        "profile": "The profile"
     };
 
     vm.fieldsUnidentifiedIp = [
         //list all fields
     {
         "type": "input",
-        "key": "agentname1",
+        "key": "archivist",
         "templateOptions": {
             "type": "text",
             "label": "Archivist Organization"
@@ -391,31 +391,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     },
     {
         "type": "input",
-        "key": "agentname2",
-        "templateOptions": {
-            "type": "text",
-            "label": "Archivist Software"
-        }
-    },
-    {
-        "type": "input",
-        "key": "agentname3",
-        "templateOptions": {
-            "type": "text",
-            "label": "Archivist Software"
-        }
-    },
-    {
-        "type": "input",
-        "key": "agentname4",
-        "templateOptions": {
-            "type": "text",
-            "label": "Archivist Software"
-        }
-    },
-    {
-        "type": "input",
-        "key": "agentname5",
+        "key": "creator",
         "templateOptions": {
             "type": "text",
             "label": "Creator Organization"
@@ -423,31 +399,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     },
     {
         "type": "input",
-        "key": "agentname6",
-        "templateOptions": {
-            "type": "text",
-            "label": "Producer Organization"
-        }
-    },
-    {
-        "type": "input",
-        "key": "agentname7",
-        "templateOptions": {
-            "type": "text",
-            "label": "Producer Individual"
-        }
-    },
-    {
-        "type": "input",
-        "key": "agentname8",
-        "templateOptions": {
-            "type": "text",
-            "label": "Producer Software"
-        }
-    },
-    {
-        "type": "input",
-        "key": "agentname9",
+        "key": "submitter_organization",
         "templateOptions": {
             "type": "text",
             "label": "Submitter Organization"
@@ -455,7 +407,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     },
     {
         "type": "input",
-        "key": "agentname10",
+        "key": "submitter_individual",
         "templateOptions": {
             "type": "text",
             "label": "Submitter Individual"
@@ -463,18 +415,58 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     },
     {
         "type": "input",
-        "key": "agentname11",
+        "key": "producer_organization",
         "templateOptions": {
             "type": "text",
-            "label": "IPOwner Individual"
+            "label": "Producer Organization"
         }
     },
     {
         "type": "input",
-        "key": "agentname12",
+        "key": "producer_individual",
+        "templateOptions": {
+            "type": "text",
+            "label": "Producer Individual"
+        }
+    },
+    {
+        "type": "input",
+        "key": "ipowner",
+        "templateOptions": {
+            "type": "text",
+            "label": "IP Owner Organization"
+        }
+    },
+    {
+        "type": "input",
+        "key": "preservation_organization",
         "templateOptions": {
             "type": "text",
             "label": "Preservation Organization"
+        }
+    },
+    {
+        "type": "input",
+        "key": "systemname",
+        "templateOptions": {
+            "type": "text",
+            "label": "Archivist Software"
+        }
+    },
+    {
+        "type": "input",
+        "key": "systemversion",
+        "templateOptions": {
+            "type": "text",
+            "label": "Archivist Software Version"
+        }
+    },
+    {
+        "type": "input",
+        "key": "systemtype",
+        "templateOptions": {
+            "type": "text",
+            "label": "Archivist Software Type"
         }
     },
     {
@@ -490,7 +482,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         "key": "STARTDATE",
         "templateOptions": {
             "type": "text",
-            "label": "Start data"
+            "label": "Start date"
         }
     },
     {
@@ -503,18 +495,26 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     },
     {
         "type": "input",
-        "key": "MetsLABEL",
+        "key": "LABEL",
         "templateOptions": {
             "type": "text",
-            "label": "Mets Label"
+            "label": "Label"
         }
     },
     {
         "type": "input",
-        "key": "MetsHdrRECORDSTATUS",
+        "key": "RECORDSTATUS",
         "templateOptions": {
             "type": "text",
             "label": "Record Status"
+        }
+    },
+    {
+        "type": "input",
+        "key": "profile",
+        "templateOptions": {
+            "type": "text",
+            "label": "Profile"
         }
     },
     ];
@@ -552,13 +552,16 @@ $scope.identifyIpModal = function (ip) {
         console.log(vm.modelUnidentifiedIp);
         $http({
             method: 'POST',
-            url: appConfig.djangoUrl+'information-packages/'+ip.Label+'/identify-ip/',
-            data: {specification_data: vm.modelUnidentifiedIp}
+            url: appConfig.djangoUrl+'ip-reception/identify-ip/',
+            data: {
+                label: ip.Label,
+                specification_data: vm.modelUnidentifiedIp
+            }
         }).then(function(response) {
             $scope.prepareUnidentifiedIp = false;
             $timeout(function(){
                 $scope.getListViewData();
-                $scope.updateListViewConditional();
+                updateListViewConditional();
             }, 1000);
         });
     };

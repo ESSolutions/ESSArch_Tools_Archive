@@ -20,30 +20,18 @@ class ReceiveSIP(DBTask):
     event_type = 20100
 
     def run(self, ip=None):
-        reception = Path.objects.get(entity="path_ingest_reception").value
         prepare = Path.objects.get(entity="path_ingest_work").value
 
-        tarfile = os.path.join(reception, "%s.tar" % ip.pk)
-        zipfile = os.path.join(reception, "%s.zip" % ip.pk)
+        srcdir, srcfile = os.path.split(ip.ObjectPath)
+        dst = os.path.join(prepare, srcfile)
 
-        if os.path.isfile(tarfile):
-            src = tarfile
-            dst = os.path.join(prepare, "%s.tar" % ip.pk)
-            shutil.copy(src, dst)
+        shutil.copy(ip.ObjectPath, dst)
 
-        if os.path.isfile(zipfile):
-            src = zipfile
-            dst = os.path.join(prepare, "%s.zip" % ip.pk)
-            shutil.copy(src, dst)
-
-        ip.ObjectPath = dst
-        ip.save(update_fields=['ObjectPath'])
-
-        src = os.path.join(reception, "%s.xml" % ip.pk)
+        src = os.path.join(srcdir, "%s.xml" % ip.pk)
         dst = os.path.join(prepare, "%s.xml" % ip.pk)
         shutil.copy(src, dst)
 
-        with open(os.path.join(reception, "%s_event_profile.json" % ip.pk)) as f:
+        with open(os.path.join(srcdir, "%s_event_profile.json" % ip.pk)) as f:
             json_str = f.read()
             for p in serializers.deserialize("json", json_str):
                 p.save()
@@ -66,13 +54,11 @@ class TransferSIP(DBTask):
     event_type = 20900
 
     def run(self, ip=None):
-        workdir = Path.objects.get(entity="path_ingest_work").value
-        srcdir = Path.objects.get(entity="path_ingest_reception").value
-        dstdir = Path.objects.get(entity="path_gate_reception").value
+        srcdir, srcfile = os.path.split(ip.ObjectPath)
+        epp = Path.objects.get(entity="path_gate_reception").value
+        dst = os.path.join(epp, srcfile)
 
-        src = string.replace(ip.ObjectPath, workdir, srcdir, 1)
-        dst = string.replace(ip.ObjectPath, workdir, dstdir, 1)
-        shutil.copy(src, dst)
+        shutil.copy(ip.ObjectPath, dst)
 
         ip.ObjectPath = dst
         ip.save(update_fields=['ObjectPath'])
@@ -80,7 +66,7 @@ class TransferSIP(DBTask):
         self.set_progress(50, total=100)
 
         src = os.path.join(srcdir, "%s.xml" % ip.pk)
-        dst = os.path.join(dstdir, "%s.xml" % ip.pk)
+        dst = os.path.join(epp, "%s.xml" % ip.pk)
         shutil.copy(src, dst)
 
         self.set_progress(100, total=100)

@@ -1,14 +1,15 @@
-import errno, glob, os, shutil
+import errno, glob, json, os, shutil, uuid
 
 from celery import states as celery_states
 
+from django.conf import settings
 from django.db.models import Prefetch
 from django_filters.rest_framework import DjangoFilterBackend
 
 from lxml import etree
 
 from rest_framework import filters, status
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 
 from ESSArch_Core.configuration.models import (
@@ -36,6 +37,7 @@ from ESSArch_Core.profiles.models import (
 
 from ESSArch_Core.util import (
     creation_date,
+    get_value_from_path,
     timestamp_to_datetime,
     remove_prefix
 )
@@ -114,10 +116,13 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         uip = Path.objects.get(entity="path_ingest_unidentified").value
         ips = []
 
-        for container_file in glob.glob(os.path.join(reception, "*.tar")) + glob.glob(os.path.join(reception, "*.zip")):
-            no_ext = os.path.splitext(container_file)[0]
-            xmlfile = no_ext + ".xml"
+        for xmlfile in glob.glob(os.path.join(reception, "*.xml")):
+            if os.path.isfile(xmlfile):
+                ip = self.parseFile(xmlfile)
+                if not InformationPackage.objects.filter(id=ip['id']).exists():
+                    ips.append(ip)
 
+        for xmlfile in glob.glob(os.path.join(uip, "*.xml")):
             if os.path.isfile(xmlfile):
                 ip = self.parseFile(xmlfile)
                 if not InformationPackage.objects.filter(id=ip['id']).exists():
@@ -131,7 +136,21 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                 'status': 0,
                 'step_state': celery_states.SUCCESS,
             }
-            ips.append(ip)
+
+            include = True
+
+            for xmlfile in glob.glob(os.path.join(uip, "*.xml")):
+                if os.path.isfile(xmlfile):
+                    doc = etree.parse(xmlfile)
+                    root = doc.getroot()
+
+                    el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
+                    if ip['Label'] == get_value_from_path(el, "@href").split('file:///')[1]:
+                        include = False
+                        break
+
+            if include:
+                ips.append(ip)
 
 
         from_db = InformationPackage.objects.filter(State='Receiving').prefetch_related(
@@ -165,14 +184,27 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
     @detail_route(methods=['post'], url_path='create-ip')
     def create_ip(self, request, pk=None):
         reception = Path.objects.get(entity="path_ingest_reception").value
+        uip = Path.objects.get(entity="path_ingest_unidentified").value
         xmlfile = os.path.join(reception, "%s.xml" % pk)
+        srcdir = reception
+        if not os.path.isfile(xmlfile):
+            xmlfile = os.path.join(uip, "%s.xml" % pk)
+            srcdir = uip
+
+        doc = etree.parse(xmlfile)
+        root = doc.getroot()
+
+        el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
+        objpath = get_value_from_path(el, "@href").split('file:///')[1]
+        objpath = os.path.join(srcdir, objpath)
+
         ipdata = self.parseFile(xmlfile)
 
         responsible = self.request.user.username or "Anonymous user"
 
         ip = InformationPackage.objects.create(
             id=pk, Label=ipdata["Label"], State="Receiving",
-            Responsible=responsible,
+            Responsible=responsible, ObjectPath=objpath,
         )
         ip.CreateDate = ipdata["CreateDate"]
         ip.save()
@@ -210,7 +242,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                         name="preingest.tasks.ValidateFiles",
                         params={
                             "ip": ip,
-                            "rootdir": reception,
+                            "rootdir": srcdir,
                             "xmlfile": xmlfile,
                             "validate_fileformat": val_format,
                             "validate_integrity": val_integrity
@@ -220,15 +252,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                     )
                 )
 
-            files = []
-            tarfile = os.path.join(reception, "%s.tar" % pk)
-            zipfile = os.path.join(reception, "%s.zip" % pk)
-
-            if os.path.isfile(tarfile):
-                files.append(tarfile)
-
-            if os.path.isfile(zipfile):
-                files.append(zipfile)
+            files = [objpath]
 
             if validators.get('validate_logical_physical_representation'):
                 validation_step.tasks.add(
@@ -275,6 +299,54 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         step.run()
 
         return Response("IP Received")
+
+    @list_route(methods=['post'], url_path='identify-ip')
+    def identify_ip(self, request):
+        fname = request.data.get('label')
+        spec_data = request.data.get('specification_data', {})
+
+        uip = Path.objects.get(entity="path_ingest_unidentified").value
+        container_file = os.path.join(uip, fname)
+
+        if not os.path.isfile(container_file):
+            return Response(
+                {'status': '%s does not exist' % container_file},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        spec = json.loads(open(
+            os.path.join(settings.BASE_DIR, 'templates/SDTemplate.json')
+        ).read())
+
+        ip_id = uuid.uuid4()
+
+        spec_data['_OBJID'] = unicode(ip_id)
+        spec_data['_OBJLABEL'] = spec_data.pop('LABEL')
+        spec_data['_IP_CREATEDATE'] = timestamp_to_datetime(
+            creation_date(container_file)
+        ).isoformat()
+
+        infoxml = u'%s.xml' % unicode(ip_id)
+        infoxml = os.path.join(uip, infoxml)
+
+        ProcessTask(
+            name='preingest.tasks.GenerateXML',
+            params={
+                'info': spec_data,
+                'filesToCreate': {
+                    infoxml: spec
+                },
+                'folderToParse': container_file,
+            },
+        ).run_eagerly()
+
+        shutil.copy(
+            'templates/event_profile.json',
+            os.path.join(uip, '%s_event_profile.json' % ip_id)
+        )
+
+        return Response({'status': 'Identified IP, created %s' % infoxml})
+
 
 class InformationPackageViewSet(viewsets.ModelViewSet):
     """
@@ -545,25 +617,41 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, pk=None):
         reception = Path.objects.get(entity="path_ingest_reception").value
-        path = os.path.join(reception, unicode(pk))
+        uip = Path.objects.get(entity="path_ingest_unidentified").value
 
-        try:
-            shutil.rmtree(path)
-        except OSError as e:
-            if e.errno in [errno.ENOENT, errno.ENOTDIR]:
-                pass
-            raise
-        finally:
-            for fl in glob.glob(path + "*"):
-                try:
-                    os.remove(fl)
-                except:
+        xmlfile = os.path.join(reception, "%s.xml" % pk)
+        srcdir = reception
+
+        if not os.path.isfile(xmlfile):
+            xmlfile = os.path.join(uip, "%s.xml" % pk)
+            srcdir = uip
+
+        if os.path.isfile(xmlfile):
+            doc = etree.parse(xmlfile)
+            root = doc.getroot()
+
+            el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
+            objpath = get_value_from_path(el, "@href").split('file:///')[1]
+            path = os.path.join(srcdir, objpath)
+
+            try:
+                shutil.rmtree(path)
+            except OSError as e:
+                if e.errno in [errno.ENOENT, errno.ENOTDIR]:
+                    os.remove(path)
+                else:
                     raise
+            finally:
+                for fl in glob.glob(os.path.splitext(xmlfile)[0] + "*"):
+                    try:
+                        os.remove(fl)
+                    except:
+                        raise
 
-            if InformationPackage.objects.filter(pk=pk).exists():
-                return super(InformationPackageViewSet, self).destroy(request, pk=pk)
-            else:
-                return Response(status=status.HTTP_204_NO_CONTENT)
+        if InformationPackage.objects.filter(pk=pk).exists():
+            return super(InformationPackageViewSet, self).destroy(request, pk=pk)
+        else:
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route()
     def events(self, request, pk=None):
