@@ -7,6 +7,11 @@ angular.module('myApp').controller('EventCtrl', ['Resource', '$scope', '$rootSco
     $scope.$on("$destroy", function() {
         $interval.cancel(eventInterval);
     });
+    $scope.newEventForm = {
+        eventType: "",
+        eventOutcome: "",
+        comment: ""
+    };
     $scope.getEventOutcome = function(outcome) {
         if(outcome == 0) {
             return "Success";
@@ -42,6 +47,11 @@ angular.module('myApp').controller('EventCtrl', ['Resource', '$scope', '$rootSco
     $scope.addEvent = function(ip, eventType, eventDetail, eventOutcome) {
         listViewService.addEvent(ip, eventType, eventDetail, eventOutcome).then(function(value) {
             $rootScope.stCtrl.pipe();
+            $scope.newEventForm = {
+                eventType: "",
+                eventOutcome: "",
+                comment: ""
+            };
         });
     }
     var eventInterval;

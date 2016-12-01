@@ -110,7 +110,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
     };
     function getEventlogData() {
         listViewService.getEventlogData().then(function(value){
-            $scope.statusNoteCollection = value;
+            $scope.eventTypeCollection = value;
         });
     };
 

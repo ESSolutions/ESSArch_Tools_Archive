@@ -113,7 +113,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     };
     function getEventlogData() {
         listViewService.getEventlogData().then(function(value){
-            $scope.statusNoteCollection = value;
+            $scope.eventTypeCollection = value;
         });
     };
 
