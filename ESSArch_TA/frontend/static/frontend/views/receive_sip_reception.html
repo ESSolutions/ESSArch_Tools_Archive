@@ -25,25 +25,25 @@
                     <button class="btn btn-primary" ng-click="identifyIp(ip)">Prepare unidentified</button>
                 </form>
             </div>
-            <div ng-if="includedIps.length">
-                <form class="receive-sip-eventlog-form">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" ng-model="approvedToReceive">{{'APPROVEDTORECEIVE' | translate}}</input>
-                        </label>
-                    </div>
-                    <button ng-disabled="!approvedToReceive" class="btn btn-info receive-button" ng-click="receiveSip(includedIps)">{{'RECEIVESIP' | translate}}</button>
-                </form>
-            </div>
-            <!--
-                <uib-tabset active="activeTab">
-                <uib-tab ng-repeat="t in tabsEditView" heading="{{t.label}}">
-                <div class="select-sub-edit-eventlog-wrapper">
-                <div ng-include src="t.templateUrl"></div>
-                </div>
-                </uib-tab>
-                </uib-tabset>
-            -->
         </div>
+        <div ng-if="includedIps.length">
+            <form class="receive-sip-eventlog-form">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="approvedToReceive">{{'APPROVEDTORECEIVE' | translate}}</input>
+                    </label>
+                </div>
+                <button ng-disabled="!approvedToReceive" class="btn btn-info receive-button" ng-click="receiveSip(includedIps)">{{'RECEIVESIP' | translate}}</button>
+            </form>
+        </div>
+        <!--
+            <uib-tabset active="activeTab">
+            <uib-tab ng-repeat="t in tabsEditView" heading="{{t.label}}">
+            <div class="select-sub-edit-eventlog-wrapper">
+            <div ng-include src="t.templateUrl"></div>
+            </div>
+            </uib-tab>
+            </uib-tabset>
+        -->
     </div>
 </body>
