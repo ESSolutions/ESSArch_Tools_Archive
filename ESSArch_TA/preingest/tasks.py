@@ -128,5 +128,10 @@ class ValidateIntegrity(tasks.ValidateIntegrity):
     event_type = 20263
 
 
+class ValidateFiles(tasks.ValidateFiles):
+    fileformat_task = "preingest.tasks.ValidateFileFormat"
+    checksum_task = "preingest.tasks.ValidateIntegrity"
+
+
 class UpdateIPStatus(tasks.UpdateIPStatus):
     event_type = 20280

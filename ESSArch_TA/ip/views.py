@@ -196,6 +196,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                         params={
                             "xml_filename": xmlfile
                         },
+                        log=EventIP,
                         information_package=ip
                     )
                 )
@@ -206,7 +207,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             if val_format or val_integrity:
                 validation_step.tasks.add(
                     ProcessTask.objects.create(
-                        name="ESSArch_Core.tasks.ValidateFiles",
+                        name="preingest.tasks.ValidateFiles",
                         params={
                             "ip": ip,
                             "rootdir": reception,
@@ -214,6 +215,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                             "validate_fileformat": val_format,
                             "validate_integrity": val_integrity
                         },
+                        log=EventIP,
                         information_package=ip
                     )
                 )
@@ -236,6 +238,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                             "files": files,
                             "xmlfile": xmlfile,
                         },
+                        log=EventIP,
                         information_package=ip
                     )
                 )
@@ -252,6 +255,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                 },
                 information_package=ip,
                 processstep_pos=0,
+                log=EventIP,
             ),
             ProcessTask.objects.create(
                 name="preingest.tasks.UpdateIPStatus",
@@ -261,6 +265,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                 },
                 information_package=ip,
                 processstep_pos=1,
+                log=EventIP,
             )
         )
         receive_step.save()
@@ -335,6 +340,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     "status": "Transferring",
                 },
                 processstep_pos=10,
+                log=EventIP,
                 information_package=ip
             )
         )
@@ -346,6 +352,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     "ip": ip,
                 },
                 processstep_pos=15,
+                log=EventIP,
                 information_package=ip
             )
         )
@@ -358,6 +365,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     "filesToCreate": filesToCreate,
                 },
                 processstep_pos=20,
+                log=EventIP,
                 information_package=ip
             )
         )
@@ -370,6 +378,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     "events": ip.events.all(),
                 },
                 processstep_pos=30,
+                log=EventIP,
                 information_package=ip
             )
         )
@@ -486,6 +495,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     "status": "Transferred",
                 },
                 processstep_pos=50,
+                log=EventIP,
                 information_package=ip
             )
         )
@@ -512,16 +522,18 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                 params={
                     "xml_filename": xmlfile
                 },
+                log=EventIP,
                 information_package=ip
             ),
             ProcessTask.objects.create(
-                name="ESSArch_Core.tasks.ValidateFiles",
+                name="preingest.tasks.ValidateFiles",
                 params={
                     "ip": ip,
                     "mets_path": xmlfile,
                     "validate_fileformat": True,
                     "validate_integrity": True,
                 },
+                log=EventIP,
                 processstep_pos=0,
                 information_package=ip
             )
