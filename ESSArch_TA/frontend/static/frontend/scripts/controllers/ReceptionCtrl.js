@@ -529,6 +529,25 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $scope.eventShow = false;
         }
     }
+$scope.identifyIpModal = function (ip) {
+        $scope.unidentifiedIp = ip;
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'static/frontend/views/identify_ip_modal.html',
+            scope: $scope,
+            size: 'lg',
+            controller: 'ModalInstanceCtrl',
+            controllerAs: '$ctrl'
+        })
+        modalInstance.result.then(function (data) {
+            $scope.identifyIp($scope.unidentifiedIp);
+        }, function () {
+            $log.info('modal-component dismissed at: ' + new Date());
+        });
+    }
+
     $scope.identifyIp = function(ip) {
         console.log(vm.modelUnidentifiedIp);
         $http({

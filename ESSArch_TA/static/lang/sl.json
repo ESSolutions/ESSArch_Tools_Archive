@@ -107,5 +107,7 @@
     "INPROGRESS": "In progress",
     "APPROVEDTORECEIVE": "Approved to receive",
     "SEETRACEBACK": "See traceback",
+    "PREPAREUNIDENTIFIEDIP": "Prepare unidentified ip",
+    "PREPARE": "Prepare",
     "AGENT": "Agent"
 }

@@ -109,5 +109,7 @@
     "INPROGRESS": "Evalueras",
     "APPROVEDTORECEIVE": "Godkänd att ta emot",
     "SEETRACEBACK": "Se traceback",
+    "PREPAREUNIDENTIFIEDIP": "Prepare unidentified ip",
+    "PREPARE": "Förbered",
     "AGENT": "Agent"
 }

@@ -1,0 +1,16 @@
+<div class="enter-profile-name">
+    <h3 style="margin: 15px;" class="modal-title" id="modal-title"><b>{{'PREPAREUNIDENTIFIEDIP' | translate}}:</b> {{ip.Label}}</h3>
+</div>
+<form ng-submit="$ctrl.prepareUnidentified()">
+    <div class="modal-body" id="modal-body">
+        <div class="edit-unidentified-ip">
+            <formly-form model="vm.modelUnidentifiedIp" fields="vm.fieldsUnidentifiedIp">
+            </formly-form>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="submit">{{'PREPARE' | translate}}</button>
+        <button class="btn btn-warning" type="button" ng-click="$ctrl.cancel()">{{'CANCEL' | translate}}</button>
+    </div>
+</form>

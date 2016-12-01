@@ -31,6 +31,12 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
         }
         $uibModalInstance.close($ctrl.data);
     };
+    $ctrl.prepareUnidentified = function () {
+        $ctrl.data = {
+            status: "prepared"
+        }
+        $uibModalInstance.close($ctrl.data);
+    };
 
     $ctrl.cancel = function () {
         $uibModalInstance.dismiss('cancel');

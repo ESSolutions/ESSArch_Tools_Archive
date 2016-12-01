@@ -37,19 +37,20 @@
                         </label>
                     </div>
                 </td>
-                <td class="clickable" ng-click="selectIp(row);ipTableClick(row)">{{row.Label}}</td>
+                <td ng-if="row.State != 'Unidentified'" class="clickable" ng-click="selectIp(row);ipTableClick(row)">{{row.Label}}</td>
+                <td ng-if="row.State == 'Unidentified'">
+                    <a ng-click="identifyIpModal(row)">{{row.Label}}</a>
+                </td>
                 <td class="clickable" ng-click="ipRowClick(row)">{{row.Responsible}}</td>
                 <td class="clickable">{{row.ArchivistOrganization.name}}</td>
                 <td  ng-click="ipRowClick(row)">{{row.CreateDate | date:"yyyy-MM-dd HH:mm:ss"}}</td>
                 <td ng-if="row.State != 'At reception' && row.State != 'Unidentified'"class="clickable" ng-click="stateClicked(row);selectIp(row)">
                     <a href="">{{row.State}}</a>
                 </td>
-                <td ng-if="row.State == 'At reception'">
+                <td ng-if="row.State == 'At reception' || row.State == 'Unidentified'">
                     <span href="">{{row.State}}</span>
                 </td>
-                <td ng-if="row.State == 'Unidentified'">
-                    <a ng-click="showPrepareUnidentified(row);selectIp(row)">{{row.State}}</a>
-                </td>
+
                 <td class="step-state">
                     <div ng-if="row.step_state == 'SUCCESS'" class="step-state-success"><b>{{'SUCCESS' | translate}}</b></div>
                     <div ng-if="row.step_state == 'FAILURE'" class="step-state-failure"><b>{{'FAILURE' | translate}}</b></div>
