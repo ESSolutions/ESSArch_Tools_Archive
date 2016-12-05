@@ -7,7 +7,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     $scope.validateShow = false;
     $scope.statusShow = false;
     $scope.eventShow = false;
- $scope.tree_data = [];
+    $scope.tree_data = [];
     $translate(['LABEL', 'RESPONSIBLE', 'DATE', 'STATE', 'STATUS']).then(function(translations) {
         $scope.responsible = translations.RESPONSIBLE;
         $scope.label = translations.LABEL;
@@ -30,6 +30,8 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         {
             field: "status",
             displayName: $scope.state,
+            cellTemplate: "<div ng-if=\"row.branch[col.field] == 'SUCCESS'\" class=\"step-state-success\"><b>{{'SUCCESS' | translate}}</b></div><div ng-if=\"row.branch[col.field] == 'FAILURE'\" class=\"step-state-failure\"><b>{{'FAILURE' | translate}}</b></div><div ng-if=\"row.branch[col.field] != 'SUCCESS' && row.branch[col.field] !='FAILURE'\" class=\"step-state-in-progress\"><b>{{'INPROGRESS' | translate}}</b></div>"
+
         },
         {
             field: "progress",
@@ -41,11 +43,11 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         }
         ];
     });
-     var stateInterval;
-     $scope.stateClicked = function(row){
-         if($scope.statusShow && $scope.ip == row){
-             $scope.statusShow = false;
-         } else {
+    var stateInterval;
+    $scope.stateClicked = function(row){
+        if($scope.statusShow && $scope.ip == row){
+            $scope.statusShow = false;
+        } else {
              $scope.eventShow = false;
              $scope.validateShow = false;
              $scope.statusShow = true;
