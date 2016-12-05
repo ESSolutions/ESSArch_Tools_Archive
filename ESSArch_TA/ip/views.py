@@ -3,6 +3,7 @@ import errno, glob, json, os, shutil, uuid
 from celery import states as celery_states
 
 from django.conf import settings
+from django.db import IntegrityError
 from django.db.models import Prefetch
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -93,6 +94,14 @@ class ArchivalLocationViewSet(viewsets.ModelViewSet):
     serializer_class = ArchivalLocationSerializer
 
 class InformationPackageReceptionViewSet(viewsets.ViewSet):
+    def get_archvist_organization(self, el):
+        return el.xpath(
+            ".//*[local-name()='agent'][@ROLE='ARCHIVIST'][@TYPE='ORGANIZATION']"
+        )[0].xpath(
+            "*[local-name()='name']"
+        )[0].text
+
+
     def parseFile(self, path):
         ip = {}
         doc = etree.parse(path)
@@ -108,6 +117,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ip['State'] = "At reception"
         ip['status'] = 100.0
         ip['step_state'] = celery_states.SUCCESS
+        ip['ArchivistOrganization'] = {
+            'name': self.get_archvist_organization(root)
+        }
 
         return ip
 
@@ -201,10 +213,21 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ipdata = self.parseFile(xmlfile)
 
         responsible = self.request.user.username or "Anonymous user"
+        archivist_organization = self.get_archvist_organization(root)
+
+        try:
+            (arch, _) = ArchivistOrganization.objects.get_or_create(
+                name = archivist_organization
+            )
+        except IntegrityError:
+            arch = ArchivistOrganization.objects.get(
+                name = archivist_organization
+            )
 
         ip = InformationPackage.objects.create(
             id=pk, Label=ipdata["Label"], State="Receiving",
             Responsible=responsible, ObjectPath=objpath,
+            ArchivistOrganization=arch,
         )
         ip.CreateDate = ipdata["CreateDate"]
         ip.save()
