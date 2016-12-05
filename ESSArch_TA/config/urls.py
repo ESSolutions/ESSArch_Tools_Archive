@@ -51,6 +51,9 @@ from profiles.views import (
     SubmissionAgreementViewSet,
 )
 
+admin.site.site_header = 'ESSArch Tools Archive Administration'
+admin.site.site_title = 'ESSArch Tools Archive Administration'
+
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
