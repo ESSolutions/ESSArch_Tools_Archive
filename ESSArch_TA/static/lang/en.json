@@ -111,5 +111,6 @@
     "SEETRACEBACK": "See traceback",
     "PREPAREUNIDENTIFIEDIP": "Prepare unidentified ip",
     "PREPARE": "Prepare",
+    "CLOSE": "Close",
     "AGENT": "Agent"
 }
