@@ -252,7 +252,8 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                             "xml_filename": xmlfile
                         },
                         log=EventIP,
-                        information_package=ip
+                        information_package=ip,
+                        responsible=self.request.user,
                     )
                 )
 
@@ -271,7 +272,8 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                             "validate_integrity": val_integrity
                         },
                         log=EventIP,
-                        information_package=ip
+                        information_package=ip,
+                        responsible=self.request.user,
                     )
                 )
 
@@ -286,7 +288,8 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                             "xmlfile": xmlfile,
                         },
                         log=EventIP,
-                        information_package=ip
+                        information_package=ip,
+                        responsible=self.request.user,
                     )
                 )
 
@@ -303,6 +306,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                 information_package=ip,
                 processstep_pos=0,
                 log=EventIP,
+                responsible=self.request.user,
             ),
             ProcessTask.objects.create(
                 name="preingest.tasks.UpdateIPStatus",
@@ -313,6 +317,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                 information_package=ip,
                 processstep_pos=1,
                 log=EventIP,
+                responsible=self.request.user,
             )
         )
         receive_step.save()
@@ -436,7 +441,8 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                 },
                 processstep_pos=10,
                 log=EventIP,
-                information_package=ip
+                information_package=ip,
+                responsible=self.request.user,
             )
         )
 
@@ -448,7 +454,8 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                 },
                 processstep_pos=15,
                 log=EventIP,
-                information_package=ip
+                information_package=ip,
+                responsible=self.request.user,
             )
         )
 
@@ -461,7 +468,8 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                 },
                 processstep_pos=20,
                 log=EventIP,
-                information_package=ip
+                information_package=ip,
+                responsible=self.request.user,
             )
         )
 
@@ -474,7 +482,8 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                 },
                 processstep_pos=30,
                 log=EventIP,
-                information_package=ip
+                information_package=ip,
+                responsible=self.request.user,
             )
         )
 
@@ -578,7 +587,8 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     "index": 0
                 },
                 processstep_pos=40,
-                information_package=ip
+                information_package=ip,
+                responsible=self.request.user,
             )
         )
 
@@ -591,7 +601,8 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                 },
                 processstep_pos=50,
                 log=EventIP,
-                information_package=ip
+                information_package=ip,
+                responsible=self.request.user,
             )
         )
 
@@ -618,7 +629,8 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     "xml_filename": xmlfile
                 },
                 log=EventIP,
-                information_package=ip
+                information_package=ip,
+                responsible=self.request.user,
             ),
             ProcessTask.objects.create(
                 name="preingest.tasks.ValidateFiles",
@@ -630,7 +642,8 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                 },
                 log=EventIP,
                 processstep_pos=0,
-                information_package=ip
+                information_package=ip,
+                responsible=self.request.user,
             )
         )
 
