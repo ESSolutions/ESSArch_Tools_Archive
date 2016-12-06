@@ -38,6 +38,7 @@ from ESSArch_Core.profiles.models import (
 
 from ESSArch_Core.util import (
     creation_date,
+    get_event_spec,
     get_value_from_path,
     timestamp_to_datetime,
     remove_prefix
@@ -368,11 +369,6 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             },
         ).run_eagerly()
 
-        shutil.copy(
-            'templates/event_profile.json',
-            os.path.join(uip, '%s_event_profile.json' % ip_id)
-        )
-
         return Response({'status': 'Identified IP, created %s' % infoxml})
 
 
@@ -417,14 +413,14 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         ip = self.get_object()
         dstdir = Path.objects.get(entity="path_gate_reception").value
 
-        event_profile = ip.get_profile('event')
-        info = event_profile.specification_data
-        info["_OBJID"] = str(pk)
-        info["_OBJLABEL"] = ip.Label
+        info = {
+            "_OBJID": str(pk),
+            "_OBJLABEL": ip.Label
+        }
 
         events_path = os.path.join(dstdir, "%s_ipevents.xml" % pk)
         filesToCreate = {
-            events_path: event_profile.specification
+            events_path: get_event_spec()
         }
 
         step = ProcessStep.objects.create(

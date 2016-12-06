@@ -31,16 +31,6 @@ class ReceiveSIP(DBTask):
         dst = os.path.join(prepare, "%s.xml" % ip.pk)
         shutil.copy(src, dst)
 
-        with open(os.path.join(srcdir, "%s_event_profile.json" % ip.pk)) as f:
-            json_str = f.read()
-            for p in serializers.deserialize("json", json_str):
-                p.save()
-
-                ProfileIP.objects.create(
-                    profile=p.object,
-                    ip=ip
-                )
-
         self.set_progress(100, total=100)
         return ip
 

@@ -339,14 +339,6 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
                         );
                         return selectRowCollapse
                     });
-                }).then(function(selectRowCollapse){
-                    type = 'event';
-                    return getProfiles(type).then(function(profiles) {
-                        selectRowCollapse[type] = createProfileObj(
-                            type, profiles, sa, ip
-                        );
-                        return selectRowCollapse
-                    });
                 });
             }
         })
