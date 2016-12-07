@@ -27,7 +27,7 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
         if(sort.reverse) {
             sortString = "-"+sortString;
         }
-        return listViewService.getListViewData(pageNumber, number, sortString, search, state).then(function(value) {
+        return listViewService.getListViewData(pageNumber, number, $rootScope.navigationFilter, sortString, search, state).then(function(value) {
             var ipCollection = value.data;
             ipCollection.forEach(function(ip) {
                 if(selected.id == ip.id) {
@@ -45,7 +45,7 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
         if(sort.reverse) {
             sortString = "-"+sortString;
         }
-        return listViewService.getReceptionIps(pageNumber, number, sortString, search, state).then(function(value) {
+        return listViewService.getReceptionIps(pageNumber, number, $rootScope.navigationFilter, sortString, search, state).then(function(value) {
             var ipCollection = value.data;
             ipCollection.forEach(function(ip) {
                 ip.checked = false;

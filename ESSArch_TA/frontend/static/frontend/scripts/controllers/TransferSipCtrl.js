@@ -2,6 +2,9 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
+    $scope.$watch(function(){return $rootScope.navigationFilter;}, function(newValue, oldValue) {
+        $scope.getListViewData();
+    }, true);
     $scope.statusShow = false;
     $scope.eventShow = false;
     $scope.tree_data = [];
@@ -160,22 +163,24 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
     //Get data according to ip table settings and populates ip table
     this.callServer = function callServer(tableState) {
         $scope.ipLoading = true;
-        $scope.tableState = tableState;
-        var search = "";
-        if(tableState.search.predicateObject) {
-            var search = tableState.search.predicateObject["$"];
-        }
-        var sorting = tableState.sort;
-        var pagination = tableState.pagination;
-        var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
-        var number = pagination.number || ctrl.itemsPerPage;  // Number of entries showed per page.
-        var pageNumber = start/number+1;
+        if(!angular.isUndefined(tableState)) {
+            $scope.tableState = tableState;
+            var search = "";
+            if(tableState.search.predicateObject) {
+                var search = tableState.search.predicateObject["$"];
+            }
+            var sorting = tableState.sort;
+            var pagination = tableState.pagination;
+            var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
+            var number = pagination.number || ctrl.itemsPerPage;  // Number of entries showed per page.
+            var pageNumber = start/number+1;
 
-        Resource.getIpPage(start, number, pageNumber, tableState, $scope.selectedIp, sorting, search, "Received,Transferring,Transferred").then(function (result) {
-            ctrl.displayedIps = result.data;
-            tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
-            $scope.ipLoading = false;
-        });
+            Resource.getIpPage(start, number, pageNumber, tableState, $scope.selectedIp, sorting, search, "Received,Transferring,Transferred").then(function (result) {
+                ctrl.displayedIps = result.data;
+                tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
+                $scope.ipLoading = false;
+            });
+        }
     };
     //Make ip selected and add class to visualize
     vm.displayedIps=[];

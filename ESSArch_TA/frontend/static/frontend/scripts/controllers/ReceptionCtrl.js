@@ -2,6 +2,9 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
+    $scope.$watch(function(){return $rootScope.navigationFilter;}, function(newValue, oldValue) {
+        $scope.getListViewData();
+    }, true);
     $scope.includedIps = [];
     $scope.receiveShow = false;
     $scope.validateShow = false;
@@ -165,19 +168,21 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     //Get data according to ip table settings and populates ip table
     this.callServer = function callServer(tableState) {
         $scope.ipLoading = true;
-        $scope.tableState = tableState;
+        if(!angular.isUndefined(tableState)) {
+            $scope.tableState = tableState;
 
-        var sorting = tableState.sort;
-        var pagination = tableState.pagination;
-        var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
-        var number = pagination.number || ctrl.itemsPerPage;  // Number of entries showed per page.
-        var pageNumber = start/number+1;
+            var sorting = tableState.sort;
+            var pagination = tableState.pagination;
+            var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
+            var number = pagination.number || ctrl.itemsPerPage;  // Number of entries showed per page.
+            var pageNumber = start/number+1;
 
-        Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.selectedIp, $scope.includedIps, sorting, "Receiving").then(function (result) {
-            vm.displayedIps = result.data;
-            tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
-            $scope.ipLoading = false;
-        });
+            Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.selectedIp, $scope.includedIps, sorting, "Receiving").then(function (result) {
+                vm.displayedIps = result.data;
+                tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
+                $scope.ipLoading = false;
+            });
+        }
     };
     //Make ip selected and add class to visualize
     vm.displayedIps=[];
