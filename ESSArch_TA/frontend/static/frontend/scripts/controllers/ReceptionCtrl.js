@@ -402,8 +402,8 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         "systemversion": "National Archives of X Version",
         "systemtype": "National Archives of X Type",
         "SUBMISSIONAGREEMENT": "RA 13-2011/5329; 2012-04-12",
-        "STARTDATE": "2012-01-01",
-        "ENDDATE": "2012-12-30",
+        "STARTDATE": moment().format('YYYY-MM-DD'),
+        "ENDDATE": moment().format('YYYY-MM-DD'),
         "LABEL": "Package label",
         "RECORDSTATUS": "NEW",
         "profile": "The profile"
@@ -508,19 +508,19 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         }
     },
     {
-        "type": "input",
+        "type": "datepicker",
         "key": "STARTDATE",
         "templateOptions": {
             "type": "text",
-            "label": "Start date"
+            "label": "Start date",
         }
     },
     {
-        "type": "input",
+        "type": "datepicker",
         "key": "ENDDATE",
         "templateOptions": {
             "type": "text",
-            "label": "End date"
+            "label": "End date",
         }
     },
     {
