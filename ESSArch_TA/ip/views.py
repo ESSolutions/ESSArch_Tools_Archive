@@ -732,10 +732,11 @@ class EventIPViewSet(viewsets.ModelViewSet):
 
         eventType = EventType.objects.get(pk=type_id)
         ip = InformationPackage.objects.get(pk=ip_id)
+        agent = request.user.username or "System"
 
         EventIP.objects.create(
             eventOutcome=outcome, eventOutcomeDetailNote=outcomeDetailNote,
             eventType=eventType, linkingObjectIdentifierValue=ip,
-            linkingAgentIdentifierValue="System"
+            linkingAgentIdentifierValue=agent,
         )
         return Response({"status": "Created event"})
