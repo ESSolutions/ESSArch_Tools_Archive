@@ -109,8 +109,9 @@
     "INPROGRESS": "Evalueras",
     "APPROVEDTORECEIVE": "Godkänd att ta emot",
     "SEETRACEBACK": "Se traceback",
-    "PREPAREUNIDENTIFIEDIP": "Prepare unidentified ip",
+    "PREPAREUNIDENTIFIEDIP": "Förbered oidentifierat IP",
     "PREPARE": "Förbered",
     "CLOSE": "Stäng",
+    "APPROVEDTOTRANSFER": "Godkänd för överföring",
     "AGENT": "Agent"
 }
