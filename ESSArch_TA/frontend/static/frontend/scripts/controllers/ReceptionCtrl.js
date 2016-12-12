@@ -187,7 +187,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     //Make ip selected and add class to visualize
     vm.displayedIps=[];
     $scope.selected = [];
-        $scope.selectIp = function(row) {
+    $scope.selectIp = function(row) {
         vm.displayedIps.forEach(function(ip) {
             if(ip.id == $scope.selectedIp.id){
                 ip.class = "";
@@ -200,7 +200,9 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $scope.selectedIp = row;
         }
     };
+    $scope.receiveDisabled = false;
     $scope.receiveSip = function(ips) {
+        $scope.receiveDisabled = true;
         if(ips == []) {
             return;
         }
@@ -213,8 +215,11 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
                 }
             }).then(function(response) {
                 $scope.includedIps = [];
-                $scope.getListViewData();
-                console.log(response)
+                $timeout(function() {
+                    $scope.getListViewData();
+                    updateListViewConditional();
+                }, 1000);
+                $scope.receiveDisabled = false;
             });
         });
     };

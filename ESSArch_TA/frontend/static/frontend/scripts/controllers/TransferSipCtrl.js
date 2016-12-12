@@ -1,4 +1,4 @@
-angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig) {
+angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout) {
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
@@ -202,6 +202,8 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
         $scope.statusShow = false;
         $scope.eventShow = false;
         $scope.ip = row;
+        $scope.select = true;
+        $scope.transferDisabled = false;
     }
     $scope.getListViewData = function() {
         vm.callServer($scope.tableState);
@@ -242,14 +244,20 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
         }, appConfig.ipInterval);
     };
     updateListViewConditional();
-
+    $scope.transferDisabled = false;
     $scope.transferSip = function(ip) {
+        $scope.transferDisabled = true;
         $http({
             method: 'POST',
             url: ip.url+"transfer/"
         }).then(function(response) {
             console.log(response);
-            $scope.getListViewData();
+            $scope.select = false;
+            $timeout(function() {
+                $scope.getListViewData();
+                updateListViewConditional();
+            }, 1000);
+            $scope.transferDisabled = false;
         });
     }
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');

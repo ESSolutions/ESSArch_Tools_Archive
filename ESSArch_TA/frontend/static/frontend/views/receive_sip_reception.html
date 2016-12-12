@@ -23,7 +23,7 @@
                             <input type="checkbox" ng-model="approvedToReceive">{{'APPROVEDTORECEIVE' | translate}}</input>
                         </label>
                     </div>
-                    <button ng-disabled="!approvedToReceive" class="btn btn-info receive-button" ng-click="receiveSip(includedIps)">{{'RECEIVESIP' | translate}}</button>
+                    <button ng-disabled="receiveDisabled || !approvedToReceive" class="btn btn-info receive-button" ng-click="receiveSip(includedIps)" ng-dblClick="">{{'RECEIVESIP' | translate}}</button>
                 </form>
             </div>
         </div>
