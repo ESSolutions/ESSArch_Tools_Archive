@@ -220,6 +220,8 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
                     updateListViewConditional();
                 }, 1000);
                 $scope.receiveDisabled = false;
+            }, function(response) {
+                $scope.receiveDisabled = false;
             });
         });
     };

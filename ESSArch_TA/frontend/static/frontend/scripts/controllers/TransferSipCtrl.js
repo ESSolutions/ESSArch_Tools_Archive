@@ -258,6 +258,8 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
                 updateListViewConditional();
             }, 1000);
             $scope.transferDisabled = false;
+        }, function(response) {
+            $scope.transferDisabled = false;
         });
     }
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
