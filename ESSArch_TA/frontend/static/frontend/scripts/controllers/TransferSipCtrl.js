@@ -1,4 +1,4 @@
-angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout) {
+angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll) {
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
@@ -197,18 +197,37 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             $scope.selectedIp = row;
         }
     };
-
-    $scope.ipTableClick = function(row) {
-        $scope.statusShow = false;
-        $scope.eventShow = false;
-        $scope.ip = row;
-        $scope.select = true;
-        $scope.transferDisabled = false;
+    $scope.ipRowClick = function(row) {
+        $scope.selectIp(row);
+        if($scope.ip == row){
+            row.class = "";
+            $scope.selectedIp = {id: "", class: ""};
+        }
+        if($scope.eventShow) {
+            $scope.eventsClick(row);
+        }
+        if($scope.statusShow) {
+            $scope.stateClicked(row);
+        }
+        if ($scope.select) {
+            $scope.ipTableClick(row);
+        }
     }
-    $scope.getListViewData = function() {
-        vm.callServer($scope.tableState);
+    $scope.ipTableClick = function(row) {
+        if($scope.select && $scope.ip.id== row.id){
+            $scope.select = false;
+        } else {
+            $scope.ip = row;
+            $scope.select = true;
+            $scope.transferDisabled = false;
+        }
+        $scope.eventShow = false;
+        $scope.statusShow = false;
     };
-    var listViewInterval;
+        $scope.getListViewData = function() {
+            vm.callServer($scope.tableState);
+        };
+        var listViewInterval;
     function updateListViewConditional() {
         $interval.cancel(listViewInterval);
         listViewInterval = $interval(function() {

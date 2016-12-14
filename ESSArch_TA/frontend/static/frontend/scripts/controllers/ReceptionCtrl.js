@@ -1,4 +1,4 @@
-angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout) {
+angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll) {
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
@@ -220,6 +220,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
                     updateListViewConditional();
                 }, 1000);
                 $scope.receiveDisabled = false;
+                $anchorScroll();
             }, function(response) {
                 $scope.receiveDisabled = false;
             });
