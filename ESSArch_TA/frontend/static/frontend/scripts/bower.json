@@ -19,7 +19,6 @@
     "angular-formly": "^8.3.0",
     "angular-smart-table": "^2.1.8",
     "angular-route": "1.5.7",
-    "angular-ui-tree": "^2.17.0",
     "angular-tree-control": "^0.2.27",
     "angular": "1.5.7",
     "bootstrap": "^3.3.6",
@@ -31,8 +30,6 @@
     "angular-translate-storage-cookie": "^2.12.1",
     "angular-translate-loader-static-files": "^2.12.1",
     "angular-sanitize": "^1.5.8",
-    "jquery-ui": "^1.12.1",
-    "angular-bootstrap-contextmenu": "^0.9.9",
     "angular-moment-picker": "moment-picker#^0.8.2",
     "angular-bootstrap": "^2.3.1"
   },
