@@ -163,6 +163,9 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
     //Get data according to ip table settings and populates ip table
     this.callServer = function callServer(tableState) {
         $scope.ipLoading = true;
+        if(vm.displayedIps.length == 0) {
+            $scope.initLoad = true;
+        }
         if(!angular.isUndefined(tableState)) {
             $scope.tableState = tableState;
             var search = "";
@@ -179,6 +182,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
                 ctrl.displayedIps = result.data;
                 tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
                 $scope.ipLoading = false;
+                $scope.initLoad = true;
             });
         }
     };
