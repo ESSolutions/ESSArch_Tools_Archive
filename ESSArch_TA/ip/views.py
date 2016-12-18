@@ -214,7 +214,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         ipdata = self.parseFile(xmlfile)
 
-        responsible = self.request.user.username or "Anonymous user"
+        responsible = self.request.user
         archivist_organization = self.get_archvist_organization(root)
 
         try:
@@ -750,7 +750,7 @@ class EventIPViewSet(viewsets.ModelViewSet):
 
         eventType = EventType.objects.get(pk=type_id)
         ip = InformationPackage.objects.get(pk=ip_id)
-        agent = request.user.username or "System"
+        agent = request.user
 
         EventIP.objects.create(
             eventOutcome=outcome, eventOutcomeDetailNote=outcomeDetailNote,

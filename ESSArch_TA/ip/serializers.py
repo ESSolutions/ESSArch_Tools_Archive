@@ -13,6 +13,8 @@ from ESSArch_Core.ip.models import (
 
 from ESSArch_Core.serializers import DynamicHyperlinkedModelSerializer
 
+from preingest.serializers import UserSerializer
+
 from ESSArch_Core.profiles.serializers import (
     ProfileIPSerializer,
 )
@@ -38,6 +40,7 @@ class ArchivalLocationSerializer(DynamicHyperlinkedModelSerializer):
         fields = ('url', 'id', 'name', 'information_packages',)
 
 class InformationPackageSerializer(serializers.HyperlinkedModelSerializer):
+    Responsible = UserSerializer()
     profiles = ProfileIPSerializer(many=True)
     ArchivalInstitution = ArchivalInstitutionSerializer(
         fields=['url', 'id', 'name']
@@ -110,6 +113,7 @@ class InformationPackageDetailSerializer(InformationPackageSerializer):
 
 
 class EventIPSerializer(serializers.HyperlinkedModelSerializer):
+    linkingAgentIdentifierValue = UserSerializer()
     eventDetail = serializers.SlugRelatedField(slug_field='eventDetail', source='eventType', read_only=True)
 
     class Meta:
