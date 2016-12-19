@@ -7,6 +7,8 @@ var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var gutil = require('gulp-util');
+var argv = require('yargs').argv;
+var isProduction = (argv.production === undefined) ? false : true;
 
 var vendorFiles = [
         'scripts/bower_components/api-check/dist/api-check.js',
@@ -49,7 +51,7 @@ var buildScripts = function() {
         .pipe(sourcemaps.init())
         .pipe(ngAnnotate())
         .pipe(concat('scripts.min.js'))
-        .pipe(uglify())
+        .pipe(gulpif(isProduction, uglify()))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(jsDest));
 };
@@ -66,7 +68,7 @@ var buildVendors = function() {
         .pipe(sourcemaps.init())
         .pipe(ngAnnotate())
         .pipe(concat('vendors.min.js'))
-        .pipe(uglify())
+        .pipe(gulpif(isProduction, uglify()))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(jsDest));
 };
