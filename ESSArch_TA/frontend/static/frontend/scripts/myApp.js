@@ -116,18 +116,6 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
     stateInterval: 10000, //ms
     eventInterval: 10000 //ms
 })
-.service('myService', function($location, PermPermissionStore) {
-        this.changePath = function(state) {
-            $state.go(state);
-        };
-        this.getPermissions = function(group){
-            var permissions = group.permissions.map(function(currentValue){return currentValue.codename});
-            PermPermissionStore.defineManyPermissions(permissions, function(permissionName) {
-                return_.contains(permissions, permissionName);
-            });
-            return permissions;
-        }
-})
 .config(function(stConfig) {
   stConfig.sort.delay = -1;
 })
@@ -181,16 +169,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
 
         djangoAuth.profile().then(function(data) {
             $rootScope.auth = data;
-            data.groups.forEach(function(group){
-                $http({
-                    method: 'GET',
-                    url: group
-                }).then(function(response) {
-                    PermRoleStore.defineRole(response.data.name, myService.getPermissions(response.data));
-                }, function() {
-                    console.log("error");
-                });
-            });
+            myService.getPermissions(data.permissions);
         }, function() {
             $state.go('login');
         });

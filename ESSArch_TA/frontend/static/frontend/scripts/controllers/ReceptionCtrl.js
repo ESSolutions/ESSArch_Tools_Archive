@@ -1,4 +1,4 @@
-angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll) {
+angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore) {
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
@@ -308,7 +308,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             templateUrl: "static/frontend/views/reception_package.html"
         }
     ];
-    $scope.colspan = 9;
+    $scope.colspan = 10;
     $scope.yes = $translate.instant('YES');
     $scope.no = $translate.instant('NO');
     vm.validatorModel = {
@@ -611,5 +611,8 @@ $scope.identifyIpModal = function (ip) {
                 updateListViewConditional();
             }, 1000);
         });
+    };
+    $scope.checkPermission = function(permissionName) {
+        return !angular.isUndefined(PermPermissionStore.getPermissionDefinition(permissionName));
     };
 });

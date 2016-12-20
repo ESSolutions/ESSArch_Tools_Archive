@@ -1,4 +1,4 @@
-angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll) {
+angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore) {
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
@@ -347,4 +347,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             $log.info('modal-component dismissed at: ' + new Date());
         });
     }
+    $scope.checkPermission = function(permissionName) {
+        return !angular.isUndefined(PermPermissionStore.getPermissionDefinition(permissionName));
+    };
 });
