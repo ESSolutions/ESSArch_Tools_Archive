@@ -27,6 +27,11 @@ from ESSArch_Core.ip.models import (
     EventIP
 )
 
+from ESSArch_Core.ip.permissions import (
+    CanDeleteIP,
+    CanTransferSIP,
+)
+
 from ESSArch_Core.WorkflowEngine.models import (
     ProcessStep,
     ProcessTask
@@ -394,6 +399,12 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
         return InformationPackageDetailSerializer
 
+    def get_permissions(self):
+        if self.action == 'destroy':
+            self.permission_classes = [CanDeleteIP]
+
+        return super(InformationPackageViewSet, self).get_permissions()
+
     def get_queryset(self):
         queryset = self.queryset
 
@@ -409,7 +420,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    @detail_route(methods=['post'], url_path='transfer')
+    @detail_route(methods=['post'], url_path='transfer', permission_classes=[CanTransferSIP])
     def transfer(self, request, pk=None):
         ip = self.get_object()
         dstdir = Path.objects.get(entity="path_gate_reception").value
