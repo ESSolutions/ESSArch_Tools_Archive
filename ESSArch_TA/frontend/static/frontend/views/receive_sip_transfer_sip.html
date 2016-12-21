@@ -10,10 +10,10 @@
         <form class="receive-sip-eventlog-form" ng-submit="transferSip(ip)">
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" ng-disabled="ip.Responsible.id != auth.id && !checkPermission('ip.transfer_sip')" ng-model="approvedToTransfer">{{'APPROVEDTOTRANSFER' | translate}}</input>
+                    <input type="checkbox" ng-disabled="!checkPermission('ip.transfer_sip')" ng-model="approvedToTransfer">{{'APPROVEDTOTRANSFER' | translate}}</input>
                 </label>
             </div>
-            <button type="submit" ng-dblClick="" ng-disabled="transferDisabled || !approvedToTransfer && (ip.Responsible.id != auth.id || !checkPermission('ip.transfer_sip'))" class="btn btn-info submit-button">{{'TRANSFERSIP' | translate}}</button>
+            <button type="submit" ng-dblClick="" ng-disabled="transferDisabled || !approvedToTransfer || !checkPermission('ip.transfer_sip')" class="btn btn-info submit-button">{{'TRANSFERSIP' | translate}}</button>
         </form>
     </div>
     <!--
