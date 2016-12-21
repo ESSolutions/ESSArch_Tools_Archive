@@ -10,7 +10,7 @@
                     </div>
                 </th>
                 <th colspan="5">
-                    <span style="float: right; margin-bottom: 5px;" ng-click="getListViewData()" class="clickable glyphicon glyphicon-refresh" ng-class="{'glyphicon-refresh-animate': ipLoading }"></span>
+                    <span style="float: right; margin-bottom: 5px;" ng-click="getListViewData()" class="clickable fa fa-refresh" ng-class="{'fa-refresh-animate': ipLoading }"></span>
                 </th>
             </tr>
             <tr>
@@ -65,7 +65,7 @@
                     <button
                         ng-if="row.State != 'At reception' && (checkPermission('ip.delete_informationpackage') || row.Responsible.id == auth.id)"
                         ng-click="removeIpModal(row)"
-                        class="glyphicon glyphicon-remove"></button>
+                        class="fa fa-trash"></button>
                 </td>
             </tr>
         </tbody>
