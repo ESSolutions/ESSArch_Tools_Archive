@@ -1,19 +1,9 @@
 from __future__ import absolute_import
 
-import os, shutil, string
-
-from django.conf import settings
-from django.core import serializers
-
-from lxml import etree
+import os, shutil
 
 from ESSArch_Core.configuration.models import Path
 from ESSArch_Core.WorkflowEngine.dbtask import DBTask
-from ESSArch_Core.profiles.models import ProfileIP
-from ESSArch_Core.util import (
-    get_value_from_path,
-    remove_prefix
-)
 from ESSArch_Core import tasks
 
 class ReceiveSIP(DBTask):

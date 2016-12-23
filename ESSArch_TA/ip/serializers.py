@@ -1,5 +1,3 @@
-from celery import states as celery_states
-
 from rest_framework import serializers
 
 from ESSArch_Core.ip.models import (

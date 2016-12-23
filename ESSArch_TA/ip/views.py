@@ -37,10 +37,6 @@ from ESSArch_Core.WorkflowEngine.models import (
     ProcessTask
 )
 
-from ESSArch_Core.profiles.models import (
-    Profile,
-)
-
 from ESSArch_Core.util import (
     creation_date,
     get_files_and_dirs,
