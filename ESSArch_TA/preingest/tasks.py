@@ -7,6 +7,7 @@ from ESSArch_Core.configuration.models import Path
 from ESSArch_Core.WorkflowEngine.dbtask import DBTask
 from ESSArch_Core import tasks
 
+
 class ReceiveSIP(DBTask):
     event_type = 20100
 
@@ -30,6 +31,7 @@ class ReceiveSIP(DBTask):
 
     def event_outcome_success(self, ip=None):
         return "Received IP '%s' with label '%s'" % (ip.pk, ip.Label)
+
 
 class TransferSIP(DBTask):
     event_type = 20900
@@ -60,8 +62,10 @@ class TransferSIP(DBTask):
     def event_outcome_success(self, ip=None):
         return "Transferred IP '%s' with label '%s'" % (ip.pk, ip.Label)
 
+
 class CalculateChecksum(tasks.CalculateChecksum):
     event_type = 20210
+
 
 class IdentifyFileFormat(tasks.IdentifyFileFormat):
     event_type = 20220

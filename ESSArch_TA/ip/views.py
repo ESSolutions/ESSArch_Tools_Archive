@@ -73,12 +73,14 @@ from preingest.pagination import (
 
 from rest_framework import viewsets
 
+
 class ArchivalInstitutionViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows archival institutions to be viewed or edited.
     """
     queryset = ArchivalInstitution.objects.all()
     serializer_class = ArchivalInstitutionSerializer
+
 
 class ArchivistOrganizationViewSet(viewsets.ModelViewSet):
     """
@@ -87,6 +89,7 @@ class ArchivistOrganizationViewSet(viewsets.ModelViewSet):
     queryset = ArchivistOrganization.objects.all()
     serializer_class = ArchivistOrganizationSerializer
 
+
 class ArchivalTypeViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows archival types to be viewed or edited.
@@ -94,12 +97,14 @@ class ArchivalTypeViewSet(viewsets.ModelViewSet):
     queryset = ArchivalType.objects.all()
     serializer_class = ArchivalTypeSerializer
 
+
 class ArchivalLocationViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows archival locations to be viewed or edited.
     """
     queryset = ArchivalLocation.objects.all()
     serializer_class = ArchivalLocationSerializer
+
 
 class InformationPackageReceptionViewSet(viewsets.ViewSet):
     def get_archvist_organization(self, el):

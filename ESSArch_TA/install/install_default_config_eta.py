@@ -33,6 +33,7 @@ from ESSArch_Core.configuration.models import Parameter, Path, EventType, Agent
 site_profile = "SE" # SE_NEW, SE, NO, EC
 #zone = "zone1" # ETP=zone1, ETA=zone2
 
+
 def installDefaultConfiguration(): # Install default configuration
 
     # install default configuration
@@ -132,6 +133,7 @@ def createDefaultUsers(): # default users, groups and permissions
     print 'added users and groups'
     return 0
     
+
 def installDefaultParameters(): # default config parameters
 
     # First remove all data
@@ -190,6 +192,7 @@ def installDefaultPaths(): # default paths
             pass
     
     return 0
+
 
 def installDefaultEventTypes(): # default events
 
