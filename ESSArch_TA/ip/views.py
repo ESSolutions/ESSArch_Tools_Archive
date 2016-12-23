@@ -228,11 +228,11 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         try:
             (arch, _) = ArchivistOrganization.objects.get_or_create(
-                name = archivist_organization
+                name=archivist_organization
             )
         except IntegrityError:
             arch = ArchivistOrganization.objects.get(
-                name = archivist_organization
+                name=archivist_organization
             )
 
         ip = InformationPackage.objects.create(
