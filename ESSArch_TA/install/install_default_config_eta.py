@@ -141,8 +141,8 @@ def installDefaultParameters(): # default config parameters
     
     # Set default parameters
     dct = {
-          'site_profile':site_profile,
-          'smtp_server':'localhost',
+          'site_profile': site_profile,
+          'smtp_server': 'localhost',
           #'zone': zone ,
           #'package_descriptionfile':'info.xml',
           #'content_descriptionfile':'info.xml',
@@ -172,14 +172,14 @@ def installDefaultPaths(): # default paths
    
     # create dictionaries 
     dct = {
-          'path_mimetypes_definitionfile':'/ESSArch/config/mime.types',
-          'path_definitions':'/ESSArch/etp/env',
-          'path_gate_reception':'/ESSArch/data/gate/reception',
-          'path_preingest_prepare':'/ESSArch/data/etp/prepare',
-          'path_preingest_reception':'/ESSArch/data/etp/reception',
-          'path_ingest_reception':'/ESSArch/data/eta/reception/eft',
-          'path_ingest_unidentified':'/ESSArch/data/eta/uip',
-          'path_ingest_work':'/ESSArch/data/eta/work',
+          'path_mimetypes_definitionfile': '/ESSArch/config/mime.types',
+          'path_definitions': '/ESSArch/etp/env',
+          'path_gate_reception': '/ESSArch/data/gate/reception',
+          'path_preingest_prepare': '/ESSArch/data/etp/prepare',
+          'path_preingest_reception': '/ESSArch/data/etp/reception',
+          'path_ingest_reception': '/ESSArch/data/eta/reception/eft',
+          'path_ingest_unidentified': '/ESSArch/data/eta/uip',
+          'path_ingest_work': '/ESSArch/data/eta/work',
           }
 
     # create according to model with two fields
@@ -242,9 +242,9 @@ def installDefaultAgent(): # default Agent
 
     # create agent dictionaries
     dct = {
-          'System':'100',
-          'Organisation':'101',
-          'User':'102',
+          'System': '100',
+          'Organisation': '101',
+          'User': '102',
           }
 
     # create according to model with two fields
