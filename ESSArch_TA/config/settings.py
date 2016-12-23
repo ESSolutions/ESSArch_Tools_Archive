@@ -187,7 +187,7 @@ STATICFILES_DIRS = (
 
 # Celery settings
 BROKER_URL = 'amqp://guest:guest@localhost:5672/eta'
-CELERY_IMPORTS = ('preingest.tasks', 'preingest.tests.tasks',)
+CELERY_IMPORTS = ("preingest.tasks", "ESSArch_Core.WorkflowEngine.tests.tasks")
 
 try:
     from local_eta_settings import *
