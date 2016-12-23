@@ -114,7 +114,6 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             "*[local-name()='name']"
         )[0].text
 
-
     def parseFile(self, path):
         ip = {}
         doc = etree.parse(path)
@@ -176,7 +175,6 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
             if include:
                 ips.append(ip)
-
 
         from_db = InformationPackage.objects.filter(State='Receiving').prefetch_related(
             Prefetch('profileip_set', to_attr='profiles'),

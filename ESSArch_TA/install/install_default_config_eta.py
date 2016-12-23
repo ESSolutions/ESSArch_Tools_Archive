@@ -259,7 +259,6 @@ def installDefaultAgent(): # default Agent
     return 0
 
 
-
 if __name__ == '__main__':
     installDefaultConfiguration()
 
