@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
-import os, shutil
+import os
+import shutil
 
 from ESSArch_Core.configuration.models import Path
 from ESSArch_Core.WorkflowEngine.dbtask import DBTask
