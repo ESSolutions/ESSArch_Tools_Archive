@@ -61,7 +61,11 @@ class TransferSIP(DBTask):
         return ip.ObjectPath
 
     def undo(self, ip=None):
-        pass
+        ipdir, ipfile = os.path.split(ip.ObjectPath)
+        gate_reception = Path.objects.get(entity="path_gate_reception").value
+
+        os.remove(os.path.join(gate_reception, ipfile))
+        os.remove(os.path.join(gate_reception, "%s.xml" % ip.pk))
 
     def event_outcome_success(self, ip=None):
         return "Transferred IP '%s' with label '%s'" % (ip.pk, ip.Label)
