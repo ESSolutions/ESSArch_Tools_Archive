@@ -104,6 +104,15 @@ def createDefaultUsers(): # default users, groups and permissions
     sysadmingroup.permissions.clear()
     #sysadmingroup.permissions.add(can_do_sysadmin_stuff)
 
+    # ESS permissions 
+    permission_list = ['transfer_sip',]
+    permission_obj_list = Permission.objects.filter(codename__in=permission_list, 
+                                                    content_type__app_label='ip',
+                                                    content_type__model='informationpackage').all()
+    for permission_obj in permission_obj_list:
+        usergroup.permissions.add(permission_obj)
+        admingroup.permissions.add(permission_obj)
+
     # create an ordinary user
     try:
         myuser = User.objects.get(username='user')
