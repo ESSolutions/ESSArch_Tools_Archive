@@ -27,7 +27,11 @@ class ReceiveSIP(DBTask):
         return ip
 
     def undo(self, ip=None):
-        pass
+        ipdir, ipfile = os.path.split(ip.ObjectPath)
+        ingest_work = Path.objects.get(entity="path_ingest_work").value
+
+        os.remove(os.path.join(ingest_work, ipfile))
+        os.remove(os.path.join(ingest_work, "%s.xml" % ip.pk))
 
     def event_outcome_success(self, ip=None):
         return "Received IP '%s' with label '%s'" % (ip.pk, ip.Label)
