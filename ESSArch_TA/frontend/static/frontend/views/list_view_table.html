@@ -9,19 +9,19 @@
                         <input ng-if="!('home.reception' | isState)" st-search="" class="form-control global-search" placeholder="{{'GLOBALSEARCH' | translate}}" type="text"/>
                     </div>
                 </th>
-                <th colspan="5">
+                <th colspan="{{colspan-2}}">
                     <span style="float: right; margin-bottom: 5px;" ng-click="getListViewData()" class="clickable fa fa-refresh" ng-class="{'fa-refresh-animate': ipLoading }"></span>
                 </th>
             </tr>
             <tr>
                 <th ng-if="'home.reception' | isState" class="clickable" class="column-label"></th>
                 <th class="clickable" st-sort="Label" class="column-label">{{'LABEL' | translate}}</th>
-                <th class="clickable" st-sort="Responsible" class="column-label">{{'RESPONSIBLE' | translate}}</th>
-                <th class="clickable" st-sort="Responsible" class="column-label">{{'ARCHIVISTORGANIZATION' | translate}}</th>
+                <th ng-if="!('home.reception' | isState)" class="clickable" st-sort="Responsible" class="column-label">{{'RESPONSIBLE' | translate}}</th>
+                <th class="clickable" st-sort="ArchivistOrganization" class="column-label">{{'ARCHIVISTORGANIZATION' | translate}}</th>
                 <th class="clickable" st-sort="CreateDate" st-sort-default="reverse" class="column-label">{{'DATE' | translate}}</th>
                 <th class="clickable" class="column-label">{{'STATE' | translate}}</th>
                 <th class="clickable" class="column-label"></th>
-                <th class="clickable" class="column-label">{{'EVENTS' | translate}}</th>
+                <th ng-if="!('home.reception' | isState)" class="clickable" class="column-label">{{'EVENTS' | translate}}</th>
                 <th class="clickable" class="column-label">{{'STATUS' | translate}}</th>
                 <th ng-if="!('home.reception' | isState)" class="clickable" class="column-label">{{'DELETE' | translate}}</th>
             </tr>
@@ -42,7 +42,7 @@
                 <td ng-if="row.State == 'Unidentified'">
                     <a ng-click="identifyIpModal(row)">{{row.Label}}</a>
                 </td>
-                <td class="clickable" ng-click="ipRowClick(row)">{{row.Responsible.username}}</td>
+                <td ng-if="!('home.reception' | isState)" class="clickable" ng-click="ipRowClick(row)">{{row.Responsible.username}}</td>
                 <td class="clickable" ng-click="ipRowClick(row)">{{row.ArchivistOrganization.name}}</td>
                 <td ng-click="ipRowClick(row)">{{row.CreateDate | date:"yyyy-MM-dd HH:mm:ss"}}</td>
                 <td ng-if="row.State != 'At reception' && row.State != 'Unidentified'"class="clickable" ng-click="stateClicked(row);selectIp(row)">
@@ -57,7 +57,7 @@
                     <div ng-if="row.step_state == 'FAILURE'" class="step-state-failure"><b>{{'FAILURE' | translate}}</b></div>
                     <div ng-if="row.step_state != 'SUCCESS' && row.step_state !='FAILURE'" class="step-state-in-progress"><b>{{'INPROGRESS' | translate}}</b></div>
                 </td>
-                <td class="clickable" ng-click="eventsClick(row);selectIp(row)"><a ng-if="row.State != 'At reception' && row.State != 'Unidentified'" href="">{{'EVENTS' | translate}}</a></td>
+                <td ng-if="!('home.reception' | isState)" class="clickable" ng-click="eventsClick(row);selectIp(row)"><a ng-if="row.State != 'At reception' && row.State != 'Unidentified'" href="">{{'EVENTS' | translate}}</a></td>
                 <td>
                     <uib-progressbar class="progress" value="row.status" type="success"><b>{{row.status | number : 0}}%</b></uib-progressbar>
                 </td>
