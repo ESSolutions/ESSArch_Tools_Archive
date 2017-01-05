@@ -8,3 +8,4 @@ scripts/vendors.min.js.map
 styles/styles.css
 fonts
 images
+scripts/configs/myApp.config.js

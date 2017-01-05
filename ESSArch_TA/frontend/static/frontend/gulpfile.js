@@ -1,5 +1,6 @@
 var gulp = require('gulp')
 var sass = require('gulp-sass');
+var ngConstant = require('gulp-ng-constant');
 var sourcemaps = require('gulp-sourcemaps');
 var concat = require('gulp-concat');
 var gulpif = require('gulp-if');
@@ -94,8 +95,23 @@ var copyImages = function() {
     return gulp.src('scripts/bower_components/angular-tree-control/images/**.*') 
         .pipe(gulp.dest('images')); 
 };
-
+var configConstants = function() {
+    var myConfig = require('./scripts/configs/config.json');
+    if(isProduction) {
+        var envConfig = myConfig["production"];
+    } else {
+        var envConfig = myConfig["development"];
+    }
+    return ngConstant({
+        name: 'myApp.config',
+        constants: envConfig,
+        stream: true
+    })
+    .pipe(rename('myApp.config.js'))
+    .pipe(gulp.dest('./scripts/configs'));
+};
 gulp.task('default', function() {
+    configConstants(),
     buildScripts(),
     buildVendors(),
     compileSass(),
@@ -109,6 +125,7 @@ gulp.task('images', copyImages);
 gulp.task('scripts', buildScripts);
 gulp.task('vendors', buildVendors);
 gulp.task('sass', compileSass);
+gulp.task('config', configConstants);
 
 gulp.task('watch', function(){
     gulp.watch(jsFiles, ['scripts']);
