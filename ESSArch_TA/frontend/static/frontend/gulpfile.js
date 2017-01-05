@@ -17,6 +17,7 @@ var vendorFiles = [
         'scripts/bower_components/jquery/dist/jquery.js',
         'scripts/bower_components/angular/angular.js',
         'scripts/bower_components/angular-route/angular-route.js',
+        'scripts/bower_components/angular-mocks/angular-mocks.js',
         'scripts/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
         'scripts/bower_components/angular-tree-control/angular-tree-control.js',
         'scripts/bower_components/angular-formly/dist/formly.js',
@@ -32,8 +33,11 @@ var vendorFiles = [
         'scripts/bower_components/angular-sanitize/angular-sanitize.js',
         'scripts/bower_components/angular-ui-select/dist/select.js',
         'scripts/bower_components/bootstrap/dist/js/bootstrap.js',
+        'scripts/bower_components/angular-moment-picker/dist/angular-moment-picker.js',
+
         'node_modules/moment/min/moment-with-locales.js',
-        'scripts/bower_components/angular-moment-picker/dist/angular-moment-picker.js'
+        'node_modules/angular-bootstrap-datetimepicker/src/js/datetimepicker.js',
+        'node_modules/angular-bootstrap-datetimepicker/src/js/datetimepicker.templates.js',
     ],
     jsFiles = [
         'scripts/myApp.js', 'scripts/controllers/*.js', 'scripts/services/*.js',
