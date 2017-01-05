@@ -1,4 +1,5 @@
 var gulp = require('gulp')
+var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var concat = require('gulp-concat');
 var gulpif = require('gulp-if');
@@ -37,7 +38,15 @@ var vendorFiles = [
         'scripts/myApp.js', 'scripts/controllers/*.js', 'scripts/services/*.js',
         'scripts/directives/*.js', 'scripts/configs/*.js'
     ],
-    jsDest = 'scripts';
+    jsDest = 'scripts',
+    cssFiles = [
+        'styles/modules/index.scss',
+        'styles/modules/login.scss',
+        'styles/modules/my_page.scss',
+        'styles/modules/receive_sip.scss',
+        'styles/styles.scss'
+    ],
+    cssDest = 'styles';
 
 var buildScripts = function() {
     return gulp.src(jsFiles)
@@ -72,17 +81,37 @@ var buildVendors = function() {
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(jsDest));
 };
+var compileSass = function() {
+ return gulp.src('styles/styles.scss')
+    .pipe(sass().on('error', sass.logError))
+    .pipe(gulp.dest('styles'));
+};
+var copyIcons = function() {
+    return gulp.src('scripts/bower_components/font-awesome/fonts/**.*') 
+        .pipe(gulp.dest('fonts')); 
+};
+var copyImages = function() {
+    return gulp.src('scripts/bower_components/angular-tree-control/images/**.*') 
+        .pipe(gulp.dest('images')); 
+};
 
 gulp.task('default', function() {
     buildScripts(),
-    buildVendors()
+    buildVendors(),
+    compileSass(),
+    copyIcons(),
+    copyImages()
 });
 
 
+gulp.task('icons', copyIcons);
+gulp.task('images', copyImages);
 gulp.task('scripts', buildScripts);
 gulp.task('vendors', buildVendors);
+gulp.task('sass', compileSass);
 
 gulp.task('watch', function(){
     gulp.watch(jsFiles, ['scripts']);
     gulp.watch(vendorFiles, ['vendors']);
+    gulp.watch(cssFiles, ['sass']);
 })

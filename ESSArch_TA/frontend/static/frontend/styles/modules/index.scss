@@ -190,17 +190,24 @@ body.modal-open[style] {
     width: 100%;
     position: relative;
 }
-.uib-daypicker {
-    margin: auto;
-}
-.uib-daypicker table {
-    margin: 0 auto;
-}
 .datepicker .form-control {
     height: 15px;
     padding: 15px;
 }
-
+.uib-daypicker {
+    table {
+        margin: 0 auto;
+    }
+    .glyphicon {
+        @extend .fa;
+        &.glyphicon-chevron-right {
+            @extend .fa-chevron-right;
+        }
+        &.glyphicon-chevron-left {
+            @extend .fa-chevron-left;
+        }
+    }
+}
 .datepicker .btn {
     padding: 8px 8px;
 }
