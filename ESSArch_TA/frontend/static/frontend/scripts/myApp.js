@@ -34,6 +34,15 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                 }],
             }
         })
+        .state('home.versionInfo', {
+            url: 'version',
+            templateUrl: '/static/frontend/views/version_info.html',
+            resolve: {
+                authenticated: ['djangoAuth', function(djangoAuth){
+                    return djangoAuth.authenticationStatus();
+                }],
+            }
+        })
         .state('home.info', {
             url: 'info',
             templateUrl: '/static/frontend/views/info_page.html',

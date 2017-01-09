@@ -34,7 +34,7 @@
                 <div ng-controller="UtilCtrl" class="tasks-icons">
                     <span ng-click="reloadPage()" class="fa fa-refresh fa-refresh-animate-once"></span>
                     <span ng-click="redirectAdmin()" class="fa fa-cog"></span>
-                    <span class="fa fa-question-circle"></span>
+                    <span ui-sref="home.versionInfo" class="fa fa-question-circle"></span>
 
                     <div ng-controller="LanguageCtrl" style="width: 100px; margin-left: 10px;">
                         <select class="form-control" ng-model="currentLanguage" ng-change="changeLanguage(currentLanguage)" ng-options="x | translate for x in availableLanguages" style="width: 100%;"></select>
