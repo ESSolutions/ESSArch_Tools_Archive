@@ -1,4 +1,4 @@
-angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'formlyBootstrap', 'smart-table', 'treeGrid', 'ui.router', 'ngCookies', 'permission', 'pascalprecht.translate', 'ngSanitize', 'moment-picker', 'myApp.config'])
+angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'formlyBootstrap', 'smart-table', 'treeGrid', 'ui.router', 'ngCookies', 'permission', 'pascalprecht.translate', 'ngSanitize', 'ui.bootstrap.datetimepicker', 'ui.dateTimeInput', 'ngAnimate', 'ngMessages', 'myApp.config'])
     .config(function($routeProvider, formlyConfigProvider, $stateProvider, $urlRouterProvider, $rootScopeProvider, $uibTooltipProvider) {
         $stateProvider
             .state('home', {
@@ -114,6 +114,10 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
         });
         $urlRouterProvider.otherwise('info');
     })
+.config(function($animateProvider) {
+    // Only animate elements with the 'angular-animate' class
+    $animateProvider.classNameFilter(/angular-animate/);
+})
 .config(['$httpProvider', function($httpProvider, $rootScope) {
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
@@ -126,7 +130,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
     $compileProvider.commentDirectivesEnabled(appConfig.commentDirectives);
     $compileProvider.cssClassDirectivesEnabled(appConfig.cssClassDirectives);
 }])
-.run(function(djangoAuth, $rootScope, $state, $location, $cookies, PermPermissionStore, PermRoleStore, $http, myService, formlyConfig){
+.config(function (formlyConfigProvider){
     function _defineProperty(obj, key, value) {
         if (key in obj) {
             Object.defineProperty(obj, key, {
@@ -139,14 +143,62 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
             obj[key] = value;
         }
         return obj;
-    }
+    };
 
-    formlyConfig.setType({
+    formlyConfigProvider.setType({
         name: 'input',
         templateUrl: 'static/frontend/views/form_template_input.html',
-        overwriteOk: true
+        overwriteOk: true,
+        wrapper: ['bootstrapHasError'],
+        defaultOptions: function(options) {
+            return {
+                templateOptions: {
+                    validation: {
+                        show: true
+                    }
+                }
+            };
+        }
     });
-    formlyConfig.setType({
+
+    formlyConfigProvider.setType({
+        name: 'select',
+        templateUrl: 'static/frontend/views/form_template_select.html',
+        overwriteOk: true,
+        wrapper: ['bootstrapHasError'],
+        defaultOptions: function defaultOptions(options) {
+            var ngOptions = options.templateOptions.ngOptions || 'option[to.valueProp || \'value\'] as option[to.labelProp || \'name\'] group by option[to.groupProp || \'group\'] for option in to.options';
+            return {
+                templateOptions: {
+                    validation: {
+                        show: true
+                    }
+                },
+                ngModelAttrs: _defineProperty({}, ngOptions, {
+                    value: options.templateOptions.optionsAttr || 'ng-options'
+                })
+            };
+        },
+    });
+
+    formlyConfigProvider.setType({
+        name: 'datepicker',
+        templateUrl: "static/frontend/views/datepicker_template.html",
+        overwriteOk: true,
+        wrapper: ['bootstrapHasError'],
+        defaultOptions: function defaultOptions(options) {
+            return {
+                templateOptions: {
+                    validation: {
+                        show: true
+                    }
+                }
+            };
+        }
+    });
+    moment.locale('sv');
+
+    formlyConfigProvider.setType({
         name: 'select-tree-edit',
         template: '<select class="form-control" ng-model="model[options.key]"><option value="" disabled hidden>Choose here</option></select>',
         wrapper: ['bootstrapLabel', 'bootstrapHasError'],
@@ -172,6 +224,34 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
             };
         }
     });
+
+    formlyConfigProvider.setWrapper({
+      name: 'validation',
+      types: ['input', 'datepicker', 'select'],
+      templateUrl: 'static/frontend/views/form_error_messages.html'
+    });
+})
+.directive('setTouched', function MainCtrl() {
+    return {
+        restrict: 'A', // only activate on element attribute
+        require: '?ngModel', // get a hold of NgModelController
+        link: function(scope, element, attrs, ngModel) {
+            if (!ngModel) return; // do nothing if no ng-model
+            element.on('blur', function() {
+                var modelControllers = scope.$eval(attrs.setTouched);
+                if(angular.isArray(modelControllers)) {
+                    angular.forEach(modelControllers, function(modelCntrl) {
+                        modelCntrl.$setTouched();
+                    });
+                }
+            });
+        }
+    };
+})
+.run(function(djangoAuth, $rootScope, $state, $location, $cookies, PermPermissionStore, PermRoleStore, $http, myService, formlyConfig, formlyValidationMessages){
+    formlyConfig.extras.errorExistsAndShouldBeVisibleExpression = 'form.$submitted || fc.$touched || fc[0].$touched';
+    formlyValidationMessages.addStringMessage('required', 'This field is required');
+
     djangoAuth.initialize('/rest-auth', false).then(function() {
 
         djangoAuth.profile().then(function(data) {
@@ -205,96 +285,4 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
         }
     });
 
-}).run(function(formlyConfig){
-    var ngModelAttrs = {};
-
-    var attributes = [
-        'ng-model',
-        'min-date',
-        'max-date',
-        'date-disabled',
-        'day-format',
-        'month-format',
-        'year-format',
-        'year-range',
-        'day-header-format',
-        'day-title-format',
-        'month-title-format',
-        'date-format',
-        'date-options',
-        'hour-step',
-        'minute-step',
-        'show-meridian',
-        'meridians',
-        'readonly-time',
-        'readonly-date',
-        'hidden-time',
-        'hidden-date',
-        'mousewheel',
-        'show-spinners',
-        'current-text',
-        'clear-text',
-        'close-text'
-            ];
-
-    var bindings = [
-        'ng-model',
-        'min-date',
-        'max-date',
-        'date-disabled',
-        'day-format',
-        'month-format',
-        'year-format',
-        'year-range',
-        'day-header-format',
-        'day-title-format',
-        'month-title-format',
-        'date-format',
-        'date-options',
-        'hour-step',
-        'minute-step',
-        'show-meridian',
-        'readonly-time',
-        'readonly-date',
-        'hidden-time',
-        'hidden-date'
-            ];
-
-    angular.forEach(attributes, function(attr) {
-        ngModelAttrs[camelize(attr)] = {
-            attribute: attr
-        };
-    });
-
-    angular.forEach(bindings, function(binding) {
-        ngModelAttrs[camelize(binding)] = {
-            bound: binding
-        };
-    });
-
-    function camelize(string) {
-        string = string.replace(/[\-_\s]+(.)?/g,
-
-                function(match, chr) {
-                    return chr ? chr.toUpperCase() : '';
-                });
-        // Ensure 1st char is always lowercase
-        return string.replace(/^([A-Z])/, function(match, chr) {
-            return chr ? chr.toLowerCase() : '';
-        });
-    }
-
-    formlyConfig.setType({
-        name: 'datepicker',
-        //template: '<input class="form-control" ng-model="ctrl.input" ng-model-options="{ updateOn: \'blur\' }" placeholder="Select a date..." moment-picker="ctrl.input">',
-        templateUrl: "static/frontend/views/datepicker_template.html",// '<br><datetimepicker ng-model="model[options.key]" show-spinners="true" date-format="M/d/yyyy" date-options="dateOptions" show-meridian="false"></datetimepicker>',
-        wrapper: ['bootstrapLabel'],
-        defaultOptions: {
-            ngModelAttrs: ngModelAttrs,
-            templateOptions: {
-                label: 'Time'
-            }
-        }
-    });
-    moment.locale('sv');
 });
