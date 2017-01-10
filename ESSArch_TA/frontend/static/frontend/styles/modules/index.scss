@@ -248,6 +248,18 @@ body.modal-open[style] {
         }
     }
 }
+.glyphicon {
+    @extend .fa;
+    &.glyphicon-arrow-left {
+        @extend .fa-arrow-left;
+    }
+    &.glyphicon-arrow-right {
+        @extend .fa-arrow-right;
+    }
+}
+.input-group-addon {
+    padding: 0 12px;
+}
 .datepicker .btn {
     padding: 8px 8px;
 }
