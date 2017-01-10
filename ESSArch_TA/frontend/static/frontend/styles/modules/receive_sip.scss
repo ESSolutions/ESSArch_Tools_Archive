@@ -90,6 +90,7 @@
         border-color: #666;
         border-radius: 15px;
         padding: 5px;
+        margin-top: 5px;
     }
     .select-view > .checkbox {
         height: 10px;
@@ -149,10 +150,27 @@
     }
 
     .edit-view {
-        border-top-style: solid;
+        border-style: solid;
         border-color: #666;
-        margin: 5px;
+        border-radius: 15px;
         padding: 5px;
+        margin-top: 5px;
+        position: relative;
+        .formly-field {
+            width: 24%;
+            margin-left: 5px;
+        }
+    }
+
+    .edit-view .formly {
+        display: flex;
+        display: -webkit-flex;
+        flex-direction: row;
+        -webkit-flex-direction: row;
+        flex-wrap: wrap;
+        -webkit-flex-wrap: wrap;
+        padding: 5px;
+        width: 100%;
     }
     .edit-view .btn-danger {
         float: right;

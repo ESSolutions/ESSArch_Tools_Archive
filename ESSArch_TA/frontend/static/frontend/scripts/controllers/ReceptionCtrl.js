@@ -290,10 +290,24 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     };
     updateListViewConditional();
     $scope.ipTableClick = function(row) {
-        $scope.ip = row;
         $scope.statusShow = false;
         $scope.eventShow = false;
-        //$scope.fileListCollection = listViewService.getFileList(row);
+        if($scope.edit && $scope.ip == row) {
+            $scope.edit = false;
+        } else {
+            vm.sdModel = {};
+            $scope.ip = row;
+            if($scope.ip.State == "At reception") {
+                $scope.buildSdForm($scope.ip);
+                $scope.getFileList($scope.ip);
+                $scope.edit = true;
+            } else {
+                $scope.edit = false;
+                $scope.ip.class = "";
+                $scope.selectedIp = {id: "", class: ""};
+
+            }
+        }
     }
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
     $scope.submitDescription = $translate.instant('SUBMITDESCRIPTION');
@@ -356,6 +370,154 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         "key": "validate_integrity",
     }
     ];
+
+    vm.sdModel = {};
+    vm.sdFields = [
+        {
+        "templateOptions": {
+            "type": "text",
+            "label": "Start date",
+            "disabled": true
+        },
+        "type": "input",
+        "key": "start_date",
+    },
+        {
+        "templateOptions": {
+            "type": "text",
+            "label": "End date",
+            "disabled": true
+        },
+        "type": "input",
+        "key": "end_date",
+    },
+        {
+        "templateOptions": {
+            "type": "text",
+            "label": "Archivist Organization",
+            "disabled": true
+        },
+        "type": "input",
+        "key": "archivist_organization",
+    },
+        {
+        "templateOptions": {
+            "type": "text",
+            "label": "Creator",
+            "disabled": true
+        },
+        "type": "input",
+        "key": "creator",
+    },
+        {
+        "templateOptions": {
+            "type": "text",
+            "label": "Submitter Organization",
+            "disabled": true
+        },
+        "type": "input",
+        "key": "submitter_organization",
+    },
+        {
+        "templateOptions": {
+            "type": "text",
+            "label": "Submitter Individual",
+            "disabled": true
+        },
+        "type": "input",
+        "key": "submitter_individual",
+    },
+        {
+        "templateOptions": {
+            "type": "text",
+            "label": "Producer Organization",
+            "disabled": true
+        },
+        "type": "input",
+        "key": "producer_organization",
+    },
+        {
+        "templateOptions": {
+            "type": "text",
+            "label": "Producer Individual",
+            "disabled": true
+        },
+        "type": "input",
+        "key": "producer_individual",
+    },
+        {
+        "templateOptions": {
+            "type": "text",
+            "label": "IP owner",
+            "disabled": true
+        },
+        "type": "input",
+        "key": "ip_owner",
+    },
+        {
+        "templateOptions": {
+            "type": "text",
+            "label": "Preservation Organization",
+            "disabled": true
+        },
+        "type": "input",
+        "key": "preservation_organization",
+    },
+        {
+        "templateOptions": {
+            "type": "text",
+            "label": "System Name",
+            "disabled": true
+        },
+        "type": "input",
+        "key": "system_name",
+    },
+        {
+        "templateOptions": {
+            "type": "text",
+            "label": "System Version",
+            "disabled": true
+        },
+        "type": "input",
+        "key": "system_version",
+    },
+        {
+        "templateOptions": {
+            "type": "text",
+            "label": "System Type",
+            "disabled": true
+        },
+        "type": "input",
+        "key": "system_type",
+    }
+    ];
+    $scope.buildSdForm = function(ip) {
+        vm.sdModel = {
+            "start_date": ip.SubmitDescription.start_date,
+            "end_date": ip.SubmitDescription.end_date,
+            "archivist_organization": ip.SubmitDescription.archivist_organization,
+            "creator": ip.SubmitDescription.creator_organization,
+            "submitter_organization": ip.SubmitDescription.submitter_organization,
+            "submitter_individual": ip.SubmitDescription.submitter_individual,
+            "producer_organization": ip.SubmitDescription.producer_organization,
+            "producer_individual": ip.SubmitDescription.producer_individual,
+            "ip_owner": ip.SubmitDescription.ipowner_organization,
+            "preservation_organization": ip.SubmitDescription.preservation_organization,
+            "system_name": ip.SubmitDescription.system_name,
+            "system_version": ip.SubmitDescription.system_version,
+            "system_type": ip.SubmitDescription.system_type
+        };
+    };
+    $scope.getFileList = function(ip) {
+        var array = [];
+        var tempElement = {
+            filename: ip.ObjectPath,
+            created: ip.CreateDate,
+            size: ip.ObjectSize
+        };
+        array.push(tempElement);
+        $scope.fileListCollection = array;
+    }
     $scope.tracebackModal = function (profiles) {
         $scope.profileToSave = profiles;
         var modalInstance = $uibModal.open({
@@ -596,7 +758,6 @@ $scope.identifyIpModal = function (ip) {
     }
 
     $scope.identifyIp = function(ip) {
-        console.log(vm.modelUnidentifiedIp);
         $http({
             method: 'POST',
             url: appConfig.djangoUrl+'ip-reception/identify-ip/',

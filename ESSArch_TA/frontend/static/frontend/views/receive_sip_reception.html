@@ -19,6 +19,32 @@
                 </form>
             </div>
         </div>
+        <div ng-if="edit" class="edit-view">
+            <h4 style="margin-left: 10px;">Submit Description</h4>
+            <form>
+                <formly-form model="vm.sdModel" fields="vm.sdFields" options="vm.sdOptions">
+                </formly-form>
+            </form>
+
+            <div class="file-list">
+                <table st-table="fileListRowCollection" st-safe-src="fileListCollection" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="clickable" st-sort="filename">{{'FILENAME' | translate}}</th>
+                            <th class="clickable" st-sort="created">{{'CREATED' | translate}}</th>
+                            <th class="clickable" st-sort="size">{{'SIZE' | translate}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="row in fileListRowCollection">
+                            <td>{{row.filename}}</td>
+                            <td>{{row.created | date:"yyyy-MM-dd hh:mm:ss"}}</td>
+                            <td>{{row.size}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
         <!--
             <uib-tabset active="activeTab">
             <uib-tab ng-repeat="t in tabsEditView" heading="{{t.label}}">
