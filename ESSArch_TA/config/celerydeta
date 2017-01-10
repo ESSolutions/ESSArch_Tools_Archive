@@ -1,6 +1,6 @@
 # Names of nodes to start
 #   most will only start one node:
-CELERYD_NODES="workereta"
+CELERYD_NODES="workereta workervalidation"
 
 # Absolute or relative path to the 'celery' command:
 CELERY_BIN="/ESSArch/pd/python/bin/celery"
@@ -13,7 +13,7 @@ CELERYD_CHDIR="/ESSArch/pd/python/lib/python2.7/site-packages/ESSArch_TA"
 #CELERYD_CHDIR="/ESSArch/alpha/ESSArch_Tools_Archive/ESSArch_TA"
 
 # Extra command-line arguments to the worker
-CELERYD_OPTS="-Q:workereta celery -c:workereta 4 --time-limit=300 --broker=amqp://guest:guest@localhost:5672/eta -Ofair --autoreload"
+CELERYD_OPTS="-Q:workereta celery -c:workereta 4 -Q:workervalidation validation -c:workervalidation 4 --time-limit=300 --broker=amqp://guest:guest@localhost:5672/eta -Ofair --autoreload"
 
 # %N will be replaced with the first part of the nodename.
 CELERYD_LOG_LEVEL=INFO
