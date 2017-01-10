@@ -76,6 +76,8 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
                 });
                 step.children = step.children.concat(step.tasks);
                 step.children.sort(function(a, b){
+                    if(a.time_created != null && b.time_created == null) return -1;
+                    if(a.time_created == null && b.time_created != null) return 1;
                     var a = new Date(a.time_created),
                         b = new Date(b.time_created);
 
@@ -463,6 +465,8 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
             child.tasksCollapsed = true;
 
             child.children.sort(function(a, b){
+                if(a.time_created != null && b.time_created == null) return -1;
+                if(a.time_created == null && b.time_created != null) return 1;
                 var a = new Date(a.time_created),
                     b = new Date(b.time_created);
 
