@@ -107,12 +107,29 @@ class ArchivalLocationViewSet(viewsets.ModelViewSet):
 
 
 class InformationPackageReceptionViewSet(viewsets.ViewSet):
-    def get_archvist_organization(self, el):
-        return el.xpath(
-            ".//*[local-name()='agent'][@ROLE='ARCHIVIST'][@TYPE='ORGANIZATION']"
-        )[0].xpath(
-            "*[local-name()='name']"
-        )[0].text
+    def get_agent(self, el, ROLE=None, OTHERROLE=None, TYPE=None, OTHERTYPE=None):
+        s = ".//*[local-name()='agent']"
+
+        if ROLE:
+            s += "[@ROLE='%s']" % ROLE
+
+        if OTHERROLE:
+            s += "[@OTHERROLE='%s']" % OTHERROLE
+
+        if TYPE:
+            s += "[@TYPE='%s']" % TYPE
+
+        if OTHERTYPE:
+            s += "[@OTHERTYPE='%s']" % OTHERTYPE
+
+        first = el.xpath(s)[0]
+        return {
+            'name': first.xpath("*[local-name()='name']")[0].text,
+            'notes': [note.text for note in first.xpath("*[local-name()='note']")]
+        }
+
+    def get_altrecordid(self, el, TYPE):
+        return el.xpath(".//*[local-name()='altRecordID'][@TYPE='%s']" % TYPE)[0].text
 
     def parseFile(self, path):
         ip = {}
@@ -129,8 +146,22 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ip['State'] = "At reception"
         ip['status'] = 100.0
         ip['step_state'] = celery_states.SUCCESS
-        ip['ArchivistOrganization'] = {
-            'name': self.get_archvist_organization(root)
+        ip['ArchivistOrganization'] = self.get_agent(root, ROLE='ARCHIVIST', TYPE='ORGANIZATION')
+
+        ip['SubmitDescription'] = {
+            'start_date': self.get_altrecordid(root, TYPE='STARTDATE'),
+            'end_date': self.get_altrecordid(root, TYPE='ENDDATE'),
+            'archivist_organization': ip['ArchivistOrganization']['name'],
+            'creator_organization': self.get_agent(root, ROLE='CREATOR', TYPE='ORGANIZATION')['name'],
+            'submitter_organization': self.get_agent(root, ROLE='OTHER', OTHERROLE='SUBMITTER', TYPE='ORGANIZATION')['name'],
+            'submitter_individual': self.get_agent(root, ROLE='OTHER', OTHERROLE='SUBMITTER', TYPE='INDIVIDUAL')['name'],
+            'producer_organization': self.get_agent(root, ROLE='OTHER', OTHERROLE='PRODUCER', TYPE='ORGANIZATION')['name'],
+            'producer_individual': self.get_agent(root, ROLE='OTHER', OTHERROLE='PRODUCER', TYPE='INDIVIDUAL')['name'],
+            'ipowner_organization': self.get_agent(root, ROLE='IPOWNER', TYPE='ORGANIZATION')['name'],
+            'preservation_organization': self.get_agent(root, ROLE='PRESERVATION', TYPE='ORGANIZATION')['name'],
+            'system_name': self.get_agent(root, ROLE='ARCHIVIST', TYPE='OTHER', OTHERTYPE='SOFTWARE')['name'],
+            'system_version': self.get_agent(root, ROLE='ARCHIVIST', TYPE='OTHER', OTHERTYPE='SOFTWARE')['notes'][0],
+            'system_type': self.get_agent(root, ROLE='ARCHIVIST', TYPE='OTHER', OTHERTYPE='SOFTWARE')['notes'][1],
         }
 
         return ip
@@ -224,7 +255,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ipdata = self.parseFile(xmlfile)
 
         responsible = self.request.user
-        archivist_organization = self.get_archvist_organization(root)
+        archivist_organization = self.get_agent(root, ROLE='ARCHIVIST', TYPE='ORGANIZATION')['name']
 
         try:
             (arch, _) = ArchivistOrganization.objects.get_or_create(
