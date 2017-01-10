@@ -136,7 +136,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         if e is not None:
             return get_value_from_path(e, "@href").split('file:///')[1]
 
-    def parseFile(self, path):
+    def parseFile(self, path, srcdir=""):
         ip = {}
         doc = etree.parse(path)
         root = doc.getroot()
@@ -156,8 +156,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         objpath = self.get_objectpath(root)
 
         if objpath:
-            reception = Path.objects.get(entity="path_ingest_reception").value
-            ip['ObjectPath'] = os.path.join(reception, objpath)
+            ip['ObjectPath'] = os.path.join(srcdir, objpath)
             ip['ObjectSize'] = os.stat(ip['ObjectPath']).st_size
 
         ip['SubmitDescription'] = {
@@ -185,7 +184,12 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         for xmlfile in glob.glob(os.path.join(reception, "*.xml")) + glob.glob(os.path.join(uip, "*.xml")):
             if os.path.isfile(xmlfile):
-                ip = self.parseFile(xmlfile)
+                if xmlfile.startswith(uip):
+                    srcdir = uip
+                else:
+                    srcdir = reception
+
+                ip = self.parseFile(xmlfile, srcdir)
                 if not InformationPackage.objects.filter(id=ip['id']).exists():
                     ips.append(ip)
 
