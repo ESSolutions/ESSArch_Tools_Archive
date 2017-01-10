@@ -171,13 +171,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         uip = Path.objects.get(entity="path_ingest_unidentified").value
         ips = []
 
-        for xmlfile in glob.glob(os.path.join(reception, "*.xml")):
-            if os.path.isfile(xmlfile):
-                ip = self.parseFile(xmlfile)
-                if not InformationPackage.objects.filter(id=ip['id']).exists():
-                    ips.append(ip)
-
-        for xmlfile in glob.glob(os.path.join(uip, "*.xml")):
+        for xmlfile in glob.glob(os.path.join(reception, "*.xml")) + glob.glob(os.path.join(uip, "*.xml")):
             if os.path.isfile(xmlfile):
                 ip = self.parseFile(xmlfile)
                 if not InformationPackage.objects.filter(id=ip['id']).exists():
