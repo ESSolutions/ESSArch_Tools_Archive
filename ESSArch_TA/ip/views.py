@@ -131,6 +131,11 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
     def get_altrecordid(self, el, TYPE):
         return el.xpath(".//*[local-name()='altRecordID'][@TYPE='%s']" % TYPE)[0].text
 
+    def get_objectpath(self, el):
+        e = el.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
+        if e is not None:
+            return get_value_from_path(e, "@href").split('file:///')[1]
+
     def parseFile(self, path):
         ip = {}
         doc = etree.parse(path)
@@ -147,6 +152,13 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ip['status'] = 100.0
         ip['step_state'] = celery_states.SUCCESS
         ip['ArchivistOrganization'] = self.get_agent(root, ROLE='ARCHIVIST', TYPE='ORGANIZATION')
+
+        objpath = self.get_objectpath(root)
+
+        if objpath:
+            reception = Path.objects.get(entity="path_ingest_reception").value
+            ip['ObjectPath'] = os.path.join(reception, objpath)
+            ip['ObjectSize'] = os.stat(ip['ObjectPath']).st_size
 
         ip['SubmitDescription'] = {
             'start_date': self.get_altrecordid(root, TYPE='STARTDATE'),
@@ -242,9 +254,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         doc = etree.parse(xmlfile)
         root = doc.getroot()
 
-        el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
-        objpath = get_value_from_path(el, "@href").split('file:///')[1]
-        objpath = os.path.join(srcdir, objpath)
+        objpath = os.path.join(srcdir, self.get_objectpath(root))
 
         ipdata = self.parseFile(xmlfile)
 
