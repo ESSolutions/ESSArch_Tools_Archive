@@ -34,7 +34,10 @@ body.modal-open[style] {
 .error-messages {
   position: relative;
 }
-
+.unexpected {
+    background-color: maroon !important;
+    color: white !important;
+}
 .error-messages, .message {
   opacity: 1;
   transition: .3s linear all;
