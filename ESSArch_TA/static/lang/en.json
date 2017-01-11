@@ -116,5 +116,13 @@
     "PREPARE": "Prepare",
     "CLOSE": "Close",
     "APPROVEDTOTRANSFER": "Approved to transfer",
-    "AGENT": "Agent"
+    "AGENT": "Agent",
+    "SYSTEMINFORMATION": "System Information",
+    "TIME": "Time",
+    "HOSTNAME": "Hostname",
+    "SETTINGSFLAGS": "Settings Flags",
+    "VERSIONINFORMATION": "Version Information",
+    "PYTHONPACKAGES": "Python packages",
+    "MYSQLVERSION": "MySQL version",
+    "LOADING": "Loading"
 }

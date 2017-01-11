@@ -116,5 +116,13 @@
     "PREPARE": "Förbered",
     "CLOSE": "Stäng",
     "APPROVEDTOTRANSFER": "Godkänd för överföring",
-    "AGENT": "Agent"
+    "AGENT": "Agent",
+    "SYSTEMINFORMATION": "Systeminformation",
+    "TIME": "Tid",
+    "HOSTNAME": "Värdnamn",
+    "SETTINGSFLAGS": "Inställningsflaggor",
+    "VERSIONINFORMATION": "Versionsinformation",
+    "PYTHONPACKAGES": "Pythonpaket",
+    "MYSQLVERSION": "MySQL-version",
+    "LOADING": "Laddar"
 }
