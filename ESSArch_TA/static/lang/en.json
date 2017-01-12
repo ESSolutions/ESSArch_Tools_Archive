@@ -124,5 +124,6 @@
     "VERSIONINFORMATION": "Version Information",
     "PYTHONPACKAGES": "Python packages",
     "MYSQLVERSION": "MySQL version",
+    "CONTACT": "Concact",
     "LOADING": "Loading"
 }
