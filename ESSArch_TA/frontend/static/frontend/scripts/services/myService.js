@@ -1,4 +1,4 @@
-angular.module('myApp').factory('myService', function($location, PermPermissionStore, $anchorScroll) {
+angular.module('myApp').factory('myService', function($location, PermPermissionStore, $anchorScroll, $http, appConfig) {
     function changePath(state) {
         $state.go(state);
     };
@@ -8,8 +8,19 @@ angular.module('myApp').factory('myService', function($location, PermPermissionS
         });
         return permissions;
     }
+    function getVersionInfo() {
+        return $http({
+            method: 'GET',
+            url: appConfig.djangoUrl+"sysinfo/"
+        }).then(function(response){
+            return response.data;
+        }, function() {
+            console.log('error');
+        })
+    }
     return {
         changePath: changePath,
-        getPermissions: getPermissions
+        getPermissions: getPermissions,
+        getVersionInfo: getVersionInfo
     }
 });
