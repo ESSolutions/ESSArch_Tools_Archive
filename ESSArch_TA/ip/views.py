@@ -243,7 +243,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, pk=None):
         path = Path.objects.get(entity="path_ingest_reception").value
-        return Response(self.parseFile(os.path.join(path, "%s.xml" % pk)))
+        return Response(self.parseFile(os.path.join(path, "%s.xml" % pk), srcdir=path))
 
     @detail_route(methods=['post'], url_path='create-ip')
     def create_ip(self, request, pk=None):
@@ -260,7 +260,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         objpath = os.path.join(srcdir, self.get_objectpath(root))
 
-        ipdata = self.parseFile(xmlfile)
+        ipdata = self.parseFile(xmlfile, srcdir)
 
         responsible = self.request.user
         archivist_organization = self.get_agent(root, ROLE='ARCHIVIST', TYPE='ORGANIZATION')['name']
@@ -335,6 +335,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                         name="preingest.tasks.ValidateLogicalPhysicalRepresentation",
                         params={
                             "files": files,
+                            "files_reldir": srcdir,
                             "xmlfile": xmlfile,
                         },
                         log=EventIP,
