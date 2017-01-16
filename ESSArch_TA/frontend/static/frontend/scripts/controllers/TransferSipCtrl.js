@@ -120,7 +120,15 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
         listViewService.getTreeData(row, expandedNodes).then(function(value) {
             $scope.tree_data = value;
             $scope.statusLoading = false;
-        });
+        }, function(response){
+             if(response.status == 404) {
+                 $scope.statusShow = false;
+                 $timeout(function(){
+                     $scope.getListViewData();
+                     updateListViewConditional();
+                 }, 1000);
+             }
+         });
     };
     /*
      * EVENTS
