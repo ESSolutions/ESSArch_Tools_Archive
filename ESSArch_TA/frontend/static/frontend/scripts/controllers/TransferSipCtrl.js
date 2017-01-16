@@ -148,6 +148,12 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
     };
 
     $scope.currentStepTask = {id: ""}
+
+    //Click on +/- on step
+    $scope.stepClick = function(step) {
+        listViewService.getChildrenForStep(step);
+    };
+
     //Click funciton for steps and tasks
     $scope.stepTaskClick = function(branch) {
         $http({
