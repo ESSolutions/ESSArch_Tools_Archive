@@ -319,7 +319,6 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             method: 'POST',
             url: ip.url+"transfer/"
         }).then(function(response) {
-            console.log(response);
             $scope.select = false;
             $timeout(function() {
                 $scope.getListViewData();
@@ -365,7 +364,6 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             method: 'DELETE',
             url: ipObject.url
         }).then(function() {
-            console.log("ip removed");
             vm.displayedIps.splice(vm.displayedIps.indexOf(ipObject), 1);
             $scope.edit = false;
             $scope.select = false;
