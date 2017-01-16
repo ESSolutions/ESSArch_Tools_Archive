@@ -39,6 +39,7 @@
     "STATUSNOTE": "Status note",
     "FILENAME": "File name",
     "CREATED": "Created",
+    "EXCEPTION": "Exception",
     "SIZE": "Size",
     "COMMENT": "Comment",
     "APPROVEDTOSUBMIT": "Approved to submit",
@@ -125,5 +126,6 @@
     "PYTHONPACKAGES": "Python packages",
     "MYSQLVERSION": "MySQL version",
     "CONTACT": "Concact",
-    "LOADING": "Loading"
+    "LOADING": "Loading",
+    "STEPREPORTFOR": "Step report for"
 }

@@ -44,6 +44,7 @@
     "OK": "Ok",
     "CANCEL": "Cancel",
     "PARAMS": "Params",
+    "EXCEPTION": "Exception",
     "STEP": "Step",
     "RESULT": "Result",
     "ENTERIPLABEL": "Enter new IP label",
@@ -123,5 +124,6 @@
     "PYTHONPACKAGES": "Python packages",
     "MYSQLVERSION": "MySQL version",
     "CONTACT": "Contact",
-    "LOADING": "Loading"
+    "LOADING": "Loading",
+    "STEPREPORTFOR": "Step report for"
 }

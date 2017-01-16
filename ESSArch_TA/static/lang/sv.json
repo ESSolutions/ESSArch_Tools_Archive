@@ -104,6 +104,7 @@
     "YES": "Ja",
     "NO": "Nej",
     "TRACEBACK": "Traceback",
+    "EXCEPTION": "Undantag",
     "NOTAVAILABLEINTHISVIEW": "Inte tillgänglig i denna vy",
     "STARTED": "Startade",
     "DONE": "Färdig",
@@ -125,5 +126,6 @@
     "PYTHONPACKAGES": "Pythonpaket",
     "MYSQLVERSION": "MySQL-version",
     "CONTACT": "Kontakt",
-    "LOADING": "Laddar"
+    "LOADING": "Laddar",
+    "STEPREPORTFOR": "Step-rapport för"
 }

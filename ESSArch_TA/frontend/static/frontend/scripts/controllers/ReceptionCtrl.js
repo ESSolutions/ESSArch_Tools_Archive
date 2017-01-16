@@ -122,22 +122,23 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         });
     };
 
- $scope.currentStepTask = {id: ""}
+    $scope.currentStepTask = {id: ""}
     //Click funciton for steps and tasks
-     $scope.stepTaskClick = function(branch) {
-         if(branch.isTask){
-             $http({
-                 method: 'GET',
-                 url: branch.url
-             }).then(function(response){
-                 console.log(response.data)
-                 $scope.currentStepTask = response.data;
-                 $scope.taskInfoModal();
-             }, function(response) {
-                 response.status;
-             });
-         }
-     };
+    $scope.stepTaskClick = function(branch) {
+        $http({
+            method: 'GET',
+            url: branch.url
+        }).then(function(response){
+                $scope.currentStepTask = response.data;
+            if(branch.isTask){
+                $scope.taskInfoModal();
+            } else {
+                $scope.stepInfoModal();
+            }
+        }, function(response) {
+            response.status;
+        });
+    };
     //Creates and shows modal with task information
     $scope.taskInfoModal = function () {
         var modalInstance = $uibModal.open({
@@ -154,7 +155,22 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $log.info('modal-component dismissed at: ' + new Date());
         });
     }
-
+    //Creates and shows modal with step information
+    $scope.stepInfoModal = function () {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'static/frontend/views/step_info_modal.html',
+            scope: $scope,
+            controller: 'ModalInstanceCtrl',
+            controllerAs: '$ctrl'
+        });
+        modalInstance.result.then(function (data, $ctrl) {
+        }, function () {
+            $log.info('modal-component dismissed at: ' + new Date());
+        });
+    }
 
     /*******************************************/
     /*Piping and Pagination for List-view table*/
