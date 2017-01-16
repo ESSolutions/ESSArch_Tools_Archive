@@ -43,6 +43,34 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
         }
         ];
     });
+    $scope.myTreeControl = {};
+    $scope.myTreeControl.scope = this;
+    //Undo step/task
+    $scope.myTreeControl.scope.taskStepUndo = function(branch) {
+        $http({
+            method: 'POST',
+            url: branch.url+"undo/"
+        }).then(function(response) {
+            $timeout(function(){
+                $scope.statusViewUpdate($scope.ip);
+            }, 1000);
+        }, function() {
+            console.log("error");
+        });
+    };
+    //Redo step/task
+     $scope.myTreeControl.scope.taskStepRedo = function(branch){
+        $http({
+            method: 'POST',
+            url: branch.url+"retry/"
+        }).then(function(response) {
+            $timeout(function(){
+                $scope.statusViewUpdate($scope.ip);
+            }, 1000);
+        }, function() {
+            console.log("error");
+        });
+    };
     var stateInterval;
     $scope.stateClicked = function(row){
         if($scope.statusShow && $scope.ip == row){
