@@ -24,6 +24,9 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             displayName: $scope.responsible,
         },
         {
+            cellTemplate: "<div ng-include src=\"'static/frontend/views/task_pagination.html'\"></div>"
+        },
+        {
             field: "time_created",
             displayName: $scope.date
         },
@@ -59,7 +62,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
         });
     };
     //Redo step/task
-     $scope.myTreeControl.scope.taskStepRedo = function(branch){
+    $scope.myTreeControl.scope.taskStepRedo = function(branch){
         $http({
             method: 'POST',
             url: branch.url+"retry/"
@@ -71,8 +74,17 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             console.log("error");
         });
     };
-    var stateInterval;
-    $scope.stateClicked = function(row){
+    $scope.myTreeControl.scope.updatePageNumber = function(branch, page) {
+        if(page > branch.page_number && branch.next){
+            branch.page_number = parseInt(branch.next.page);
+            listViewService.getChildrenForStep(branch, branch.page_number);
+        } else if(page < branch.page_number && branch.prev && page > 0) {
+            branch.page_number = parseInt(branch.prev.page);
+            listViewService.getChildrenForStep(branch, branch.page_number);
+        }
+    };
+     var stateInterval;
+     $scope.stateClicked = function(row){
         if($scope.statusShow && $scope.ip == row){
             $scope.statusShow = false;
         } else {
@@ -102,7 +114,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
          var ret = [];
          nodes.forEach(function(node) {
              if(node.expanded == true) {
-                ret.push({id: node.id, name: node.name});
+                ret.push(node);
             }
             if(node.children && node.children.length > 0) {
                 ret = ret.concat(checkExpanded(node.children));
@@ -169,7 +181,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             url: branch.url
         }).then(function(response){
                 $scope.currentStepTask = response.data;
-            if(branch.isTask){
+             if(branch.flow_type == "task"){
                 $scope.taskInfoModal();
             } else {
                 $scope.stepInfoModal();
