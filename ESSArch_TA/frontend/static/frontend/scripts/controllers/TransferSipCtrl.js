@@ -27,7 +27,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             cellTemplate: "<div ng-include src=\"'static/frontend/views/task_pagination.html'\"></div>"
         },
         {
-            field: "time_created",
+            field: "time_started",
             displayName: $scope.date
         },
         {
