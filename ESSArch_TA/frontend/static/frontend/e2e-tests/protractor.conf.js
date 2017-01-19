@@ -1,4 +1,4 @@
-<!--
+/*
     ESSArch is an open source archiving and digital preservation system
 
     ESSArch Tools for Producer (ETP)
@@ -20,7 +20,7 @@
     Contact information:
     Web - http://www.essolutions.se
     Email - essarch@essolutions.se
--->
+*/
 
 //jshint strict: false
 exports.config = {
