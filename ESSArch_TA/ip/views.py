@@ -51,7 +51,13 @@ from ESSArch_Core.util import (
     remove_prefix
 )
 
-from ip.filters import InformationPackageFilter
+from ip.filters import (
+    ArchivalInstitutionFilter,
+    ArchivistOrganizationFilter,
+    ArchivalTypeFilter,
+    ArchivalLocationFilter,
+    InformationPackageFilter,
+)
 
 from ip.serializers import (
     ArchivalInstitutionSerializer,
@@ -81,6 +87,8 @@ class ArchivalInstitutionViewSet(viewsets.ModelViewSet):
     queryset = ArchivalInstitution.objects.all()
     serializer_class = ArchivalInstitutionSerializer
 
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = ArchivalInstitutionFilter
 
 class ArchivistOrganizationViewSet(viewsets.ModelViewSet):
     """
@@ -89,6 +97,8 @@ class ArchivistOrganizationViewSet(viewsets.ModelViewSet):
     queryset = ArchivistOrganization.objects.all()
     serializer_class = ArchivistOrganizationSerializer
 
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = ArchivistOrganizationFilter
 
 class ArchivalTypeViewSet(viewsets.ModelViewSet):
     """
@@ -96,6 +106,9 @@ class ArchivalTypeViewSet(viewsets.ModelViewSet):
     """
     queryset = ArchivalType.objects.all()
     serializer_class = ArchivalTypeSerializer
+
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = ArchivalTypeFilter
 
 
 class ArchivalLocationViewSet(viewsets.ModelViewSet):
@@ -105,6 +118,8 @@ class ArchivalLocationViewSet(viewsets.ModelViewSet):
     queryset = ArchivalLocation.objects.all()
     serializer_class = ArchivalLocationSerializer
 
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = ArchivalLocationFilter
 
 class InformationPackageReceptionViewSet(viewsets.ViewSet):
     def get_agent(self, el, ROLE=None, OTHERROLE=None, TYPE=None, OTHERTYPE=None):
