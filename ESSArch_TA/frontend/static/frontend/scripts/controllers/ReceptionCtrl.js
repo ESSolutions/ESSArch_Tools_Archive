@@ -96,6 +96,9 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
              $scope.statusShow = true;
              $scope.statusViewUpdate(row);
          }
+         $scope.eventShow = false;
+         $scope.edit = false;
+         $scope.select = false;
          $scope.ip = row;
          $rootScope.ip = row;
      };
@@ -161,6 +164,9 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $scope.validateShow = false;
             $scope.statusShow = false;
         }
+        $scope.edit = false;
+        $scope.select = false;
+        $scope.statusShow = false;
         $scope.ip = row;
         $rootScope.ip = row;
     };
@@ -293,6 +299,10 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
                     $scope.getListViewData();
                     updateListViewConditional();
                 }, 1000);
+                $scope.edit = false;
+                $scope.select = false;
+                $scope.eventShow = false;
+                $scope.statusShow = false;
                 $scope.receiveDisabled = false;
                 $anchorScroll();
             }, function(response) {
