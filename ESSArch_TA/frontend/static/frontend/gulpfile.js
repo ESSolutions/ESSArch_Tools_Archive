@@ -9,6 +9,8 @@ var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var gutil = require('gulp-util');
+var license = require('gulp-header-license');
+var fs = require('fs');
 var argv = require('yargs').argv;
 var isProduction = (argv.production === undefined) ? false : true;
 
@@ -58,6 +60,7 @@ var vendorFiles = [
     ],
     cssDest = 'styles';
 
+var licenseString = fs.readFileSync('license.txt');
 var buildScripts = function() {
     return gulp.src(jsFiles)
         .pipe(plumber(function(error) {
@@ -72,6 +75,7 @@ var buildScripts = function() {
         .pipe(concat('scripts.min.js'))
         .pipe(gulpif(isProduction, uglify()))
         .pipe(sourcemaps.write('.'))
+        .pipe(license('/*\n'+licenseString+'\n*/\n'))
         .pipe(gulp.dest(jsDest));
 };
 
@@ -127,8 +131,6 @@ gulp.task('default', function() {
     copyIcons(),
     copyImages()
 });
-
-
 gulp.task('icons', copyIcons);
 gulp.task('images', copyImages);
 gulp.task('scripts', buildScripts);
