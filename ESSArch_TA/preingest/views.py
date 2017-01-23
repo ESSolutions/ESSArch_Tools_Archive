@@ -72,7 +72,7 @@ class ProcessStepViewSet(viewsets.ModelViewSet):
     def children(self, request, pk=None):
         step = self.get_object()
         child_steps = step.child_steps.all()
-        tasks = step.tasks.filter(hidden=False)
+        tasks = step.tasks.filter(hidden=False).select_related('responsible')
         queryset = sorted(
             itertools.chain(child_steps, tasks),
             key=lambda instance: instance.time_started or
@@ -100,7 +100,7 @@ class ProcessStepViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['get'])
     def tasks(self, request, pk=None):
         step = self.get_object()
-        tasks = step.tasks.filter(hidden=False)
+        tasks = step.tasks.filter(hidden=False).select_related('responsible')
         page = self.paginate_queryset(tasks)
         if page is not None:
             serializers = ProcessTaskSerializer(page, many=True, context={'request': request})
@@ -138,7 +138,7 @@ class ProcessTaskViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows tasks to be viewed or edited.
     """
-    queryset = ProcessTask.objects.all()
+    queryset = ProcessTask.objects.select_related('responsible').all()
     serializer_class = ProcessTaskSerializer
 
     def get_serializer_class(self):
