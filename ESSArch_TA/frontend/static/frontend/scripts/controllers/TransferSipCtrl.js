@@ -278,7 +278,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
                 ctrl.displayedIps = result.data;
                 tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
                 $scope.ipLoading = false;
-                $scope.initLoad = true;
+                $scope.initLoad = false;
             });
         }
     };
