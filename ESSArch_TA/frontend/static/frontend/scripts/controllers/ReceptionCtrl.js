@@ -23,6 +23,7 @@
 */
 
 angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore) {
+    var ipSortString = "Receiving";
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
@@ -280,7 +281,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             var number = pagination.number || ctrl.itemsPerPage;  // Number of entries showed per page.
             var pageNumber = start/number+1;
 
-            Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.selectedIp, $scope.includedIps, sorting, "Receiving").then(function (result) {
+            Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.selectedIp, $scope.includedIps, sorting, ipSortString).then(function (result) {
                 vm.displayedIps = result.data;
                 tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
                 $scope.ipLoading = false;
@@ -356,6 +357,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     }
     $scope.getListViewData = function() {
         vm.callServer($scope.tableState);
+        $rootScope.loadNavigation(ipSortString);
     };
     var listViewInterval;
     function updateListViewConditional() {
