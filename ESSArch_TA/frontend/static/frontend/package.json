@@ -4,6 +4,7 @@
     "angular-bootstrap-datetimepicker": "^1.1.3",
     "bower": "^1.8.0",
     "gulp": "^3.9.1",
+    "gulp-clean-css": "^2.3.2",
     "gulp-concat": "^2.6.1",
     "gulp-header-license": "^1.0.9",
     "gulp-if": "^2.0.2",
