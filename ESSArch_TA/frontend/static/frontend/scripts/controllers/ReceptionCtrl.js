@@ -668,7 +668,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $scope.eventlog = false;
             $scope.eventShow = false;
             $scope.statusShow = false;
-
+            $rootScope.loadNavigation(ipSortString);
         });
     }
     $scope.editUnidentifiedIp = true;
