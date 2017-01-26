@@ -82,7 +82,7 @@
     "ARCHIVALDESCRIPTION": "Arkivbeskrivning",
     "MANAGACONTENT": "Hantera innehåll",
     "QUALITYCONTROL": "Kvalitétskontroll",
-    "SUBMITDESCRIPTION": "???Submit description???",
+    "SUBMITDESCRIPTION": "Submit description",
     "ROOT": "rot",
     "ADD": "Lägg till",
     "UPDATE": "Uppdatera",
@@ -127,5 +127,8 @@
     "MYSQLVERSION": "MySQL-version",
     "CONTACT": "Kontakt",
     "LOADING": "Laddar",
-    "STEPREPORTFOR": "Step-rapport för"
+    "STEPREPORTFOR": "Step-rapport för",
+    "OLDPASSWORD": "Gammalt Lösenord",
+    "NEWPASSWORD": "Nytt Lösenord",
+    "REPEATPASSWORD": "Repetera Lösenord"
 }

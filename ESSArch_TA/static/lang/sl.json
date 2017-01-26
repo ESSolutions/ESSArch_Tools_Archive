@@ -125,5 +125,8 @@
     "MYSQLVERSION": "MySQL version",
     "CONTACT": "Contact",
     "LOADING": "Loading",
-    "STEPREPORTFOR": "Step report for"
+    "STEPREPORTFOR": "Step report for",
+    "OLDPASSWORD": "Old Password",
+    "NEWPASSWORD": "New Password",
+    "REPEATPASSWORD": "Repeat Password"
 }
