@@ -22,7 +22,12 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore) {
+angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies) {
+    var vm = this;
+    vm.itemsPerPage = $cookies.get('eta-ips-per-page') || 10;
+    $scope.updateIpsPerPage = function(items) {
+        $cookies.put('eta-ips-per-page', items);
+    };
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
@@ -250,9 +255,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
     /*******************************************/
     /*Piping and Pagination for List-view table*/
     /*******************************************/
-    var vm = this;
     var ctrl = this;
-    this.itemsPerPage = 10;
     $scope.selectedIp = {id: "", class: ""};
     this.displayedIps = [];
 
@@ -271,7 +274,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             var sorting = tableState.sort;
             var pagination = tableState.pagination;
             var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
-            var number = pagination.number || ctrl.itemsPerPage;  // Number of entries showed per page.
+            var number = pagination.number || vm.itemsPerPage;  // Number of entries showed per page.
             var pageNumber = start/number+1;
 
             Resource.getIpPage(start, number, pageNumber, tableState, $scope.selectedIp, sorting, search, ipSortString).then(function (result) {
