@@ -1,3 +1,27 @@
+"""
+    ESSArch is an open source archiving and digital preservation system
+
+    ESSArch Tools for Archive (ETA)
+    Copyright (C) 2005-2017 ES Solutions AB
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+    Contact information:
+    Web - http://www.essolutions.se
+    Email - essarch@essolutions.se
+"""
+
 import errno
 import glob
 import json
@@ -47,6 +71,7 @@ from ESSArch_Core.util import (
     get_files_and_dirs,
     get_event_spec,
     get_value_from_path,
+    parse_content_range_header,
     timestamp_to_datetime,
     remove_prefix
 )
@@ -259,6 +284,26 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         path = Path.objects.get(entity="path_ingest_reception").value
         return Response(self.parseFile(os.path.join(path, "%s.xml" % pk), srcdir=path))
+
+    @list_route(methods=['post'])
+    def upload(self, request):
+        path = Path.objects.get(entity="path_ingest_reception").value
+
+        content_range = request.META.get('HTTP_CONTENT_RANGE', 'bytes 0-0/0')
+        filename = os.path.join(path, request.data.get('filename'))
+        chunk = request.data.get('chunk')
+
+        (start, end, total) = parse_content_range_header(content_range)
+
+        if start == 0:
+            with open(filename, 'w') as dstf:
+                dstf.write(chunk)
+        else:
+            with open(filename, 'a') as dstf:
+                dstf.seek(start)
+                dstf.write(chunk)
+
+        return Response()
 
     @detail_route(methods=['post'], url_path='create-ip')
     def create_ip(self, request, pk=None):
