@@ -47,6 +47,7 @@ from ESSArch_Core.util import (
     get_files_and_dirs,
     get_event_spec,
     get_value_from_path,
+    parse_content_range_header,
     timestamp_to_datetime,
     remove_prefix
 )
@@ -259,6 +260,26 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         path = Path.objects.get(entity="path_ingest_reception").value
         return Response(self.parseFile(os.path.join(path, "%s.xml" % pk), srcdir=path))
+
+    @list_route(methods=['post'])
+    def upload(self, request):
+        path = Path.objects.get(entity="path_ingest_reception").value
+
+        content_range = request.META.get('HTTP_CONTENT_RANGE', 'bytes 0-0/0')
+        filename = os.path.join(path, request.data.get('filename'))
+        chunk = request.data.get('chunk')
+
+        (start, end, total) = parse_content_range_header(content_range)
+
+        if start == 0:
+            with open(filename, 'w') as dstf:
+                dstf.write(chunk)
+        else:
+            with open(filename, 'a') as dstf:
+                dstf.seek(start)
+                dstf.write(chunk)
+
+        return Response()
 
     @detail_route(methods=['post'], url_path='create-ip')
     def create_ip(self, request, pk=None):
