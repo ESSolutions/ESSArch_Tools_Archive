@@ -66,6 +66,8 @@ var vendorFiles = [
         'scripts/bower_components/angular-link-header-parser/release/angular-link-header-parser.js',
         'scripts/bower_components/lodash/lodash.js',
         'scripts/bower_components/uri-util/dist/uri-util.js',
+        'scripts/bower_components/marked/lib/marked.js',
+        'scripts/bower_components/angular-marked/dist/angular-marked.js',
         'node_modules/moment/min/moment-with-locales.js',
         'node_modules/angular-date-time-input/src/dateTimeInput.js',
         'node_modules/angular-bootstrap-datetimepicker/src/js/datetimepicker.js',
