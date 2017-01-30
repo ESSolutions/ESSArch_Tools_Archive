@@ -130,5 +130,8 @@
     "STEPREPORTFOR": "Step-rapport för",
     "OLDPASSWORD": "Gammalt Lösenord",
     "NEWPASSWORD": "Nytt Lösenord",
-    "REPEATPASSWORD": "Repetera Lösenord"
+    "REPEATPASSWORD": "Repetera Lösenord",
+    "SETTINGS": "Inställningar",
+    "REFRESHPAGE": "Uppdatera sida",
+    "HELP": "Hjälp"
 }

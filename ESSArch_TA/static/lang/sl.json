@@ -128,5 +128,8 @@
     "STEPREPORTFOR": "Step report for",
     "OLDPASSWORD": "Old Password",
     "NEWPASSWORD": "New Password",
-    "REPEATPASSWORD": "Repeat Password"
+    "REPEATPASSWORD": "Repeat Password",
+    "SETTINGS": "Settings",
+    "REFRESHPAGE": "Refresh page",
+    "HELP": "Help"
 }
