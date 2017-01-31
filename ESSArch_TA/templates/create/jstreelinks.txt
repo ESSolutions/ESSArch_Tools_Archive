@@ -1,4 +1,0 @@
-	<link rel="stylesheet" href="/static/jstree/dist/themes/default/style.min.css" />
-	<script type="text/javascript" src="static/jquery/jquery-1.11.3.js"></script>
-	<script type="text/javascript" src="static/jquery/jquery-migrate-1.2.1.min.js"></script>
-	<script type="text/javascript" src="/static/jstree/dist/jstree.min.js"></script>

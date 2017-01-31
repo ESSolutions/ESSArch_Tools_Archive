@@ -1,6 +1,5 @@
-recursive-include * *.js *.html *.txt *.gif *.png *.css *.wsdl *.xml *.xsd *.sh
+recursive-include * *.js *.html *.txt *.gif *.png *.css *.wsdl *.xml *.xsd *.sh *.map *.ico *.psd *.scss *.json *.swf *.woff2 *.woff *.ttf *.md
 include versioneer.py
 recursive-include ESSArch_TA/config *.conf *.crt *.key
-recursive-include ESSArch_TA/env *.xsd *.types
+include ESSArch_TA/config/celerydeta
 recursive-include ESSArch_TA/static *
-recursive-include ESSArch_TA/testdata *

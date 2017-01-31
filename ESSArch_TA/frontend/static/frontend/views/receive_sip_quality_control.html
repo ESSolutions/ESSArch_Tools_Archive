@@ -1,0 +1,20 @@
+<div class="content-wrapper">
+    <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'">
+    </div>
+    <div ng-if="validateShow">
+        <div ng-include src="'static/frontend/views/validator_choices.html'"></div>
+        <button class="btn btn-info" ng-click="validateSip(ip)">{{'VALIDATE' | translate}}</button>
+    </div>
+    <div ng-if="statusShow || eventShow"class="events-status-wrapper">
+        <div ng-include src="'static/frontend/views/event_table.html'"></div>
+        <div ng-if="statusShow" class="status-view" ng-include src="'static/frontend/views/status_tree_view.html'"></div>
+    </div>
+    <!--
+    <uib-tabset active="activeTab">
+        <uib-tab ng-repeat="t in tabsEditView" heading="{{t.label}}">
+            <div class="select-sub-edit-eventlog-wrapper">
+            </div>
+        </uib-tab>
+    </uib-tabset>
+    -->
+</div>

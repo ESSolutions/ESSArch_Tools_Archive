@@ -1,6 +1,0 @@
-# as arch user
-# create db
-# install default config parameters
-cd /ESSArch/eta
-python manage.py syncdb
-python install_default_config_eta.py

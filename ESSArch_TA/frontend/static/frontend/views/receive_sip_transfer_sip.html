@@ -1,0 +1,29 @@
+<div class="transfer-sip">
+    <div class="content-wrapper">
+        <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'">
+        </div>
+        <div ng-if="statusShow || eventShow"class="events-status-wrapper">
+            <div ng-include src="'static/frontend/views/event_table.html'"></div>
+            <div ng-if="statusShow" class="status-view" ng-include src="'static/frontend/views/status_tree_view.html'"></div>
+        </div>
+        <div class="select-view" id="select-view" ng-if="selectedIp.id != '' && selectedIp.State != 'Transferred' && selectedIp.State != 'Transferring' && select">
+            <p style="margin: 5px;">IP: {{ip.Label}}</p>
+            <form class="receive-sip-eventlog-form" ng-submit="transferSip(ip)">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-disabled="!checkPermission('ip.transfer_sip')" ng-model="approvedToTransfer">{{'APPROVEDTOTRANSFER' | translate}}</input>
+                    </label>
+                </div>
+                <button type="submit" ng-dblClick="" ng-disabled="transferDisabled || !approvedToTransfer || !checkPermission('ip.transfer_sip')" class="btn btn-info submit-button">{{'TRANSFERSIP' | translate}}</button>
+            </form>
+        </div>
+        <!--
+            <uib-tabset active="activeTab">
+            <uib-tab ng-repeat="t in tabsEditView" heading="{{t.label}}">
+            <div class="select-sub-edit-eventlog-wrapper">
+            </div>
+            </uib-tab>
+            </uib-tabset>
+        -->
+    </div>
+</div>

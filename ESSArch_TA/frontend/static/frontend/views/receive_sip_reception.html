@@ -1,0 +1,59 @@
+<div class="reception">
+    <div class="content-wrapper">
+        <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'">
+        </div>
+        <div ng-if="statusShow || eventShow" class="events-status-wrapper">
+            <div ng-include src="'static/frontend/views/event_table.html'"></div>
+            <div ng-if="statusShow" class="status-view" ng-include src="'static/frontend/views/status_tree_view.html'"></div>
+        </div>
+        <div ng-if="edit" class="edit-view">
+            <h4 style="margin-left: 10px;">Submit Description</h4>
+            <form>
+                <formly-form model="vm.sdModel" fields="vm.sdFields" options="vm.sdOptions">
+                </formly-form>
+            </form>
+
+            <div class="file-list">
+                <table st-table="fileListRowCollection" st-safe-src="fileListCollection" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th class="clickable" st-sort="filename">{{'FILENAME' | translate}}</th>
+                            <th class="clickable" st-sort="created">{{'CREATED' | translate}}</th>
+                            <th class="clickable" st-sort="size">{{'SIZE' | translate}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="row in fileListRowCollection">
+                            <td>{{row.filename}}</td>
+                            <td>{{row.created | date:"yyyy-MM-dd hh:mm:ss"}}</td>
+                            <td>{{row.size}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="select-view" ng-if="prepareUnidentifiedIp || includedIps.length">
+            <div ng-if="includedIps.length">
+                <div ng-include src="'static/frontend/views/validator_choices.html'"></div>
+                <form class="receive-sip-eventlog-form">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" ng-model="approvedToReceive">{{'APPROVEDTORECEIVE' | translate}}</input>
+                        </label>
+                    </div>
+                    <button ng-disabled="receiveDisabled || !approvedToReceive" class="btn btn-info receive-button" ng-click="receiveSip(includedIps)" ng-dblClick="">{{'RECEIVESIP' | translate}}</button>
+                </form>
+            </div>
+        </div>
+
+        <!--
+            <uib-tabset active="activeTab">
+            <uib-tab ng-repeat="t in tabsEditView" heading="{{t.label}}">
+            <div class="select-sub-edit-eventlog-wrapper">
+            <div ng-include src="t.templateUrl"></div>
+            </div>
+            </uib-tab>
+            </uib-tabset>
+        -->
+    </div>
+</div>

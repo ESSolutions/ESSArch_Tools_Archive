@@ -1,6 +1,8 @@
-'''
-    ESSArch Tools - ESSArch is an Electronic Preservation Platform
-    Copyright (C) 2005-2013  ES Solutions AB
+"""
+    ESSArch is an open source archiving and digital preservation system
+
+    ESSArch Tools for Archive (ETA)
+    Copyright (C) 2005-2017 ES Solutions AB
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -13,28 +15,26 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
 
     Contact information:
     Web - http://www.essolutions.se
     Email - essarch@essolutions.se
-'''
 """
-WSGI config for ESSArch TA.
+
 """
-import os, sys, platform
+WSGI config for etp project.
 
-# Activate virtualenv before any imports
-if platform.system() != 'Linux' :
-    activate_this = '/ESSArch/env/Scripts/activate_this.py'
-    execfile(activate_this, dict(__file__=activate_this))
-    sys.path.append('/ESSArch/eta')
-else:
-    sys.path.append('/ESSArch/pd/python/lib/python2.7/site-packages/ESSArch_TA')
-    sys.path.append('/ESSArch/config')
-    #sys.path.append('/ESSArch/eta') # append path
+It exposes the WSGI callable as a module-level variable named ``application``.
 
-os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings"
+For more information on this file, see
+https://docs.djangoproject.com/en/1.9/howto/deployment/wsgi/
+"""
+
+import os
 
 from django.core.wsgi import get_wsgi_application
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+
 application = get_wsgi_application()
