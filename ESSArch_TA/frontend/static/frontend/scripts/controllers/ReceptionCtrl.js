@@ -271,167 +271,167 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
 
     };
     vm.validatorFields = [
-    {
-        "templateOptions": {
-            "type": "text",
-            "label": $translate.instant('VALIDATEFILEFORMAT'),
-            "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+        {
+            "templateOptions": {
+                "type": "text",
+                "label": $translate.instant('VALIDATEFILEFORMAT'),
+                "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+            },
+            "defaultValue": true,
+            "type": "select",
+            "key": "validate_file_format",
         },
-        "defaultValue": true,
-        "type": "select",
-        "key": "validate_file_format",
-    },
-    {
-        "templateOptions": {
-            "type": "text",
-            "label": $translate.instant('VALIDATEXMLFILE'),
-            "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+        {
+            "templateOptions": {
+                "type": "text",
+                "label": $translate.instant('VALIDATEXMLFILE'),
+                "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+            },
+            "defaultValue": true,
+            "type": "select",
+            "key": "validate_xml_file",
         },
-        "defaultValue": true,
-        "type": "select",
-        "key": "validate_xml_file",
-    },
-    {
-        "templateOptions": {
-            "type": "text",
-            "label": $translate.instant('VALIDATELOGICALPHYSICALREPRESENTATION'),
-            "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+        {
+            "templateOptions": {
+                "type": "text",
+                "label": $translate.instant('VALIDATELOGICALPHYSICALREPRESENTATION'),
+                "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+            },
+            "defaultValue": true,
+            "type": "select",
+            "key": "validate_logical_physical_representation",
         },
-        "defaultValue": true,
-        "type": "select",
-        "key": "validate_logical_physical_representation",
-    },
-    {
-        "templateOptions": {
-            "type": "text",
-            "label": $translate.instant('VALIDATEINTEGRITY'),
-            "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
-        },
-        "defaultValue": true,
-        "type": "select",
-        "key": "validate_integrity",
-    }
+        {
+            "templateOptions": {
+                "type": "text",
+                "label": $translate.instant('VALIDATEINTEGRITY'),
+                "options": [{name: $scope.yes, value: true},{name: $scope.no, value: false}],
+            },
+            "defaultValue": true,
+            "type": "select",
+            "key": "validate_integrity",
+        }
     ];
 
     vm.sdModel = {};
     vm.sdFields = [
         {
-        "templateOptions": {
-            "type": "text",
-            "label": "Start date",
-            "disabled": true
+            "templateOptions": {
+                "type": "text",
+                "label": "Start date",
+                "disabled": true
+            },
+            "type": "input",
+            "key": "start_date",
         },
-        "type": "input",
-        "key": "start_date",
-    },
         {
-        "templateOptions": {
-            "type": "text",
-            "label": "End date",
-            "disabled": true
+            "templateOptions": {
+                "type": "text",
+                "label": "End date",
+                "disabled": true
+            },
+            "type": "input",
+            "key": "end_date",
         },
-        "type": "input",
-        "key": "end_date",
-    },
         {
-        "templateOptions": {
-            "type": "text",
-            "label": "Archivist Organization",
-            "disabled": true
+            "templateOptions": {
+                "type": "text",
+                "label": "Archivist Organization",
+                "disabled": true
+            },
+            "type": "input",
+            "key": "archivist_organization",
         },
-        "type": "input",
-        "key": "archivist_organization",
-    },
         {
-        "templateOptions": {
-            "type": "text",
-            "label": "Creator",
-            "disabled": true
+            "templateOptions": {
+                "type": "text",
+                "label": "Creator",
+                "disabled": true
+            },
+            "type": "input",
+            "key": "creator",
         },
-        "type": "input",
-        "key": "creator",
-    },
         {
-        "templateOptions": {
-            "type": "text",
-            "label": "Submitter Organization",
-            "disabled": true
+            "templateOptions": {
+                "type": "text",
+                "label": "Submitter Organization",
+                "disabled": true
+            },
+            "type": "input",
+            "key": "submitter_organization",
         },
-        "type": "input",
-        "key": "submitter_organization",
-    },
         {
-        "templateOptions": {
-            "type": "text",
-            "label": "Submitter Individual",
-            "disabled": true
+            "templateOptions": {
+                "type": "text",
+                "label": "Submitter Individual",
+                "disabled": true
+            },
+            "type": "input",
+            "key": "submitter_individual",
         },
-        "type": "input",
-        "key": "submitter_individual",
-    },
         {
-        "templateOptions": {
-            "type": "text",
-            "label": "Producer Organization",
-            "disabled": true
+            "templateOptions": {
+                "type": "text",
+                "label": "Producer Organization",
+                "disabled": true
+            },
+            "type": "input",
+            "key": "producer_organization",
         },
-        "type": "input",
-        "key": "producer_organization",
-    },
         {
-        "templateOptions": {
-            "type": "text",
-            "label": "Producer Individual",
-            "disabled": true
+            "templateOptions": {
+                "type": "text",
+                "label": "Producer Individual",
+                "disabled": true
+            },
+            "type": "input",
+            "key": "producer_individual",
         },
-        "type": "input",
-        "key": "producer_individual",
-    },
         {
-        "templateOptions": {
-            "type": "text",
-            "label": "IP owner",
-            "disabled": true
+            "templateOptions": {
+                "type": "text",
+                "label": "IP owner",
+                "disabled": true
+            },
+            "type": "input",
+            "key": "ip_owner",
         },
-        "type": "input",
-        "key": "ip_owner",
-    },
         {
-        "templateOptions": {
-            "type": "text",
-            "label": "Preservation Organization",
-            "disabled": true
+            "templateOptions": {
+                "type": "text",
+                "label": "Preservation Organization",
+                "disabled": true
+            },
+            "type": "input",
+            "key": "preservation_organization",
         },
-        "type": "input",
-        "key": "preservation_organization",
-    },
         {
-        "templateOptions": {
-            "type": "text",
-            "label": "System Name",
-            "disabled": true
+            "templateOptions": {
+                "type": "text",
+                "label": "System Name",
+                "disabled": true
+            },
+            "type": "input",
+            "key": "system_name",
         },
-        "type": "input",
-        "key": "system_name",
-    },
         {
-        "templateOptions": {
-            "type": "text",
-            "label": "System Version",
-            "disabled": true
+            "templateOptions": {
+                "type": "text",
+                "label": "System Version",
+                "disabled": true
+            },
+            "type": "input",
+            "key": "system_version",
         },
-        "type": "input",
-        "key": "system_version",
-    },
         {
-        "templateOptions": {
-            "type": "text",
-            "label": "System Type",
-            "disabled": true
-        },
-        "type": "input",
-        "key": "system_type",
-    }
+            "templateOptions": {
+                "type": "text",
+                "label": "System Type",
+                "disabled": true
+            },
+            "type": "input",
+            "key": "system_type",
+        }
     ];
     $scope.buildSdForm = function(ip) {
         vm.sdModel = {
@@ -499,142 +499,142 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
 
     vm.fieldsUnidentifiedIp = [
         //list all fields
-    {
-        "type": "input",
-        "key": "archivist",
-        "templateOptions": {
-            "type": "text",
-            "label": "Archivist Organization"
-        }
-    },
-    {
-        "type": "input",
-        "key": "creator",
-        "templateOptions": {
-            "type": "text",
-            "label": "Creator Organization"
-        }
-    },
-    {
-        "type": "input",
-        "key": "submitter_organization",
-        "templateOptions": {
-            "type": "text",
-            "label": "Submitter Organization"
-        }
-    },
-    {
-        "type": "input",
-        "key": "submitter_individual",
-        "templateOptions": {
-            "type": "text",
-            "label": "Submitter Individual"
-        }
-    },
-    {
-        "type": "input",
-        "key": "producer_organization",
-        "templateOptions": {
-            "type": "text",
-            "label": "Producer Organization"
-        }
-    },
-    {
-        "type": "input",
-        "key": "producer_individual",
-        "templateOptions": {
-            "type": "text",
-            "label": "Producer Individual"
-        }
-    },
-    {
-        "type": "input",
-        "key": "ipowner",
-        "templateOptions": {
-            "type": "text",
-            "label": "IP Owner Organization"
-        }
-    },
-    {
-        "type": "input",
-        "key": "preservation_organization",
-        "templateOptions": {
-            "type": "text",
-            "label": "Preservation Organization"
-        }
-    },
-    {
-        "type": "input",
-        "key": "systemname",
-        "templateOptions": {
-            "type": "text",
-            "label": "Archivist Software"
-        }
-    },
-    {
-        "type": "input",
-        "key": "systemversion",
-        "templateOptions": {
-            "type": "text",
-            "label": "Archivist Software Version"
-        }
-    },
-    {
-        "type": "input",
-        "key": "systemtype",
-        "templateOptions": {
-            "type": "text",
-            "label": "Archivist Software Type"
-        }
-    },
-    {
-        "type": "input",
-        "key": "SUBMISSIONAGREEMENT",
-        "templateOptions": {
-            "type": "text",
-            "label": "Submission Agreement"
-        }
-    },
-    {
-        "type": "datepicker",
-        "key": "STARTDATE",
-        "templateOptions": {
-            "type": "text",
-            "label": "Start date",
-        }
-    },
-    {
-        "type": "datepicker",
-        "key": "ENDDATE",
-        "templateOptions": {
-            "type": "text",
-            "label": "End date",
-        }
-    },
-    {
-        "type": "input",
-        "key": "LABEL",
-        "templateOptions": {
-            "type": "text",
-            "label": "Label"
-        }
-    },
-    {
-        "type": "input",
-        "key": "RECORDSTATUS",
-        "templateOptions": {
-            "type": "text",
-            "label": "Record Status"
-        }
-    },
-    {
-        "type": "input",
-        "key": "profile",
-        "templateOptions": {
-            "type": "text",
-            "label": "Profile"
-        }
-    },
+        {
+            "type": "input",
+            "key": "archivist",
+            "templateOptions": {
+                "type": "text",
+                "label": "Archivist Organization"
+            }
+        },
+        {
+            "type": "input",
+            "key": "creator",
+            "templateOptions": {
+                "type": "text",
+                "label": "Creator Organization"
+            }
+        },
+        {
+            "type": "input",
+            "key": "submitter_organization",
+            "templateOptions": {
+                "type": "text",
+                "label": "Submitter Organization"
+            }
+        },
+        {
+            "type": "input",
+            "key": "submitter_individual",
+            "templateOptions": {
+                "type": "text",
+                "label": "Submitter Individual"
+            }
+        },
+        {
+            "type": "input",
+            "key": "producer_organization",
+            "templateOptions": {
+                "type": "text",
+                "label": "Producer Organization"
+            }
+        },
+        {
+            "type": "input",
+            "key": "producer_individual",
+            "templateOptions": {
+                "type": "text",
+                "label": "Producer Individual"
+            }
+        },
+        {
+            "type": "input",
+            "key": "ipowner",
+            "templateOptions": {
+                "type": "text",
+                "label": "IP Owner Organization"
+            }
+        },
+        {
+            "type": "input",
+            "key": "preservation_organization",
+            "templateOptions": {
+                "type": "text",
+                "label": "Preservation Organization"
+            }
+        },
+        {
+            "type": "input",
+            "key": "systemname",
+            "templateOptions": {
+                "type": "text",
+                "label": "Archivist Software"
+            }
+        },
+        {
+            "type": "input",
+            "key": "systemversion",
+            "templateOptions": {
+                "type": "text",
+                "label": "Archivist Software Version"
+            }
+        },
+        {
+            "type": "input",
+            "key": "systemtype",
+            "templateOptions": {
+                "type": "text",
+                "label": "Archivist Software Type"
+            }
+        },
+        {
+            "type": "input",
+            "key": "SUBMISSIONAGREEMENT",
+            "templateOptions": {
+                "type": "text",
+                "label": "Submission Agreement"
+            }
+        },
+        {
+            "type": "datepicker",
+            "key": "STARTDATE",
+            "templateOptions": {
+                "type": "text",
+                "label": "Start date",
+            }
+        },
+        {
+            "type": "datepicker",
+            "key": "ENDDATE",
+            "templateOptions": {
+                "type": "text",
+                "label": "End date",
+            }
+        },
+        {
+            "type": "input",
+            "key": "LABEL",
+            "templateOptions": {
+                "type": "text",
+                "label": "Label"
+            }
+        },
+        {
+            "type": "input",
+            "key": "RECORDSTATUS",
+            "templateOptions": {
+                "type": "text",
+                "label": "Record Status"
+            }
+        },
+        {
+            "type": "input",
+            "key": "profile",
+            "templateOptions": {
+                "type": "text",
+                "label": "Profile"
+            }
+        },
     ];
     $scope.prepareUnidentifiedIp = false;
     $scope.showPrepareUnidentified = function(ip) {
@@ -647,7 +647,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $scope.eventShow = false;
         }
     }
-$scope.identifyIpModal = function (ip) {
+    $scope.identifyIpModal = function (ip) {
         $scope.unidentifiedIp = ip;
         var modalInstance = $uibModal.open({
             animation: true,

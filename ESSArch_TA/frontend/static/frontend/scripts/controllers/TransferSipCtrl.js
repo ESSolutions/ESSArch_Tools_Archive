@@ -36,31 +36,31 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
     $scope.statusShow = false;
     $scope.eventShow = false;
     $scope.tree_data = [];
-     var stateInterval;
-     $scope.stateClicked = function(row){
+    var stateInterval;
+    $scope.stateClicked = function(row){
         if($scope.statusShow && $scope.ip == row){
             $scope.statusShow = false;
         } else {
-             $scope.eventShow = false;
-             $scope.validateShow = false;
-             $scope.statusShow = true;
-             $scope.statusViewUpdate(row);
-         }
-         $scope.ip = row;
-         $rootScope.ip = row;
-     };
-     $scope.$watch(function(){return $scope.statusShow;}, function(newValue, oldValue) {
-         if(newValue) {
-             $interval.cancel(stateInterval);
-             stateInterval = $interval(function(){$scope.statusViewUpdate($scope.ip)}, appConfig.stateInterval);
+            $scope.eventShow = false;
+            $scope.validateShow = false;
+            $scope.statusShow = true;
+            $scope.statusViewUpdate(row);
+        }
+        $scope.ip = row;
+        $rootScope.ip = row;
+    };
+    $scope.$watch(function(){return $scope.statusShow;}, function(newValue, oldValue) {
+        if(newValue) {
+            $interval.cancel(stateInterval);
+            stateInterval = $interval(function(){$scope.statusViewUpdate($scope.ip)}, appConfig.stateInterval);
         } else {
             $interval.cancel(stateInterval);
         }
-     });
-     $rootScope.$on('$stateChangeStart', function() {
-         $interval.cancel(stateInterval);
+    });
+    $rootScope.$on('$stateChangeStart', function() {
+        $interval.cancel(stateInterval);
         $interval.cancel(listViewInterval);
-     });
+    });
 
     /*
      * EVENTS
@@ -162,11 +162,11 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
         $scope.eventShow = false;
         $scope.statusShow = false;
     };
-        $scope.getListViewData = function() {
-            vm.callServer($scope.tableState);
-            $rootScope.loadNavigation(ipSortString);
-        };
-        var listViewInterval;
+    $scope.getListViewData = function() {
+        vm.callServer($scope.tableState);
+        $rootScope.loadNavigation(ipSortString);
+    };
+    var listViewInterval;
     function updateListViewConditional() {
         $interval.cancel(listViewInterval);
         listViewInterval = $interval(function() {
