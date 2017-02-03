@@ -27,9 +27,6 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     var vm = this;
     var ipSortString = "Receiving";
     vm.itemsPerPage = $cookies.get('eta-ips-per-page') || 10;
-    $scope.updateIpsPerPage = function(items) {
-        $cookies.put('eta-ips-per-page', items);
-    };
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });

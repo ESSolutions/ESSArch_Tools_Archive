@@ -1,6 +1,9 @@
 angular.module('myApp').controller('BaseCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies) {
     vm = this;
     $scope.angular = angular;
+    $scope.updateIpsPerPage = function(items) {
+        $cookies.put('eta-ips-per-page', items);
+    };
     $translate(['LABEL', 'RESPONSIBLE', 'DATE', 'STATE', 'STATUS']).then(function(translations) {
         $scope.responsible = translations.RESPONSIBLE;
         $scope.label = translations.LABEL;

@@ -26,9 +26,6 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
     $controller('BaseCtrl', { $scope: $scope });
     var vm = this;
     vm.itemsPerPage = $cookies.get('eta-ips-per-page') || 10;
-    $scope.updateIpsPerPage = function(items) {
-        $cookies.put('eta-ips-per-page', items);
-    };
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
