@@ -105,6 +105,7 @@ body.modal-open[style] {
 }
 .step-task-pagination {
     user-select: none;
+    min-width: 60px;
 }
 .logo {
     width: 85%;
@@ -317,6 +318,14 @@ body.modal-open[style] {
 .status-tree-grid {
     padding: 5px;
     margin: 5px;
+}
+.tree-grid {
+    td {
+        span {
+            text-overflow: ellipsis;
+        }
+        max-width: 350px;
+    }
 }
 .list-view-table {
     margin: 5px;
