@@ -468,7 +468,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         infoxml = u'%s.xml' % unicode(ip_id)
         infoxml = os.path.join(uip, infoxml)
 
-        ProcessTask(
+        ProcessTask.object.create(
             name='preingest.tasks.GenerateXML',
             params={
                 'info': spec_data,
