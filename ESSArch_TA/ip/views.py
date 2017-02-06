@@ -355,7 +355,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             )
 
             if validators.get('validate_xml_file', False):
-                validation_step.tasks.add(
+                validation_step.add_tasks(
                     ProcessTask.objects.create(
                         name="preingest.tasks.ValidateXMLFile",
                         params={
@@ -371,7 +371,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             val_integrity = validators.get("validate_integrity", False)
 
             if val_format or val_integrity:
-                validation_step.tasks.add(
+                validation_step.add_tasks(
                     ProcessTask.objects.create(
                         name="preingest.tasks.ValidateFiles",
                         params={
@@ -390,7 +390,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             files = [objpath]
 
             if validators.get('validate_logical_physical_representation'):
-                validation_step.tasks.add(
+                validation_step.add_tasks(
                     ProcessTask.objects.create(
                         name="preingest.tasks.ValidateLogicalPhysicalRepresentation",
                         params={
@@ -408,7 +408,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             name="Receive",
         )
 
-        receive_step.tasks.add(
+        receive_step.add_tasks(
             ProcessTask.objects.create(
                 name="preingest.tasks.ReceiveSIP",
                 params={
@@ -433,7 +433,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         )
         receive_step.save()
 
-        step.child_steps.add(receive_step)
+        step.add_child_steps(receive_step)
         step.save()
         step.run()
 
@@ -550,7 +550,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             information_package=ip
         )
 
-        step.tasks.add(
+        step.add_tasks(
             ProcessTask.objects.create(
                 name="preingest.tasks.UpdateIPStatus",
                 params={
@@ -564,7 +564,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             )
         )
 
-        step.tasks.add(
+        step.add_tasks(
             ProcessTask.objects.create(
                 name="preingest.tasks.TransferSIP",
                 params={
@@ -577,7 +577,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             )
         )
 
-        step.tasks.add(
+        step.add_tasks(
             ProcessTask.objects.create(
                 name="preingest.tasks.GenerateXML",
                 params={
@@ -591,7 +591,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             )
         )
 
-        step.tasks.add(
+        step.add_tasks(
             ProcessTask.objects.create(
                 name="preingest.tasks.AppendEvents",
                 params={
@@ -694,7 +694,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             'FName': ip.ObjectPath,
         }
 
-        step.tasks.add(
+        step.add_tasks(
             ProcessTask.objects.create(
                 name="ESSArch_Core.tasks.InsertXML",
                 params={
@@ -710,7 +710,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             )
         )
 
-        step.tasks.add(
+        step.add_tasks(
             ProcessTask.objects.create(
                 name="preingest.tasks.UpdateIPStatus",
                 params={
@@ -740,7 +740,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             information_package=ip
         )
 
-        step.tasks.add(
+        step.add_tasks(
             ProcessTask.objects.create(
                 name="preingest.tasks.ValidateXMLFile",
                 params={
