@@ -102,7 +102,7 @@ class test_tasks(TestCase):
         ip.ObjectPath = os.path.join(self.ingest_reception, str(ip.pk) + ".tar")
         ip.save()
 
-        task = ProcessTask(
+        task = ProcessTask.objects.create(
             name="preingest.tasks.ReceiveSIP",
             params={
                 "ip": ip
@@ -129,7 +129,7 @@ class test_tasks(TestCase):
         ip.ObjectPath = os.path.join(self.ingest_reception, str(ip.pk) + ".tar")
         ip.save()
 
-        task = ProcessTask(
+        task = ProcessTask.objects.create(
             name="preingest.tasks.TransferSIP",
             params={
                 "ip": ip
