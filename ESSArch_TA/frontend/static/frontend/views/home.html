@@ -4,7 +4,7 @@
                     <h3 ui-sref="home.info">ESSArch Tools for Archive</h3>
                 </div>
                 <div class="user-admin">
-                    <div class="edit-user" ng-controller="DropdownCtrl">
+                    <div class="edit-user" ng-controller="DropdownCtrl" uib-popover="{{'USEROPTIONS' | translate}}" popover-trigger="'mouseenter'" popover-placement="right" popover-popup-delay="500" popover-append-to-body="true">
                         <div class="btn-group" uib-dropdown is-open="status.isopen">
                             <div class="user-dropdown" uib-dropdown-toggle ng-disabled="disabled">
                                 <h4>{{auth.username}}</h4>
@@ -26,9 +26,14 @@
                 <div class="menu" ng-controller="TabsCtrl">
                     <uib-tabset active="activeTab">
                         <uib-tab
-                                  ng-repeat="t in tabs"
-                                  heading="{{t.label}}"
-                                  ng-click="go(t)">
+                                ng-repeat="t in tabs"
+                                heading="{{t.label}}"
+                                ng-click="go(t)"
+                                uib-popover="{{'NAVIGATETO' | translate}}: {{t.label}}"
+                                popover-trigger="'mouseenter'"
+                                popover-placement="top-left"
+                                popover-popup-delay="500"
+                                popover-append-to-body="true">
                         </uib-tab>
                     </uib-tabset>
                 </div>
@@ -38,7 +43,7 @@
                     <span ui-sref="home.versionInfo" class="fa fa-question-circle info-popover" uib-popover="{{'HELP' | translate}}" popover-trigger="'mouseenter'" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"></span>
 
                     <div ng-controller="LanguageCtrl" style="width: 100px; margin-left: 10px;">
-                        <select class="form-control" ng-model="currentLanguage" ng-change="changeLanguage(currentLanguage)" ng-options="x | translate for x in availableLanguages" style="width: 100%;"></select>
+                        <select class="form-control" ng-model="currentLanguage" ng-change="changeLanguage(currentLanguage)" ng-options="x | translate for x in availableLanguages" style="width: 100%;" uib-popover="{{'CHOOSELANGUAGE' | translate}}" popover-trigger="'mouseenter'" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"></select>
                     </div>
                 </div>
             </div>
@@ -65,35 +70,65 @@
                                      tree-model="ArchivalInstitution"
                                      options="treeOptions"
                                      on-selection="showSelectedInstitution(node)"
-                                     selected-node="nodeInst">
-                        {{node.name}}
+                                     selected-node="nodeInst"
+                                     uib-popover="{{'FILTERBY' | translate}}: Archival institution"
+                                     popover-trigger="'mouseenter'"
+                                     popover-placement="top-left"
+                                     popover-popup-delay="500"
+                                     popover-append-to-body="true"
+                                     >
+                                     {{node.name}}
                         </treecontrol>
                         <treecontrol class="tree-light"
                                      tree-model="ArchivistOrganization"
                                      options="treeOptions"
                                      on-selection="showSelectedOrganization(node)"
-                                     selected-node="nodeOrg">
-                        {{node.name}}
+                                     selected-node="nodeOrg"
+                                     uib-popover="{{'FILTERBY' | translate}}: Archivist organization"
+                                     popover-trigger="'mouseenter'"
+                                     popover-placement="top-left"
+                                     popover-popup-delay="500"
+                                     popover-append-to-body="true"
+                                     >
+                                     {{node.name}}
                         </treecontrol>
                         <treecontrol class="tree-light"
                                      tree-model="ArchivalType"
                                      options="treeOptions"
                                      on-selection="showSelectedType(node)"
-                                     selected-node="nodeType">
-                        {{node.name}}
+                                     selected-node="nodeType"
+                                     uib-popover="{{'FILTERBY' | translate}}: Archival type"
+                                     popover-trigger="'mouseenter'"
+                                     popover-placement="top-left"
+                                     popover-popup-delay="500"
+                                     popover-append-to-body="true"
+                                     >
+                                     {{node.name}}
                         </treecontrol>
                         <treecontrol class="tree-light"
                                      tree-model="ArchivalLocation"
                                      options="treeOptions"
                                      on-selection="showSelectedLocation(node)"
-                                     selected-node="nodeLoc">
+                                     selected-node="nodeLoc"
+                                     uib-popover="{{'FILTERBY' | translate}}: Archival location"
+                                     popover-trigger="'mouseenter'"
+                                     popover-placement="top-left"
+                                     popover-popup-delay="500"
+                                     popover-append-to-body="true"
+                                     >
                         {{node.name}}
                         </treecontrol>
                         <treecontrol class="tree-light"
                                      tree-model="other"
                                      options="treeOptions"
                                      on-selection="showSelectedOther(node)"
-                                     selected-node="nodeOther">
+                                     selected-node="nodeOther"
+                                     uib-popover="{{'FILTERBY' | translate}}: Other"
+                                     popover-trigger="'mouseenter'"
+                                     popover-placement="top-left"
+                                     popover-popup-delay="500"
+                                     popover-append-to-body="true"
+                                     >
                         {{node.name}}
                         </treecontrol>
                         </p>
