@@ -36,6 +36,7 @@ angular.module('myApp').controller('VersionCtrl', function($scope, myService, $w
     }
     $scope.docs = $translate.instant('DOCS');
     $scope.sysInfo = $translate.instant('SYSTEMINFORMATION');
+    $scope.support = $translate.instant('SUPPORT');
     $scope.tabs = [
         {
             label: $scope.docs,
@@ -44,6 +45,10 @@ angular.module('myApp').controller('VersionCtrl', function($scope, myService, $w
         {
             label: $scope.sysInfo,
             templateUrl: "static/frontend/views/sysinfo.html"
+        },
+        {
+            label: $scope.support,
+            templateUrl: "static/frontend/views/support.html"
         }
     ];
 });
