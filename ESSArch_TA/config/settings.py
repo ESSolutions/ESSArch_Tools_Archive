@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'frontend',
+    'ESSArch_Core.auth',
     'ESSArch_Core.configuration',
     'ESSArch_Core.ip',
     'ESSArch_Core.profiles',
@@ -175,7 +176,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # http://django-rest-auth.readthedocs.io/en/latest/configuration.html
 
 REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'preingest.serializers.UserSerializer'
+    'USER_DETAILS_SERIALIZER': 'ESSArch_Core.auth.serializers.UserSerializer'
 }
 
 # File elements in different metadata standards
