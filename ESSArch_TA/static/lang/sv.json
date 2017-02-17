@@ -120,6 +120,7 @@
     "AGENT": "Agent",
     "SYSTEMINFORMATION": "Systeminformation",
     "TIME": "Tid",
+    "DURATION": "Duration",
     "HOSTNAME": "Värdnamn",
     "SETTINGSFLAGS": "Inställningsflaggor",
     "VERSIONINFORMATION": "Versionsinformation",

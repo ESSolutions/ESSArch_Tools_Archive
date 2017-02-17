@@ -120,6 +120,7 @@
     "AGENT": "Agent",
     "SYSTEMINFORMATION": "System Information",
     "TIME": "Time",
+    "DURATION": "Duration",
     "HOSTNAME": "Hostname",
     "SETTINGSFLAGS": "Settings Flags",
     "VERSIONINFORMATION": "Version Information",
