@@ -28,6 +28,7 @@ import os
 import shutil
 
 from ESSArch_Core.configuration.models import Path
+from ESSArch_Core.ip.models import InformationPackage
 from ESSArch_Core.WorkflowEngine.dbtask import DBTask
 from ESSArch_Core import tasks
 
@@ -37,62 +38,70 @@ class ReceiveSIP(DBTask):
 
     def run(self, ip=None):
         prepare = Path.objects.get(entity="path_ingest_work").value
+        objectpath = InformationPackage.objects.values_list('ObjectPath', flat=True).get(pk=ip)
 
-        srcdir, srcfile = os.path.split(ip.ObjectPath)
+        srcdir, srcfile = os.path.split(objectpath)
         dst = os.path.join(prepare, srcfile)
 
-        shutil.copy(ip.ObjectPath, dst)
+        shutil.copy(objectpath, dst)
 
-        src = os.path.join(srcdir, "%s.xml" % ip.pk)
-        dst = os.path.join(prepare, "%s.xml" % ip.pk)
+        src = os.path.join(srcdir, "%s.xml" % ip)
+        dst = os.path.join(prepare, "%s.xml" % ip)
         shutil.copy(src, dst)
 
         self.set_progress(100, total=100)
         return ip
 
     def undo(self, ip=None):
-        ipdir, ipfile = os.path.split(ip.ObjectPath)
+        objectpath = InformationPackage.objects.values_list('ObjectPath', flat=True).get(pk=ip)
+
+        ipdir, ipfile = os.path.split(objectpath)
         ingest_work = Path.objects.get(entity="path_ingest_work").value
 
         os.remove(os.path.join(ingest_work, ipfile))
-        os.remove(os.path.join(ingest_work, "%s.xml" % ip.pk))
+        os.remove(os.path.join(ingest_work, "%s.xml" % ip))
 
     def event_outcome_success(self, ip=None):
-        return "Received IP '%s' with label '%s'" % (ip.pk, ip.Label)
+        label = InformationPackage.objects.values_list('Label', flat=True).get(pk=ip)
+        return "Received IP '%s' with label '%s'" % (ip, label)
 
 
 class TransferSIP(DBTask):
     event_type = 20900
 
     def run(self, ip=None):
-        srcdir, srcfile = os.path.split(ip.ObjectPath)
+        objectpath = InformationPackage.objects.values_list('ObjectPath', flat=True).get(pk=ip)
+
+        srcdir, srcfile = os.path.split(objectpath)
         epp = Path.objects.get(entity="path_gate_reception").value
         dst = os.path.join(epp, srcfile)
 
-        shutil.copy(ip.ObjectPath, dst)
+        shutil.copy(objectpath, dst)
 
-        ip.ObjectPath = dst
-        ip.save(update_fields=['ObjectPath'])
+        InformationPackage.objects.filter(pk=ip).update(ObjectPath=dst)
 
         self.set_progress(50, total=100)
 
-        src = os.path.join(srcdir, "%s.xml" % ip.pk)
-        dst = os.path.join(epp, "%s.xml" % ip.pk)
+        src = os.path.join(srcdir, "%s.xml" % ip)
+        dst = os.path.join(epp, "%s.xml" % ip)
         shutil.copy(src, dst)
 
         self.set_progress(100, total=100)
 
-        return ip.ObjectPath
+        return dst
 
     def undo(self, ip=None):
-        ipdir, ipfile = os.path.split(ip.ObjectPath)
+        objectpath = InformationPackage.objects.values_list('ObjectPath', flat=True).get(pk=ip)
+
+        ipdir, ipfile = os.path.split(objectpath)
         gate_reception = Path.objects.get(entity="path_gate_reception").value
 
         os.remove(os.path.join(gate_reception, ipfile))
-        os.remove(os.path.join(gate_reception, "%s.xml" % ip.pk))
+        os.remove(os.path.join(gate_reception, "%s.xml" % ip))
 
     def event_outcome_success(self, ip=None):
-        return "Transferred IP '%s' with label '%s'" % (ip.pk, ip.Label)
+        label = InformationPackage.objects.values_list('Label', flat=True).get(pk=ip)
+        return "Transferred IP '%s' with label '%s'" % (ip, label)
 
 
 class CalculateChecksum(tasks.CalculateChecksum):

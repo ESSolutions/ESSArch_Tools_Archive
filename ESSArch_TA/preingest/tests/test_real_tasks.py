@@ -105,7 +105,7 @@ class test_tasks(TestCase):
         task = ProcessTask.objects.create(
             name="preingest.tasks.ReceiveSIP",
             params={
-                "ip": ip
+                "ip": ip.pk
             },
         )
         task.run()
@@ -132,7 +132,7 @@ class test_tasks(TestCase):
         task = ProcessTask.objects.create(
             name="preingest.tasks.TransferSIP",
             params={
-                "ip": ip
+                "ip": ip.pk
             },
         )
         task.run()
