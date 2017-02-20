@@ -355,83 +355,79 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             )
 
             if validators.get('validate_xml_file', False):
-                validation_step.add_tasks(
-                    ProcessTask.objects.create(
-                        name="preingest.tasks.ValidateXMLFile",
-                        params={
-                            "xml_filename": xmlfile
-                        },
-                        log=EventIP,
-                        information_package=ip,
-                        responsible=self.request.user,
-                    )
+                ProcessTask.objects.create(
+                    name="preingest.tasks.ValidateXMLFile",
+                    params={
+                        "xml_filename": xmlfile
+                    },
+                    log=EventIP,
+                    information_package=ip,
+                    responsible=self.request.user,
+                    processstep=validation_step
                 )
 
             val_format = validators.get("validate_file_format", False)
             val_integrity = validators.get("validate_integrity", False)
 
             if val_format or val_integrity:
-                validation_step.add_tasks(
-                    ProcessTask.objects.create(
-                        name="preingest.tasks.ValidateFiles",
-                        params={
-                            "ip": ip,
-                            "rootdir": srcdir,
-                            "xmlfile": xmlfile,
-                            "validate_fileformat": val_format,
-                            "validate_integrity": val_integrity
-                        },
-                        log=EventIP,
-                        information_package=ip,
-                        responsible=self.request.user,
-                    )
+                ProcessTask.objects.create(
+                    name="preingest.tasks.ValidateFiles",
+                    params={
+                        "ip": ip.pk,
+                        "rootdir": srcdir,
+                        "xmlfile": xmlfile,
+                        "validate_fileformat": val_format,
+                        "validate_integrity": val_integrity
+                    },
+                    log=EventIP,
+                    information_package=ip,
+                    responsible=self.request.user,
+                    processstep=validation_step
                 )
 
             files = [objpath]
 
             if validators.get('validate_logical_physical_representation'):
-                validation_step.add_tasks(
-                    ProcessTask.objects.create(
-                        name="preingest.tasks.ValidateLogicalPhysicalRepresentation",
-                        params={
-                            "files": files,
-                            "files_reldir": srcdir,
-                            "xmlfile": xmlfile,
-                        },
-                        log=EventIP,
-                        information_package=ip,
-                        responsible=self.request.user,
-                    )
+                ProcessTask.objects.create(
+                    name="preingest.tasks.ValidateLogicalPhysicalRepresentation",
+                    params={
+                        "files": files,
+                        "files_reldir": srcdir,
+                        "xmlfile": xmlfile,
+                    },
+                    log=EventIP,
+                    information_package=ip,
+                    responsible=self.request.user,
+                    processstep=validation_step
                 )
 
         receive_step = ProcessStep.objects.create(
             name="Receive",
         )
 
-        receive_step.add_tasks(
-            ProcessTask.objects.create(
-                name="preingest.tasks.ReceiveSIP",
-                params={
-                    "ip": ip,
-                },
-                information_package=ip,
-                processstep_pos=0,
-                log=EventIP,
-                responsible=self.request.user,
-            ),
-            ProcessTask.objects.create(
-                name="preingest.tasks.UpdateIPStatus",
-                params={
-                    "status": "Received",
-                    "ip": ip
-                },
-                information_package=ip,
-                processstep_pos=1,
-                log=EventIP,
-                responsible=self.request.user,
-            )
+        ProcessTask.objects.create(
+            name="preingest.tasks.ReceiveSIP",
+            params={
+                "ip": ip.pk,
+            },
+            information_package=ip,
+            processstep_pos=0,
+            log=EventIP,
+            responsible=self.request.user,
+            processstep=receive_step,
         )
-        receive_step.save()
+        ProcessTask.objects.create(
+            name="preingest.tasks.UpdateIPStatus",
+            params={
+                "status": "Received",
+                "ip": ip.pk
+            },
+            information_package=ip,
+            processstep_pos=1,
+            log=EventIP,
+            responsible=self.request.user,
+            processstep=receive_step,
+        )
 
         step.add_child_steps(receive_step)
         step.save()
@@ -554,7 +550,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             ProcessTask.objects.create(
                 name="preingest.tasks.UpdateIPStatus",
                 params={
-                    "ip": ip,
+                    "ip": ip.pk,
                     "status": "Transferring",
                 },
                 processstep_pos=10,
@@ -568,7 +564,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             ProcessTask.objects.create(
                 name="preingest.tasks.TransferSIP",
                 params={
-                    "ip": ip,
+                    "ip": ip.pk,
                 },
                 processstep_pos=15,
                 log=EventIP,
@@ -714,7 +710,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             ProcessTask.objects.create(
                 name="preingest.tasks.UpdateIPStatus",
                 params={
-                    "ip": ip,
+                    "ip": ip.pk,
                     "status": "Transferred",
                 },
                 processstep_pos=50,
@@ -753,7 +749,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             ProcessTask.objects.create(
                 name="preingest.tasks.ValidateFiles",
                 params={
-                    "ip": ip,
+                    "ip": ip.pk,
                     "mets_path": xmlfile,
                     "validate_fileformat": True,
                     "validate_integrity": True,
