@@ -13,7 +13,7 @@ CELERYD_CHDIR="/ESSArch/pd/python/lib/python2.7/site-packages/ESSArch_TA"
 #CELERYD_CHDIR="/ESSArch/alpha/ESSArch_Tools_Archive/ESSArch_TA"
 
 # Extra command-line arguments to the worker
-CELERYD_OPTS="-Q:workereta celery -c:workereta 4 -Q:workeretavalidation validation -c:workeretavalidation 4 -Q:workeretafileoperation file_operation -c:workeretafileoperation 4 --time-limit=300 --broker=amqp://guest:guest@localhost:5672/eta -Ofair --autoreload"
+CELERYD_OPTS="-Q:workereta celery -c:workereta 4 -Q:workeretavalidation validation -c:workeretavalidation 4 -Q:workeretafileoperation file_operation -c:workeretafileoperation 4 --broker=amqp://guest:guest@localhost:5672/eta -Ofair --autoreload"
 
 # %N will be replaced with the first part of the nodename.
 CELERYD_LOG_LEVEL=INFO
