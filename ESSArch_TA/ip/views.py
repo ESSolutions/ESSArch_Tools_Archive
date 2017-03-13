@@ -61,6 +61,8 @@ from ESSArch_Core.ip.permissions import (
     CanTransferSIP,
 )
 
+from ESSArch_Core.pagination import LinkHeaderPagination
+
 from ESSArch_Core.WorkflowEngine.models import (
     ProcessStep,
     ProcessTask
@@ -96,10 +98,6 @@ from ip.serializers import (
 
 from preingest.serializers import (
     ProcessStepSerializer,
-)
-
-from preingest.pagination import (
-    LinkHeaderPagination
 )
 
 from rest_framework import viewsets
