@@ -342,7 +342,8 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         step = ProcessStep.objects.create(
             name="Receive SIP",
-            information_package=ip
+            information_package=ip,
+            eager=False,
         )
 
         validators = request.data.get('validators', {})
@@ -541,7 +542,8 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
         step = ProcessStep.objects.create(
             name="Transfer SIP",
-            information_package=ip
+            information_package=ip,
+            eager=False,
         )
 
         step.add_tasks(
