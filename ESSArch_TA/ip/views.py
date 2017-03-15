@@ -228,7 +228,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                     srcdir = reception
 
                 ip = self.parseFile(xmlfile, srcdir)
-                if not InformationPackage.objects.filter(id=ip['id']).exists():
+                if not InformationPackage.objects.filter(ObjectIdentifierValue=ip['id']).exists():
                     ips.append(ip)
 
         for container_file in glob.glob(os.path.join(uip, "*.tar")) + glob.glob(os.path.join(uip, "*.zip")):
