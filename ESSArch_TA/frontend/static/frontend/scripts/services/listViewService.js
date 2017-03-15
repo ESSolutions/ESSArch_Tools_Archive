@@ -389,7 +389,7 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
         var tempElement = {
             filename: ip.ObjectPath,
             created: ip.CreateDate,
-            size: ip.ObjectSize
+            size: ip.object_size
         };
          array.push(tempElement);
          return array;

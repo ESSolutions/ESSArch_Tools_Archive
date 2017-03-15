@@ -455,7 +455,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         var tempElement = {
             filename: ip.ObjectPath,
             created: ip.CreateDate,
-            size: ip.ObjectSize
+            size: ip.object_size
         };
         array.push(tempElement);
         $scope.fileListCollection = array;

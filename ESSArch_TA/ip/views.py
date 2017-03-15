@@ -92,7 +92,6 @@ from ip.serializers import (
     ArchivalTypeSerializer,
     ArchivalLocationSerializer,
     InformationPackageSerializer,
-    InformationPackageDetailSerializer,
     EventIPSerializer,
 )
 
@@ -195,7 +194,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         if objpath:
             ip['ObjectPath'] = os.path.join(srcdir, objpath)
-            ip['ObjectSize'] = os.stat(ip['ObjectPath']).st_size
+            ip['object_size'] = os.stat(ip['ObjectPath']).st_size
 
         ip['SubmitDescription'] = {
             'start_date': self.get_altrecordid(root, TYPE='STARTDATE'),
@@ -416,13 +415,24 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             processstep=receive_step,
         )
         ProcessTask.objects.create(
+            name="ESSArch_Core.tasks.UpdateIPSizeAndCount",
+            params={
+                "ip": ip.pk,
+            },
+            information_package=ip,
+            processstep_pos=5,
+            log=EventIP,
+            responsible=self.request.user,
+            processstep=receive_step,
+        )
+        ProcessTask.objects.create(
             name="preingest.tasks.UpdateIPStatus",
             params={
                 "status": "Received",
                 "ip": ip.pk
             },
             information_package=ip,
-            processstep_pos=1,
+            processstep_pos=10,
             log=EventIP,
             responsible=self.request.user,
             processstep=receive_step,
@@ -497,12 +507,6 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     )
     search_fields = ('Label', 'Responsible__first_name', 'Responsible__last_name', 'Responsible__username', 'State', 'SubmissionAgreement__sa_name')
     filter_class = InformationPackageFilter
-
-    def get_serializer_class(self):
-        if self.action == 'list':
-            return InformationPackageSerializer
-
-        return InformationPackageDetailSerializer
 
     def get_permissions(self):
         if self.action == 'destroy':
