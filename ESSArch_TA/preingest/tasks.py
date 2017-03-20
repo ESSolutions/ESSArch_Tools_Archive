@@ -45,8 +45,12 @@ class ReceiveSIP(DBTask):
 
         shutil.copy(objectpath, dst)
 
-        src = os.path.join(srcdir, "%s.xml" % ip)
-        dst = os.path.join(prepare, "%s.xml" % ip)
+        objid = InformationPackage.objects.values_list(
+            'ObjectIdentifierValue', flat=True
+        ).get(pk=ip)
+
+        src = os.path.join(srcdir, "%s.xml" % objid)
+        dst = os.path.join(prepare, "%s.xml" % objid)
         shutil.copy(src, dst)
 
         self.set_progress(100, total=100)
@@ -58,8 +62,12 @@ class ReceiveSIP(DBTask):
         ipdir, ipfile = os.path.split(objectpath)
         ingest_work = Path.objects.get(entity="path_ingest_work").value
 
+        objid = InformationPackage.objects.values_list(
+            'ObjectIdentifierValue', flat=True
+        ).get(pk=ip)
+
         os.remove(os.path.join(ingest_work, ipfile))
-        os.remove(os.path.join(ingest_work, "%s.xml" % ip))
+        os.remove(os.path.join(ingest_work, "%s.xml" % objid))
 
     def event_outcome_success(self, ip=None):
         label = InformationPackage.objects.values_list('Label', flat=True).get(pk=ip)
@@ -82,8 +90,12 @@ class TransferSIP(DBTask):
 
         self.set_progress(50, total=100)
 
-        src = os.path.join(srcdir, "%s.xml" % ip)
-        dst = os.path.join(epp, "%s.xml" % ip)
+        objid = InformationPackage.objects.values_list(
+            'ObjectIdentifierValue', flat=True
+        ).get(pk=ip)
+
+        src = os.path.join(srcdir, "%s.xml" % objid)
+        dst = os.path.join(epp, "%s.xml" % objid)
         shutil.copy(src, dst)
 
         self.set_progress(100, total=100)
@@ -96,8 +108,12 @@ class TransferSIP(DBTask):
         ipdir, ipfile = os.path.split(objectpath)
         gate_reception = Path.objects.get(entity="path_gate_reception").value
 
+        objid = InformationPackage.objects.values_list(
+            'ObjectIdentifierValue', flat=True
+        ).get(pk=ip)
+
         os.remove(os.path.join(gate_reception, ipfile))
-        os.remove(os.path.join(gate_reception, "%s.xml" % ip))
+        os.remove(os.path.join(gate_reception, "%s.xml" % objid))
 
     def event_outcome_success(self, ip=None):
         label = InformationPackage.objects.values_list('Label', flat=True).get(pk=ip)

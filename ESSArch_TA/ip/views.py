@@ -332,7 +332,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             )
 
         ip = InformationPackage.objects.create(
-            id=pk, Label=ipdata["Label"], State="Receiving",
+            ObjectIdentifierValue=pk, Label=ipdata["Label"], State="Receiving",
             Responsible=responsible, ObjectPath=objpath,
             ArchivistOrganization=arch,
         )
