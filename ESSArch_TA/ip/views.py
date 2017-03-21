@@ -535,11 +535,11 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         dstdir = Path.objects.get(entity="path_gate_reception").value
 
         info = {
-            "_OBJID": str(pk),
+            "_OBJID": ip.ObjectIdentifierValue,
             "_OBJLABEL": ip.Label
         }
 
-        events_path = os.path.join(dstdir, "%s_ipevents.xml" % pk)
+        events_path = os.path.join(dstdir, "%s_ipevents.xml" % ip.ObjectIdentifierValue)
         filesToCreate = {
             events_path: get_event_spec()
         }
@@ -668,7 +668,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                                 {
                                     "-name": "contentLocationValue",
                                     "-namespace": "premis",
-                                    "#content": [{"text": "file:///%s.tar" % pk}],
+                                    "#content": [{"text": "file:///%s.tar" % ip.ObjectIdentifierValue}],
                                     "-children": []
                                 }
                             ]
