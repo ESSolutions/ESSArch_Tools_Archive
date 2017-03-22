@@ -688,7 +688,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
         info = {
             'FIDType': "UUID",
-            'FID': "%s" % str(ip.pk),
+            'FID': "%s" % str(ip.ObjectIdentifierValue),
             'FFormatName': 'TAR',
             'FLocationType': 'URI',
             'FName': ip.ObjectPath,
