@@ -107,7 +107,7 @@ class InformationPackageSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = InformationPackage
         fields = (
-            'url', 'id', 'Label', 'Content', 'Responsible', 'CreateDate',
+            'url', 'id', 'ObjectIdentifierValue', 'Label', 'Content', 'Responsible', 'CreateDate',
             'State', 'status', 'step_state', 'ObjectPath', 'object_size',
             'object_num_items', 'Startdate', 'Enddate', 'OAIStype',
             'SubmissionAgreement', 'ArchivalInstitution',
