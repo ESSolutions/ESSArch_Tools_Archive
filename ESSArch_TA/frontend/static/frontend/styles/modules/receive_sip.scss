@@ -1,4 +1,4 @@
-.reception, .transfer-sip {
+.reception, .transfer-sip, .user-settings {
     .content-wrapper {
         display: flex;
         display: -webkit-flex;
@@ -314,5 +314,13 @@
     }
     .transfer-sip-button {
         float: right;
+    }
+    .column-picker {
+        display: flex;
+        flex-direction: row;
+        .buttons {
+            display: flex;
+            flex-direction: column;
+        }
     }
 }
