@@ -179,9 +179,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         root = doc.getroot()
 
         try:
-            ip['id'] = root.get('OBJID').split(':')[1]
+            ip['ObjectIdentifierValue'] = root.get('OBJID').split(':')[1]
         except:
-            ip['id'] = root.get('OBJID')
+            ip['ObjectIdentifierValue'] = root.get('OBJID')
 
         ip['Label'] = root.get('LABEL')
         ip['CreateDate'] = root.find("{*}metsHdr").get('CREATEDATE')
@@ -227,7 +227,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                     srcdir = reception
 
                 ip = self.parseFile(xmlfile, srcdir)
-                if not InformationPackage.objects.filter(ObjectIdentifierValue=ip['id']).exists():
+                if not InformationPackage.objects.filter(ObjectIdentifierValue=ip['ObjectIdentifierValue']).exists():
                     ips.append(ip)
 
         for container_file in glob.glob(os.path.join(uip, "*.tar")) + glob.glob(os.path.join(uip, "*.zip")):
