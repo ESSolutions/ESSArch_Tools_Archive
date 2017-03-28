@@ -209,6 +209,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         for container_file in glob.glob(os.path.join(uip, "*.tar")) + glob.glob(os.path.join(uip, "*.zip")):
             ip = {
+                'ObjectIdentifierValue': os.path.basename(container_file),
                 'Label': os.path.basename(container_file),
                 'CreateDate': str(timestamp_to_datetime(creation_date(container_file)).isoformat()),
                 'State': 'Unidentified',
@@ -459,7 +460,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                 },
                 'folderToParse': container_file,
             },
-        ).run_eagerly()
+        ).run()
 
         return Response({'status': 'Identified IP, created %s' % infoxml})
 
