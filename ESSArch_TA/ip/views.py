@@ -424,7 +424,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
     @list_route(methods=['post'], url_path='identify-ip')
     def identify_ip(self, request):
-        fname = request.data.get('label')
+        fname = request.data.get('filename')
         spec_data = request.data.get('specification_data', {})
 
         uip = Path.objects.get(entity="path_ingest_unidentified").value

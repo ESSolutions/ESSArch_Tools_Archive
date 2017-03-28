@@ -671,7 +671,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             method: 'POST',
             url: appConfig.djangoUrl+'ip-reception/identify-ip/',
             data: {
-                label: ip.Label,
+                filename: ip.Label,
                 specification_data: vm.modelUnidentifiedIp
             }
         }).then(function(response) {
