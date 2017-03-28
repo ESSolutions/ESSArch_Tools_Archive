@@ -440,15 +440,15 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             os.path.join(settings.BASE_DIR, 'templates/SDTemplate.json')
         ).read())
 
-        ip_id = uuid.uuid4()
+        objid = os.path.splitext(fname)[0]
 
-        spec_data['_OBJID'] = unicode(ip_id)
+        spec_data['_OBJID'] = objid
         spec_data['_OBJLABEL'] = spec_data.pop('LABEL')
         spec_data['_IP_CREATEDATE'] = timestamp_to_datetime(
             creation_date(container_file)
         ).isoformat()
 
-        infoxml = u'%s.xml' % unicode(ip_id)
+        infoxml = u'%s.xml' % objid
         infoxml = os.path.join(uip, infoxml)
 
         ProcessTask.objects.create(
