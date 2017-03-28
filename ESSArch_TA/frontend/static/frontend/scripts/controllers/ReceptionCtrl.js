@@ -130,7 +130,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     $scope.selected = [];
     $scope.selectIp = function(row) {
         vm.displayedIps.forEach(function(ip) {
-            if(ip.id == $scope.selectedIp.id){
+            if(ip.ObjectIdentifierValue == $scope.selectedIp.id){
                 ip.class = "";
             }
         });
@@ -150,7 +150,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         ips.forEach(function(ip) {
             $http({
                 method: 'POST',
-                url: appConfig.djangoUrl+"ip-reception/"+ip.id+"/create-ip/",
+                url: appConfig.djangoUrl+"ip-reception/"+ip.ObjectIdentifierValue+"/create-ip/",
                 data: {
                     validators: vm.validatorModel
                 }
