@@ -124,17 +124,18 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
     vm.displayedIps=[];
     $scope.selectIp = function(row) {
         vm.displayedIps.forEach(function(ip) {
-            if(ip.id == $scope.selectedIp.id){
+            if(ip.ObjectIdentifierValue == $scope.selectedIp.ObjectIdentifierValue){
                 ip.class = "";
             }
         });
-        if(row.id == $scope.selectedIp.id && !$scope.select && !$scope.statusShow && !$scope.eventShow){
-            $scope.selectedIp = {id: "", class: ""};
+        if(row.ObjectIdentifierValue == $scope.selectedIp.ObjectIdentifierValue){
+            $scope.selectedIp = {ObjectIdentifierValue: "", class: ""};
         } else {
             row.class = "selected";
             $scope.selectedIp = row;
         }
     };
+
     $scope.ipRowClick = function(row) {
         $scope.selectIp(row);
         if($scope.ip == row){

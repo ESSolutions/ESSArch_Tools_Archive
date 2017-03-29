@@ -130,12 +130,12 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     $scope.selected = [];
     $scope.selectIp = function(row) {
         vm.displayedIps.forEach(function(ip) {
-            if(ip.ObjectIdentifierValue == $scope.selectedIp.id){
+            if(ip.ObjectIdentifierValue == $scope.selectedIp.ObjectIdentifierValue){
                 ip.class = "";
             }
         });
-        if(row.id == $scope.selectedIp.id && !$scope.select && !$scope.statusShow && !$scope.eventShow){
-            $scope.selectedIp = {id: "", class: ""};
+        if(row.ObjectIdentifierValue == $scope.selectedIp.ObjectIdentifierValue){
+            $scope.selectedIp = {ObjectIdentifierValue: "", class: ""};
         } else {
             row.class = "selected";
             $scope.selectedIp = row;
