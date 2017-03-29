@@ -247,6 +247,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             $scope.eventShow = false;
             $scope.statusShow = false;
             $rootScope.loadNavigation(ipSortString);
+            $scope.getListViewData();
         });
     }
 });

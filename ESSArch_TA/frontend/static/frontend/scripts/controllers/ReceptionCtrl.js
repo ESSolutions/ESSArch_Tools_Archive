@@ -473,6 +473,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $scope.eventShow = false;
             $scope.statusShow = false;
             $rootScope.loadNavigation(ipSortString);
+            $scope.getListViewData();
         });
     }
     $scope.editUnidentifiedIp = true;
