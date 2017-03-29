@@ -42,6 +42,7 @@ var isProduction = (argv.production === undefined) ? false : true;
 var vendorFiles = [
         'scripts/bower_components/api-check/dist/api-check.js',
         'scripts/bower_components/jquery/dist/jquery.js',
+        'scripts/bower_components/ua-parser-js/src/ua-parser.js',
         'scripts/bower_components/angular/angular.js',
         'scripts/bower_components/angular-animate/angular-animate.js',
         'scripts/bower_components/angular-messages/angular-messages.js',

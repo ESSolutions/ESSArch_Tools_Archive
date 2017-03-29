@@ -1,4 +1,4 @@
-<div ng-if="row.State != 'At reception' && row.State != 'Unidentified'"class="clickable" ng-click="stateClicked(row);selectIp(row)" uib-popover="{{'IPSTATEDESC' | translate}}: {{row.Label}}" popover-trigger="'mouseenter'" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true">
+<div ng-if="row.State != 'At reception' && row.State != 'Unidentified'"class="clickable" ng-click="stateClicked(row);selectIp(row)" uib-popover="{{'IPSTATEDESC' | translate}}: {{row.Label}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true">
     <a href="">{{row.State}}</a>
 </div>
 <div ng-if="row.State == 'At reception' || row.State == 'Unidentified'" style="min-width: 80px;">

@@ -180,6 +180,16 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
     .config(function(stConfig) {
         stConfig.sort.delay = -1;
     })
+    .config(['$uibTooltipProvider', function($uibTooltipProvider) {
+        var parser = new UAParser();
+        var result = parser.getResult();
+        var touch = result.device && (result.device.type === 'tablet' || result.device.type === 'mobile');
+        if ( touch ){
+            $uibTooltipProvider.options({trigger: 'dontTrigger'});
+        } else {
+            $uibTooltipProvider.options({trigger: 'mouseenter'});
+        }
+    }])
     .config(['$compileProvider', 'appConfig', '$logProvider', function ($compileProvider, appConfig, $logProvider) {
         $compileProvider.debugInfoEnabled(appConfig.debugInfo);
         $compileProvider.commentDirectivesEnabled(appConfig.commentDirectives);
