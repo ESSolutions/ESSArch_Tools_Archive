@@ -162,5 +162,8 @@
     "ARCHIVAL_INSTITUTION": "Arkivinstitution",
     "ARCHIVIST_ORGANIZATION": "Arkivorganisation",
     "START_DATE": "Startdatum",
-    "END_DATE": "Slutdatum"
+    "END_DATE": "Slutdatum",
+    "SAVED_MESSAGE": "Sparad!",
+    "EVENT_ADDED": "Event tillagt!",
+    "SAVE_ERROR": "Ett fel uppstod!"
 }

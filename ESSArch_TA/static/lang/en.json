@@ -162,5 +162,8 @@
     "ARCHIVAL_INSTITUTION": "Archival Institution",
     "ARCHIVIST_ORGANIZATION": "Archivist organization",
     "START_DATE": "Start date",
-    "END_DATE": "End date"
+    "END_DATE": "End date",
+    "SAVED_MESSAGE": "Saved!",
+    "EVENT_ADDED": "Event added!",
+    "SAVE_ERROR": "An error occured!"
 }
