@@ -1,6 +1,9 @@
 angular.module('myApp').controller('BaseCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies) {
     vm = this;
     $scope.angular = angular;
+    $scope.checkPermission = function(permissionName) {
+        return !angular.isUndefined(PermPermissionStore.getPermissionDefinition(permissionName));
+    };
     $scope.updateIpsPerPage = function(items) {
         $cookies.put('eta-ips-per-page', items);
     };
@@ -36,11 +39,14 @@ angular.module('myApp').controller('BaseCtrl', function($http, $scope, $rootScop
                 field: "progress",
                 displayName: $scope.status,
                 cellTemplate: "<uib-progressbar class=\"progress\" value=\"row.branch[col.field]\" type=\"success\"><b>{{row.branch[col.field]+\"%\"}}</b></uib-progressbar>"
-            },
-            {
-                cellTemplate: "<div ng-include src=\"'static/frontend/views/undo_redo.html'\"></div>"
             }
         ];
+        if($scope.checkPermission("WorkflowEngine.can_undo") || $scope.checkPermission("WorkflowEngine.can_retry")) {
+            $scope.col_defs.push(
+            {
+                cellTemplate: "<div ng-include src=\"'static/frontend/views/undo_redo.html'\"></div>"
+            });
+        }
     });
     $scope.myTreeControl = {};
     $scope.myTreeControl.scope = this;
@@ -151,9 +157,6 @@ angular.module('myApp').controller('BaseCtrl', function($http, $scope, $rootScop
         }, function(response) {
             response.status;
         });
-    };
-    $scope.checkPermission = function(permissionName) {
-        return !angular.isUndefined(PermPermissionStore.getPermissionDefinition(permissionName));
     };
     //Creates and shows modal with task information
     $scope.taskInfoModal = function () {
