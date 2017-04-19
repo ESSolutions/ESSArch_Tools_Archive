@@ -37,6 +37,7 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
                 page_size: pageSize,
                 archival_institution: filters.institution,
                 archivist_organization: filters.organization,
+                other: filters.other,
                 ordering: sortString,
                 search: searchString,
                 state: state
