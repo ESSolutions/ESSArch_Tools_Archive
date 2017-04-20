@@ -26,7 +26,7 @@ import os
 import shutil
 
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.test import TransactionTestCase, override_settings
 from django.urls import reverse
 
 from lxml import etree
@@ -38,7 +38,8 @@ from ESSArch_Core.configuration.models import Path
 from ESSArch_Core.ip.models import InformationPackage
 
 
-class IdentifyIP(TestCase):
+@override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
+class IdentifyIP(TransactionTestCase):
     def setUp(self):
         self.bd = os.path.dirname(os.path.realpath(__file__))
         self.datadir = os.path.join(self.bd, "datafiles")
