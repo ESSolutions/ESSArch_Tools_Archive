@@ -1,4 +1,3 @@
 <div>
-    <uib-progressbar class="progress" value="row.status" type="success"><b>{{row.status | number : 0}}%</b></uib-progressbar>
+    <uib-progressbar class="progress clickable" ng-click="selectIp(row);ipTableClick(row)" value="row.status" type="success"><b>{{row.status | number : 0}}%</b></uib-progressbar>
 </div>
-
