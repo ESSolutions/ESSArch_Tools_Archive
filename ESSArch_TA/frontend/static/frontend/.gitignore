@@ -1,5 +1,4 @@
-#Bower components
-scripts/bower_components/
+bower_components/
 node_modules/
 scripts/scripts.min.js
 scripts/scripts.min.js.map
