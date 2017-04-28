@@ -177,7 +177,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         var temp = true;
         $scope.includedIps.forEach(function(included) {
 
-            if(included.id == row.id) {
+            if(included.ObjectIdentifierValue == row.ObjectIdentifierValue) {
                 $scope.includedIps.splice($scope.includedIps.indexOf(row), 1);
                 temp = false;
             }
