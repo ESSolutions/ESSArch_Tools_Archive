@@ -66,7 +66,6 @@ var vendorFiles = [
         'scripts/bower_components/bootstrap/dist/js/bootstrap.js',
         'scripts/bower_components/angular-moment-picker/dist/angular-moment-picker.js',
         'scripts/bower_components/angular-link-header-parser/release/angular-link-header-parser.js',
-        'scripts/bower_components/lodash/lodash.js',
         'scripts/bower_components/uri-util/dist/uri-util.js',
         'scripts/bower_components/marked/lib/marked.js',
         'scripts/bower_components/angular-marked/dist/angular-marked.js',
