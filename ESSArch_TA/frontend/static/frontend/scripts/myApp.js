@@ -314,41 +314,33 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
             }
         };
     })
-    .run(function(djangoAuth, $rootScope, $state, $location, $cookies, PermPermissionStore, PermRoleStore, $http, myService, formlyConfig, formlyValidationMessages){
+    .run(function (djangoAuth, $rootScope, $state, $location, $cookies, PermPermissionStore, PermRoleStore, $http, myService, formlyConfig, formlyValidationMessages) {
         formlyConfig.extras.errorExistsAndShouldBeVisibleExpression = 'form.$submitted || fc.$touched || fc[0].$touched';
         formlyValidationMessages.addStringMessage('required', 'This field is required');
 
-        djangoAuth.initialize('/rest-auth', false).then(function() {
-
-            djangoAuth.profile().then(function(response) {
-                $rootScope.auth = response.data;
-                $rootScope.listViewColumns = myService.generateColumns(response.data.ip_list_columns).activeColumns;
-                myService.getPermissions(response.data.permissions);
-            }, function() {
-                $state.go('login');
-            });
+        djangoAuth.initialize('/rest-auth', false).then(function (response) {
+            $rootScope.auth = response.data;
+            $rootScope.listViewColumns = myService.generateColumns(response.data.ip_list_columns).activeColumns;
+            myService.getPermissions(response.data.permissions);
 
             $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState) {
-                if (toState.name === 'login' ){
+                if (toState.name === 'login') {
                     return;
                 }
-                if(djangoAuth.authenticated !== true){
+                if (djangoAuth.authenticated !== true) {
                     event.preventDefault();
                     $state.go('login'); // go to login
                 }
 
                 // now, redirect only not authenticated
-
-
             });
-        }, function(status) {
-            console.log("when not logged in");
-            console.log(status);
+        }).catch(function (status) {
+            $state.go('login');
         });
-        $rootScope.$on('$stateChangeStart', function(evt, to, params) {
+        $rootScope.$on('$stateChangeStart', function (evt, to, params) {
             if (to.redirectTo) {
                 evt.preventDefault();
-                $state.go(to.redirectTo, params, {location: 'replace'})
+                $state.go(to.redirectTo, params, { location: 'replace' })
             }
         });
 
