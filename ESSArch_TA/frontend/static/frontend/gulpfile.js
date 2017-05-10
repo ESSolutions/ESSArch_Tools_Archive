@@ -179,12 +179,12 @@ var configConstants = function() {
     .pipe(gulp.dest('./scripts/configs'));
 };
 gulp.task('default', function() {
-    configConstants(),
-    buildScripts(),
-    buildVendors(),
-    compileSass(),
-    copyIcons(),
+    configConstants();
+    compileSass();
+    copyIcons();
     copyImages()
+    buildScripts();
+    return buildVendors();
 });
 gulp.task('icons', copyIcons);
 gulp.task('images', copyImages);
