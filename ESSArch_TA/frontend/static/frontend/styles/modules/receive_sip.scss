@@ -1,14 +1,9 @@
 .reception, .transfer-sip, .user-settings {
     .content-wrapper {
         display: flex;
-        display: -webkit-flex;
         flex-direction: column;
-        -webkit-flex-direction: column;
         width: 100%;
-
-    }
-    .glyphicon-triangle-bottom {
-        cursor: pointer;
+        margin-top: 10px;
     }
     .column-label {
         margin: auto;
@@ -18,24 +13,12 @@
         margin-left: 5px;
     }
     .search-prepare-wrapper {
+        width: 100%;
         display: flex;
-        display: -webkit-flex;
         flex-direction: row;
-        -webkit-flex-direction: row;
     }
     .search-prepare-wrapper button {
         margin-left: 10px;
-    }
-    .list-view {
-        border-style: solid;
-        border-color: #666;
-        border-radius: 15px;
-        display: flex;
-        display: -webkit-flex;
-        flex-direction: column;
-        -webkit-flex-direction: column;
-        margin-top: 0px;
-        position: relative;
     }
     .progress {
         height: 20px;
@@ -43,29 +26,15 @@
         margin: 0;
         background-color: #aaa;
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.48);
-        -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.48);
     }
-    .progress b { position: relative; }
+    .progress b {
+        position: relative;
+    }
     .column-label {
-        cursor: pointer;
-    }
-    .clickable {
         cursor: pointer;
     }
     .edit-view .submit-button {
         margin-bottom: 5px;
-    }
-    .list-view-buttons {
-        display: flex;
-        display: -webkit-flex;
-        flex-direction: row;
-        -webkit-flex-direction: row;
-        justify-content: left;
-        -webkit-justify-content: left;
-        margin-bottom: 5px;
-    }
-    .list-view-buttons .btn {
-        margin-left: 10px;
     }
     .select-sub-edit-eventlog-wrapper {
         border-style: solid;
@@ -111,30 +80,18 @@
         padding-bottom: 8px;
         line-height: 1;
     }
-    .status-view {
-    }
-    /*.status-view treecontrol {
-    font-size: 20px;
-    }*/
     .tasks-list {
-        /* border-style: solid;
-        border-color: #ccc;
-        border-radius: 5px;*/
-    padding: 10px;
+        padding: 10px;
     }
     .sub-select-view {
         border-top-style: solid;
         border-color: #666;
-        /*text-align: center;
-        position: relative;*/
-    height: 60px;
-    font-size: 20px;
-    display: flex;
-    display: -webkit-flex;
-    flex-direction: row;
-    -webkit-flex-direction: row;
-    margin: 5px;
-    padding: 5px;
+        height: 60px;
+        font-size: 20px;
+        display: flex;
+        flex-direction: row;
+        margin: 5px;
+        padding: 5px;
     }
     .sub-select-view > select {
         margin-left: 20px;;
@@ -165,11 +122,8 @@
 
     .edit-view .formly {
         display: flex;
-        display: -webkit-flex;
         flex-direction: row;
-        -webkit-flex-direction: row;
         flex-wrap: wrap;
-        -webkit-flex-wrap: wrap;
         padding: 5px;
         width: 100%;
     }
@@ -180,29 +134,20 @@
         border-top-style: solid;
         border-color: #666;
         display: flex;
-        display: -webkit-flex;
         flex-direction: row;
-        -webkit-flex-direction: row;
         height: 70px;
         margin: 5px;
         padding: 5px;
         justify-content: space-between;
-        -webkit-justify-content: space-between;
     }
 
     .eventlog-view .form-group {
         display: flex;
-        display: -webkit-flex;
         flex-direction: column;
-        -webkit-flex-direction: column;
         width: 33%;
     }
     .eventlog-view .btn-info {
         float: right;
-    }
-    .eventlog-view .status-note{
-    }
-    .eventlog-view .checkbox {
     }
     input[type="checkbox"] {
         transform:scale(1.3, 1.3);
@@ -211,47 +156,31 @@
         height: 40px;
         margin-right: 20px;
     }
-    .eventlog-view .signature {
-    }
-    .edit-unidentified-ip {
-    }
     .edit-unidentified-ip .formly {
         display: flex;
-        display: -webkit-flex;
         flex-direction: row;
-        -webkit-flex-direction: row;
         flex-wrap: wrap;
-        -webkit-flex-wrap: wrap;
         padding: 5px;
         width: 100%;
     }
     .eventlog-form {
         display: flex;
-        display: -webkit-flex;
         flex-direction: row;
-        -webkit-flex-direction: row;
         width: 100%;
         justify-content: flex-end;
-        -webkit-justify-content: flex-end;
         margin-left: 10px;
     }
     .submit-sip-eventlog-form {
         display: flex;
-        display: -webkit-flex;
         flex-direction: row;
-        -webkit-flex-direction: row;
         width: 100%;
         justify-content: flex-end;
-        -webkit-justify-content: flex-end;
         margin-left: 10px;
     }
     .receive-sip-eventlog-form {
         display: flex;
-        display: -webkit-flex;
         flex-direction: row;
-        -webkit-flex-direction: row;
         justify-content: flex-end;
-        -webkit-justify-content: flex-end;
         margin: 5px;
     }
     .receive-sip-eventlog-form .checkbox {
@@ -259,11 +188,8 @@
     }
     .events-footer {
         display: flex;
-        display: -webkit-flex;
         flex-direction: row;
-        -webkit-flex-direction: row;
         justify-content: flex-end;
-        -webkit-justify-content: flex-end;
         height: 60px;
         margin: 5px;
         padding: 5px;
@@ -277,11 +203,8 @@
     }
     .events-form {
         display: flex;
-        display: -webkit-flex;
         flex-direction: row;
-        -webkit-flex-direction: row;
         justify-content: flex-end;
-        -webkit-justify-content: flex-end;
         width: 100%;
         margin-left: 10px;
     }
@@ -301,10 +224,7 @@
     }
     .validator-choices .formly {
         display: flex;
-        display: -webkit-flex;
         flex-direction: row;
-        -webkit-flex-direction: row;
-
     }
     .validator-choices .formly select {
         width: 170px;
@@ -314,13 +234,5 @@
     }
     .transfer-sip-button {
         float: right;
-    }
-    .column-picker {
-        display: flex;
-        flex-direction: row;
-        .buttons {
-            display: flex;
-            flex-direction: column;
-        }
     }
 }

@@ -17,9 +17,6 @@ body.modal-open[style] {
     content: '\25B2';
     position: relative;
 }
-.content-wrapper {
-    margin-top: 10px;
-}
 .st-sort-descent:before {
     content: '\25BC';
     position: relative;
@@ -250,8 +247,6 @@ body.modal-open[style] {
     body {
         min-width: 900px;
     }
-    .list-view, .select-sub-edit-eventlog-wrapper {
-    }
     .hamburger {
         margin-right: 5px;
         margin-top: 10px;
@@ -369,6 +364,29 @@ body.modal-open[style] {
         max-width: 350px;
     }
 }
+.list-view {
+    border-style: solid;
+    border-color: #666;
+    border-radius: 15px;
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+    margin-top: 0px;
+    position: relative;
+}
+.list-view-buttons {
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: row;
+    -webkit-flex-direction: row;
+    justify-content: left;
+    -webkit-justify-content: left;
+    margin-bottom: 5px;
+}
+.list-view-buttons .btn {
+    margin-left: 10px;
+}
 .list-view-table {
     margin: 5px;
 }
@@ -384,9 +402,6 @@ body.modal-open[style] {
 }
 .global-search {
     width: 400px;
-}
-.search-prepare-wrapper {
-    width: 100%;
 }
 .global-search {
     width: 400px;
@@ -461,5 +476,16 @@ body.modal-open[style] {
 #passwordForm {
     input {
         width: 50%;
+    }
+}
+.clickable {
+    cursor: pointer;
+}
+.column-picker {
+    display: flex;
+    flex-direction: row;
+    .buttons {
+        display: flex;
+        flex-direction: column;
     }
 }
