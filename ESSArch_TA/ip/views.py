@@ -38,7 +38,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from lxml import etree
 
-from rest_framework import filters, status
+from rest_framework import exceptions, filters, status
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 
@@ -79,6 +79,7 @@ from ESSArch_Core.util import (
     get_files_and_dirs,
     get_event_spec,
     get_value_from_path,
+    in_directory,
     parse_content_range_header,
     timestamp_to_datetime,
     remove_prefix
@@ -810,9 +811,16 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     def files(self, request, pk=None):
         ip = self.get_object()
         entries = []
-        path = os.path.join(ip.ObjectPath, request.query_params.get('path', ''))
+        path = request.query_params.get('path', '')
+        fullpath = os.path.join(ip.ObjectPath, path)
 
-        for entry in get_files_and_dirs(path):
+        if not in_directory(fullpath, ip.ObjectPath):
+            raise exceptions.ParseError('Illegal path %s' % path)
+
+        if not os.path.exists(fullpath):
+            raise exceptions.NotFound
+
+        for entry in get_files_and_dirs(fullpath):
             entry_type = "dir" if entry.is_dir() else "file"
             entries.append(
                 {
