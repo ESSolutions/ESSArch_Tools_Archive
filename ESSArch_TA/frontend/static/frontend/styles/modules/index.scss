@@ -77,9 +77,6 @@ body.modal-open[style] {
     padding-bottom: 0;
     font-size: 13px;
 }
-.modal::-webkit-scrollbar {
-    width: 0 !important;
-}
 .body-wrapper {
     display: flex;
     flex-direction: column;
@@ -369,27 +366,26 @@ body.modal-open[style] {
     border-color: #666;
     border-radius: 15px;
     display: flex;
-    display: -webkit-flex;
     flex-direction: column;
-    -webkit-flex-direction: column;
     margin-top: 0px;
     position: relative;
+    padding: 5px;
+    .list-view-table {
+        margin: 5px;
+        position: relative;
+        overflow-x: auto;
+    }
 }
 .list-view-buttons {
     display: flex;
-    display: -webkit-flex;
     flex-direction: row;
-    -webkit-flex-direction: row;
     justify-content: left;
-    -webkit-justify-content: left;
     margin-bottom: 5px;
+    .btn {
+        margin-left: 10px;
+    }
 }
-.list-view-buttons .btn {
-    margin-left: 10px;
-}
-.list-view-table {
-    margin: 5px;
-}
+
 .well-sm {
     padding: 0px;
 }
@@ -488,4 +484,8 @@ body.modal-open[style] {
         display: flex;
         flex-direction: column;
     }
+}
+.table-container {
+    position: relative;
+    overflow-x: auto;
 }

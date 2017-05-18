@@ -1,42 +1,36 @@
-<div class="list-view-table">
-    <table st-table="vm.displayedIps" st-pipe="vm.callServer" class="table table-striped" style="margin-bottom: 0px;">
-        <thead>
-            <tr>
-                <th colspan="{{listViewColumns.length}}">
-                    <div class="search-prepare-wrapper">
-                        <label for items-per-page></label>
-                        <select id="items-per-page" style="margin-right: 10px;" ng-change="updateIpsPerPage(vm.itemsPerPage)" class="form-control items-per-page" ng-model="vm.itemsPerPage" ng-options="x for x in [5,10,20,25,50]" uib-popover="{{'ITEMSPERPAGE' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"></select>
-                        <input ng-if="!('home.reception' | isState)" style="width: 50%;" st-search="" class="form-control global-search" placeholder="{{'GLOBALSEARCH' | translate}}" type="text" uib-popover="{{'GLOBALSEARCHDESC' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true" />
-                        <span style="position:absolute; top:12px; right:12px;" ng-click="getListViewData()" class="clickable fa fa-refresh" ng-class="{'fa-refresh-animate': ipLoading }" uib-popover="{{'REFRESHTABLEDESC' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"></span>
-                    </div>
-                </th>
-            </tr>
-            <tr>
-                <th ng-if="'home.reception' | isState" class="clickable" class="column-label"></th>
-                <th class="clickable" class="column-label" st-sort="{{col.sortString}}" st-sort-default="{{col.sortString == 'CreateDate'? 'reverse' : ''}}" ng-repeat="col in listViewColumns"><span ng-hide="col.label=='step_state'">{{col.label.toUpperCase() | translate}}</span></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-class="row.class" ng-repeat="row in vm.displayedIps" class="table-item">
-                <td ng-if="'home.reception' | isState">
-                    <div ng-if="row.State == 'At reception'"class="checkbox table-col">
-                        <label>
-                            <input ng-disabled="row.State == 'Receiving'" type="checkbox" ng-model="row.checked" ng-change="includeIp(row)" uib-popover="{{'MARKFORRECEIVE' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true">
-                            </input>
-                        </label>
-                    </div>
-                </td>
-                <td ng-repeat="col in listViewColumns">
-                    <div ng-include src="col.template"></div>
-                </td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td ng-show="!initLoad" colspan="{{listViewColumns.length}}" class="text-center">
-                    <div st-template="static/frontend/views/pagination.html" st-pagination="" st-items-by-page="vm.itemsPerPage" st-displayed-pages="7"></div>
-                </td>
-            </tr>
-        </tfoot>
-    </table>
+<div st-table="vm.displayedIps" st-pipe="vm.callServer">
+    <div class="search-prepare-wrapper">
+        <label for items-per-page></label>
+        <select id="items-per-page" style="margin-right: 10px;" ng-change="updateIpsPerPage(vm.itemsPerPage)" class="form-control items-per-page" ng-model="vm.itemsPerPage" ng-options="x for x in [5,10,20,25,50]" uib-popover="{{'ITEMSPERPAGE' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"></select>
+        <input ng-if="!('home.reception' | isState)" style="width: 50%;" st-search="" class="form-control global-search" placeholder="{{'GLOBALSEARCH' | translate}}" type="text" uib-popover="{{'GLOBALSEARCHDESC' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true" />
+        <span style="position:absolute; top:12px; right:12px;" ng-click="getListViewData()" class="clickable fa fa-refresh" ng-class="{'fa-refresh-animate': ipLoading }" uib-popover="{{'REFRESHTABLEDESC' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"></span>
+    </div>
+    <div class="list-view-table">
+        <table class="table table-striped" style="margin-bottom: 0px;">
+            <thead>
+                <tr>
+                    <th ng-if="'home.reception' | isState" class="clickable" class="column-label"></th>
+                    <th class="clickable" class="column-label" st-sort="{{col.sortString}}" st-sort-default="{{col.sortString == 'CreateDate'? 'reverse' : ''}}" ng-repeat="col in listViewColumns"><span ng-hide="col.label=='step_state'">{{col.label.toUpperCase() | translate}}</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-class="row.class" ng-repeat="row in vm.displayedIps" class="table-item">
+                    <td ng-if="'home.reception' | isState">
+                        <div ng-if="row.State == 'At reception'"class="checkbox table-col">
+                            <label>
+                                <input ng-disabled="row.State == 'Receiving'" type="checkbox" ng-model="row.checked" ng-change="includeIp(row)" uib-popover="{{'MARKFORRECEIVE' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true">
+                                </input>
+                            </label>
+                        </div>
+                    </td>
+                    <td ng-repeat="col in listViewColumns">
+                        <div ng-include src="col.template"></div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <td ng-show="!initLoad" colspan="{{listViewColumns.length}}">
+        <div class="text-center" st-template="static/frontend/views/pagination.html" st-pagination="" st-items-by-page="vm.itemsPerPage" st-displayed-pages="7"></div>
+    </td>
 </div>
