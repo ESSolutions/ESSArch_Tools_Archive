@@ -270,14 +270,15 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         chunk = request.data.get('chunk')
 
         (start, end, total) = parse_content_range_header(content_range)
+        encoded = chunk.encode('utf-8')
 
         if start == 0:
             with open(filename, 'w') as dstf:
-                dstf.write(chunk)
+                dstf.write(encoded)
         else:
             with open(filename, 'a') as dstf:
                 dstf.seek(start)
-                dstf.write(chunk)
+                dstf.write(encoded)
 
         return Response()
 
