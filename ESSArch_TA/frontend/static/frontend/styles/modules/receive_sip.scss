@@ -1,8 +1,11 @@
+@import 'colors';
+@import 'mixins';
+
 .content-wrapper {
     display: flex;
     flex-direction: column;
     width: 100%;
-    margin-top: 10px;
+    position: relative;
 }
 .column-label {
     margin: auto;
@@ -11,6 +14,11 @@
     margin-bottom: 10px;
     margin-left: 5px;
 }
+@media screen and (max-width: 1200px) {
+    .content-wrapper > div {
+        margin-left: 0;
+    }
+}
 .search-prepare-wrapper {
     display: flex;
     flex-direction: row;
@@ -18,8 +26,8 @@
     flex-wrap: nowrap;
     align-items: stretch;
     position: relative;
-    margin-bottom:5px;
     width: 100%;
+    padding: 0 0 10px 0;
     .btn-info {
         margin-left: 10px;
         padding: 2px 12px;
@@ -29,6 +37,10 @@
         top: 10px;
         right: 0px;
     }
+}
+.text-center {
+    text-align: center;
+    margin: auto;
 }
 .progress {
     height: 20px;
@@ -43,37 +55,39 @@
 .column-label {
     cursor: pointer;
 }
-.edit-view .submit-button {
-    margin-bottom: 5px;
-}
 .select-sub-edit-eventlog-wrapper {
-    border-style: solid;
-    border-color: #666;
-    border-radius: 15px;
+    @include container;
     position: relative;
 }
 .events-status-wrapper {
-    margin-top: 5px;
-    border-style: solid;
-    border-color: #666;
-    border-radius: 15px;
+    @include container;
 }
 .event-view {
     margin: 5px;
     padding: 5px;
+    .table {
+        position: relative;
+        overflow-x: auto;
+    }
+    .submit-button {
+        margin-bottom: 5px;
+    }
 }
 .items-per-page {
     width: 15%;
+    min-width: 50px;
+
 }
 .select-view {
-    border-style: solid;
-    border-color: #666;
-    border-radius: 15px;
+    margin: 5px;
     padding: 5px;
-    margin-top: 5px;
 }
 .select-view > .checkbox {
     height: 10px;
+}
+.select-view > .table>tbody>tr>td {
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 .table-col {
     margin: 0;
@@ -95,7 +109,7 @@
 }
 .sub-select-view {
     border-top-style: solid;
-    border-color: #666;
+    border-color: $border-color;
     height: 60px;
     font-size: 20px;
     display: flex;
@@ -118,31 +132,30 @@
 }
 
 .edit-view {
-    border-style: solid;
-    border-color: #666;
-    border-radius: 15px;
+    border-color: $border-color;
     padding: 5px;
-    margin-top: 5px;
+    margin: 5px;
     position: relative;
     .formly-field {
         width: 24%;
         margin-left: 5px;
     }
-}
+    .formly {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 5px;
+        width: 100%;
+    }
+    .btn-danger {
+        float: right;
+    }
 
-.edit-view .formly {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding: 5px;
-    width: 100%;
-}
-.edit-view .btn-danger {
-    float: right;
 }
 .eventlog-view {
     border-top-style: solid;
-    border-color: #666;
+    border-top-width: 1px;
+    border-color: $border-color;
     display: flex;
     flex-direction: row;
     height: 70px;
@@ -158,13 +171,13 @@
 }
 .eventlog-view .btn-info {
     float: right;
+    margin-top: 10px;
 }
 input[type="checkbox"] {
-    transform:scale(1.3, 1.3);
+    transform:scale(1.2, 1.2);
 }
 .eventlog-view .submit-button {
     height: 40px;
-    margin-right: 20px;
 }
 .edit-unidentified-ip .formly {
     display: flex;
@@ -203,13 +216,13 @@ input[type="checkbox"] {
     height: 60px;
     margin: 5px;
     padding: 5px;
-}
-.events-footer .signature {
-    width: 250px;
-    height: 35px;
-    margin-left: 5px;
-    margin-right: 5px;
-    resize: none;
+    .signature {
+        width: 250px;
+        height: 35px;
+        margin-left: 5px;
+        margin-right: 5px;
+        resize: none;
+    }
 }
 .events-form {
     display: flex;
@@ -244,4 +257,8 @@ input[type="checkbox"] {
 }
 .transfer-sip-button {
     float: right;
+}
+.version-info-page {
+    @include container(10px);
+    margin-top: 10px;
 }
