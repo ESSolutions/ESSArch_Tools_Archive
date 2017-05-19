@@ -265,20 +265,19 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
     def upload(self, request):
         path = Path.objects.get(entity="path_ingest_reception").value
 
+        f = request.FILES['file']
         content_range = request.META.get('HTTP_CONTENT_RANGE', 'bytes 0-0/0')
-        filename = os.path.join(path, request.data.get('filename'))
-        chunk = request.data.get('chunk')
+        filename = os.path.join(path, f.name)
 
         (start, end, total) = parse_content_range_header(content_range)
-        encoded = chunk.encode('utf-8')
 
         if start == 0:
-            with open(filename, 'w') as dstf:
-                dstf.write(encoded)
+            with open(filename, 'wb') as dstf:
+                dstf.write(f.read())
         else:
-            with open(filename, 'a') as dstf:
+            with open(filename, 'ab') as dstf:
                 dstf.seek(start)
-                dstf.write(encoded)
+                dstf.write(f.read())
 
         return Response()
 
