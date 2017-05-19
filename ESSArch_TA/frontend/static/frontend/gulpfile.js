@@ -85,6 +85,9 @@ var vendorFiles = [
         'styles/modules/login.scss',
         'styles/modules/my_page.scss',
         'styles/modules/receive_sip.scss',
+        'styles/modules/colors.scss',
+        'styles/modules/mixins.scss',
+        'styles/modules/tree_control.scss',
         'styles/styles.scss'
     ],
     cssDest = 'styles';
