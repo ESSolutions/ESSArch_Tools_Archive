@@ -281,6 +281,26 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         return Response()
 
+    @list_route(methods=['post'])
+    def upload_complete(self, request):
+        path = Path.objects.get(entity="path_ingest_reception").value
+
+        md5 = request.data['md5']
+        filepath = request.data['path']
+        filepath = os.path.join(path, filepath)
+
+        ProcessTask.objects.create(
+            name="ESSArch_Core.tasks.ValidateIntegrity",
+            params={
+                "filename": filepath,
+                "checksum": md5,
+                "algorithm": 'MD5'
+            },
+            responsible=self.request.user,
+        ).run().get()
+
+        return Response('Upload of %s complete' % filepath)
+
     @detail_route(methods=['post'], url_path='create-ip')
     def create_ip(self, request, pk=None):
         reception = Path.objects.get(entity="path_ingest_reception").value
