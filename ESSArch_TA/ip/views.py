@@ -265,7 +265,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
     def upload(self, request):
         path = Path.objects.get(entity="path_ingest_reception").value
 
-        f = request.FILES['file']
+        f = request.FILES['the_file']
         content_range = request.META.get('HTTP_CONTENT_RANGE', 'bytes 0-0/0')
         filename = os.path.join(path, f.name)
 
@@ -282,7 +282,8 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                 dstf.seek(start)
                 dstf.write(f.read())
 
-        return Response()
+        upload_id = request.data.get('upload_id', uuid.uuid4().hex)
+        return Response({'upload_id': upload_id})
 
     @list_route(methods=['post'])
     def upload_complete(self, request):
