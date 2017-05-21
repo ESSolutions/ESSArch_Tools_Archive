@@ -271,6 +271,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         (start, end, total) = parse_content_range_header(content_range)
 
+        if f.size != end - start + 1:
+            raise exceptions.ParseError("File size doesn't match headers")
+
         if start == 0:
             with open(filename, 'wb') as dstf:
                 dstf.write(f.read())
