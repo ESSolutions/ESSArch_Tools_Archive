@@ -97,7 +97,7 @@ class IdentifyIP(TransactionTestCase):
         doc = etree.parse(xmlfile)
         root = doc.getroot()
 
-        self.assertEqual(root.get('OBJID').split(':')[1], self.objid)
+        self.assertEqual(root.get('OBJID').split(':')[1], data['specification_data']['ObjectIdentifierValue'])
         self.assertEqual(root.get('LABEL'), data['specification_data']['LABEL'])
 
     def test_identify_ip_no_objid(self):
@@ -141,5 +141,5 @@ class IdentifyIP(TransactionTestCase):
         doc = etree.parse(xmlfile)
         root = doc.getroot()
 
-        self.assertEqual(root.get('OBJID').split(':')[1], self.objid)
+        self.assertEqual(root.get('OBJID').split(':')[1], data['specification_data']['ObjectIdentifierValue'])
         self.assertEqual(root.get('LABEL'), self.objid)

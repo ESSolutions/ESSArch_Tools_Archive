@@ -467,7 +467,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         objid = os.path.splitext(fname)[0]
 
-        spec_data['_OBJID'] = spec_data.pop('ObjectIdentifierValye', objid)
+        spec_data['_OBJID'] = spec_data.pop('ObjectIdentifierValue', objid)
         spec_data['_OBJLABEL'] = spec_data.pop('LABEL', objid)
         spec_data['_IP_CREATEDATE'] = timestamp_to_datetime(
             creation_date(container_file)
