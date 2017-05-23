@@ -165,5 +165,6 @@
     "END_DATE": "End date",
     "SAVED_MESSAGE": "Saved!",
     "EVENT_ADDED": "Event added!",
-    "SAVE_ERROR": "An error occured!"
+    "SAVE_ERROR": "An error occured!",
+    "ARGS": "Args"
 }
