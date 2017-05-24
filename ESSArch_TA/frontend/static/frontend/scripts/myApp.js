@@ -151,7 +151,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
     })
     .config(function($animateProvider) {
         // Only animate elements with the 'angular-animate' class
-        $animateProvider.classNameFilter(/angular-animate/);
+        $animateProvider.classNameFilter(/angular-animate|ui-select-/);
     })
     .config(['$httpProvider', function($httpProvider, $rootScope) {
         $httpProvider.defaults.xsrfCookieName = 'csrftoken';
