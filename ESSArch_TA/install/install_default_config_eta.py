@@ -28,7 +28,10 @@ import django
 django.setup()
 
 from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
+
 from ESSArch_Core.configuration.models import Parameter, Path, EventType, Agent
+from ESSArch_Core.ip.models import InformationPackage
 
 
 def installDefaultConfiguration():
@@ -63,6 +66,12 @@ def installDefaultUsers():
     user_sysadmin.set_password('sysadmin')
     user_sysadmin.save()
 
+    user_reta, _ = User.objects.get_or_create(
+        username='reta', email='reta@essolutions.se',
+    )
+    user_reta.set_password('reta')
+    user_reta.save()
+
     group_user, _ = Group.objects.get_or_create(name='user')
     group_admin, _ = Group.objects.get_or_create(name='admin')
     group_sysadmin, _ = Group.objects.get_or_create(name='sysadmin')
@@ -73,7 +82,12 @@ def installDefaultUsers():
 
     group_user.permissions.add(can_add_ip_event, can_change_ip_event, can_delete_ip_event)
 
+    content_type = ContentType.objects.get_for_model(InformationPackage)
+    can_receive_remote_files = Permission.objects.get(content_type=content_type, codename='can_receive_remote_files')
+    user_reta.user_permissions.add(can_receive_remote_files)
+
     group_user.user_set.add(user_user)
+    group_user.user_set.add(user_reta)
     group_admin.user_set.add(user_admin)
     group_sysadmin.user_set.add(user_sysadmin)
 
