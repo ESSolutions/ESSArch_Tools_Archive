@@ -74,11 +74,11 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
             ipCollection.forEach(function(ip) {
                 ip.checked = false;
                 checked.forEach(function(checkedIp) {
-                    if(ip.id == checkedIp.id) {
+                    if(ip.ObjectIdentifierValue === checkedIp.ObjectIdentifierValue) {
                         ip.checked = true;
                     }
                 });
-                if(selected.id == ip.id) {
+                if(selected.ObjectIdentifierValue === ip.ObjectIdentifierValue) {
                     ip.class = "selected";
                 }
             });
