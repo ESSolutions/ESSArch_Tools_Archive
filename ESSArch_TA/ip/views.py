@@ -74,6 +74,10 @@ from ESSArch_Core.WorkflowEngine.models import (
     ProcessTask
 )
 
+from ESSArch_Core.WorkflowEngine.serializers import (
+    ProcessStepSerializer,
+)
+
 from ESSArch_Core.util import (
     creation_date,
     get_files_and_dirs,
@@ -100,10 +104,6 @@ from ip.serializers import (
     ArchivalLocationSerializer,
     InformationPackageSerializer,
     EventIPSerializer,
-)
-
-from preingest.serializers import (
-    ProcessStepSerializer,
 )
 
 from rest_framework import viewsets
