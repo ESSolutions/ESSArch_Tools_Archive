@@ -49,8 +49,8 @@ from ESSArch_Core.configuration.models import (
 
 from ESSArch_Core.essxml.util import (
     get_agent,
-    get_altrecordid,
     get_objectpath,
+    parse_submit_description,
 )
 
 from ESSArch_Core.ip.models import (
@@ -151,47 +151,6 @@ class ArchivalLocationViewSet(viewsets.ModelViewSet):
     filter_class = ArchivalLocationFilter
 
 class InformationPackageReceptionViewSet(viewsets.ViewSet):
-    def parseFile(self, path, srcdir=""):
-        ip = {}
-        doc = etree.parse(path)
-        root = doc.getroot()
-
-        try:
-            ip['ObjectIdentifierValue'] = root.get('OBJID').split(':')[1]
-        except:
-            ip['ObjectIdentifierValue'] = root.get('OBJID')
-
-        ip['Label'] = root.get('LABEL')
-        ip['CreateDate'] = root.find("{*}metsHdr").get('CREATEDATE')
-        ip['State'] = "At reception"
-        ip['status'] = 100.0
-        ip['step_state'] = celery_states.SUCCESS
-        ip['ArchivistOrganization'] = get_agent(root, ROLE='ARCHIVIST', TYPE='ORGANIZATION')
-
-        objpath = get_objectpath(root)
-
-        if objpath:
-            ip['ObjectPath'] = os.path.join(srcdir, objpath)
-            ip['object_size'] = os.stat(ip['ObjectPath']).st_size
-
-        ip['SubmitDescription'] = {
-            'start_date': get_altrecordid(root, TYPE='STARTDATE'),
-            'end_date': get_altrecordid(root, TYPE='ENDDATE'),
-            'archivist_organization': ip['ArchivistOrganization']['name'],
-            'creator_organization': get_agent(root, ROLE='CREATOR', TYPE='ORGANIZATION')['name'],
-            'submitter_organization': get_agent(root, ROLE='OTHER', OTHERROLE='SUBMITTER', TYPE='ORGANIZATION')['name'],
-            'submitter_individual': get_agent(root, ROLE='OTHER', OTHERROLE='SUBMITTER', TYPE='INDIVIDUAL')['name'],
-            'producer_organization': get_agent(root, ROLE='OTHER', OTHERROLE='PRODUCER', TYPE='ORGANIZATION')['name'],
-            'producer_individual': get_agent(root, ROLE='OTHER', OTHERROLE='PRODUCER', TYPE='INDIVIDUAL')['name'],
-            'ipowner_organization': get_agent(root, ROLE='IPOWNER', TYPE='ORGANIZATION')['name'],
-            'preservation_organization': get_agent(root, ROLE='PRESERVATION', TYPE='ORGANIZATION')['name'],
-            'system_name': get_agent(root, ROLE='ARCHIVIST', TYPE='OTHER', OTHERTYPE='SOFTWARE')['name'],
-            'system_version': get_agent(root, ROLE='ARCHIVIST', TYPE='OTHER', OTHERTYPE='SOFTWARE')['notes'][0],
-            'system_type': get_agent(root, ROLE='ARCHIVIST', TYPE='OTHER', OTHERTYPE='SOFTWARE')['notes'][1],
-        }
-
-        return ip
-
     def list(self, request):
         reception = Path.objects.get(entity="path_ingest_reception").value
         uip = Path.objects.get(entity="path_ingest_unidentified").value
@@ -204,16 +163,19 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                 else:
                     srcdir = reception
 
-                ip = self.parseFile(xmlfile, srcdir)
-                if not InformationPackage.objects.filter(ObjectIdentifierValue=ip['ObjectIdentifierValue']).exists():
+                ip = parse_submit_description(xmlfile, srcdir)
+                ip['state'] = 'At reception'
+                ip['status'] = 100
+                ip['step_state'] = celery_states.SUCCESS
+                if not InformationPackage.objects.filter(object_identifier_value=ip['object_identifier_value']).exists():
                     ips.append(ip)
 
         for container_file in glob.glob(os.path.join(uip, "*.tar")) + glob.glob(os.path.join(uip, "*.zip")):
             ip = {
-                'ObjectIdentifierValue': os.path.basename(container_file),
-                'Label': os.path.basename(container_file),
-                'CreateDate': str(timestamp_to_datetime(creation_date(container_file)).isoformat()),
-                'State': 'Unidentified',
+                'object_identifier_value': os.path.basename(container_file),
+                'label': os.path.basename(container_file),
+                'create_date': str(timestamp_to_datetime(creation_date(container_file)).isoformat()),
+                'state': 'Unidentified',
                 'status': 0,
                 'step_state': celery_states.SUCCESS,
             }
@@ -226,14 +188,14 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                     root = doc.getroot()
 
                     el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
-                    if ip['Label'] == get_value_from_path(el, "@href").split('file:///')[1]:
+                    if ip['label'] == get_value_from_path(el, "@href").split('file:///')[1]:
                         include = False
                         break
 
             if include:
                 ips.append(ip)
 
-        from_db = InformationPackage.objects.filter(State='Receiving').prefetch_related(
+        from_db = InformationPackage.objects.filter(state='Receiving').prefetch_related(
             Prefetch('profileip_set', to_attr='profiles'),
         )
         serializer = InformationPackageSerializer(
@@ -259,7 +221,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, pk=None):
         path = Path.objects.get(entity="path_ingest_reception").value
-        return Response(self.parseFile(os.path.join(path, "%s.xml" % pk), srcdir=path))
+        return Response(parse_submit_description(os.path.join(path, "%s.xml" % pk), srcdir=path))
 
     @list_route(methods=['post'])
     def upload(self, request):
@@ -311,8 +273,11 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         return Response('Upload of %s complete' % filepath)
 
-    @detail_route(methods=['post'], url_path='create-ip')
-    def create_ip(self, request, pk=None):
+    @detail_route(methods=['post'], url_path='receive')
+    def receive(self, request, pk=None):
+        if InformationPackage.objects.filter(object_identifier_value=pk).exists():
+            raise exceptions.ParseError('IP with id "%s" already exist')
+
         reception = Path.objects.get(entity="path_ingest_reception").value
         uip = Path.objects.get(entity="path_ingest_unidentified").value
         xmlfile = os.path.join(reception, "%s.xml" % pk)
@@ -323,34 +288,10 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         doc = etree.parse(xmlfile)
         root = doc.getroot()
-
         objpath = os.path.join(srcdir, get_objectpath(root))
-
-        ipdata = self.parseFile(xmlfile, srcdir)
-
-        responsible = self.request.user
-        archivist_organization = get_agent(root, ROLE='ARCHIVIST', TYPE='ORGANIZATION')['name']
-
-        try:
-            (arch, _) = ArchivistOrganization.objects.get_or_create(
-                name=archivist_organization
-            )
-        except IntegrityError:
-            arch = ArchivistOrganization.objects.get(
-                name=archivist_organization
-            )
-
-        ip = InformationPackage.objects.create(
-            ObjectIdentifierValue=pk, Label=ipdata["Label"], State="Receiving",
-            Responsible=responsible, ObjectPath=objpath,
-            ArchivistOrganization=arch,
-        )
-        ip.CreateDate = ipdata["CreateDate"]
-        ip.save()
 
         step = ProcessStep.objects.create(
             name="Receive SIP",
-            information_package=ip,
             eager=False,
         )
 
@@ -368,7 +309,6 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                         "xml_filename": xmlfile
                     },
                     log=EventIP,
-                    information_package=ip,
                     responsible=self.request.user,
                     processstep=validation_step
                 )
@@ -380,14 +320,12 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                 ProcessTask.objects.create(
                     name="preingest.tasks.ValidateFiles",
                     params={
-                        "ip": ip.pk,
                         "rootdir": srcdir,
                         "xmlfile": xmlfile,
                         "validate_fileformat": val_format,
                         "validate_integrity": val_integrity
                     },
                     log=EventIP,
-                    information_package=ip,
                     responsible=self.request.user,
                     processstep=validation_step
                 )
@@ -403,7 +341,6 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                         "xmlfile": xmlfile,
                     },
                     log=EventIP,
-                    information_package=ip,
                     responsible=self.request.user,
                     processstep=validation_step
                 )
@@ -412,12 +349,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             name="Receive",
         )
 
-        ProcessTask.objects.create(
+        t = ProcessTask.objects.create(
             name="preingest.tasks.ReceiveSIP",
-            params={
-                "ip": ip.pk,
-            },
-            information_package=ip,
+            args=[xmlfile, objpath],
             processstep_pos=0,
             log=EventIP,
             responsible=self.request.user,
@@ -425,10 +359,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         )
         ProcessTask.objects.create(
             name="ESSArch_Core.tasks.UpdateIPSizeAndCount",
-            params={
-                "ip": ip.pk,
+            result_params={
+                "ip": t.pk,
             },
-            information_package=ip,
             processstep_pos=5,
             log=EventIP,
             responsible=self.request.user,
@@ -438,9 +371,10 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             name="preingest.tasks.UpdateIPStatus",
             params={
                 "status": "Received",
-                "ip": ip.pk
             },
-            information_package=ip,
+            result_params={
+                "ip": t.pk,
+            },
             processstep_pos=10,
             log=EventIP,
             responsible=self.request.user,
@@ -502,22 +436,22 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     """
     queryset = InformationPackage.objects.all().prefetch_related(
         Prefetch('profileip_set', to_attr='profiles'), 'profiles__profile',
-        'ArchivalInstitution', 'ArchivistOrganization', 'ArchivalType', 'ArchivalLocation',
-        'Responsible__user_permissions', 'Responsible__groups__permissions', 'steps',
-    ).select_related('SubmissionAgreement')
+        'archival_institution', 'archivist_organization', 'archival_type', 'archival_location',
+        'responsible__user_permissions', 'responsible__groups__permissions', 'steps',
+    ).select_related('submission_agreement')
     serializer_class = InformationPackageSerializer
     filter_backends = (
         filters.OrderingFilter, DjangoFilterBackend, filters.SearchFilter,
     )
     ordering_fields = (
-        'Label', 'Responsible', 'CreateDate', 'State', 'eventDateTime',
+        'label', 'responsible', 'create_date', 'state', 'eventDateTime',
         'eventType', 'eventOutcomeDetailNote', 'eventOutcome',
         'linkingAgentIdentifierValue', 'id'
     )
     search_fields = (
-        'ObjectIdentifierValue', 'Label', 'Responsible__first_name',
-        'Responsible__last_name', 'Responsible__username', 'State',
-        'SubmissionAgreement__name', 'Startdate', 'Enddate',
+        'object_identifier_value', 'label', 'responsible__first_name',
+        'responsible__last_name', 'responsible__username', 'state',
+        'submission_agreement__name', 'start_date', 'end_date',
     )
     filter_class = InformationPackageFilter
 
@@ -534,10 +468,10 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
         if other is not None:
             queryset = queryset.filter(
-                ArchivalInstitution=None,
-                ArchivistOrganization=None,
-                ArchivalType=None,
-                ArchivalLocation=None
+                archival_institution=None,
+                archivist_organization=None,
+                archival_type=None,
+                archival_location=None
             )
 
         return queryset
@@ -548,11 +482,11 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         dstdir = Path.objects.get(entity="path_gate_reception").value
 
         info = {
-            "_OBJID": ip.ObjectIdentifierValue,
-            "_OBJLABEL": ip.Label
+            "_OBJID": ip.object_identifier_value,
+            "_OBJLABEL": ip.label
         }
 
-        events_path = os.path.join(dstdir, "%s_ipevents.xml" % ip.ObjectIdentifierValue)
+        events_path = os.path.join(dstdir, "%s_ipevents.xml" % ip.object_identifier_value)
         filesToCreate = {
             events_path: get_event_spec()
         }
@@ -681,7 +615,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                                 {
                                     "-name": "contentLocationValue",
                                     "-namespace": "premis",
-                                    "#content": [{"text": "file:///%s.tar" % ip.ObjectIdentifierValue}],
+                                    "#content": [{"text": "file:///%s.tar" % ip.object_identifier_value}],
                                     "-children": []
                                 }
                             ]
@@ -701,10 +635,10 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
         info = {
             'FIDType': "UUID",
-            'FID': "%s" % str(ip.ObjectIdentifierValue),
+            'FID': "%s" % str(ip.object_identifier_value),
             'FFormatName': 'TAR',
             'FLocationType': 'URI',
-            'FName': ip.ObjectPath,
+            'FName': ip.object_path,
         }
 
         step.add_tasks(
@@ -846,9 +780,9 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         ip = self.get_object()
         entries = []
         path = request.query_params.get('path', '')
-        fullpath = os.path.join(ip.ObjectPath, path)
+        fullpath = os.path.join(ip.object_path, path)
 
-        if not in_directory(fullpath, ip.ObjectPath):
+        if not in_directory(fullpath, ip.object_path):
             raise exceptions.ParseError('Illegal path %s' % path)
 
         if not os.path.exists(fullpath):

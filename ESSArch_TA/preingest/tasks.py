@@ -28,57 +28,109 @@ import os
 import shutil
 
 from ESSArch_Core.configuration.models import Path
-from ESSArch_Core.ip.models import InformationPackage
+from ESSArch_Core.essxml.util import parse_submit_description
+from ESSArch_Core.ip.models import (
+    ArchivalInstitution,
+    ArchivistOrganization,
+    ArchivalLocation,
+    ArchivalType,
+    InformationPackage,
+)
 from ESSArch_Core.WorkflowEngine.dbtask import DBTask
+from ESSArch_Core.WorkflowEngine.models import ProcessTask, ProcessStep
 from ESSArch_Core import tasks
 
 
 class ReceiveSIP(DBTask):
     event_type = 20100
 
-    def run(self, ip=None):
-        prepare = Path.objects.get(entity="path_ingest_work").value
-        objectpath = InformationPackage.objects.values_list('ObjectPath', flat=True).get(pk=ip)
+    def run(self, xml, container):
+        objid, container_type = os.path.splitext(os.path.basename(container))
+        parsed = parse_submit_description(xml, srcdir=os.path.split(container)[0])
 
-        srcdir, srcfile = os.path.split(objectpath)
+        ip = InformationPackage.objects.create(
+            object_identifier_value=objid, label=parsed.get("label"), state="Receiving",
+            responsible_id=self.responsible, object_path=parsed['object_path'],
+            create_date=parsed['create_date'],
+        )
+
+        archival_institution = parsed.get('archival_institution')
+        archivist_organization = parsed.get('archivist_organization')
+        archival_type = parsed.get('archival_type')
+        archival_location = parsed.get('archival_location')
+
+        if archival_institution:
+            arch, _ = ArchivalInstitution.objects.get_or_create(
+                name=archival_institution
+            )
+            ip.archival_institution = arch
+
+        if archivist_organization:
+            arch, _ = ArchivistOrganization.objects.get_or_create(
+                name=archivist_organization
+            )
+            ip.archivist_organization = arch
+
+        if archival_type:
+            arch, _ = ArchivalType.objects.get_or_create(
+                name=archival_type
+            )
+            ip.archival_type = arch
+
+        if archival_location:
+            arch, _ = ArchivalLocation.objects.get_or_create(
+                name=archival_location
+            )
+            ip.archival_location = arch
+
+        ip.save(update_fields=[
+            'archival_institution', 'archivist_organization', 'archival_type',
+            'archival_location',
+        ])
+
+        ProcessTask.objects.filter(pk=self.request.id).update(
+            information_package=ip
+        )
+
+        ProcessStep.objects.filter(pk=self.step).update(
+            information_package=ip
+        )
+
+        prepare = Path.objects.get(entity="path_ingest_work").value
+
+        srcdir, srcfile = os.path.split(ip.object_path)
         dst = os.path.join(prepare, srcfile)
 
-        shutil.copy(objectpath, dst)
-
-        objid = InformationPackage.objects.values_list(
-            'ObjectIdentifierValue', flat=True
-        ).get(pk=ip)
+        shutil.copy(ip.object_path, dst)
 
         src = os.path.join(srcdir, "%s.xml" % objid)
         dst = os.path.join(prepare, "%s.xml" % objid)
         shutil.copy(src, dst)
 
-        self.set_progress(100, total=100)
-        return ip
+        return ip.pk
 
-    def undo(self, ip=None):
-        objectpath = InformationPackage.objects.values_list('ObjectPath', flat=True).get(pk=ip)
+    def undo(self, xmlfile, container):
+        objid, container_type = os.path.splitext(os.path.basename(container))
+        ip = InformationPackage.objects.get(object_identifier_value=objid)
 
-        ipdir, ipfile = os.path.split(objectpath)
+        ipdir, ipfile = os.path.split(ip.object_path)
         ingest_work = Path.objects.get(entity="path_ingest_work").value
-
-        objid = InformationPackage.objects.values_list(
-            'ObjectIdentifierValue', flat=True
-        ).get(pk=ip)
 
         os.remove(os.path.join(ingest_work, ipfile))
         os.remove(os.path.join(ingest_work, "%s.xml" % objid))
 
-    def event_outcome_success(self, ip=None):
-        label = InformationPackage.objects.values_list('Label', flat=True).get(pk=ip)
-        return "Received IP '%s' with label '%s'" % (ip, label)
+        ip.delete()
+
+    def event_outcome_success(self, xml, container):
+        ip_id = os.path.splitext(os.path.basename(xml))[0]
+        return "Received IP '%s'" % ip_id
 
 
 class TransferSIP(DBTask):
     event_type = 20900
 
     def run(self, ip=None):
-        objectpath = InformationPackage.objects.values_list('ObjectPath', flat=True).get(pk=ip)
+        objectpath = InformationPackage.objects.values_list('object_path', flat=True).get(pk=ip)
 
         srcdir, srcfile = os.path.split(objectpath)
         epp = Path.objects.get(entity="path_gate_reception").value
@@ -86,12 +138,12 @@ class TransferSIP(DBTask):
 
         shutil.copy(objectpath, dst)
 
-        InformationPackage.objects.filter(pk=ip).update(ObjectPath=dst)
+        InformationPackage.objects.filter(pk=ip).update(object_path=dst)
 
         self.set_progress(50, total=100)
 
         objid = InformationPackage.objects.values_list(
-            'ObjectIdentifierValue', flat=True
+            'object_identifier_value', flat=True
         ).get(pk=ip)
 
         src = os.path.join(srcdir, "%s.xml" % objid)
@@ -103,20 +155,20 @@ class TransferSIP(DBTask):
         return dst
 
     def undo(self, ip=None):
-        objectpath = InformationPackage.objects.values_list('ObjectPath', flat=True).get(pk=ip)
+        objectpath = InformationPackage.objects.values_list('object_path', flat=True).get(pk=ip)
 
         ipdir, ipfile = os.path.split(objectpath)
         gate_reception = Path.objects.get(entity="path_gate_reception").value
 
         objid = InformationPackage.objects.values_list(
-            'ObjectIdentifierValue', flat=True
+            'object_identifier_value', flat=True
         ).get(pk=ip)
 
         os.remove(os.path.join(gate_reception, ipfile))
         os.remove(os.path.join(gate_reception, "%s.xml" % objid))
 
     def event_outcome_success(self, ip=None):
-        label = InformationPackage.objects.values_list('Label', flat=True).get(pk=ip)
+        label = InformationPackage.objects.values_list('label', flat=True).get(pk=ip)
         return "Transferred IP '%s' with label '%s'" % (ip, label)
 
 

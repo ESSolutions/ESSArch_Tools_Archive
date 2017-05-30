@@ -130,12 +130,12 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     $scope.selected = [];
     $scope.selectIp = function(row) {
         vm.displayedIps.forEach(function(ip) {
-            if(ip.ObjectIdentifierValue == $scope.selectedIp.ObjectIdentifierValue){
+            if(ip.object_identifier_value == $scope.selectedIp.object_identifier_value){
                 ip.class = "";
             }
         });
-        if(row.ObjectIdentifierValue == $scope.selectedIp.ObjectIdentifierValue){
-            $scope.selectedIp = {ObjectIdentifierValue: "", class: ""};
+        if(row.object_identifier_value == $scope.selectedIp.object_identifier_value){
+            $scope.selectedIp = {object_identifier_value: "", class: ""};
         } else {
             row.class = "selected";
             $scope.selectedIp = row;
@@ -150,7 +150,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         ips.forEach(function(ip) {
             $http({
                 method: 'POST',
-                url: appConfig.djangoUrl+"ip-reception/"+ip.ObjectIdentifierValue+"/create-ip/",
+                url: appConfig.djangoUrl+"ip-reception/"+ip.object_identifier_value+"/receive/",
                 data: {
                     validators: vm.validatorModel
                 }
@@ -177,7 +177,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         var temp = true;
         $scope.includedIps.forEach(function(included) {
 
-            if(included.ObjectIdentifierValue == row.ObjectIdentifierValue) {
+            if(included.object_identifier_value == row.object_identifier_value) {
                 $scope.includedIps.splice($scope.includedIps.indexOf(row), 1);
                 temp = false;
             }
@@ -239,7 +239,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         } else {
             vm.sdModel = {};
             $scope.ip = row;
-            if($scope.ip.State == "At reception") {
+            if($scope.ip.state == "At reception") {
                 $scope.buildSdForm($scope.ip);
                 $scope.getFileList($scope.ip);
                 $scope.edit = true;
@@ -449,8 +449,8 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     $scope.getFileList = function(ip) {
         var array = [];
         var tempElement = {
-            filename: ip.ObjectPath,
-            created: ip.CreateDate,
+            filename: ip.object_path,
+            created: ip.create_date,
             size: ip.object_size
         };
         array.push(tempElement);
@@ -668,7 +668,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             method: 'POST',
             url: appConfig.djangoUrl+'ip-reception/identify-ip/',
             data: {
-                filename: ip.Label,
+                filename: ip.label,
                 specification_data: vm.modelUnidentifiedIp
             }
         }).then(function(response) {

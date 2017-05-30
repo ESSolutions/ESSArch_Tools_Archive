@@ -24,12 +24,15 @@
 
 import os
 import shutil
+import tempfile
 
 from django.contrib.auth.models import User
-from django.test import TransactionTestCase, override_settings
+from django.test import TestCase, TransactionTestCase, override_settings
 from django.urls import reverse
 
 from lxml import etree
+
+import mock
 
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -143,3 +146,44 @@ class IdentifyIP(TransactionTestCase):
 
         self.assertEqual(root.get('OBJID').split(':')[1], data['specification_data']['ObjectIdentifierValue'])
         self.assertEqual(root.get('LABEL'), self.objid)
+
+
+class InformationPackageReceptionViewSetTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username="admin", password='admin')
+
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+        self.url = reverse('ip-reception-list')
+
+        self.reception = tempfile.mkdtemp()
+        self.unidentified = tempfile.mkdtemp()
+
+        Path.objects.create(entity='path_ingest_reception', value=self.reception)
+        Path.objects.create(entity='path_ingest_unidentified', value=self.unidentified)
+
+        tar_filepath = os.path.join(self.reception, '1.tar')
+        xml_filepath = os.path.join(self.reception, '1.xml')
+
+        open(tar_filepath, 'a').close()
+        with open(xml_filepath, 'w') as xml:
+            xml.write('''<?xml version="1.0" encoding="UTF-8" ?>
+            <root OBJID="1">
+                <metsHdr/>
+                <file><FLocat href="file:///1.tar"/></file>
+            </root>
+            ''')
+
+    @mock.patch('ip.views.ProcessStep.run', side_effect=lambda *args, **kwargs: None)
+    def test_receive(self, mock_receive):
+        res = self.client.post(self.url + '1/receive/')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        mock_receive.assert_called_once()
+
+    @mock.patch('ip.views.ProcessStep.run', side_effect=lambda *args, **kwargs: None)
+    def test_receive_existing(self, mock_receive):
+        InformationPackage.objects.create(object_identifier_value='1')
+        res = self.client.post(self.url + '1/receive/')
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        mock_receive.assert_not_called()

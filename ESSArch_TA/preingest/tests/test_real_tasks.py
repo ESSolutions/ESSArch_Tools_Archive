@@ -28,6 +28,9 @@ import shutil
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.utils import timezone
+
+import mock
 
 from install.install_default_config_eta import installDefaultEventTypes
 
@@ -91,32 +94,34 @@ class test_tasks(TestCase):
         settings.CELERY_ALWAYS_EAGER = True
         settings.CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
 
-    def test_receive_sip(self):
-        ip = InformationPackage.objects.create()
-
-        srctar = os.path.join(self.ingest_reception, "%s.tar" % ip.pk)
-        srcxml = os.path.join(self.ingest_reception, "%s.xml" % ip.pk)
+    @mock.patch('preingest.tasks.parse_submit_description')
+    def test_receive_sip(self, mock_parse):
+        srctar = os.path.join(self.ingest_reception, "foo.tar")
+        srcxml = os.path.join(self.ingest_reception, "foo.xml")
         open(srctar, "a").close()
         open(srcxml, "a").close()
 
-        ip.ObjectPath = os.path.join(self.ingest_reception, str(ip.pk) + ".tar")
-        ip.save()
+        mock_parse.configure_mock(**{'return_value': {
+            'label': '1', 'object_path': srctar,
+            'create_date': timezone.now()
+        }})
 
         task = ProcessTask.objects.create(
             name="preingest.tasks.ReceiveSIP",
-            params={
-                "ip": ip.pk
-            },
+            args=[srcxml, srctar],
         )
-        task.run()
+        ip = InformationPackage.objects.get(pk=task.run().get())
 
-        self.assertTrue(os.path.isfile(os.path.join(self.ingest_work, str(ip.pk) + ".tar")))
-        self.assertTrue(os.path.isfile(os.path.join(self.ingest_work, str(ip.pk) + ".xml")))
+        self.assertTrue(os.path.isfile(os.path.join(self.ingest_work, ip.object_identifier_value + ".tar")))
+        self.assertTrue(os.path.isfile(os.path.join(self.ingest_work, ip.object_identifier_value + ".xml")))
 
         task.undo()
 
-        self.assertFalse(os.path.isfile(os.path.join(self.ingest_work, str(ip.pk) + ".tar")))
-        self.assertFalse(os.path.isfile(os.path.join(self.ingest_work, str(ip.pk) + ".xml")))
+        self.assertFalse(os.path.isfile(os.path.join(self.ingest_work, ip.object_identifier_value + ".tar")))
+        self.assertFalse(os.path.isfile(os.path.join(self.ingest_work, ip.object_identifier_value + ".xml")))
+
+        with self.assertRaises(InformationPackage.DoesNotExist):
+            ip.refresh_from_db()
 
     def test_transfer_sip(self):
         ip = InformationPackage.objects.create()
@@ -126,7 +131,7 @@ class test_tasks(TestCase):
         open(srctar, "a").close()
         open(srcxml, "a").close()
 
-        ip.ObjectPath = os.path.join(self.ingest_reception, str(ip.pk) + ".tar")
+        ip.object_path = os.path.join(self.ingest_reception, str(ip.pk) + ".tar")
         ip.save()
 
         task = ProcessTask.objects.create(

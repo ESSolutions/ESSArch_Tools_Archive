@@ -10,15 +10,15 @@
             <thead>
                 <tr>
                     <th ng-if="'home.reception' | isState" class="clickable" class="column-label"></th>
-                    <th class="clickable" class="column-label" st-sort="{{col.sortString}}" st-sort-default="{{col.sortString == 'CreateDate'? 'reverse' : ''}}" ng-repeat="col in listViewColumns"><span ng-hide="col.label=='step_state'">{{col.label.toUpperCase() | translate}}</span></th>
+                    <th class="clickable" class="column-label" st-sort="{{col.sortString}}" st-sort-default="{{col.sortString == 'create_date'? 'reverse' : ''}}" ng-repeat="col in listViewColumns"><span ng-hide="col.label=='step_state'">{{col.label.toUpperCase() | translate}}</span></th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-class="row.class" ng-repeat="row in vm.displayedIps" class="table-item">
                     <td ng-if="'home.reception' | isState">
-                        <div ng-if="row.State == 'At reception'"class="checkbox table-col">
+                        <div ng-if="row.state == 'At reception'"class="checkbox table-col">
                             <label>
-                                <input ng-disabled="row.State == 'Receiving'" type="checkbox" ng-model="row.checked" ng-change="includeIp(row)" uib-popover="{{'MARKFORRECEIVE' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true">
+                                <input ng-disabled="row.state == 'Receiving'" type="checkbox" ng-model="row.checked" ng-change="includeIp(row)" uib-popover="{{'MARKFORRECEIVE' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true">
                                 </input>
                             </label>
                         </div>

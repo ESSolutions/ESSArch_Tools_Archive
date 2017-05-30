@@ -64,7 +64,7 @@ angular.module('myApp').controller('CatalogueCtrl', function($http, $scope, $roo
 
     $scope.ipTableClick = function(row) {
         $scope.ip = row;
-        listViewService.getSa(row.SubmissionAgreement).then(function(sa) {
+        listViewService.getSa(row.submission_agreement).then(function(sa) {
             $scope.currentSa = sa;
         });
     }

@@ -189,9 +189,9 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
             saProfile.profileObjects = sas;
             sas.forEach(function (sa) {
                 saProfile.profiles.push(sa);
-                if (ip.SubmissionAgreement == sa.url){
+                if (ip.submission_agreement == sa.url){
                     saProfile.profile = sa;
-                    saProfile.locked = ip.SubmissionAgreementLocked;
+                    saProfile.locked = ip.submission_agreement_locked;
                 }
             });
             return saProfile;
@@ -388,8 +388,8 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
     function getFileList(ip) {
         var array = [];
         var tempElement = {
-            filename: ip.ObjectPath,
-            created: ip.CreateDate,
+            filename: ip.object_path,
+            created: ip.create_date,
             size: ip.object_size
         };
          array.push(tempElement);
