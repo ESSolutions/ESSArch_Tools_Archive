@@ -41,7 +41,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
-from rest_framework import routers
+from rest_framework_extensions.routers import ExtendedDefaultRouter
 
 from ESSArch_Core.configuration.views import (
     AgentViewSet,
@@ -58,6 +58,7 @@ from ESSArch_Core.auth.views import (
 )
 
 from ESSArch_Core.WorkflowEngine.views import (
+    ProcessViewSet,
     ProcessStepViewSet,
     ProcessTaskViewSet,
 )
@@ -82,7 +83,7 @@ from profiles.views import (
 admin.site.site_header = 'ESSArch Tools Archive Administration'
 admin.site.site_title = 'ESSArch Tools Archive Administration'
 
-router = routers.DefaultRouter()
+router = ExtendedDefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 router.register(r'permissions', PermissionViewSet)
@@ -93,6 +94,18 @@ router.register(r'archival-locations', ArchivalLocationViewSet)
 router.register(r'information-packages', InformationPackageViewSet)
 router.register(r'ip-reception', InformationPackageReceptionViewSet, base_name="ip-reception")
 router.register(r'steps', ProcessStepViewSet)
+router.register(r'steps', ProcessStepViewSet, base_name='steps').register(
+    r'tasks',
+    ProcessTaskViewSet,
+    base_name='steps-tasks',
+    parents_query_lookups=['processstep']
+)
+router.register(r'steps', ProcessStepViewSet, base_name='steps').register(
+    r'children',
+    ProcessViewSet,
+    base_name='steps-children',
+    parents_query_lookups=['processstep']
+)
 router.register(r'tasks', ProcessTaskViewSet)
 router.register(r'events', EventIPViewSet)
 router.register(r'event-types', EventTypeViewSet)
