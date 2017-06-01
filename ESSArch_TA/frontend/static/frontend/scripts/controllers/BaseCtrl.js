@@ -1,4 +1,4 @@
-angular.module('myApp').controller('BaseCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies) {
+angular.module('myApp').controller('BaseCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $q) {
     vm = this;
     $scope.angular = angular;
     $scope.checkPermission = function(permissionName) {
@@ -79,10 +79,14 @@ angular.module('myApp').controller('BaseCtrl', function($http, $scope, $rootScop
     $scope.myTreeControl.scope.updatePageNumber = function(branch, page) {
         if(page > branch.page_number && branch.next){
             branch.page_number = parseInt(branch.next.page);
-            listViewService.getChildrenForStep(branch, branch.page_number);
+            listViewService.getChildrenForStep(branch, branch.page_number).then(function(result) {
+                branch = result;
+            })
         } else if(page < branch.page_number && branch.prev && page > 0) {
             branch.page_number = parseInt(branch.prev.page);
-            listViewService.getChildrenForStep(branch, branch.page_number);
+            listViewService.getChildrenForStep(branch, branch.page_number).then(function(result) {
+                branch = result;
+            })
         }
     };
 
@@ -99,6 +103,7 @@ angular.module('myApp').controller('BaseCtrl', function($http, $scope, $rootScop
         });
         return ret;
     }
+
     //Update status view data
     $scope.statusViewUpdate = function(row){
         $scope.statusLoading = true;
@@ -107,18 +112,70 @@ angular.module('myApp').controller('BaseCtrl', function($http, $scope, $rootScop
             expandedNodes = checkExpanded($scope.tree_data);
         }
         listViewService.getTreeData(row, expandedNodes).then(function(value) {
-            $scope.tree_data = value;
+            $q.all(value).then(function(values) {
+                if($scope.tree_data.length) {
+                    $scope.tree_data = updateStepProperties($scope.tree_data, values);
+                } else {
+                    $scope.tree_data = value;
+                }
+            })
             $scope.statusLoading = false;
         }, function(response){
-             if(response.status == 404) {
-                 $scope.statusShow = false;
-                 $timeout(function(){
-                     $scope.getListViewData();
-                     updateListViewConditional();
-                 }, 1000);
-             }
-         });
+            if(response.status == 404) {
+                $scope.statusShow = false;
+                $timeout(function(){
+                    $scope.getListViewData();
+                    updateListViewConditional();
+                }, 1000);
+            }
+        });
     };
+
+    // Calculates difference in two sets of steps and tasks recursively
+    // and updates the old set with the differances.
+    function updateStepProperties(A, B) {
+        if (A.length > B.length) {
+            A.splice(0, B.length);
+        }
+        for (i = 0; i < B.length; i++) {
+            if (A[i]) {
+                for (var prop in B[i]) {
+                    if (B[i].hasOwnProperty(prop) && prop != "children") {
+                        A[i][prop] = compareAndReplace(A[i], B[i], prop);
+                    }
+                }
+                if (B[i].flow_type != "task") {
+                    waitForChildren(A[i], B[i]).then(function (result) {
+                        result.step.children = result.children;
+                    })
+                }
+            } else {
+                A.push(B[i]);
+            }
+        }
+        return A;
+    }
+
+    // Waits for promises in b.children to resolve before returning
+    // the result from updateStepProperties called with children of a and b
+    function waitForChildren(a, b) {
+        return $q.all(b.children).then(function (bchildren) {
+            return { step: a, children: updateStepProperties(a.children, bchildren) };
+        })
+    }
+
+    // If property in a and b does not have the same value, update a with the value of b
+    function compareAndReplace(a, b, prop) {
+        if (a.hasOwnProperty(prop) && b.hasOwnProperty(prop)) {
+            if (a[prop] !== b[prop]) {
+                a[prop] = b[prop];
+            }
+            return a[prop];
+        } else {
+            return b[prop]
+        }
+    }
+
     $scope.currentStepTask = {id: ""}
     //Click on +/- on step
     $scope.stepClick = function(step) {
