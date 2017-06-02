@@ -57,22 +57,26 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
                 $scope.tree_data = [];
             if ($scope.ip == row) {
                 $scope.statusShow = false;
+                $scope.ip = null;
+                $rootScope.ip = null;
             } else {
                 $scope.statusShow = true;
                 $scope.edit = false;
                 $scope.statusViewUpdate(row);
+                $scope.ip = row;
+                $rootScope.ip = row;
             }
         } else {
             $scope.statusShow = true;
             $scope.edit = false;
             $scope.statusViewUpdate(row);
+            $scope.ip = row;
+            $rootScope.ip = row;
         }
         $scope.subSelect = false;
         $scope.eventlog = false;
         $scope.select = false;
         $scope.eventShow = false;
-        $scope.ip = row;
-        $rootScope.ip = row;
     };
 
     /*
@@ -82,6 +86,8 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         if($scope.eventShow && $scope.ip == row){
             $scope.eventShow = false;
             $rootScope.stCtrl = null;
+            $scope.ip = null;
+            $rootScope.ip = null;
         } else {
             if($rootScope.stCtrl) {
                 $rootScope.stCtrl.pipe();
@@ -90,12 +96,12 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $scope.eventShow = true;
             $scope.validateShow = false;
             $scope.statusShow = false;
+            $scope.ip = row;
+            $rootScope.ip = row;
         }
         $scope.edit = false;
         $scope.select = false;
         $scope.statusShow = false;
-        $scope.ip = row;
-        $rootScope.ip = row;
     };
     function getEventlogData() {
         listViewService.getEventlogData().then(function(value){
@@ -107,7 +113,6 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     /*Piping and Pagination for List-view table*/
     /*******************************************/
     var ctrl = this;
-    $scope.selectedIp = {id: "", class: ""};
     this.displayedIps = [];
 
     //Get data according to ip table settings and populates ip table
@@ -125,7 +130,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             var number = pagination.number || vm.itemsPerPage;  // Number of entries showed per page.
             var pageNumber = start/number+1;
 
-            Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.selectedIp, $scope.includedIps, sorting, ipSortString).then(function (result) {
+            Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.includedIps, sorting, ipSortString).then(function (result) {
                 vm.displayedIps = result.data;
                 tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
                 $scope.ipLoading = false;
@@ -136,19 +141,6 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     //Make ip selected and add class to visualize
     vm.displayedIps=[];
     $scope.selected = [];
-    $scope.selectIp = function(row) {
-        vm.displayedIps.forEach(function(ip) {
-            if(ip.object_identifier_value == $scope.selectedIp.object_identifier_value){
-                ip.class = "";
-            }
-        });
-        if(row.object_identifier_value == $scope.selectedIp.object_identifier_value){
-            $scope.selectedIp = {object_identifier_value: "", class: ""};
-        } else {
-            row.class = "selected";
-            $scope.selectedIp = row;
-        }
-    };
     $scope.receiveDisabled = false;
     $scope.receiveSip = function(ips) {
         $scope.receiveDisabled = true;
@@ -244,18 +236,20 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         $scope.eventShow = false;
         if($scope.edit && $scope.ip == row) {
             $scope.edit = false;
+            $scope.ip = null;
+            $rootScope.ip = null;
         } else {
             vm.sdModel = {};
-            $scope.ip = row;
-            if($scope.ip.state == "At reception") {
-                $scope.buildSdForm($scope.ip);
-                $scope.getFileList($scope.ip);
+            if(row.state == "At reception") {
+                $scope.ip = row;
+                $rootScope.ip = row;
+                $scope.buildSdForm(row);
+                $scope.getFileList(row);
                 $scope.edit = true;
             } else {
                 $scope.edit = false;
-                $scope.ip.class = "";
-                $scope.selectedIp = {id: "", class: ""};
-
+                $scope.ip = null;
+                $rootScope.ip = null;
             }
         }
     }
@@ -439,19 +433,19 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     ];
     $scope.buildSdForm = function(ip) {
         vm.sdModel = {
-            "start_date": ip.SubmitDescription.start_date,
-            "end_date": ip.SubmitDescription.end_date,
-            "archivist_organization": ip.SubmitDescription.archivist_organization,
-            "creator": ip.SubmitDescription.creator_organization,
-            "submitter_organization": ip.SubmitDescription.submitter_organization,
-            "submitter_individual": ip.SubmitDescription.submitter_individual,
-            "producer_organization": ip.SubmitDescription.producer_organization,
-            "producer_individual": ip.SubmitDescription.producer_individual,
-            "ip_owner": ip.SubmitDescription.ipowner_organization,
-            "preservation_organization": ip.SubmitDescription.preservation_organization,
-            "system_name": ip.SubmitDescription.system_name,
-            "system_version": ip.SubmitDescription.system_version,
-            "system_type": ip.SubmitDescription.system_type
+            "start_date": ip.start_date,
+            "end_date": ip.end_date,
+            "archivist_organization": ip.archivist_organization,
+            "creator": ip.creator_organization,
+            "submitter_organization": ip.submitter_organization,
+            "submitter_individual": ip.submitter_individual,
+            "producer_organization": ip.producer_organization,
+            "producer_individual": ip.producer_individual,
+            "ip_owner": ip.ipowner_organization,
+            "preservation_organization": ip.preservation_organization,
+            "system_name": ip.system_name,
+            "system_version": ip.system_version,
+            "system_type": ip.system_type
         };
     };
     $scope.getFileList = function(ip) {

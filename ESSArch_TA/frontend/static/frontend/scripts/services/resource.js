@@ -46,25 +46,20 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
         });
 	}
     //Get data for IP table
-    function getIpPage(start, number, pageNumber, params, selected, sort, search, state) {
+    function getIpPage(start, number, pageNumber, params, sort, search, state) {
         var sortString = sort.predicate;
         if(sort.reverse) {
             sortString = "-"+sortString;
         }
         return listViewService.getListViewData(pageNumber, number, $rootScope.navigationFilter, sortString, search, state).then(function(value) {
             var ipCollection = value.data;
-            ipCollection.forEach(function(ip) {
-                if(selected.id == ip.id) {
-                    ip.class = "selected";
-                }
-            });
             return {
                 data: ipCollection,
                 numberOfPages: Math.ceil(value.count / number)
             };
         });
 	}
-    function getReceptionIps(start, number, pageNumber, params, selected, checked, sort, search, state) {
+    function getReceptionIps(start, number, pageNumber, params, checked, sort, search, state) {
         var sortString = sort.predicate;
         if(sort.reverse) {
             sortString = "-"+sortString;
@@ -78,9 +73,6 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
                         ip.checked = true;
                     }
                 });
-                if(selected.object_identifier_value === ip.object_identifier_value) {
-                    ip.class = "selected";
-                }
             });
             return {
                 data: ipCollection,
