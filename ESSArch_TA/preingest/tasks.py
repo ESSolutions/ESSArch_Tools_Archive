@@ -51,7 +51,7 @@ class ReceiveSIP(DBTask):
         ip = InformationPackage.objects.create(
             object_identifier_value=objid, label=parsed.get("label"), state="Receiving",
             responsible_id=self.responsible, object_path=parsed['object_path'],
-            create_date=parsed['create_date'],
+            object_size=parsed['object_size'], create_date=parsed['create_date'],
         )
 
         archival_institution = parsed.get('archival_institution')

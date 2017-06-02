@@ -103,6 +103,7 @@ class test_tasks(TestCase):
 
         mock_parse.configure_mock(**{'return_value': {
             'label': '1', 'object_path': srctar,
+            'object_size': os.stat(srctar).st_size,
             'create_date': timezone.now()
         }})
 
@@ -111,6 +112,9 @@ class test_tasks(TestCase):
             args=[srcxml, srctar],
         )
         ip = InformationPackage.objects.get(pk=task.run().get())
+
+        self.assertEqual(ip.object_path, srctar)
+        self.assertEqual(ip.object_size, os.stat(srctar).st_size)
 
         self.assertTrue(os.path.isfile(os.path.join(self.ingest_work, ip.object_identifier_value + ".tar")))
         self.assertTrue(os.path.isfile(os.path.join(self.ingest_work, ip.object_identifier_value + ".xml")))
