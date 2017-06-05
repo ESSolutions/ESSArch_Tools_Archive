@@ -44,15 +44,10 @@ from ESSArch_Core import tasks
 class ReceiveSIP(DBTask):
     event_type = 20100
 
-    def run(self, xml, container):
+    def run(self, ip, xml, container):
+        ip = InformationPackage.objects.get(pk=ip)
         objid, container_type = os.path.splitext(os.path.basename(container))
         parsed = parse_submit_description(xml, srcdir=os.path.split(container)[0])
-
-        ip = InformationPackage.objects.create(
-            object_identifier_value=objid, label=parsed.get("label"), state="Receiving",
-            responsible_id=self.responsible, object_path=parsed['object_path'],
-            object_size=parsed['object_size'], create_date=parsed['create_date'],
-        )
 
         archival_institution = parsed.get('archival_institution')
         archivist_organization = parsed.get('archivist_organization')
@@ -88,14 +83,6 @@ class ReceiveSIP(DBTask):
             'archival_location',
         ])
 
-        ProcessTask.objects.filter(pk=self.request.id).update(
-            information_package=ip
-        )
-
-        ProcessStep.objects.filter(pk=self.step).update(
-            information_package=ip
-        )
-
         prepare = Path.objects.get(entity="path_ingest_work").value
 
         srcdir, srcfile = os.path.split(ip.object_path)
@@ -107,9 +94,7 @@ class ReceiveSIP(DBTask):
         dst = os.path.join(prepare, "%s.xml" % objid)
         shutil.copy(src, dst)
 
-        return ip.pk
-
-    def undo(self, xmlfile, container):
+    def undo(self, ip, xml, container):
         objid, container_type = os.path.splitext(os.path.basename(container))
         ip = InformationPackage.objects.get(object_identifier_value=objid)
 
@@ -119,11 +104,10 @@ class ReceiveSIP(DBTask):
         os.remove(os.path.join(ingest_work, ipfile))
         os.remove(os.path.join(ingest_work, "%s.xml" % objid))
 
-        ip.delete()
+        InformationPackage.objects.filter(pk=ip).delete()
 
-    def event_outcome_success(self, xml, container):
-        ip_id = os.path.splitext(os.path.basename(xml))[0]
-        return "Received IP '%s'" % ip_id
+    def event_outcome_success(self, ip, xml, container):
+        return "Received IP '%s'" % str(ip)
 
 
 class TransferSIP(DBTask):

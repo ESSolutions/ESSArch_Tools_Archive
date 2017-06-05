@@ -290,8 +290,18 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         root = doc.getroot()
         objpath = os.path.join(srcdir, get_objectpath(root))
 
+        objid, container_type = os.path.splitext(os.path.basename(objpath))
+        parsed = parse_submit_description(xmlfile, srcdir=os.path.split(objpath)[0])
+
+        ip = InformationPackage.objects.create(
+            object_identifier_value=objid, label=parsed.get("label"), state="Receiving",
+            responsible=self.request.user, object_path=parsed['object_path'],
+            object_size=parsed['object_size'], create_date=parsed['create_date'],
+        )
+
         step = ProcessStep.objects.create(
             name="Receive SIP",
+            information_package=ip,
             eager=False,
         )
 
@@ -309,6 +319,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                         "xml_filename": xmlfile
                     },
                     log=EventIP,
+                    information_package=ip,
                     responsible=self.request.user,
                     processstep=validation_step
                 )
@@ -326,6 +337,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                         "validate_integrity": val_integrity
                     },
                     log=EventIP,
+                    information_package=ip,
                     responsible=self.request.user,
                     processstep=validation_step
                 )
@@ -341,6 +353,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                         "xmlfile": xmlfile,
                     },
                     log=EventIP,
+                    information_package=ip,
                     responsible=self.request.user,
                     processstep=validation_step
                 )
@@ -349,34 +362,33 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             name="Receive",
         )
 
-        t = ProcessTask.objects.create(
+        ProcessTask.objects.create(
             name="preingest.tasks.ReceiveSIP",
-            args=[xmlfile, objpath],
+            args=[ip.pk, xmlfile, objpath],
             processstep_pos=0,
             log=EventIP,
+            information_package=ip,
             responsible=self.request.user,
             processstep=receive_step,
         )
         ProcessTask.objects.create(
             name="ESSArch_Core.tasks.UpdateIPSizeAndCount",
-            result_params={
-                "ip": t.pk,
-            },
+            args=[ip.pk],
             processstep_pos=5,
             log=EventIP,
+            information_package=ip,
             responsible=self.request.user,
             processstep=receive_step,
         )
         ProcessTask.objects.create(
             name="preingest.tasks.UpdateIPStatus",
+            args=[ip.pk],
             params={
                 "status": "Received",
             },
-            result_params={
-                "ip": t.pk,
-            },
             processstep_pos=10,
             log=EventIP,
+            information_package=ip,
             responsible=self.request.user,
             processstep=receive_step,
         )
