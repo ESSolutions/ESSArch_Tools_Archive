@@ -25,6 +25,8 @@
 angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller) {
     $controller('BaseCtrl', { $scope: $scope });
     var vm = this;
+    $scope.ip = null;
+    $rootScope.ip = null;
     vm.itemsPerPage = $cookies.get('eta-ips-per-page') || 10;
     $rootScope.$on('$translateChangeSuccess', function () {
         $state.reload()
