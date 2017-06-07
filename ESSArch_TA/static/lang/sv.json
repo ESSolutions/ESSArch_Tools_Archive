@@ -166,5 +166,6 @@
     "SAVED_MESSAGE": "Sparad!",
     "EVENT_ADDED": "Event tillagt!",
     "SAVE_ERROR": "Ett fel uppstod!",
-    "ARGS": "Args"
+    "ARGS": "Args",
+    "REFRESH": "Uppdatera"
 }

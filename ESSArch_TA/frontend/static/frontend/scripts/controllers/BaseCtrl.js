@@ -196,25 +196,30 @@ angular.module('myApp').controller('BaseCtrl', function($http, $scope, $rootScop
         $("#traceback_textarea").hide();
     };
     //Click funciton for steps and tasks
-    $scope.stepTaskClick = function(branch) {
-        $http({
+    $scope.stepTaskClick = function (branch) {
+        $scope.getStepTask(branch).then(function (response) {
+            if (branch.flow_type == "task") {
+                $scope.taskInfoModal();
+            } else {
+                $scope.stepInfoModal();
+            }
+        });
+    };
+
+    $scope.getStepTask = function (branch) {
+        $scope.stepTaskLoading = true;
+        return $http({
             method: 'GET',
             url: branch.url
-        }).then(function(response){
+        }).then(function (response) {
             var data = response.data;
             var started = moment(data.time_started);
             var done = moment(data.time_done);
             data.duration = done.diff(started);
             $scope.currentStepTask = data;
-            if(branch.flow_type == "task"){
-                $scope.taskInfoModal();
-            } else {
-                $scope.stepInfoModal();
-            }
-        }, function(response) {
-            response.status;
+            $scope.stepTaskLoading = false;
         });
-    };
+    }
     //Creates and shows modal with task information
     $scope.taskInfoModal = function () {
         var modalInstance = $uibModal.open({
