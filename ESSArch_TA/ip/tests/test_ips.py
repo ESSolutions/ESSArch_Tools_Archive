@@ -169,7 +169,7 @@ class InformationPackageReceptionViewSetTestCase(TestCase):
         open(tar_filepath, 'a').close()
         with open(xml_filepath, 'w') as xml:
             xml.write('''<?xml version="1.0" encoding="UTF-8" ?>
-            <root OBJID="1">
+            <root OBJID="1" LABEL="mylabel">
                 <metsHdr/>
                 <file><FLocat href="file:///1.tar"/></file>
             </root>
