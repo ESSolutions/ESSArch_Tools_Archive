@@ -306,7 +306,12 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         )
 
         validators = request.data.get('validators', {})
-        if any(validators.itervalues()):
+        available_validators = [
+            'validate_xml_file', 'validate_file_format', 'validate_integrity',
+            'validate_logical_physical_representation',
+        ]
+
+        if any(v is True and k in available_validators for k, v in validators.iteritems()):
             validation_step = ProcessStep.objects.create(
                 name="Validate",
                 parent_step=step

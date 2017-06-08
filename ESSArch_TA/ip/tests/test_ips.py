@@ -39,6 +39,7 @@ from rest_framework.test import APIClient
 
 from ESSArch_Core.configuration.models import Path
 from ESSArch_Core.ip.models import InformationPackage
+from ESSArch_Core.WorkflowEngine.models import ProcessStep, ProcessTask
 
 
 @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
@@ -187,3 +188,22 @@ class InformationPackageReceptionViewSetTestCase(TestCase):
         res = self.client.post(self.url + '1/receive/')
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         mock_receive.assert_not_called()
+
+    @mock.patch('ip.views.ProcessStep.run', side_effect=lambda *args, **kwargs: None)
+    def test_receive_invalid_validator(self, mock_receive):
+        data = {'validators': {'validate_invalid': True}}
+        res = self.client.post(self.url + '1/receive/', data=data)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertFalse(ProcessStep.objects.filter(name='Validate').exists())
+        mock_receive.assert_called_once()
+
+    @mock.patch('ip.views.ProcessStep.run', side_effect=lambda *args, **kwargs: None)
+    def test_receive_validator(self, mock_receive):
+        data = {'validators': {'validate_xml_file': True}}
+        res = self.client.post(self.url + '1/receive/', data=data)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertTrue(ProcessStep.objects.filter(name='Validate').exists())
+        self.assertTrue(ProcessTask.objects.filter(name='preingest.tasks.ValidateXMLFile').exists())
+        mock_receive.assert_called_once()
