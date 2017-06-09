@@ -434,10 +434,25 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         }
     ];
     $scope.buildSdForm = function(ip) {
+        var startDate, endDate;
+        try {
+            startDate = [ip.altrecordids.STARTDATE][0];
+        }
+        catch(err) {
+            console.log("FAIL", err)
+            startDate = "";
+        }
+        try {
+            endDate = ip.altrecordids.STARTDATE[0]
+        }
+        catch(err) {
+            console.log("FAIL", err)
+            endDate = "";
+        }
         vm.sdModel = {
-            "start_date": ip.start_date,
-            "end_date": ip.end_date,
-            "archivist_organization": ip.archivist_organization,
+            "start_date": startDate,
+            "end_date": endDate,
+            "archivist_organization": ip.archivist_organization.name,
             "creator": ip.creator_organization,
             "submitter_organization": ip.submitter_organization,
             "submitter_individual": ip.submitter_individual,
