@@ -170,6 +170,18 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
         $scope.eventShow = false;
         $scope.statusShow = false;
     };
+    $scope.filebrowser = false;
+    $scope.filebrowserClick = function (ip) {
+        if ($scope.filebrowser && $scope.ip == ip) {
+            $scope.filebrowser = false;
+            $scope.ip = null;
+            $rootScope.ip = null;
+        } else {
+            $scope.filebrowser = true;
+            $scope.ip = ip;
+            $rootScope.ip = ip;
+        }
+    }
     $scope.getListViewData = function() {
         vm.callServer($scope.tableState);
         $rootScope.loadNavigation(ipSortString);

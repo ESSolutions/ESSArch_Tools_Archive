@@ -75,4 +75,31 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     $ctrl.cancel = function () {
         $uibModalInstance.dismiss('cancel');
     };
+})
+.controller('OverwriteModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data) {
+    var $ctrl = this;
+    $ctrl.file = data.file;
+    $ctrl.type = data.type;
+    $ctrl.overwrite = function () {
+        $ctrl.data = {
+            status: "overwritten"
+        }
+        $uibModalInstance.close($ctrl.data);
+    };
+    $ctrl.cancel = function () {
+        $uibModalInstance.dismiss('cancel');
+    };
+})
+.controller('FileModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data) {
+    var $ctrl = this;
+    $ctrl.file = data.file;
+    $ctrl.overwrite = function () {
+        $ctrl.data = {
+            status: "overwritten"
+        }
+        $uibModalInstance.close($ctrl.data);
+    };
+    $ctrl.cancel = function () {
+        $uibModalInstance.dismiss('cancel');
+    };
 });

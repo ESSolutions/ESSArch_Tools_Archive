@@ -167,5 +167,6 @@
     "EVENT_ADDED": "Event added!",
     "SAVE_ERROR": "An error occured!",
     "ARGS": "Args",
-    "REFRESH": "Refresh"
+    "REFRESH": "Refresh",
+    "FILEBROWSER": "File browser"
 }

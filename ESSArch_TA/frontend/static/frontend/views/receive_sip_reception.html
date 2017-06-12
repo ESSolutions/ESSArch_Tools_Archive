@@ -6,6 +6,7 @@
             <div ng-include src="'static/frontend/views/event_table.html'"></div>
             <div ng-if="statusShow" class="status-view" ng-include src="'static/frontend/views/status_tree_view.html'"></div>
         </div>
+        <div ng-if="filebrowser" class="file-browser" ng-controller="FilebrowserController" ng-include src="'static/frontend/views/filebrowser.html'"></div>
         <div class="select-sub-edit-eventlog-wrapper" ng-if="prepareUnidentifiedIp || includedIps.length || edit">
             <div ng-if="edit" class="edit-view">
                 <h4 style="margin-left: 10px;">Submit Description</h4>

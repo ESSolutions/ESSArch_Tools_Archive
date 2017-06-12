@@ -396,6 +396,32 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
          array.push(tempElement);
          return array;
     }
+
+    function getDir(ip, pathStr) {
+        if(pathStr == "") {
+            sendData = {};
+        } else {
+            sendData = {path: pathStr};
+        }
+        return $http({
+            method: 'GET',
+            url: ip.url + "files/",
+            params: sendData
+        }).then(function(response) {
+            return response.data;
+        });
+    }
+
+    function getFile(ip, path, file) {
+        return $http({
+            method: 'GET',
+            url: ip.url + "files/",
+            params: {path: path + file.name}
+        }).then(function(response) {
+            return response;
+        });
+    }
+
     /*******************/
     /*HELPER FUNCTIONS*/
     /*****************/
@@ -579,9 +605,11 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
         prepareIp: prepareIp,
         getIp: getIp,
         getSa: getSa,
+        getDir: getDir,
         getFileList: getFileList,
         getStructure: getStructure,
-        getReceptionIps: getReceptionIps
+        getReceptionIps: getReceptionIps,
+        getFile: getFile,
     };
 
 });

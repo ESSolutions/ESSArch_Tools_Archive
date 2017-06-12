@@ -167,5 +167,6 @@
     "EVENT_ADDED": "Event tillagt!",
     "SAVE_ERROR": "Ett fel uppstod!",
     "ARGS": "Args",
-    "REFRESH": "Uppdatera"
+    "REFRESH": "Uppdatera",
+    "FILEBROWSER": "Filhanterare"
 }
