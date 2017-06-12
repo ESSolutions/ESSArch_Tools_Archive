@@ -230,6 +230,41 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
         return Response(parse_submit_description(fullpath, srcdir=path))
 
+    @detail_route(methods=['get'])
+    def files(self, request, pk=None):
+        reception = Path.objects.get(entity="path_ingest_reception").value
+        xml = os.path.join(reception, "%s.xml" % pk)
+
+        if not os.path.exists(xml):
+            raise exceptions.NotFound
+
+        ip = parse_submit_description(xml, srcdir=reception)
+        container = ip['object_path']
+
+        path = request.query_params.get('path')
+
+        if path in [os.path.basename(container), os.path.basename(xml)]:
+            fullpath = os.path.join(os.path.dirname(container), path)
+            content_type, _ = mimetypes.guess_type(fullpath)
+            return HttpResponse(open(fullpath).read(), content_type=content_type)
+        elif path is not None:
+            raise exceptions.NotFound
+
+        entry = {
+            "name": os.path.basename(container),
+            "type": 'file',
+            "size": os.path.getsize(container),
+            "modified": timestamp_to_datetime(os.path.getmtime(container)),
+        }
+
+        xmlentry = {
+            "name": os.path.basename(xml),
+            "type": 'file',
+            "size": os.path.getsize(xml),
+            "modified": timestamp_to_datetime(os.path.getmtime(xml)),
+        }
+        return Response([entry, xmlentry])
+
     @list_route(methods=['post'])
     def upload(self, request):
         if not request.user.has_perm('ip.can_receive_remote_files'):
