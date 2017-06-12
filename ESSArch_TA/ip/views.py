@@ -223,7 +223,12 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, pk=None):
         path = Path.objects.get(entity="path_ingest_reception").value
-        return Response(parse_submit_description(os.path.join(path, "%s.xml" % pk), srcdir=path))
+        fullpath = os.path.join(path, "%s.xml" % pk)
+
+        if not os.path.exists(fullpath):
+            raise exceptions.NotFound
+
+        return Response(parse_submit_description(fullpath, srcdir=path))
 
     @list_route(methods=['post'])
     def upload(self, request):
