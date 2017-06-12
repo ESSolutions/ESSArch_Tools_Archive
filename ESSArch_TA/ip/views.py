@@ -25,6 +25,7 @@
 import errno
 import glob
 import json
+import mimetypes
 import os
 import shutil
 import uuid
@@ -34,6 +35,7 @@ from celery import states as celery_states
 from django.conf import settings
 from django.db import IntegrityError
 from django.db.models import Prefetch
+from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 
 from lxml import etree
@@ -792,29 +794,35 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         serializer.is_valid()
         return Response(serializer.data)
 
-    @detail_route()
+    @detail_route(methods=['get'])
     def files(self, request, pk=None):
         ip = self.get_object()
-        entries = []
-        path = request.query_params.get('path', '')
-        fullpath = os.path.join(ip.object_path, path)
+        path = request.query_params.get('path')
 
-        if not in_directory(fullpath, ip.object_path):
-            raise exceptions.ParseError('Illegal path %s' % path)
+        container = ip.object_path
+        xml = os.path.splitext(ip.object_path)[0] + '.xml'
 
-        if not os.path.exists(fullpath):
+        if path in [os.path.basename(container), os.path.basename(xml)]:
+            fullpath = os.path.join(os.path.dirname(container), path)
+            content_type, _ = mimetypes.guess_type(fullpath)
+            return HttpResponse(open(fullpath).read(), content_type=content_type)
+        elif path is not None:
             raise exceptions.NotFound
 
-        for entry in get_files_and_dirs(fullpath):
-            entry_type = "dir" if entry.is_dir() else "file"
-            entries.append(
-                {
-                    "name": os.path.basename(entry.path),
-                    "type": entry_type
-                }
-            )
+        entry = {
+            "name": os.path.basename(container),
+            "type": 'file',
+            "size": os.path.getsize(container),
+            "modified": timestamp_to_datetime(os.path.getmtime(container)),
+        }
 
-        return Response(entries)
+        xmlentry = {
+            "name": os.path.basename(xml),
+            "type": 'file',
+            "size": os.path.getsize(xml),
+            "modified": timestamp_to_datetime(os.path.getmtime(xml)),
+        }
+        return Response([entry, xmlentry])
 
 
 class EventIPViewSet(viewsets.ModelViewSet):
