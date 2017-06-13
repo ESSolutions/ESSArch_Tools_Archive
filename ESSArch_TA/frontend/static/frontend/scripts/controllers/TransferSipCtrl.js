@@ -179,9 +179,11 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
                 $rootScope.ip = null;
             }
         } else {
-            $scope.filebrowser = true;
-            $scope.ip = ip;
-            $rootScope.ip = ip;
+            if ($rootScope.auth.id == ip.responsible.id || !ip.responsible) {
+                $scope.filebrowser = true;
+                $scope.ip = ip;
+                $rootScope.ip = ip;
+            }
         }
     }
     $scope.getListViewData = function() {

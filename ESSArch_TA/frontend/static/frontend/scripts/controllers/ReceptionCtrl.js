@@ -264,10 +264,12 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
                 $rootScope.ip = null;
             }
         } else {
-            $scope.filebrowser = true;
-            ip.url = appConfig.djangoUrl + "ip-reception/" + ip.id + "/";
-            $scope.ip = ip;
-            $rootScope.ip = ip;
+                if (!ip.responsible) {
+                $scope.filebrowser = true;
+                ip.url = appConfig.djangoUrl + "ip-reception/" + ip.id + "/";
+                $scope.ip = ip;
+                $rootScope.ip = ip;
+            }
         }
     }
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
