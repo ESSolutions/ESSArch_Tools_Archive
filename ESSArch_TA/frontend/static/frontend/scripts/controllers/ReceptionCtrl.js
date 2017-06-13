@@ -259,8 +259,10 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     $scope.filebrowserClick = function (ip) {
         if ($scope.filebrowser && $scope.ip == ip) {
             $scope.filebrowser = false;
-            $scope.ip = null;
-            $rootScope.ip = null;
+            if(!$scope.select && !$scope.edit && !$scope.statusShow && !$scope.eventShow) {
+                $scope.ip = null;
+                $rootScope.ip = null;
+            }
         } else {
             $scope.filebrowser = true;
             ip.url = appConfig.djangoUrl + "ip-reception/" + ip.id + "/";
