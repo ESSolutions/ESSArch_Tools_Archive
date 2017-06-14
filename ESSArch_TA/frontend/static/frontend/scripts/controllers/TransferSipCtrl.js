@@ -268,6 +268,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             $scope.eventlog = false;
             $scope.eventShow = false;
             $scope.statusShow = false;
+            $scope.filebrowser = false;
             $rootScope.loadNavigation(ipSortString);
             $scope.getListViewData();
         });

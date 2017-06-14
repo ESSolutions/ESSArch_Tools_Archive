@@ -166,6 +166,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
                 $scope.select = false;
                 $scope.eventShow = false;
                 $scope.statusShow = false;
+                $scope.filebrowser = false;
                 $scope.receiveDisabled = false;
                 $anchorScroll();
             }, function(response) {
@@ -504,6 +505,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $scope.eventlog = false;
             $scope.eventShow = false;
             $scope.statusShow = false;
+            $scope.filebrowser = false;
             $rootScope.loadNavigation(ipSortString);
             $scope.getListViewData();
         });
