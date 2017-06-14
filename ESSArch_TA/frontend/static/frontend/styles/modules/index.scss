@@ -456,7 +456,6 @@ body.modal-open[style] {
 }
 .table-container {
     position: relative;
-    overflow-x: auto;
     thead, tbody {
         border: 1px solid $border-color;
     }
