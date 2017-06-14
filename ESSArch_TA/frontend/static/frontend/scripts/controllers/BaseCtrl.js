@@ -181,20 +181,6 @@ angular.module('myApp').controller('BaseCtrl', function($http, $scope, $rootScop
     $scope.stepClick = function(step) {
         listViewService.getChildrenForStep(step);
     };
-
-    $scope.copyToClipboard = function() {
-        $("#traceback_textarea").val($("#traceback_pre").html()).show();
-        $("#traceback_pre").hide();
-        $("#traceback_textarea").focus()[0].select();
-        try {
-            var successful = document.execCommand('copy');
-            var msg = successful ? 'successful' : 'unsuccessful';
-        } catch (err) {
-            console.log('Oops, unable to copy');
-        }
-        $("#traceback_pre").html($("#traceback_textarea").val()).show();
-        $("#traceback_textarea").hide();
-    };
     //Click funciton for steps and tasks
     $scope.stepTaskClick = function (branch) {
         $scope.getStepTask(branch).then(function (response) {

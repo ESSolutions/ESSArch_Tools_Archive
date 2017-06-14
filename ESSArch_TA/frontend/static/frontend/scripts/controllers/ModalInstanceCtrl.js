@@ -27,6 +27,10 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     $ctrl.error_messages_old = [];
     $ctrl.error_messages_pw1 = [];
     $ctrl.error_messages_pw2 = [];
+    $ctrl.tracebackCopied = false;
+    $ctrl.copied = function() {
+        $ctrl.tracebackCopied = true;
+    }
     $ctrl.save = function () {
         $ctrl.data = {
             name: $ctrl.profileName

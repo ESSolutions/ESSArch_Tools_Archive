@@ -74,6 +74,7 @@ var vendorFiles = [
         'node_modules/angular-date-time-input/src/dateTimeInput.js',
         'node_modules/angular-bootstrap-datetimepicker/src/js/datetimepicker.js',
         'node_modules/angular-bootstrap-datetimepicker/src/js/datetimepicker.templates.js',
+        'node_modules/angular-clipboard/angular-clipboard.js',
     ],
     jsFiles = [
         'scripts/myApp.js', 'scripts/controllers/*.js', 'scripts/services/*.js',

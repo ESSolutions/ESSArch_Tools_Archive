@@ -591,3 +591,7 @@ body.modal-open[style] {
         line-height: 1;
     }
 }
+
+.traceback-copied {
+    color: $step-success;
+}
