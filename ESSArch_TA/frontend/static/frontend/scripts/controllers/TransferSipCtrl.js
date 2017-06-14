@@ -141,7 +141,6 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
     vm.displayedIps=[];
 
     $scope.ipRowClick = function(row) {
-        $scope.selectIp(row);
         if($scope.ip == row){
             $scope.ip = null;
             $rootScope.ip = null;

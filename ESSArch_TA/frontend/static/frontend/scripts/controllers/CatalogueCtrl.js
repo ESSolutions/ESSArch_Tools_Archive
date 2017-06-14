@@ -48,20 +48,6 @@ angular.module('myApp').controller('CatalogueCtrl', function($http, $scope, $roo
     };
     //Make ip selected and add class to visualize
     vm.displayedIps=[];
-    $scope.selectIp = function(row) {
-        vm.displayedIps.forEach(function(ip) {
-            if(ip.id == $scope.selectedIp.id){
-                ip.class = "";
-            }
-        });
-        if(row.id == $scope.selectedIp.id && !$scope.select && !$scope.statusShow && !$scope.eventShow){
-            $scope.selectedIp = {id: "", class: ""};
-        } else {
-            row.class = "selected";
-            $scope.selectedIp = row;
-        }
-    };
-
     $scope.ipTableClick = function(row) {
         $scope.ip = row;
         listViewService.getSa(row.submission_agreement).then(function(sa) {

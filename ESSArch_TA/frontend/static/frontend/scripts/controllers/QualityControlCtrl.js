@@ -194,19 +194,6 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
     };
     //Make ip selected and add class to visualize
     vm.displayedIps=[];
-    $scope.selectIp = function(row) {
-        vm.displayedIps.forEach(function(ip) {
-            if(ip.id == $scope.selectedIp.id){
-                ip.class = "";
-            }
-        });
-        if(row.id == $scope.selectedIp.id){
-            $scope.selectedIp = {id: "", class: ""};
-        } else {
-            row.class = "selected";
-            $scope.selectedIp = row;
-        }
-    };
     $scope.getListViewData = function() {
         vm.callServer($scope.tableState);
     };
