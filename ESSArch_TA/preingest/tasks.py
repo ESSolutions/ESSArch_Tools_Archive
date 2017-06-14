@@ -56,25 +56,25 @@ class ReceiveSIP(DBTask):
 
         if archival_institution:
             arch, _ = ArchivalInstitution.objects.get_or_create(
-                name=archival_institution
+                name=archival_institution['name']
             )
             ip.archival_institution = arch
 
         if archivist_organization:
             arch, _ = ArchivistOrganization.objects.get_or_create(
-                name=archivist_organization
+                name=archivist_organization['name']
             )
             ip.archivist_organization = arch
 
         if archival_type:
             arch, _ = ArchivalType.objects.get_or_create(
-                name=archival_type
+                name=archival_type['name']
             )
             ip.archival_type = arch
 
         if archival_location:
             arch, _ = ArchivalLocation.objects.get_or_create(
-                name=archival_location
+                name=archival_location['name']
             )
             ip.archival_location = arch
 
