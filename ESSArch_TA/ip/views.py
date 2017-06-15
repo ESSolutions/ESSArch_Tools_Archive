@@ -837,33 +837,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['get'])
     def files(self, request, pk=None):
         ip = self.get_object()
-        path = request.query_params.get('path')
-
-        container = ip.object_path
-        xml = os.path.splitext(ip.object_path)[0] + '.xml'
-
-        if path in [os.path.basename(container), os.path.basename(xml)]:
-            fullpath = os.path.join(os.path.dirname(container), path)
-            content_type, _ = mimetypes.guess_type(fullpath)
-            return HttpResponse(open(fullpath).read(), content_type=content_type)
-        elif path is not None:
-            raise exceptions.NotFound
-
-        entry = {
-            "name": os.path.basename(container),
-            "type": 'file',
-            "size": os.path.getsize(container),
-            "modified": timestamp_to_datetime(os.path.getmtime(container)),
-        }
-
-        xmlentry = {
-            "name": os.path.basename(xml),
-            "type": 'file',
-            "size": os.path.getsize(xml),
-            "modified": timestamp_to_datetime(os.path.getmtime(xml)),
-        }
-        return Response([entry, xmlentry])
-
+        return ip.files(request.query_params.get('path', '').rstrip('/'))
 
 class EventIPViewSet(viewsets.ModelViewSet):
     """
