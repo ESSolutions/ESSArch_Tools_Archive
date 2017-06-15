@@ -595,3 +595,7 @@ body.modal-open[style] {
 .traceback-copied {
     color: $step-success;
 }
+
+.popover {
+    word-break: break-all;
+}
