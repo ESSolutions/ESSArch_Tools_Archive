@@ -31,6 +31,10 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     $ctrl.copied = function() {
         $ctrl.tracebackCopied = true;
     }
+    $ctrl.idCopied = false;
+    $ctrl.idCopyDone = function() {
+        $ctrl.idCopied = true;
+    }
     $ctrl.save = function () {
         $ctrl.data = {
             name: $ctrl.profileName

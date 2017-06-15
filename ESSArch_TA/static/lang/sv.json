@@ -168,5 +168,7 @@
     "SAVE_ERROR": "Ett fel uppstod!",
     "ARGS": "Args",
     "REFRESH": "Uppdatera",
-    "FILEBROWSER": "Filhanterare"
+    "FILEBROWSER": "Filhanterare",
+    "COPYID": "Kopiera ID"
+
 }

@@ -168,5 +168,6 @@
     "SAVE_ERROR": "An error occured!",
     "ARGS": "Args",
     "REFRESH": "Refresh",
-    "FILEBROWSER": "File browser"
+    "FILEBROWSER": "File browser",
+    "COPYID": "Copy ID"
 }
