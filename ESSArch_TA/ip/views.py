@@ -797,8 +797,10 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             try:
                 shutil.rmtree(path)
             except OSError as e:
-                if e.errno in [errno.ENOENT, errno.ENOTDIR]:
+                if e.errno == errno.ENOTDIR:
                     os.remove(path)
+                elif e.errno == errno.ENOENT:
+                    pass
                 else:
                     raise
             finally:
