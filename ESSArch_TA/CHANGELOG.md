@@ -13,6 +13,8 @@
 * Added duration to task report
 * Milliseconds are now included in start and end time in task report
 * Updates of the task tree for an IP is no longer rebuilt on each refresh
+* A file browser is now available in the reception and for the logged in user's IPs
+* A button for copying the id is now available in the task modal
 
 #### API
 
@@ -21,6 +23,7 @@
 * IPs can now also be searched for with object identifier value, first and last
   name of responsible, start date and end date
 * The task serialization now includes `args` which is the list of positional arguments provided to the task
+* Task parameters are now serialized as json instead of a string
 * `ObjectIdentifierValue` and `LABEL` are now optional variables when identifying IP
 * File uploads are now expected to be done using Multipart-Encoded files
 * Each chunk will be verified against it's `HTTP_CONTENT_RANGE` header and will
@@ -28,6 +31,7 @@
 * When all chunks has been uploaded for a file, an additional request to
   `/api/information-packages/id/upload_complete` can be done to verify that the
   checksum is correct
+* Files in an IP can now be listed, previewed (depending on browser) and downloaded at `/api/information-packages/{id}/files/` and `/api/ip-reception/{id}/files/`
 
 #### Misc
 
@@ -38,7 +42,9 @@
 
 * (API) Providing the IP files route with a path outside of the IP returns `400 Bad Request`
 * (API) Providing the IP files route with a path that does not exist returns `404 Not Found`
+* (API) Retrieving an IP that does not exist now returns `404 Not Found`
 * (API) Viewing a task with params containing non-ascii characters no longer results in a `500 Internal Server Error`
+* (API) IPs already deleted from file system can now be deleted without resulting in a `500 Internal Server Error`
 
 ## Requirement changes
 ### Updates
