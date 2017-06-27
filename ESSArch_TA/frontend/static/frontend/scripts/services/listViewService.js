@@ -56,7 +56,7 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
         });
         return promise;
     }
-    function getReceptionIps(pageNumber, pageSize, filters, sortString, searchString, state) {
+    function getReceptionIps(pageNumber, pageSize, filters, sortString) {
         var promise = $http({
             method: 'GET',
             url: appConfig.djangoUrl+'ip-reception/',
@@ -66,8 +66,6 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
                 archival_institution: filters.institution,
                 archivist_organization: filters.organization,
                 ordering: sortString,
-                search: searchString,
-                state: state
             }
         })
         .then(function successCallback(response) {

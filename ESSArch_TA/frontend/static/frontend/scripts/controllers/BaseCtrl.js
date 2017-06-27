@@ -1,12 +1,253 @@
-angular.module('myApp').controller('BaseCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $q) {
-    vm = this;
-    $scope.angular = angular;
+angular.module('myApp').controller('BaseCtrl', function(vm, ipSortString, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $q) {
+    console.log("vm", vm);
+    // Initialize variables
+    $scope.filebrowser = false;
+    $scope.statusShow = false;
+    $scope.eventShow = false;
+    $scope.ip = null;
+    $rootScope.ip = null;
+    vm.itemsPerPage = $cookies.get('eta-ips-per-page') || 10;
+
+    // Watchers
+    $scope.$watch(function(){return $rootScope.navigationFilter;}, function(newValue, oldValue) {
+        $scope.getListViewData();
+    }, true);
+    $rootScope.$on('$translateChangeSuccess', function () {
+        $state.reload()
+    });
+
+    // Init intervals 
+    $rootScope.$on('$stateChangeStart', function() {
+        $interval.cancel(stateInterval);
+    });
+
+    var stateInterval;
+    $scope.$watch(function(){return $scope.statusShow;}, function(newValue, oldValue) {
+        if(newValue) {
+            $interval.cancel(stateInterval);
+            stateInterval = $interval(function(){$scope.statusViewUpdate($scope.ip)}, appConfig.stateInterval);
+        } else {
+            $interval.cancel(stateInterval);
+            $interval.cancel(listViewInterval);
+        }
+    });
+
+    // Click functions
+
+    $scope.stateClicked = function (row) {
+        if ($scope.statusShow) {
+                $scope.tree_data = [];
+            if ($scope.ip == row) {
+                $scope.statusShow = false;
+                $scope.ip = null;
+                $rootScope.ip = null;
+            } else {
+                $scope.statusShow = true;
+                $scope.edit = false;
+                $scope.statusViewUpdate(row);
+                $scope.ip = row;
+                $rootScope.ip = row;
+            }
+        } else {
+            $scope.statusShow = true;
+            $scope.edit = false;
+            $scope.statusViewUpdate(row);
+            $scope.ip = row;
+            $rootScope.ip = row;
+        }
+        $scope.subSelect = false;
+        $scope.eventlog = false;
+        $scope.select = false;
+        $scope.eventShow = false;
+    };
+
+    $scope.eventsClick = function (row) {
+        if($scope.eventShow && $scope.ip == row){
+            $scope.eventShow = false;
+            $rootScope.stCtrl = null;
+            $scope.ip = null;
+            $rootScope.ip = null;
+        } else {
+            if($rootScope.stCtrl) {
+                $rootScope.stCtrl.pipe();
+            }
+            getEventlogData();
+            $scope.eventShow = true;
+            $scope.validateShow = false;
+            $scope.statusShow = false;
+            $scope.ip = row;
+            $rootScope.ip = row;
+        }
+    };
+
+    $scope.filebrowserClick = function (ip) {
+        if ($scope.filebrowser && $scope.ip == ip) {
+            $scope.filebrowser = false;
+            if(!$scope.select && !$scope.edit && !$scope.statusShow && !$scope.eventShow) {
+                $scope.ip = null;
+                $rootScope.ip = null;
+            }
+        } else {
+            if ($rootScope.auth.id == ip.responsible.id || !ip.responsible) {
+                $scope.filebrowser = true;
+                $scope.ip = ip;
+                $rootScope.ip = ip;
+            }
+        }
+    }
+
+    // Update list view interval
+
+    var listViewInterval;
+    vm.updateListViewConditional = function() {
+        $interval.cancel(listViewInterval);
+        listViewInterval = $interval(function() {
+            var updateVar = false;
+            vm.displayedIps.forEach(function(ip, idx) {
+                if(ip.status < 100) {
+                    if(ip.step_state != "FAILURE") {
+                        updateVar = true;
+                    }
+                }
+            });
+            if(updateVar) {
+                $scope.getListViewData();
+            } else {
+                $interval.cancel(listViewInterval);
+                listViewInterval = $interval(function() {
+                    var updateVar = false;
+                    vm.displayedIps.forEach(function(ip, idx) {
+                        if(ip.status < 100) {
+                            if(ip.step_state != "FAILURE") {
+                                updateVar = true;
+                            }
+                        }
+                    });
+                    if(!updateVar) {
+                        $scope.getListViewData();
+                    } else {
+                        vm.updateListViewConditional();
+                    }
+
+                }, appConfig.ipIdleInterval);
+            }
+        }, appConfig.ipInterval);
+    };
+    vm.updateListViewConditional();
+
+    // List view
+
+    vm.displayedIps = [];
+
+    //Get data according to ip table settings and populates ip table
+    vm.callServer = function callServer(tableState) {
+        $scope.ipLoading = true;
+        if(vm.displayedIps.length == 0) {
+            $scope.initLoad = true;
+        }
+        if(!angular.isUndefined(tableState)) {
+            $scope.tableState = tableState;
+            var search = "";
+            if(tableState.search.predicateObject) {
+                var search = tableState.search.predicateObject["$"];
+            }
+            var sorting = tableState.sort;
+            var pagination = tableState.pagination;
+            var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
+            var number = pagination.number || vm.itemsPerPage;  // Number of entries showed per page.
+            var pageNumber = start/number+1;
+
+            Resource.getIpPage(start, number, pageNumber, tableState, sorting, search, ipSortString).then(function (result) {
+                vm.displayedIps = result.data;
+                tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
+                $scope.ipLoading = false;
+                $scope.initLoad = false;
+            });
+        }
+    };
+
+    // Get list view data
+    
+    $scope.getListViewData = function() {
+        vm.callServer($scope.tableState);
+        $rootScope.loadNavigation(ipSortString);
+    };
+
+    // Validators
+
+    vm.validatorModel = {};
+    vm.validatorFields = [
+        {
+            "templateOptions": {
+                "type": "text",
+                "label": $translate.instant('VALIDATEFILEFORMAT'),
+            },
+            "defaultValue": true,
+            "type": "checkbox",
+            "key": "validate_file_format",
+        },
+        {
+            "templateOptions": {
+                "type": "text",
+                "label": $translate.instant('VALIDATEXMLFILE'),
+            },
+            "defaultValue": true,
+            "type": "checkbox",
+            "key": "validate_xml_file",
+        },
+        {
+            "templateOptions": {
+                "type": "text",
+                "label": $translate.instant('VALIDATELOGICALPHYSICALREPRESENTATION'),
+            },
+            "defaultValue": true,
+            "type": "checkbox",
+            "key": "validate_logical_physical_representation",
+        },
+        {
+            "templateOptions": {
+                "type": "text",
+                "label": $translate.instant('VALIDATEINTEGRITY'),
+            },
+            "defaultValue": true,
+            "type": "checkbox",
+            "key": "validate_integrity",
+        }
+    ];
+
+    // Basic functions
+
+    //Remove and ip
+    $scope.removeIp = function (ipObject) {
+        $http({
+            method: 'DELETE',
+            url: ipObject.url
+        }).then(function() {
+            vm.displayedIps.splice(vm.displayedIps.indexOf(ipObject), 1);
+            $scope.edit = false;
+            $scope.select = false;
+            $scope.eventlog = false;
+            $scope.eventShow = false;
+            $scope.statusShow = false;
+            $scope.filebrowser = false;
+            $rootScope.loadNavigation(ipSortString);
+            $scope.getListViewData();
+        });
+    }
+    vm.getEventlogData = function() {
+        listViewService.getEventlogData().then(function(value){
+            $scope.eventTypeCollection = value;
+        });
+    };
     $scope.checkPermission = function(permissionName) {
         return !angular.isUndefined(PermPermissionStore.getPermissionDefinition(permissionName));
     };
     $scope.updateIpsPerPage = function(items) {
         $cookies.put('eta-ips-per-page', items);
     };
+    // Status tree view structure
+    $scope.tree_data = [];
+    $scope.angular = angular;
     $translate(['LABEL', 'RESPONSIBLE', 'DATE', 'STATE', 'STATUS']).then(function(translations) {
         $scope.responsible = translations.RESPONSIBLE;
         $scope.label = translations.LABEL;
