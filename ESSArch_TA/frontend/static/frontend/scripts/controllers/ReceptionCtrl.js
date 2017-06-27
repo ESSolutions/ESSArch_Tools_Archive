@@ -23,102 +23,22 @@
 */
 
 angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller) {
-    $controller('BaseCtrl', { $scope: $scope });
     var vm = this;
     var ipSortString = "Receiving";
-    $scope.ip = null;
-    $rootScope.ip = null;
-    vm.itemsPerPage = $cookies.get('eta-ips-per-page') || 10;
-    $rootScope.$on('$translateChangeSuccess', function () {
-        $state.reload()
-    });
-    $scope.$watch(function(){return $rootScope.navigationFilter;}, function(newValue, oldValue) {
-        $scope.getListViewData();
-    }, true);
+    $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
+
     $scope.includedIps = [];
     $scope.receiveShow = false;
     $scope.validateShow = false;
-    $scope.statusShow = false;
-    $scope.eventShow = false;
-    $scope.tree_data = [];
-    $scope.$watch(function(){return $scope.statusShow;}, function(newValue, oldValue) {
-        if(newValue) {
-            $interval.cancel(stateInterval);
-            stateInterval = $interval(function(){$scope.statusViewUpdate($scope.ip)}, appConfig.stateInterval);
-        } else {
-            $interval.cancel(stateInterval);
-        }
-    });
-    $rootScope.$on('$stateChangeStart', function() {
-        $interval.cancel(stateInterval);
-        $interval.cancel(listViewInterval);
-    });
-    var stateInterval;
-    $scope.stateClicked = function (row) {
-        if ($scope.statusShow) {
-                $scope.tree_data = [];
-            if ($scope.ip == row) {
-                $scope.statusShow = false;
-                $scope.ip = null;
-                $rootScope.ip = null;
-            } else {
-                $scope.statusShow = true;
-                $scope.edit = false;
-                $scope.statusViewUpdate(row);
-                $scope.ip = row;
-                $rootScope.ip = row;
-            }
-        } else {
-            $scope.statusShow = true;
-            $scope.edit = false;
-            $scope.statusViewUpdate(row);
-            $scope.ip = row;
-            $rootScope.ip = row;
-        }
-        $scope.subSelect = false;
-        $scope.eventlog = false;
-        $scope.select = false;
-        $scope.eventShow = false;
-    };
-
-    /*
-     * EVENTS
-     */
-    $scope.eventsClick = function (row) {
-        if($scope.eventShow && $scope.ip == row){
-            $scope.eventShow = false;
-            $rootScope.stCtrl = null;
-            $scope.ip = null;
-            $rootScope.ip = null;
-        } else {
-            if($rootScope.stCtrl) {
-                $rootScope.stCtrl.pipe();
-            }
-            getEventlogData();
-            $scope.eventShow = true;
-            $scope.validateShow = false;
-            $scope.statusShow = false;
-            $scope.ip = row;
-            $rootScope.ip = row;
-        }
-        $scope.edit = false;
-        $scope.select = false;
-        $scope.statusShow = false;
-    };
-    function getEventlogData() {
-        listViewService.getEventlogData().then(function(value){
-            $scope.eventTypeCollection = value;
-        });
-    };
 
     /*******************************************/
     /*Piping and Pagination for List-view table*/
     /*******************************************/
     var ctrl = this;
-    this.displayedIps = [];
+    vm.displayedIps = [];
 
     //Get data according to ip table settings and populates ip table
-    this.callServer = function callServer(tableState) {
+    vm.callServer = function callServer(tableState) {
         $scope.ipLoading = true;
         if(vm.displayedIps.length == 0) {
             $scope.initLoad = true;
@@ -132,7 +52,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             var number = pagination.number || vm.itemsPerPage;  // Number of entries showed per page.
             var pageNumber = start/number+1;
 
-            Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.includedIps, sorting, ipSortString).then(function (result) {
+            Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.includedIps, sorting).then(function (result) {
                 vm.displayedIps = result.data;
                 tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
                 $scope.ipLoading = false;
@@ -140,9 +60,6 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             });
         }
     };
-    //Make ip selected and add class to visualize
-    vm.displayedIps=[];
-    $scope.selected = [];
     $scope.receiveDisabled = false;
     $scope.receiveSip = function(ips) {
         $scope.receiveDisabled = true;
@@ -160,7 +77,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
                 $scope.includedIps = [];
                 $timeout(function() {
                     $scope.getListViewData();
-                    updateListViewConditional();
+                    vm.updateListViewConditional();
                 }, 1000);
                 $scope.edit = false;
                 $scope.select = false;
@@ -194,46 +111,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $scope.receiveShow = false;
         }
     }
-    $scope.getListViewData = function() {
-        vm.callServer($scope.tableState);
-        $rootScope.loadNavigation(ipSortString);
-    };
-    var listViewInterval;
-    function updateListViewConditional() {
-        $interval.cancel(listViewInterval);
-        listViewInterval = $interval(function() {
-            var updateVar = false;
-            vm.displayedIps.forEach(function(ip, idx) {
-                if(ip.status < 100) {
-                    if(ip.step_state != "FAILURE") {
-                        updateVar = true;
-                    }
-                }
-            });
-            if(updateVar) {
-                $scope.getListViewData();
-            } else {
-                $interval.cancel(listViewInterval);
-                listViewInterval = $interval(function() {
-                    var updateVar = false;
-                    vm.displayedIps.forEach(function(ip, idx) {
-                        if(ip.status < 100) {
-                            if(ip.step_state != "FAILURE") {
-                                updateVar = true;
-                            }
-                        }
-                    });
-                    if(!updateVar) {
-                        $scope.getListViewData();
-                    } else {
-                        updateListViewConditional();
-                    }
 
-                }, appConfig.ipIdleInterval);
-            }
-        }, appConfig.ipInterval);
-    };
-    updateListViewConditional();
     $scope.ipTableClick = function(row) {
         $scope.statusShow = false;
         $scope.eventShow = false;
@@ -256,23 +134,6 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             }
         }
     }
-    $scope.filebrowser = false;
-    $scope.filebrowserClick = function (ip) {
-        if ($scope.filebrowser && $scope.ip == ip) {
-            $scope.filebrowser = false;
-            if(!$scope.select && !$scope.edit && !$scope.statusShow && !$scope.eventShow) {
-                $scope.ip = null;
-                $rootScope.ip = null;
-            }
-        } else {
-                if (!ip.responsible) {
-                $scope.filebrowser = true;
-                ip.url = appConfig.djangoUrl + "ip-reception/" + ip.id + "/";
-                $scope.ip = ip;
-                $rootScope.ip = ip;
-            }
-        }
-    }
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
     $scope.submitDescription = $translate.instant('SUBMITDESCRIPTION');
     $scope.package = $translate.instant('PACKAGE');
@@ -286,50 +147,8 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             templateUrl: "static/frontend/views/reception_package.html"
         }
     ];
-    $scope.colspan = 8;
     $scope.yes = $translate.instant('YES');
     $scope.no = $translate.instant('NO');
-    vm.validatorModel = {
-
-    };
-    vm.validatorFields = [
-        {
-            "templateOptions": {
-                "type": "text",
-                "label": $translate.instant('VALIDATEFILEFORMAT'),
-            },
-            "defaultValue": true,
-            "type": "checkbox",
-            "key": "validate_file_format",
-        },
-        {
-            "templateOptions": {
-                "type": "text",
-                "label": $translate.instant('VALIDATEXMLFILE'),
-            },
-            "defaultValue": true,
-            "type": "checkbox",
-            "key": "validate_xml_file",
-        },
-        {
-            "templateOptions": {
-                "type": "text",
-                "label": $translate.instant('VALIDATELOGICALPHYSICALREPRESENTATION'),
-            },
-            "defaultValue": true,
-            "type": "checkbox",
-            "key": "validate_logical_physical_representation",
-        },
-        {
-            "templateOptions": {
-                "type": "text",
-                "label": $translate.instant('VALIDATEINTEGRITY'),
-            },
-            "defaultValue": true,
-            "type": "checkbox",
-            "key": "validate_integrity",
-        }
-    ];
 
     vm.sdModel = {};
     vm.sdFields = [
@@ -713,7 +532,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $scope.prepareUnidentifiedIp = false;
             $timeout(function(){
                 $scope.getListViewData();
-                updateListViewConditional();
+                vm.updateListViewConditional();
             }, 1000);
         });
     };

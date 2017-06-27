@@ -59,12 +59,12 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
             };
         });
 	}
-    function getReceptionIps(start, number, pageNumber, params, checked, sort, search, state) {
+    function getReceptionIps(start, number, pageNumber, params, checked, sort) {
         var sortString = sort.predicate;
         if(sort.reverse) {
             sortString = "-"+sortString;
         }
-        return listViewService.getReceptionIps(pageNumber, number, $rootScope.navigationFilter, sortString, search, state).then(function(value) {
+        return listViewService.getReceptionIps(pageNumber, number, $rootScope.navigationFilter, sortString).then(function(value) {
             var ipCollection = value.data;
             ipCollection.forEach(function(ip) {
                 ip.checked = false;
