@@ -1,5 +1,4 @@
 angular.module('myApp').controller('BaseCtrl', function(vm, ipSortString, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $q) {
-    console.log("vm", vm);
     // Initialize variables
     $scope.filebrowser = false;
     $scope.statusShow = false;
