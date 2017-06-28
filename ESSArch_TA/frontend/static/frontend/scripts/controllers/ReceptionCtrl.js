@@ -91,6 +91,22 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             });
         });
     };
+    $scope.filebrowserClick = function (ip) {
+        if ($scope.filebrowser && $scope.ip == ip) {
+            $scope.filebrowser = false;
+            if(!$scope.select && !$scope.edit && !$scope.statusShow && !$scope.eventShow) {
+                $scope.ip = null;
+                $rootScope.ip = null;
+            }
+        } else {
+            if (!ip.responsible) {
+                $scope.filebrowser = true;
+                ip.url = appConfig.djangoUrl + "ip-reception/" + ip.id + "/";
+                $scope.ip = ip;
+                $rootScope.ip = ip;
+            }
+        }
+    }
     $scope.includeIp = function(row) {
         $scope.statusShow = false;
         $scope.eventShow = false;
