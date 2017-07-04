@@ -137,7 +137,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $scope.edit = false;
             $scope.ip = null;
             $rootScope.ip = null;
-            $scope.filebrowser = null;
+            $scope.filebrowser = false;
         } else {
             vm.sdModel = {};
             if(row.state == "At reception") {
