@@ -101,7 +101,9 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         } else {
             if (!ip.responsible) {
                 $scope.filebrowser = true;
-                ip.url = appConfig.djangoUrl + "ip-reception/" + ip.id + "/";
+                if(!ip.url) {
+                    ip.url = appConfig.djangoUrl + "ip-reception/" + ip.id + "/";
+                }
                 $scope.ip = ip;
                 $rootScope.ip = ip;
             }
@@ -135,6 +137,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             $scope.edit = false;
             $scope.ip = null;
             $rootScope.ip = null;
+            $scope.filebrowser = null;
         } else {
             vm.sdModel = {};
             if(row.state == "At reception") {
@@ -143,6 +146,9 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
                 $scope.buildSdForm(row);
                 $scope.getFileList(row);
                 $scope.edit = true;
+                if($scope.filebrowser && !$scope.ip.url) {
+                    $scope.ip.url = appConfig.djangoUrl + "ip-reception/" + $scope.ip.id + "/";
+                }
             } else {
                 $scope.edit = false;
                 $scope.ip = null;

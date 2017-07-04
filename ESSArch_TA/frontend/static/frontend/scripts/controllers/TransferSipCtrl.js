@@ -32,6 +32,7 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             $scope.select = false;
             $scope.ip = null;
             $rootScope.ip = null;
+            $scope.filebrowser = null;
         } else {
             $scope.ip = row;
             $rootScope.ip = row;
