@@ -70,7 +70,7 @@ angular.module('myApp').controller('BaseCtrl', function(vm, ipSortString, $http,
             if($rootScope.stCtrl) {
                 $rootScope.stCtrl.pipe();
             }
-            getEventlogData();
+            vm.getEventlogData();
             $scope.eventShow = true;
             $scope.validateShow = false;
             $scope.statusShow = false;
