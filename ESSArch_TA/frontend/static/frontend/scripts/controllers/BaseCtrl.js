@@ -1,4 +1,4 @@
-angular.module('myApp').controller('BaseCtrl', function(vm, ipSortString, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $q) {
+angular.module('myApp').controller('BaseCtrl', function(IP, vm, ipSortString, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $q) {
     // Initialize variables
     $scope.filebrowser = false;
     $scope.statusShow = false;
@@ -218,10 +218,7 @@ angular.module('myApp').controller('BaseCtrl', function(vm, ipSortString, $http,
 
     //Remove and ip
     $scope.removeIp = function (ipObject) {
-        $http({
-            method: 'DELETE',
-            url: ipObject.url
-        }).then(function() {
+        IP.delete({ id: ipObject.id }).$promise.then(function() {
             vm.displayedIps.splice(vm.displayedIps.indexOf(ipObject), 1);
             $scope.edit = false;
             $scope.select = false;
@@ -292,27 +289,21 @@ angular.module('myApp').controller('BaseCtrl', function(vm, ipSortString, $http,
     $scope.myTreeControl.scope = this;
     //Undo step/task
     $scope.myTreeControl.scope.taskStepUndo = function(branch) {
-        $http({
-            method: 'POST',
-            url: branch.url+"undo/"
-        }).then(function(response) {
+        branch.$undo().then(function(response) {
             $timeout(function(){
                 $scope.statusViewUpdate($scope.ip);
             }, 1000);
-        }, function() {
+        }).catch(function() {
             console.log("error");
         });
     };
     //Redo step/task
     $scope.myTreeControl.scope.taskStepRedo = function(branch){
-        $http({
-            method: 'POST',
-            url: branch.url+"retry/"
-        }).then(function(response) {
+        branch.$retry().then(function(response) {
             $timeout(function(){
                 $scope.statusViewUpdate($scope.ip);
             }, 1000);
-        }, function() {
+        }).catch(function() {
             console.log("error");
         });
     };
@@ -434,18 +425,16 @@ angular.module('myApp').controller('BaseCtrl', function(vm, ipSortString, $http,
 
     $scope.getStepTask = function (branch) {
         $scope.stepTaskLoading = true;
-        return $http({
-            method: 'GET',
-            url: branch.url
-        }).then(function (response) {
-            var data = response.data;
+        return branch.$get().then(function (data) {
             var started = moment(data.time_started);
             var done = moment(data.time_done);
             data.duration = done.diff(started);
             $scope.currentStepTask = data;
             $scope.stepTaskLoading = false;
+            return data;
         });
     }
+
     //Creates and shows modal with task information
     $scope.taskInfoModal = function () {
         var modalInstance = $uibModal.open({

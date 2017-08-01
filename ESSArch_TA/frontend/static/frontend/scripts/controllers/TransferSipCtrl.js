@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller) {
+angular.module('myApp').controller('TransferSipCtrl', function(IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller) {
     var vm = this;
     var ipSortString = "Received,Transferring,Transferred";
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
@@ -47,10 +47,9 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
     $scope.transferDisabled = false;
     $scope.transferSip = function(ip) {
         $scope.transferDisabled = true;
-        $http({
-            method: 'POST',
-            url: ip.url+"transfer/"
-        }).then(function(response) {
+        IP.transfer({
+            id: ip.id
+        }).$promise.then(function(response) {
             $scope.select = false;
             $timeout(function() {
                 $scope.getListViewData();

@@ -22,17 +22,14 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').factory('listViewService', function ($q, $http, $state, $log, appConfig, $rootScope, $filter, linkHeaderParser) {
+angular.module('myApp').factory('listViewService', function (IP, IPReception, Event, Step, Task, EventType, $q, $http, $state, $log, appConfig, $rootScope, $filter, linkHeaderParser) {
     //Go to Given state
     function changePath(state) {
         $state.go(state);
     }
     //Gets data for list view i.e information packages
     function getListViewData(pageNumber, pageSize, filters, sortString, searchString, state) {
-        var promise = $http({
-            method: 'GET',
-            url: appConfig.djangoUrl+'information-packages/',
-            params: {
+        return IP.query({
                 page: pageNumber,
                 page_size: pageSize,
                 archival_institution: filters.institution,
@@ -41,54 +38,43 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
                 ordering: sortString,
                 search: searchString,
                 state: state
-            }
-        })
-        .then(function successCallback(response) {
-            count = response.headers('Count');
+        }).$promise.then(function (resource) {
+            count = resource.$httpHeaders('Count');
             if (count == null) {
-                count = response.data.length;
+                count = resource.length;
             }
             return {
                 count: count,
-                data: response.data
+                data: resource
             };
-        }, function errorCallback(response){
         });
-        return promise;
     }
+
     function getReceptionIps(pageNumber, pageSize, filters, sortString) {
-        var promise = $http({
-            method: 'GET',
-            url: appConfig.djangoUrl+'ip-reception/',
-            params: {
-                page: pageNumber,
-                page_size: pageSize,
-                archival_institution: filters.institution,
-                archivist_organization: filters.organization,
-                ordering: sortString,
-            }
-        })
-        .then(function successCallback(response) {
-            count = response.headers('Count');
+        return IPReception.query({
+            page: pageNumber,
+            page_size: pageSize,
+            archival_institution: filters.institution,
+            archivist_organization: filters.organization,
+            ordering: sortString,
+        }).$promise.then(function (resource) {
+            count = resource.$httpHeaders('Count');
             if (count == null) {
-                count = response.data.length;
+                count = resource.length;
             }
             return {
                 count: count,
-                data: response.data
+                data: resource
             };
-        }, function errorCallback(response){
         });
-        return promise;
     }
 
     //Get data for status view. child steps and tasks
     function getStatusViewData(ip, expandedNodes) {
-        return $http({
-            method: 'GET',
-            url: ip.url + 'steps/'
-        }).then(function (response) {
-            var steps = response.data;
+        return IP.steps({
+            id: ip.id
+        }).$promise.then(function (resource) {
+            var steps = resource;
             steps.forEach(function (step) {
                 step.time_started = $filter('date')(step.time_created, "yyyy-MM-dd HH:mm:ss");
                 step.children = [{ val: -1 }];
@@ -104,285 +90,51 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
 
     //Add a new event
     function addEvent(ip, eventType, eventDetail, outcome) {
-        var promise = $http({
-            method: 'POST',
-            url: appConfig.djangoUrl+"events/",
-            data: {
-                "eventType": eventType.eventType,
-                "eventOutcomeDetailNote": eventDetail,
-                "eventOutcome": outcome.value,
-                "information_package": ip.id
-            }
+        return Event.save({
+            eventType: eventType.eventType,
+            eventOutcomeDetailNote: eventDetail,
+            eventOutcome: outcome.value,
+            information_package: ip.id
 
-        }).then(function(response) {
-            return response.data;
-        }, function(){
-
+        }).$promise.then(function (resource) {
+            return resource;
         });
-        return promise;
     }
     //Returns all events for one ip
     function getEvents(ip, pageNumber, pageSize, sortString) {
-        var promise = $http({
-            method: 'GET',
-            url: ip.url+'events/',
-            params: {page: pageNumber, page_size: pageSize, ordering: sortString}
-        })
-        .then(function successCallback(response) {
-            count = response.headers('Count');
+        return IP.events({
+            id: ip.id,
+            page: pageNumber,
+            page_size: pageSize,
+            ordering: sortString
+        }).$promise.then(function (resource) {
+            count = resource.$httpHeaders('Count');
             if (count == null) {
-                count = response.data.length;
+                count = resource.length;
             }
             return {
                 count: count,
-                data: response.data
+                data: resource
             };
-        }, function errorCallback(response){
         });
-        return promise;
     }
     //Gets event type for dropdown selection
     function getEventlogData() {
-        var promise = $http({
-            method: 'GET',
-            url: appConfig.djangoUrl+'event-types/'
-        })
-        .then(function successCallback(response) {
-            return response.data;
-        }, function errorCallback(response){
-            alert(response.status);
-        });
-        return promise;
-
-    }
-    //Returns map structure for a profile
-    function getStructure(profileUrl) {
-        console.log(profileUrl)
-        return $http({
-            method: 'GET',
-            url: profileUrl
-        }).then(function(response) {
-            console.log(response.data.structure);
-            return response.data.structure;
-        }, function(response) {
+        return EventType.query()
+        .$promise.then(function (resource) {
+            return resource;
         });
     }
-    //returns all SA-profiles and current as an object
-    function getSaProfiles(ip) {
-        var sas = [];
-        var saProfile =
-        {
-            entity: "PROFILE_SUBMISSION_AGREEMENT",
-            profile: null,
-            profiles: [
 
-            ],
-        };
-        var promise = $http({
-            method: 'GET',
-            url: appConfig.djangoUrl+'submission-agreements/'
-        })
-        .then(function successCallback(response) {
-            sas = response.data;
-            saProfile.profiles = [];
-            saProfile.profileObjects = sas;
-            sas.forEach(function (sa) {
-                saProfile.profiles.push(sa);
-                if (ip.submission_agreement == sa.url){
-                    saProfile.profile = sa;
-                    saProfile.locked = ip.submission_agreement_locked;
-                }
-            });
-            return saProfile;
-        }, function errorCallback(response){
-            alert(response.status);
-        });
-        return promise;
-    }
-
-    function getProfileByTypeFromSA(sa, type){
-        return sa['profile_' + type];
-    }
-
-    function getProfileByTypeFromIP(ip, type){
-        return ip['profile_' + type];
-    }
-
-    function findProfileByUrl(url, profiles){
-        var p = null;
-
-        profiles.forEach(function(profile){
-            if (profile.url == url){
-                p = profile;
-            }
-        });
-
-        return p;
-    }
-
-    function createProfileObj(type, profiles, sa, ip){
-        var required = false;
-        var locked = false;
-        var url = null;
-
-        p = getProfileByTypeFromIP(ip, type);
-        if (p) {
-            url_from_ip = p.profile;
-            url = url_from_ip;
-            locked = p.LockedBy ? true : false;
-        }
-        p = getProfileByTypeFromSA(sa, type);
-        if (p){
-            required = true;
-            if (url == null) {
-                url = p.profile;
-            }
-        }
-        active = findProfileByUrl(url, profiles);
-        checked = active == null ? false : true
-
-        return {
-            active: active,
-            checked: checked,
-            required: required,
-            profiles: profiles,
-            locked: locked
-        };
-    }
-
-    //Returns an array consisting of profile objects for an SA
-    function getSelectCollection(sa, ip) {
-        if(sa == null) {
-            var deferred = $q.defer();
-            deferred.resolve([]);
-            return deferred.promise;
-        }
-        return getIp(ip.url).then(function(value) {
-            ip = value;
-            if(sa.id != null) {
-                var selectRowCollapse = {};
-                var type = 'transfer_project';
-
-                return getProfiles(type).then(function(profiles) {
-                    selectRowCollapse[type] = createProfileObj(
-                        type, profiles, sa, ip
-                    );
-                    return selectRowCollapse
-                }).then(function(selectRowCollapse){
-                    type = 'content_type';
-                    return getProfiles(type).then(function(profiles) {
-                        selectRowCollapse[type] = createProfileObj(
-                            type, profiles, sa, ip
-                        );
-                        return selectRowCollapse
-                    });
-                }).then(function(selectRowCollapse){
-                    type = 'data_selection';
-                    return getProfiles(type).then(function(profiles) {
-                        selectRowCollapse[type] = createProfileObj(
-                            type, profiles, sa, ip
-                        );
-                        return selectRowCollapse
-                    });
-                }).then(function(selectRowCollapse){
-                    type = 'classification';
-                    return getProfiles(type).then(function(profiles) {
-                        selectRowCollapse[type] = createProfileObj(
-                            type, profiles, sa, ip
-                        );
-                        return selectRowCollapse
-                    });
-                }).then(function(selectRowCollapse){
-                    type = 'import';
-                    return getProfiles(type).then(function(profiles) {
-                        selectRowCollapse[type] = createProfileObj(
-                            type, profiles, sa, ip
-                        );
-                        return selectRowCollapse
-                    });
-                }).then(function(selectRowCollapse){
-                    type = 'submit_description';
-                    return getProfiles(type).then(function(profiles) {
-                        selectRowCollapse[type] = createProfileObj(
-                            type, profiles, sa, ip
-                        );
-                        return selectRowCollapse
-                    });
-                }).then(function(selectRowCollapse){
-                    type = 'sip';
-                    return getProfiles(type).then(function(profiles) {
-                        selectRowCollapse[type] = createProfileObj(
-                            type, profiles, sa, ip
-                        );
-                        return selectRowCollapse
-                    });
-                }).then(function(selectRowCollapse){
-                    type = 'aip';
-                    return getProfiles(type).then(function(profiles) {
-                        selectRowCollapse[type] = createProfileObj(
-                            type, profiles, sa, ip
-                        );
-                        return selectRowCollapse
-                    });
-                }).then(function(selectRowCollapse){
-                    type = 'dip';
-                    return getProfiles(type).then(function(profiles) {
-                        selectRowCollapse[type] = createProfileObj(
-                            type, profiles, sa, ip
-                        );
-                        return selectRowCollapse
-                    });
-                }).then(function(selectRowCollapse){
-                    type = 'workflow';
-                    return getProfiles(type).then(function(profiles) {
-                        selectRowCollapse[type] = createProfileObj(
-                            type, profiles, sa, ip
-                        );
-                        return selectRowCollapse
-                    });
-                }).then(function(selectRowCollapse){
-                    type = 'preservation_metadata';
-                    return getProfiles(type).then(function(profiles) {
-                        selectRowCollapse[type] = createProfileObj(
-                            type, profiles, sa, ip
-                        );
-                        return selectRowCollapse
-                    });
-                });
-            }
-        })
-    };
-    //Execute prepare ip, which creates a new IP
-    function prepareIp(label){
-        return $http({
-            method: 'POST',
-            url: appConfig.djangoUrl+"information-packages/",
-            data: {label: label}
-        }).then(function (response){
-            return "created";
-        });
-
-    }
     //Returns IP
-    function getIp(url) {
-        return $http({
-            method: 'GET',
-            url: url
-        }).then(function(response) {
-            return response.data;
-        }, function(response) {
+    function getIp(id) {
+        return IP.get({
+            id: id
+        }).then(function(data) {
+            return data;
         });
     }
-    //Returns SA
-    function getSa(url) {
-        return $http({
-            method: 'GET',
-            url: url
-        }).then(function(response) {
-            return response.data;
-        }, function(response) {
-        });
-    }
+
     //Get list of files in Ip
     function getFileList(ip) {
         var array = [];
@@ -401,21 +153,18 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
         } else {
             sendData = {path: pathStr};
         }
-        return $http({
-            method: 'GET',
-            url: ip.url + "files/",
-            params: sendData
-        }).then(function(response) {
-            return response.data;
+        return IP.files(
+            angular.extend({ id: ip.id }, sendData)
+        ).$promise.then(function(data) {
+            return data;
         });
     }
 
     function getFile(ip, path, file) {
-        return $http({
-            method: 'GET',
-            url: ip.url + "files/",
-            params: {path: path + file.name}
-        }).then(function(response) {
+        return IP.files({
+            id: ip.id ,
+            path: path + file.name
+        }).$promise.then(function(response) {
             return response;
         });
     }
@@ -464,32 +213,29 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
         } else {
             step.page_number = page_number;
         }
-        return $http({
-            method: 'GET',
-            url: step.url + "children/",
-            params: {
+        return Step.children({
+            id: step.id,
                 page: step.page_number,
                 page_size: page_size,
                 hidden: false
-            }
-        }).then(function (response) {
-            var link = linkHeaderParser.parse(response.headers('Link'));
-            var count = response.headers('Count');
+        }).$promise.then(function (resource) {
+            var link = linkHeaderParser.parse(resource.$httpHeaders('Link'));
+            var count = resource.$httpHeaders('Count');
             if (count == null) {
-                count = response.data.length;
+                count = resource.length;
             }
             step.pages = Math.ceil(count / page_size);
             link.next ? step.next = link.next : step.next = null;
             link.prev ? step.prev = link.prev : step.prev = null;
             step.page_number = page_number || 1;
             var placeholder_removed = false;
-            if (response.data.length > 0) {
+            if (resource.length > 0) {
                 // Delete placeholder
                 step.children.pop();
                 placeholder_removed = true;
             }
             var tempChildArray = [];
-            response.data.forEach(function (child) {
+            resource.forEach(function (child) {
                 child.label = child.name;
                 child.user = child.responsible;
                 if (child.flow_type == "step") {
@@ -509,42 +255,7 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
         });
     }
 
-    //Gets all profiles of a specific profile type for an IP
-    function getProfiles(type){
-        var promise = $http({
-            method: 'GET',
-            url: appConfig.djangoUrl+"profiles",
-            params: {type: type}
-        })
-        .then(function successCallback(response) {
-            return response.data;
-        }, function errorCallback(response){
-            alert(response.status);
-        });
-        return promise;
-    };
-
-    //Checks if a given sa is locked to a given ip
-    function saLocked(sa, ip) {
-        locked = false;
-        ip.locks.forEach(function (lock) {
-            if(lock.submission_agreement == sa.url){
-                locked = true;
-            }
-        });
-        return locked;
-    }
-
-    //Checks if a profile is locked
-    function profileLocked(profileObject, sa, locks) {
-        profileObject.locked = false;
-        locks.forEach(function (lock) {
-            if(lock.submission_agreement == sa && lock.profile == profileObject.profile.url){
-                profileObject.locked = true;
-            }
-        });
-        return profileObject;
-    }
+ 
     //Return child steps list and corresponding tasks on all levels of child steps
     function getChildSteps(childSteps) {
         var stepsToRemove = [];
@@ -598,14 +309,9 @@ angular.module('myApp').factory('listViewService', function ($q, $http, $state, 
         getStatusViewData: getStatusViewData,
         changePath: changePath,
         getEventlogData: getEventlogData,
-        getSaProfiles: getSaProfiles,
-        getSelectCollection: getSelectCollection,
-        prepareIp: prepareIp,
         getIp: getIp,
-        getSa: getSa,
         getDir: getDir,
         getFileList: getFileList,
-        getStructure: getStructure,
         getReceptionIps: getReceptionIps,
         getFile: getFile,
     };
