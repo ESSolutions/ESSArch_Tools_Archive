@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller) {
+angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller) {
     var vm = this;
     var ipSortString = "Receiving";
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
@@ -67,13 +67,10 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
             return;
         }
         ips.forEach(function(ip) {
-            $http({
-                method: 'POST',
-                url: appConfig.djangoUrl+"ip-reception/"+ip.object_identifier_value+"/receive/",
-                data: {
-                    validators: vm.validatorModel
-                }
-            }).then(function(response) {
+            IPReception.receive({
+                id: ip.id,
+                validators: vm.validatorModel
+            }).$promise.then(function(response) {
                 $scope.includedIps = [];
                 $timeout(function() {
                     $scope.getListViewData();
@@ -334,23 +331,7 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
         array.push(tempElement);
         $scope.fileListCollection = array;
     }
-    //Remove and ip
-    $scope.removeIp = function (ipObject) {
-        $http({
-            method: 'DELETE',
-            url: appConfig.djangoUrl+"information-packages/"+ipObject.id
-        }).then(function() {
-            vm.displayedIps.splice(vm.displayedIps.indexOf(ipObject), 1);
-            $scope.edit = false;
-            $scope.select = false;
-            $scope.eventlog = false;
-            $scope.eventShow = false;
-            $scope.statusShow = false;
-            $scope.filebrowser = false;
-            $rootScope.loadNavigation(ipSortString);
-            $scope.getListViewData();
-        });
-    }
+
     $scope.editUnidentifiedIp = true;
 
     vm.modelUnidentifiedIp = {
@@ -543,14 +524,10 @@ angular.module('myApp').controller('ReceptionCtrl', function($http, $scope, $roo
     }
 
     $scope.identifyIp = function(ip) {
-        $http({
-            method: 'POST',
-            url: appConfig.djangoUrl+'ip-reception/identify-ip/',
-            data: {
+        IPReception.identify({
                 filename: ip.label,
                 specification_data: vm.modelUnidentifiedIp
-            }
-        }).then(function(response) {
+        }).$promise.then(function(response) {
             $scope.prepareUnidentifiedIp = false;
             $timeout(function(){
                 $scope.getListViewData();
