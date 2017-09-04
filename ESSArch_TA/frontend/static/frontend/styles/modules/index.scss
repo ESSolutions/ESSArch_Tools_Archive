@@ -454,7 +454,8 @@ body.modal-open[style] {
         border: 1px solid $border-color;
     }
 }
-.nav {
+.header .nav {
+    cursor: default;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
