@@ -255,7 +255,7 @@ angular.module('myApp').factory('listViewService', function (IP, IPReception, Ev
         });
     }
 
- 
+
     //Return child steps list and corresponding tasks on all levels of child steps
     function getChildSteps(childSteps) {
         var stepsToRemove = [];

@@ -1,4 +1,4 @@
-# **User guide** 
+# **User guide**
 
 ## Table of Contents
 
@@ -59,7 +59,7 @@ To Receive an IP, check the checkbox at the start of the table row, choose valid
 ![reception1][reception1]
 
 ## Transfer SIP
-Once an IP is received it is visible in the Transfer SIP view. 
+Once an IP is received it is visible in the Transfer SIP view.
 The purpose of this view, other than inspecting tasks, steps and events, is to just Transfer the SIP, so when clicking the label column check "Approved to transfer" and click "Transfer SIP".
 
 ![transfer_sip1][transfer_sip1]

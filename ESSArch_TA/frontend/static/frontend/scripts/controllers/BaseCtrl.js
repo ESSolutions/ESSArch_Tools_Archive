@@ -15,7 +15,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, vm, ipSortString, $h
         $state.reload()
     });
 
-    // Init intervals 
+    // Init intervals
     $rootScope.$on('$stateChangeStart', function() {
         $interval.cancel(stateInterval);
     });
@@ -166,7 +166,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, vm, ipSortString, $h
     };
 
     // Get list view data
-    
+
     $scope.getListViewData = function() {
         vm.callServer($scope.tableState);
         $rootScope.loadNavigation(ipSortString);
