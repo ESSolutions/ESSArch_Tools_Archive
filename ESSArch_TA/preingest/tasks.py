@@ -176,25 +176,12 @@ class CopySchemas(tasks.CopySchemas):
     event_type = 20250
 
 
-class ValidateFileFormat(tasks.ValidateFileFormat):
-    event_type = 20260
-
-
 class ValidateXMLFile(tasks.ValidateXMLFile):
     event_type = 20261
 
 
 class ValidateLogicalPhysicalRepresentation(tasks.ValidateLogicalPhysicalRepresentation):
     event_type = 20262
-
-
-class ValidateIntegrity(tasks.ValidateIntegrity):
-    event_type = 20263
-
-
-class ValidateFiles(tasks.ValidateFiles):
-    fileformat_task = "preingest.tasks.ValidateFileFormat"
-    checksum_task = "preingest.tasks.ValidateIntegrity"
 
 
 class UpdateIPStatus(tasks.UpdateIPStatus):

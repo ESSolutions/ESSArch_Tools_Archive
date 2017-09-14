@@ -58,6 +58,8 @@ from ESSArch_Core.essxml.util import (
     parse_submit_description,
 )
 
+from ESSArch_Core.fixity.validation import validate_checksum
+
 from ESSArch_Core.ip.models import (
     ArchivalInstitution,
     ArchivistOrganization,
@@ -385,15 +387,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         filepath = request.data['path']
         filepath = os.path.join(path, filepath)
 
-        ProcessTask.objects.create(
-            name="ESSArch_Core.tasks.ValidateIntegrity",
-            params={
-                "filename": filepath,
-                "checksum": md5,
-                "algorithm": 'MD5'
-            },
-            responsible=self.request.user,
-        ).run().get()
+        validate_checksum(filepath, algorithm='MD5', checksum=md5)
 
         return Response('Upload of %s complete' % filepath)
 
@@ -458,7 +452,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
 
             if val_format or val_integrity:
                 ProcessTask.objects.create(
-                    name="preingest.tasks.ValidateFiles",
+                    name="ESSArch_Core.tasks.ValidateFiles",
                     params={
                         "rootdir": srcdir,
                         "xmlfile": xmlfile,
@@ -839,7 +833,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                 responsible=self.request.user,
             ),
             ProcessTask.objects.create(
-                name="preingest.tasks.ValidateFiles",
+                name="ESSArch_Core.tasks.ValidateFiles",
                 params={
                     "ip": ip.pk,
                     "mets_path": xmlfile,
