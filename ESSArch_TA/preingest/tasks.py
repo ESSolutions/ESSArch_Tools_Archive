@@ -156,14 +156,6 @@ class TransferSIP(DBTask):
         return "Transferred IP '%s' with label '%s'" % (ip, label)
 
 
-class CalculateChecksum(tasks.CalculateChecksum):
-    event_type = 20210
-
-
-class IdentifyFileFormat(tasks.IdentifyFileFormat):
-    event_type = 20220
-
-
 class GenerateXML(tasks.GenerateXML):
     event_type = 20230
 
