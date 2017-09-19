@@ -886,10 +886,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     except:
                         raise
 
-        if InformationPackage.objects.filter(pk=pk).exists():
-            return super(InformationPackageViewSet, self).destroy(request, pk=pk)
-        else:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        return super(InformationPackageViewSet, self).destroy(request, pk=pk)
 
     @detail_route()
     def events(self, request, pk=None):
