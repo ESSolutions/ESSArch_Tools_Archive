@@ -170,5 +170,6 @@
     "REFRESH": "Refresh",
     "FILEBROWSER": "File browser",
     "CHANGED": "Changed",
-    "COPYID": "Copy ID"
+    "COPYID": "Copy ID",
+    "EMPTY": "Empty"
 }

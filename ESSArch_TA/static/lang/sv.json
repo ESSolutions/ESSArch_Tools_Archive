@@ -170,5 +170,6 @@
     "REFRESH": "Uppdatera",
     "FILEBROWSER": "Filhanterare",
     "CHANGED": "Ändrad",
-    "COPYID": "Kopiera ID"
+    "COPYID": "Kopiera ID",
+    "EMPTY": "Tomt"
 }
