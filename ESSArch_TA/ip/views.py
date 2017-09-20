@@ -852,39 +852,65 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         return Response("Validating IP")
 
     def destroy(self, request, pk=None):
-        reception = Path.objects.get(entity="path_ingest_reception").value
-        uip = Path.objects.get(entity="path_ingest_unidentified").value
 
-        xmlfile = os.path.join(reception, "%s.xml" % pk)
-        srcdir = reception
+        delete_from_reception = request.data.get('reception', True)
+        delete_from_workarea = request.data.get('workarea', False)
 
-        if not os.path.isfile(xmlfile):
-            xmlfile = os.path.join(uip, "%s.xml" % pk)
-            srcdir = uip
+        objid = self.get_object().object_identifier_value
 
-        if os.path.isfile(xmlfile):
-            doc = etree.parse(xmlfile)
-            root = doc.getroot()
+        if delete_from_reception:
+            reception = Path.objects.get(entity="path_ingest_reception").value
+            uip = Path.objects.get(entity="path_ingest_unidentified").value
 
-            el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
-            objpath = get_value_from_path(el, "@href").split('file:///')[1]
-            path = os.path.join(srcdir, objpath)
+            xmlfile = os.path.join(reception, "%s.xml" % objid)
+            srcdir = reception
+
+            if not os.path.isfile(xmlfile):
+                xmlfile = os.path.join(uip, "%s.xml" % objid)
+                srcdir = uip
+
+            if os.path.isfile(xmlfile):
+                doc = etree.parse(xmlfile)
+                root = doc.getroot()
+
+                el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
+                objpath = get_value_from_path(el, "@href").split('file:///')[1]
+                path = os.path.join(srcdir, objpath)
+
+                try:
+                    shutil.rmtree(path)
+                except OSError as e:
+                    if e.errno == errno.ENOTDIR:
+                        os.remove(path)
+                    elif e.errno == errno.ENOENT:
+                        pass
+                    else:
+                        raise
+                finally:
+                    for fl in glob.glob(os.path.splitext(xmlfile)[0] + "*"):
+                        try:
+                            os.remove(fl)
+                        except:
+                            raise
+
+        if delete_from_workarea:
+            workarea = Path.objects.get(entity="path_ingest_work").value
+            objpath = os.path.join(workarea, objid)
+
+            paths = [objpath + '.' + ext for ext in ['xml', 'tar', 'zip']]
+
+            for path in paths:
+                try:
+                    os.remove(path)
+                except OSError as e:
+                    if e.errno != errno.ENOENT:
+                        raise
 
             try:
-                shutil.rmtree(path)
+                shutil.rmtree(objpath)
             except OSError as e:
-                if e.errno == errno.ENOTDIR:
-                    os.remove(path)
-                elif e.errno == errno.ENOENT:
-                    pass
-                else:
+                if e.errno != errno.ENOENT:
                     raise
-            finally:
-                for fl in glob.glob(os.path.splitext(xmlfile)[0] + "*"):
-                    try:
-                        os.remove(fl)
-                    except:
-                        raise
 
         return super(InformationPackageViewSet, self).destroy(request, pk=pk)
 
