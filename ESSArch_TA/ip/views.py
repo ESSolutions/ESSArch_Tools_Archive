@@ -895,11 +895,14 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     else:
                         raise
                 finally:
-                    for fl in glob.glob(os.path.splitext(xmlfile)[0] + "*"):
+                    paths = [os.path.splitext(xmlfile)[0] + '.' + ext for ext in ['xml', 'tar', 'zip']]
+
+                    for path in paths:
                         try:
-                            os.remove(fl)
-                        except:
-                            raise
+                            os.remove(path)
+                        except OSError as e:
+                            if e.errno != errno.ENOENT:
+                                raise
 
         if delete_from_workarea:
             workarea = Path.objects.get(entity="path_ingest_work").value
