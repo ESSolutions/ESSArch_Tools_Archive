@@ -26,6 +26,7 @@ import datetime
 import errno
 import glob
 import json
+import logging
 import mimetypes
 import os
 import shutil
@@ -159,6 +160,8 @@ class ArchivalLocationViewSet(viewsets.ModelViewSet):
 
 class InformationPackageReceptionViewSet(viewsets.ViewSet):
     def list(self, request):
+        logger = logging.getLogger('essarch.reception')
+
         reception = Path.objects.get(entity="path_ingest_reception").value
         uip = Path.objects.get(entity="path_ingest_unidentified").value
         ips = []
@@ -170,7 +173,12 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                 else:
                     srcdir = reception
 
-                ip = parse_submit_description(xmlfile, srcdir)
+                try:
+                    ip = parse_submit_description(xmlfile, srcdir)
+                except ValueError as e:
+                    logger.warn('Failed to parse %s: %s' % (xmlfile, e.message))
+                    continue
+
                 ip['state'] = 'At reception'
                 ip['status'] = 100
                 ip['step_state'] = celery_states.SUCCESS
