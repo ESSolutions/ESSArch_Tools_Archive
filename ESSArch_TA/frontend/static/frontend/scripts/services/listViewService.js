@@ -320,4 +320,3 @@ angular.module('myApp').factory('listViewService', function (IP, IPReception, Ev
     };
 
 });
-
