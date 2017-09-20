@@ -1,4 +1,4 @@
-angular.module('myApp').controller('BaseCtrl', function(IP, vm, ipSortString, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $q) {
+angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSortString, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $q) {
     // Initialize variables
     $scope.filebrowser = false;
     $scope.statusShow = false;
@@ -412,20 +412,9 @@ angular.module('myApp').controller('BaseCtrl', function(IP, vm, ipSortString, $h
     $scope.stepClick = function(step) {
         listViewService.getChildrenForStep(step);
     };
-    //Click funciton for steps and tasks
-    $scope.stepTaskClick = function (branch) {
-        $scope.getStepTask(branch).then(function (response) {
-            if (branch.flow_type == "task") {
-                $scope.taskInfoModal();
-            } else {
-                $scope.stepInfoModal();
-            }
-        });
-    };
 
-    $scope.getStepTask = function (branch) {
-        $scope.stepTaskLoading = true;
-        return branch.$get().then(function (data) {
+    $scope.getTask = function(branch) {
+        return Task.get({ id: branch.id }).$promise.then(function (data) {
             var started = moment(data.time_started);
             var done = moment(data.time_done);
             data.duration = done.diff(started);
@@ -435,6 +424,29 @@ angular.module('myApp').controller('BaseCtrl', function(IP, vm, ipSortString, $h
         });
     }
 
+    $scope.getStep = function(branch) {
+        return Step.get({ id: branch.id }).$promise.then(function (data) {
+            var started = moment(data.time_started);
+            var done = moment(data.time_done);
+            data.duration = done.diff(started);
+            $scope.currentStepTask = data;
+            $scope.stepTaskLoading = false;
+            return data;
+        });
+    }
+    //Click funciton for steps and tasks
+    $scope.stepTaskClick = function (branch) {
+        $scope.stepTaskLoading = true;
+        if (branch.flow_type == "task") {
+            $scope.getTask(branch).then(function(data) {
+                $scope.taskInfoModal();
+            });
+        } else {
+            $scope.getStep(branch).then(function(data) {
+                $scope.stepInfoModal();
+            });
+        }
+    };
     //Creates and shows modal with task information
     $scope.taskInfoModal = function () {
         var modalInstance = $uibModal.open({
