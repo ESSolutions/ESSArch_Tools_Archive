@@ -75,6 +75,8 @@ from ESSArch_Core.ip.permissions import (
     CanTransferSIP,
 )
 
+from ESSArch_Core.ip.serializers import EventIPSerializer
+
 from ESSArch_Core.pagination import LinkHeaderPagination
 
 from ESSArch_Core.WorkflowEngine.models import (
@@ -111,7 +113,6 @@ from ip.serializers import (
     ArchivalTypeSerializer,
     ArchivalLocationSerializer,
     InformationPackageSerializer,
-    EventIPSerializer,
 )
 
 from rest_framework import viewsets
@@ -686,7 +687,6 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                 name="preingest.tasks.AppendEvents",
                 params={
                     "filename": events_path,
-                    "events": ip.events.all(),
                 },
                 processstep_pos=30,
                 log=EventIP,
@@ -928,7 +928,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     @detail_route()
     def events(self, request, pk=None):
         ip = self.get_object()
-        events = filters.OrderingFilter().filter_queryset(request, ip.events.all(), self)
+        events = filters.OrderingFilter().filter_queryset(request, EventIP.objects.filter(linkingObjectIdentifierValue=ip.object_identifier_value), self)
         page = self.paginate_queryset(events)
         if page is not None:
             serializers = EventIPSerializer(page, many=True, context={'request': request})
@@ -950,37 +950,3 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     def files(self, request, pk=None):
         ip = self.get_object()
         return ip.files(request.query_params.get('path', '').rstrip('/'))
-
-class EventIPViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows events to be viewed or edited.
-    """
-    queryset = EventIP.objects.all()
-    serializer_class = EventIPSerializer
-    filter_backends = (
-        filters.OrderingFilter, DjangoFilterBackend,
-    )
-    ordering_fields = (
-        'id', 'eventType', 'eventOutcomeDetailNote', 'eventOutcome',
-        'linkingAgentIdentifierValue', 'eventDateTime',
-    )
-
-    def create(self, request):
-        """
-        """
-
-        outcomeDetailNote = request.data.get('eventOutcomeDetailNote', None)
-        outcome = request.data.get('eventOutcome', 0)
-        type_id = request.data.get('eventType', None)
-        ip_id = request.data.get('information_package', None)
-
-        eventType = EventType.objects.get(pk=type_id)
-        ip = InformationPackage.objects.get(pk=ip_id)
-        agent = request.user
-
-        EventIP.objects.create(
-            eventOutcome=outcome, eventOutcomeDetailNote=outcomeDetailNote,
-            eventType=eventType, linkingObjectIdentifierValue=ip,
-            linkingAgentIdentifierValue=agent,
-        )
-        return Response({"status": "Created event"})
