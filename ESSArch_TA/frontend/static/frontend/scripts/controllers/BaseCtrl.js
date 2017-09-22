@@ -227,6 +227,9 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             $scope.statusShow = false;
             $scope.filebrowser = false;
             $rootScope.loadNavigation(ipSortString);
+            if(vm.displayedIps.length == 0) {
+                $state.reload();
+            }
             $scope.getListViewData();
         });
     }
