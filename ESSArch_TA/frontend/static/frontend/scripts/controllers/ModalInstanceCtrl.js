@@ -27,6 +27,8 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     $ctrl.error_messages_old = [];
     $ctrl.error_messages_pw1 = [];
     $ctrl.error_messages_pw2 = [];
+    $ctrl.workareaRemove = true;
+    $ctrl.receptionRemove = true;
     $ctrl.tracebackCopied = false;
     $ctrl.copied = function() {
         $ctrl.tracebackCopied = true;
@@ -61,7 +63,8 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     };
     $ctrl.remove = function () {
         $ctrl.data = {
-            status: "removed"
+            workarea: $ctrl.workareaRemove,
+            reception: $ctrl.receptionRemove
         }
         $uibModalInstance.close($ctrl.data);
     };

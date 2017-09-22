@@ -2,6 +2,17 @@
     <h3 style="margin: 10px;" class="modal-title" id="modal-title">{{'DOYOUWANTTOREMOVEIP' | translate}}</h3>
 </div>
 <div class="modal-body" id="modal-body">
+    <form>
+        <label>
+            <input type="checkbox" ng-model="$ctrl.workareaRemove">
+            {{ 'REMOVE_FROM_WORKAREA' | translate }}
+        </label>
+        <br />
+        <label>
+            <input type="checkbox" ng-model="$ctrl.receptionRemove">
+            {{ 'REMOVE_FROM_RECEPTION' | translate }}
+        </label>
+    </form>
 </div>
 <div class="modal-footer">
     <button class="btn btn-primary" type="button" ng-click="$ctrl.remove()" focused="true">{{'OK' | translate}}</button>

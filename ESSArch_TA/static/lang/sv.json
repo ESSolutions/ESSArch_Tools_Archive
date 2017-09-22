@@ -171,5 +171,7 @@
     "FILEBROWSER": "Filhanterare",
     "CHANGED": "Ändrad",
     "COPYID": "Kopiera ID",
-    "EMPTY": "Tomt"
+    "EMPTY": "Tomt",
+    "REMOVE_FROM_WORKAREA": "Ta bort IP från arbetsarea",
+    "REMOVE_FROM_RECEPTION": "Ta bort IP från reception"
 }
