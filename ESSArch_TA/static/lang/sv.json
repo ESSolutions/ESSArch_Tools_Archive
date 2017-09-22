@@ -173,5 +173,6 @@
     "COPYID": "Kopiera ID",
     "EMPTY": "Tomt",
     "REMOVE_FROM_WORKAREA": "Ta bort IP från arbetsarea",
-    "REMOVE_FROM_RECEPTION": "Ta bort IP från reception"
+    "REMOVE_FROM_RECEPTION": "Ta bort IP från reception",
+    "ERROR_MESSAGE": "Event kunde inte bli tillagt"
 }
