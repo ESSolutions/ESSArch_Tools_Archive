@@ -30,7 +30,7 @@ django.setup()
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 
-from ESSArch_Core.configuration.models import Parameter, Path, EventType, Agent
+from ESSArch_Core.configuration.models import Parameter, Path, Agent
 from ESSArch_Core.ip.models import InformationPackage
 
 
@@ -39,8 +39,6 @@ def installDefaultConfiguration():
     installDefaultUsers()
     print "\nInstalling paths..."
     installDefaultPaths()
-    print "\nInstalling event types..."
-    installDefaultEventTypes()
 
     return 0
 
@@ -117,37 +115,6 @@ def installDefaultPaths():
     for key in dct:
         print '-> %s: %s' % (key, dct[key])
         Path.objects.get_or_create(entity=key, value=dct[key])
-
-    return 0
-
-
-def installDefaultEventTypes():
-    dct = {
-        'Other': '20000',
-        'Delivery received': '20100',
-        'Delivery checked': '20200',
-        'Calculate checksum': '20210',
-        'Identify format': '20220',
-        'Generate XML files': '20230',
-        'Append events': '20240',
-        'Copy schemas': '20250',
-        'Validate file format': '20260',
-        'Validate XML file': '20261',
-        'Validate logical representation against physical representation': '20262',
-        'Validate checksum': '20263',
-        'Update IP status': '20280',
-        'Delivery registered': '20300',
-        'Delivery registered in journal system': '20400',
-        'Delivery registered in archival information system': '20500',
-        'Delivery receipt sent': '20600',
-        'Virus control done': '20700',
-        'Delivery ready for hand over': '20800',
-        'Transferring delivery': '20900',
-    }
-
-    for key in dct:
-        print '-> %s: %s' % (key, dct[key])
-        EventType.objects.get_or_create(eventType=dct[key], eventDetail=key)
 
     return 0
 

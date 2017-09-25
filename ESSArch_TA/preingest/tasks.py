@@ -154,27 +154,3 @@ class TransferSIP(DBTask):
     def event_outcome_success(self, ip=None):
         label = InformationPackage.objects.values_list('label', flat=True).get(pk=ip)
         return "Transferred IP '%s' with label '%s'" % (ip, label)
-
-
-class GenerateXML(tasks.GenerateXML):
-    event_type = 20230
-
-
-class AppendEvents(tasks.AppendEvents):
-    event_type = 20240
-
-
-class CopySchemas(tasks.CopySchemas):
-    event_type = 20250
-
-
-class ValidateXMLFile(tasks.ValidateXMLFile):
-    event_type = 20261
-
-
-class ValidateLogicalPhysicalRepresentation(tasks.ValidateLogicalPhysicalRepresentation):
-    event_type = 20262
-
-
-class UpdateIPStatus(tasks.UpdateIPStatus):
-    event_type = 20280
