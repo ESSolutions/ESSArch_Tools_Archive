@@ -111,7 +111,7 @@ class ReceiveSIP(DBTask):
 
 
 class TransferSIP(DBTask):
-    event_type = 20900
+    event_type = 20600
 
     def run(self, ip=None):
         objectpath = InformationPackage.objects.values_list('object_path', flat=True).get(pk=ip)
