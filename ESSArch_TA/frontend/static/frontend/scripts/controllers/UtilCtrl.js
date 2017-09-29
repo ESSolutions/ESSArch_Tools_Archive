@@ -22,11 +22,15 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('UtilCtrl', function($scope, $state, $location, $window, $http, appConfig) {
+angular.module('myApp').controller('UtilCtrl', function($scope, $state, $location, $window, $http, appConfig, TopAlert) {
+    $scope.$state = $state;
     $scope.reloadPage = function (){
         $state.reload();
     }
     $scope.redirectAdmin = function () {
         $window.location.href="/admin/";
+    }
+    $scope.showAlert = function() {
+        TopAlert.show();
     }
 });

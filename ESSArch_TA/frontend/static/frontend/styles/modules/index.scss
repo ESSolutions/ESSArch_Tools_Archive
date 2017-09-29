@@ -298,6 +298,9 @@ body.modal-open[style] {
 .fa.fa-pencil {
     font-size: 21px;
 }
+.fa.fa-bell {
+    font-size: 21px;
+}
 .fa.fa-print {
     font-size: 21px;
 }
@@ -591,4 +594,24 @@ body.modal-open[style] {
 .empty-step {
     background-color: rgba(244, 66, 66, 0.30);
     text-align: center;
+}
+
+.notification-icon {
+    position: relative;
+    cursor: pointer;
+}
+
+.unseen-text {
+    width: auto;
+    position: absolute;
+    color: white;
+    height: 12px;
+    top: -5px;
+    right: -3px;
+    border-radius: 2px;
+    padding-right: 10%;
+    padding-left: 10%;
+    background-color: $step-fail;
+    font-size: 10px;
+    margin-left: 10px;
 }

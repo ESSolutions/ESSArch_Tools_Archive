@@ -10,7 +10,8 @@
             "debugInfo": false,
             "logDebug": false,
             "commentDirectives": false,
-            "cssClassDirectives": false
+            "cssClassDirectives": false,
+            "webSocketProtocol": "wss"
         }
     },
     "development": {
@@ -24,8 +25,8 @@
             "debugInfo": true,
             "logDebug": true,
             "commentDirectives": true,
-            "cssClassDirectives": true
-
+            "cssClassDirectives": true,
+            "webSocketProtocol": "ws"
         }
 
     }
