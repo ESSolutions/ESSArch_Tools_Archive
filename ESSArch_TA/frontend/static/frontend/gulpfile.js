@@ -78,8 +78,8 @@ var vendorFiles = [
         'node_modules/angular-resource/angular-resource.js',
     ],
     jsFiles = [
-        'scripts/myApp.js', 'scripts/controllers/*.js', 'scripts/services/*.js',
-        'scripts/directives/*.js', 'scripts/configs/*.js'
+        'scripts/polyfills/*.js', 'scripts/myApp.js', 'scripts/controllers/*.js', 'scripts/components/*.js',
+         'scripts/services/*.js', 'scripts/directives/*.js', 'scripts/configs/*.js'
     ],
     jsDest = 'scripts',
     cssFiles = [

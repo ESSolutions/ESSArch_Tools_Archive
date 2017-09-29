@@ -67,10 +67,6 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             $scope.ip = null;
             $rootScope.ip = null;
         } else {
-            if($rootScope.stCtrl) {
-                $rootScope.stCtrl.pipe();
-            }
-            vm.getEventlogData();
             $scope.eventShow = true;
             $scope.validateShow = false;
             $scope.statusShow = false;
