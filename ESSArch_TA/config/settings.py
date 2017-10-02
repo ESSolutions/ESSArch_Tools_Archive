@@ -96,6 +96,9 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgi_redis.RedisChannelLayer",
         "ROUTING": "ESSArch_Core.routing.channel_routing",
+        "CONFIG": {
+            "hosts": ["redis://localhost/2"],
+        },
     },
 }
 
