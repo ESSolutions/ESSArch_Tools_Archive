@@ -214,7 +214,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
 
     //Remove and ip
     $scope.removeIp = function (ipObject, workarea, reception) {
-        IP.delete({ id: ipObject.id, workarea: workarea, reception: reception }).$promise.then(function() {
+        IP.delete({ id: ipObject.id }, { workarea: workarea, reception: reception }).$promise.then(function() {
             vm.displayedIps.splice(vm.displayedIps.indexOf(ipObject), 1);
             $scope.edit = false;
             $scope.select = false;

@@ -14,6 +14,12 @@ angular.module('myApp').factory('IP', function ($resource, appConfig, Event, Ste
                 }
             },
         },
+        delete: {
+            method: 'DELETE',
+            params: {id: "@id" },
+            hasBody: true,
+            headers: { "Content-type": 'application/json;charset=utf-8' }
+        },
         events: {
             method: 'GET',
             params: {action: "events", id: "@id"},
