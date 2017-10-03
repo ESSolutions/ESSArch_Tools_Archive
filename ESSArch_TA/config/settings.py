@@ -174,6 +174,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'ESSArch_Core.log.dbhandler.DBHandler',
             'application': 'ESSArch Tools for Archive',
+            'agent_role': 'Archivist',
         }
     },
     'loggers': {
