@@ -157,9 +157,29 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
                 tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
                 $scope.ipLoading = false;
                 $scope.initLoad = false;
+                ipExists();
             });
         }
     };
+
+    function ipExists() {
+        if($scope.ip != null) {
+            var temp = false;
+            vm.displayedIps.forEach(function(aic) {
+                if($scope.ip.id == aic.id) {
+                    temp = true;
+                }
+            })
+            if(!temp) {
+                $scope.eventShow = false;
+                $scope.statusShow = false;
+                $scope.filebrowser = false;
+                $scope.requestForm = false;
+                $scope.eventlog = false;
+                $scope.requestEventlog = false;
+            }
+        }
+    }
 
     // Get list view data
 
