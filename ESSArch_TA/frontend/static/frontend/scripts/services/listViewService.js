@@ -148,16 +148,19 @@ angular.module('myApp').factory('listViewService', function (IP, IPReception, Ev
     }
 
     function getDir(ip, pathStr) {
-        if(pathStr == "") {
-            sendData = {};
-        } else {
-            sendData = {path: pathStr};
+        var sendData = { 'id': ip.id };
+        if (pathStr != "") {
+            sendData = angular.extend(sendData, { path: pathStr });
         }
-        return IP.files(
-            angular.extend({ id: ip.id }, sendData)
-        ).$promise.then(function(data) {
-            return data;
-        });
+        if (ip.state == "At reception") {
+            return IPReception.files(sendData).$promise.then(function (data) {
+                return data;
+            });
+        } else {
+            return IP.files(sendData).$promise.then(function (data) {
+                return data;
+            });
+        }
     }
 
     function getFile(ip, path, file) {

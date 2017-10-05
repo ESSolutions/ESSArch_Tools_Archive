@@ -22,6 +22,11 @@ angular.module('myApp').factory('IPReception', function ($resource, appConfig) {
             method: "POST",
             params: { action: "identify-ip" }
         },
+        files: {
+            method: "GET",
+            params: { action: "files", id: "@id" },
+            isArray: true
+        },
         submit: {
             method: 'POST',
             params: { action: "submit", id: "@id" }
