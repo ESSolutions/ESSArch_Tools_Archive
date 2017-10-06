@@ -1,0 +1,16 @@
+{
+    "permissionConfig": {
+        "home": {
+            "reception": {
+                "_permissions": [
+                    "ip.receive"
+                ]
+            },
+            "transferSip": {
+                "_permissions": [
+                    "ip.transfer_sip"
+                ]
+            }
+        }
+    }
+}

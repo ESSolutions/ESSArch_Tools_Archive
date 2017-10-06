@@ -23,7 +23,7 @@
 */
 
 angular.module('myApp')
-.controller('RestrictedCtrl', function ($scope, $location) {
+.controller('RestrictedCtrl', function ($scope, $location, $state) {
     $scope.$on('djangoAuth.logged_in', function() {
         $state.go('home');
     });
