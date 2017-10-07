@@ -44,6 +44,14 @@ def installDefaultConfiguration():
 
 
 def installDefaultUsers():
+    user_superuser, created = User.objects.get_or_create(
+        username='superuser', email='superuser@essolutions.se',
+        is_staff=True, is_superuser=True
+    )
+    if created:
+        user_superuser.set_password('superuser')
+        user_superuser.save()
+
     user_user, _ = User.objects.get_or_create(
         username='user', email='usr1@essolutions.se'
     )
@@ -59,7 +67,7 @@ def installDefaultUsers():
 
     user_sysadmin, _ = User.objects.get_or_create(
         username='sysadmin', email='sysadmin@essolutions.se',
-        is_staff=True, is_superuser=True
+        is_staff=True
     )
     user_sysadmin.set_password('sysadmin')
     user_sysadmin.save()
@@ -74,28 +82,84 @@ def installDefaultUsers():
     group_admin, _ = Group.objects.get_or_create(name='admin')
     group_sysadmin, _ = Group.objects.get_or_create(name='sysadmin')
 
-    can_add_ip_event = Permission.objects.get(codename='add_eventip')
-    can_change_ip_event = Permission.objects.get(codename='change_eventip')
-    can_delete_ip_event = Permission.objects.get(codename='delete_eventip')
-
-    group_user.permissions.add(can_add_ip_event, can_change_ip_event, can_delete_ip_event)
-
     content_type = ContentType.objects.get_for_model(InformationPackage)
     can_receive_remote_files = Permission.objects.get(content_type=content_type, codename='can_receive_remote_files')
     user_reta.user_permissions.add(can_receive_remote_files)
+
+    permission_list_user = [
+        ## ---- app: ip ---- model: informationpackage
+        ['receive','ip','informationpackage'],                    # Can receive IP
+        ['transfer_sip','ip','informationpackage'],                    # Can transfer SIP
+        ## ---- app: WorkflowEngine ---- model: processtask
+        #['can_undo','WorkflowEngine','processtask'],             # Can undo tasks (other)
+        #['can_retry','WorkflowEngine','processtask'],             # Can retry tasks (other)
+    ]
+
+    for p in permission_list_user:
+        p_obj = Permission.objects.get(
+                                          codename=p[0], content_type__app_label=p[1],
+                                          content_type__model=p[2],
+                                          )
+        group_user.permissions.add(p_obj)
+
+    permission_list_admin = [
+        ## ---- app: ip ---- model: informationpackage
+        ['receive','ip','informationpackage'],                    # Can receive IP
+        ['transfer_sip','ip','informationpackage'],                    # Can transfer SIP
+        ## ---- app: WorkflowEngine ---- model: processtask
+        #['can_undo','WorkflowEngine','processtask'],             # Can undo tasks (other)
+        #['can_retry','WorkflowEngine','processtask'],             # Can retry tasks (other)                             
+    ]
+   
+    for p in permission_list_admin:
+        p_obj = Permission.objects.get(
+                                          codename=p[0], content_type__app_label=p[1],
+                                          content_type__model=p[2],
+                                          )        
+        group_admin.permissions.add(p_obj)
+
+    permission_list_sysadmin = [
+        ## ---- app: auth ---- model: group
+        ['add_group','auth','group'],                    # Can add group
+        ['change_group','auth','group'],                    # Can change group
+        ['delete_group','auth','group'],                    # Can delete group
+        ## ---- app: auth ---- model: user
+        ['add_user','auth','user'],                    # Can add user
+        ['change_user','auth','user'],                    # Can change user
+        ['delete_user','auth','user'],                    # Can delete user
+        ## ---- app: configuration ---- model: parameter
+        ['add_parameter','configuration','parameter'],                    # Can add parameter
+        ['change_parameter','configuration','parameter'],                    # Can change parameter
+        ['delete_parameter','configuration','parameter'],                    # Can delete parameter
+        ## ---- app: configuration ---- model: path
+        ['add_path','configuration','path'],                    # Can add path
+        ['change_path','configuration','path'],                    # Can change path
+        ['delete_path','configuration','path'],                    # Can delete path
+        ## ---- app: configuration ---- model: eventtype
+        ['add_eventtype','configuration','eventtype'],                    # Can add eventtype
+        ['change_eventtype','configuration','eventtype'],                    # Can change eventtype
+        ['delete_eventtype','configuration','eventtype'],                    # Can delete eventtype        
+        ## ---- app: profiles ---- model: profile
+        ['add_profile','profiles','profile'],                    # Can add profile
+        ['change_profile','profiles','profile'],                    # Can change profile
+        ['delete_profile','profiles','profile'],                    # Can delete profile
+        ## ---- app: profiles ---- model: submissionagreement
+        ['add_submissionagreement','profiles','submissionagreement'],                    # Can add submissionagreement
+        ['change_submissionagreement','profiles','submissionagreement'],                    # Can change submissionagreement
+        ['delete_submissionagreement','profiles','submissionagreement'],                    # Can delete submissionagreement        
+    ]
+   
+    for p in permission_list_sysadmin:
+        p_obj = Permission.objects.get(
+                                          codename=p[0], content_type__app_label=p[1],
+                                          content_type__model=p[2],
+                                          )        
+        group_sysadmin.permissions.add(p_obj)
 
     group_user.user_set.add(user_user)
     group_user.user_set.add(user_reta)
     group_admin.user_set.add(user_admin)
     group_sysadmin.user_set.add(user_sysadmin)
-
-    transfer_sip_permission = Permission.objects.get(
-        codename='transfer_sip', content_type__app_label='ip',
-        content_type__model='informationpackage'
-    )
-
-    group_user.permissions.add(transfer_sip_permission)
-    group_admin.permissions.add(transfer_sip_permission)
 
     return 0
 
