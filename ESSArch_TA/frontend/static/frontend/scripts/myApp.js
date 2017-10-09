@@ -401,7 +401,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                     $state.transitionTo('home.info');
                 }
             }
-            if(to.name == "home.reception" || to.name == "home.tranferSip") {
+            if(to.name == "home.administration") {
                 evt.preventDefault();
                 var resolved = Object.resolve(to.name, permissionConfig);
                 for( var key in resolved) {
