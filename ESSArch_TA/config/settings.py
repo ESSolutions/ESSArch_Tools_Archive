@@ -53,6 +53,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 REST_FRAMEWORK = {
+    'DEFAULT_METADATA_CLASS': 'ESSArch_Core.metadata.CustomMetadata',
     'DEFAULT_PAGINATION_CLASS': 'ESSArch_Core.pagination.LinkHeaderPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_PERMISSION_CLASSES': (
