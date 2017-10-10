@@ -503,9 +503,8 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ProcessTask.objects.create(
             name='ESSArch_Core.tasks.GenerateXML',
             params={
-                'info': spec_data,
                 'filesToCreate': {
-                    infoxml: spec
+                    infoxml: {'spec': spec, 'data': spec_data}
                 },
                 'folderToParse': container_file,
             },
@@ -571,7 +570,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
         events_path = os.path.join(dstdir, "%s_ipevents.xml" % ip.object_identifier_value)
         filesToCreate = {
-            events_path: get_event_spec()
+            events_path: {'spec': get_event_spec(), 'data': info}
         }
 
         step = ProcessStep.objects.create(
@@ -611,7 +610,6 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             ProcessTask.objects.create(
                 name="ESSArch_Core.tasks.GenerateXML",
                 params={
-                    "info": info,
                     "filesToCreate": filesToCreate,
                 },
                 processstep_pos=20,
