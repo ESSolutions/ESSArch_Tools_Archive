@@ -28,13 +28,13 @@ from rest_framework import serializers
 
 from ESSArch_Core.configuration.models import EventType
 
-from ESSArch_Core.ip.models import (
-    ArchivalInstitution,
-    ArchivistOrganization,
-    ArchivalType,
-    ArchivalLocation,
-    EventIP,
-    InformationPackage
+from ESSArch_Core.ip.models import InformationPackage
+
+from ESSArch_Core.ip.serializers import (
+    ArchivalInstitutionSerializer,
+    ArchivistOrganizationSerializer,
+    ArchivalTypeSerializer,
+    ArchivalLocationSerializer,
 )
 
 from ESSArch_Core.serializers import DynamicHyperlinkedModelSerializer
@@ -47,46 +47,13 @@ from ESSArch_Core.profiles.serializers import (
 
 VERSION = get_versions()['version']
 
-
-class ArchivalInstitutionSerializer(DynamicHyperlinkedModelSerializer):
-    class Meta:
-        model = ArchivalInstitution
-        fields = ('url', 'id', 'name', 'information_packages',)
-
-
-class ArchivistOrganizationSerializer(DynamicHyperlinkedModelSerializer):
-    class Meta:
-        model = ArchivistOrganization
-        fields = ('url', 'id', 'name', 'information_packages',)
-
-
-class ArchivalTypeSerializer(DynamicHyperlinkedModelSerializer):
-    class Meta:
-        model = ArchivalType
-        fields = ('url', 'id', 'name', 'information_packages',)
-
-
-class ArchivalLocationSerializer(DynamicHyperlinkedModelSerializer):
-    class Meta:
-        model = ArchivalLocation
-        fields = ('url', 'id', 'name', 'information_packages',)
-
-
 class InformationPackageSerializer(serializers.HyperlinkedModelSerializer):
     responsible = UserSerializer()
     profiles = ProfileIPSerializer(many=True)
-    archival_institution = ArchivalInstitutionSerializer(
-        fields=['url', 'id', 'name']
-    )
-    archivist_organization = ArchivistOrganizationSerializer(
-        fields=['url', 'id', 'name']
-    )
-    archival_type = ArchivalTypeSerializer(
-        fields=['url', 'id', 'name']
-    )
-    archival_location = ArchivalLocationSerializer(
-        fields=['url', 'id', 'name']
-    )
+    archival_institution = ArchivalInstitutionSerializer(read_only=True)
+    archivist_organization = ArchivistOrganizationSerializer(read_only=True)
+    archival_type = ArchivalTypeSerializer(read_only=True)
+    archival_location = ArchivalLocationSerializer(read_only=True)
 
     def to_representation(self, obj):
         data = super(InformationPackageSerializer, self).to_representation(obj)
