@@ -74,6 +74,8 @@ from ESSArch_Core.ip.serializers import EventIPSerializer
 
 from ESSArch_Core.pagination import LinkHeaderPagination
 
+from ESSArch_Core.profiles.utils import fill_specification_data
+
 from ESSArch_Core.WorkflowEngine.models import (
     ProcessStep,
     ProcessTask
@@ -563,10 +565,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         ip = self.get_object()
         dstdir = Path.objects.get(entity="path_gate_reception").value
 
-        info = {
-            "_OBJID": ip.object_identifier_value,
-            "_OBJLABEL": ip.label
-        }
+        info = fill_specification_data(ip=ip)
 
         events_path = os.path.join(dstdir, "%s_ipevents.xml" % ip.object_identifier_value)
         filesToCreate = {
