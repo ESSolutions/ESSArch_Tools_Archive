@@ -492,6 +492,18 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
                         "key": key,
                     })
                  break;
+                 case "BooleanFilter":
+                    $scope.fields.push({
+                        "templateOptions": {
+                            "label": $translate.instant(key.toUpperCase()),
+                            "labelProp": key,
+                            "valueProp": key,
+                        },
+                        "type": "checkbox",
+                        "key": key,
+                    })
+                 break;
+                 case "ListFilter":
                  case "CharFilter":
                     $scope.fields.push({
                         "templateOptions": {
