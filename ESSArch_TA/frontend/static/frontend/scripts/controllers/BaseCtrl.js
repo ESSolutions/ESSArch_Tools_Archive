@@ -185,7 +185,9 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
 
     $scope.getListViewData = function() {
         vm.callServer($scope.tableState);
-        $rootScope.loadNavigation(ipSortString);
+        if(!$state.is('home.reception')) {
+            $rootScope.loadNavigation(ipSortString);
+        }
     };
 
     // Validators

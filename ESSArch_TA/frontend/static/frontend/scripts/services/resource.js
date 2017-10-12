@@ -71,7 +71,19 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
         if(sort.reverse) {
             sortString = "-"+sortString;
         }
-        return listViewService.getReceptionIps(pageNumber, number, $rootScope.navigationFilter, sortString).then(function(value) {
+        var filter = {};
+        if($rootScope.navigationFilter) {
+            fitler = $rootScope.navigationFilter;
+        } else {
+            filter = {
+                institution: null,
+                organization: null,
+                type: null,
+                location: null,
+                other: null
+            };
+        }
+        return listViewService.getReceptionIps(pageNumber, number, filter, sortString).then(function(value) {
             var ipCollection = value.data;
             ipCollection.forEach(function(ip) {
                 ip.checked = false;
