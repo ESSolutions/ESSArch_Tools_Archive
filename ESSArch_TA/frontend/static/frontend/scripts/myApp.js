@@ -109,7 +109,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                 },
                 data: {
                     permissions: {
-                        only: nestedPermissions("home.reception"),
+                        only: nestedPermissions(Object.resolve("home.reception", permissionConfig)),
                         redirectTo: 'home.restricted'
                     }
                 }
@@ -145,7 +145,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                 },
                 data: {
                     permissions: {
-                        only: nestedPermissions("home.transferSip"),
+                        only: nestedPermissions(Object.resolve("home.transferSip", permissionConfig)),
                         redirectTo: 'home.restricted'
                     }
                 }
