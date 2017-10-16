@@ -73,7 +73,7 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
         }
         var filter = {};
         if($rootScope.navigationFilter) {
-            fitler = $rootScope.navigationFilter;
+            filter = $rootScope.navigationFilter;
         } else {
             filter = {
                 institution: null,
