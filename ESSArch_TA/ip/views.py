@@ -899,8 +899,6 @@ class WorkareaFilesViewSet(viewsets.ViewSet):
         force_download = request.query_params.get('download', False)
         fullpath = os.path.join(root, path)
 
-        self.validate_path(fullpath, root)
-
         mimetypes.suffix_map = {}
         mimetypes.encodings_map = {}
         mimetypes.types_map = {}
@@ -911,40 +909,47 @@ class WorkareaFilesViewSet(viewsets.ViewSet):
         mimetypes.init(files=[mimetypes_file])
         mtypes = mimetypes.types_map
 
-        container = os.path.join(root, path.split('/')[0])
-        if os.path.isfile(container):
-            if tarfile.is_tarfile(container):
-                with tarfile.open(container) as tar:
-                    if fullpath == container:
-                        entries = []
-                        for member in tar.getmembers():
-                            if not member.isfile():
-                                continue
+        if os.path.isfile(fullpath) and tarfile.is_tarfile(fullpath):
+            self.validate_path(fullpath, root)
+            with tarfile.open(fullpath) as tar:
+                entries = []
+                for member in tar.getmembers():
+                    if not member.isfile():
+                        continue
 
-                            entries.append({
-                                "name": member.name,
-                                "type": 'file',
-                                "size": member.size,
-                                "modified": timestamp_to_datetime(member.mtime),
-                            })
-                        return Response(entries)
-                    else:
-                        subpath = path.split('/', 1)[-1]
-                        try:
-                            member = tar.getmember(subpath)
+                    entries.append({
+                        "name": member.name,
+                        "type": 'file',
+                        "size": member.size,
+                        "modified": timestamp_to_datetime(member.mtime),
+                    })
+                return Response(entries)
 
-                            if not member.isfile():
-                                raise exceptions.NotFound
+        try:
+            tarpath, subpath = fullpath.split('.tar', 1)
+            tarpath = tarpath + '.tar'
+            subpath = subpath.lstrip('/')
+        except ValueError:
+            pass
+        else:
+            self.validate_path(tarpath, root, existence=False)
+            print tarpath
+            print subpath
+            if tarfile.is_tarfile(tarpath):
+                with tarfile.open(tarpath) as tar:
+                    try:
+                        member = tar.getmember(subpath)
 
-                            f = tar.extractfile(member)
-                            content_type = mtypes.get(os.path.splitext(subpath)[1])
-                            return generate_file_response(f, content_type, force_download)
-                        except KeyError:
+                        if not member.isfile():
                             raise exceptions.NotFound
 
-            content_type = mtypes.get(os.path.splitext(fullpath)[1])
-            return generate_file_response(open(fullpath), content_type, force_download)
+                        f = tar.extractfile(member)
+                        content_type = mtypes.get(os.path.splitext(subpath)[1])
+                        return generate_file_response(f, content_type, force_download)
+                    except KeyError:
+                        raise exceptions.NotFound
 
+        self.validate_path(fullpath, root)
         if os.path.isfile(fullpath):
             content_type = mtypes.get(os.path.splitext(fullpath)[1])
             download = request.query_params.get('download', False)
