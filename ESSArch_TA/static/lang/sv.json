@@ -212,8 +212,8 @@
     "EVENTDATETIME_END": "Event-tid slut",
     "APPLY": "Applicera",
     "SEE_MY_IPS": "Se egna IPn",
-    "CREATE_DATE_START": "Event-tid start",
-    "CREATE_DATE_END": "Event-tid end",
+    "CREATE_DATE_START": "Skapad start",
+    "CREATE_DATE_END": "Skapad slut",
     "ARCHIVAL_TYPE": "Arkivtyp",
     "ARCHIVAL_LOCATION": "Arkivplats",
     "RETRY_CONNECTION": "Försök igen"
