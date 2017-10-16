@@ -27,6 +27,8 @@ from __future__ import absolute_import
 import os
 import shutil
 
+from django.contrib.auth import get_user_model
+
 from ESSArch_Core.configuration.models import Path
 from ESSArch_Core.essxml.util import parse_submit_description
 from ESSArch_Core.ip.models import (
@@ -35,11 +37,15 @@ from ESSArch_Core.ip.models import (
     ArchivalLocation,
     ArchivalType,
     InformationPackage,
+    Workarea,
 )
+from ESSArch_Core.util import mkdir_p
 from ESSArch_Core.WorkflowEngine.dbtask import DBTask
 from ESSArch_Core.WorkflowEngine.models import ProcessTask, ProcessStep
 from ESSArch_Core import tasks
 
+
+User = get_user_model()
 
 class ReceiveSIP(DBTask):
     event_type = 20100
@@ -83,27 +89,27 @@ class ReceiveSIP(DBTask):
             'archival_location',
         ])
 
-        prepare = Path.objects.get(entity="path_ingest_work").value
+        workarea = Path.objects.get(entity='ingest_workarea').value
+        username = User.objects.get(pk=self.responsible).username
+        workarea_user = os.path.join(workarea, username)
+        dst_dir = os.path.join(workarea_user, ip.object_identifier_value)
+        mkdir_p(dst_dir)
 
         srcdir, srcfile = os.path.split(ip.object_path)
-        dst = os.path.join(prepare, srcfile)
-
+        dst = os.path.join(dst_dir, srcfile)
         shutil.copy(ip.object_path, dst)
 
         src = os.path.join(srcdir, "%s.xml" % objid)
-        dst = os.path.join(prepare, "%s.xml" % objid)
+        dst = os.path.join(dst_dir, "%s.xml" % objid)
         shutil.copy(src, dst)
+
+        Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=True)
 
     def undo(self, ip, xml, container):
         objid, container_type = os.path.splitext(os.path.basename(container))
         ip = InformationPackage.objects.get(object_identifier_value=objid)
-
-        ipdir, ipfile = os.path.split(ip.object_path)
-        ingest_work = Path.objects.get(entity="path_ingest_work").value
-
-        os.remove(os.path.join(ingest_work, ipfile))
-        os.remove(os.path.join(ingest_work, "%s.xml" % objid))
-
+        ingest_work = Path.objects.get(entity="ingest_workarea").value
+        shutil.rmtree(os.path.join(ingest_work, ip.object_identifier_value))
         InformationPackage.objects.filter(pk=ip).delete()
 
     def event_outcome_success(self, ip, xml, container):

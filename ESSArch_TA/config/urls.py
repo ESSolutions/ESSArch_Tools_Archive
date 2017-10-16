@@ -77,6 +77,7 @@ from configuration.views import EventTypeViewSet
 from ip.views import (
     InformationPackageViewSet,
     InformationPackageReceptionViewSet,
+    WorkareaFilesViewSet,
 )
 
 from profiles.views import (
@@ -129,6 +130,7 @@ router.register(r'profile-ip', ProfileIPViewSet)
 router.register(r'agents', AgentViewSet)
 router.register(r'parameters', ParameterViewSet)
 router.register(r'paths', PathViewSet)
+router.register(r'workarea-files', WorkareaFilesViewSet, base_name='workarea-files')
 
 urlpatterns = [
     url(r'^', include('frontend.urls'), name='home'),

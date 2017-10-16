@@ -29,10 +29,13 @@ import json
 import logging
 import mimetypes
 import os
+import re
 import shutil
 import tarfile
 import uuid
 import zipfile
+
+from operator import itemgetter
 
 from celery import states as celery_states
 
@@ -61,9 +64,7 @@ from ESSArch_Core.essxml.util import (
 
 from ESSArch_Core.fixity.validation import validate_checksum
 
-from ESSArch_Core.ip.filters import InformationPackageFilter
-
-from ESSArch_Core.ip.models import InformationPackage, EventIP
+from ESSArch_Core.ip.models import InformationPackage, EventIP, Workarea
 
 from ESSArch_Core.ip.permissions import (
     CanDeleteIP,
@@ -87,8 +88,10 @@ from ESSArch_Core.WorkflowEngine.serializers import (
 
 from ESSArch_Core.util import (
     creation_date,
+    generate_file_response,
     get_files_and_dirs,
     get_event_spec,
+    get_tree_size_and_count,
     get_value_from_path,
     in_directory,
     parse_content_range_header,
@@ -96,6 +99,7 @@ from ESSArch_Core.util import (
     remove_prefix
 )
 
+from ip.filters import InformationPackageFilter
 from ip.serializers import InformationPackageSerializer
 
 from rest_framework import viewsets
@@ -758,7 +762,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     def validate(self, request, pk=None):
         ip = self.get_object()
 
-        prepare = Path.objects.get(entity="path_ingest_work").value
+        prepare = Path.objects.get(entity="ingest_workarea").value
         xmlfile = os.path.join(prepare, "%s.xml" % pk)
 
         step = ProcessStep.objects.create(
@@ -841,7 +845,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                                 raise
 
         if delete_from_workarea:
-            workarea = Path.objects.get(entity="path_ingest_work").value
+            workarea = Path.objects.get(entity="ingest_workarea").value
             objpath = os.path.join(workarea, objid)
 
             paths = [objpath + '.' + ext for ext in ['xml', 'tar', 'zip']]
@@ -875,3 +879,93 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     def files(self, request, pk=None):
         ip = self.get_object()
         return ip.files(request.query_params.get('path', '').rstrip('/'))
+
+
+class WorkareaFilesViewSet(viewsets.ViewSet):
+    def validate_path(self, path, root, existence=True):
+        relpath = os.path.relpath(path, root)
+
+        if not in_directory(path, root):
+            raise exceptions.ParseError('Illegal path %s' % relpath)
+
+        if existence and not os.path.exists(path):
+            raise exceptions.NotFound('Path "%s" does not exist' % relpath)
+
+    def list(self, request):
+        root = os.path.join(Path.objects.get(entity='ingest_workarea').value, request.user.username)
+
+        entries = []
+        path = request.query_params.get('path', '').strip('/ ')
+        force_download = request.query_params.get('download', False)
+        fullpath = os.path.join(root, path)
+
+        self.validate_path(fullpath, root)
+
+        mimetypes.suffix_map = {}
+        mimetypes.encodings_map = {}
+        mimetypes.types_map = {}
+        mimetypes.common_types = {}
+        mimetypes_file = Path.objects.get(
+            entity="path_mimetypes_definitionfile"
+        ).value
+        mimetypes.init(files=[mimetypes_file])
+        mtypes = mimetypes.types_map
+
+        container = os.path.join(root, path.split('/')[0])
+        if os.path.isfile(container):
+            if tarfile.is_tarfile(container):
+                with tarfile.open(container) as tar:
+                    if fullpath == container:
+                        entries = []
+                        for member in tar.getmembers():
+                            if not member.isfile():
+                                continue
+
+                            entries.append({
+                                "name": member.name,
+                                "type": 'file',
+                                "size": member.size,
+                                "modified": timestamp_to_datetime(member.mtime),
+                            })
+                        return Response(entries)
+                    else:
+                        subpath = path.split('/', 1)[-1]
+                        try:
+                            member = tar.getmember(subpath)
+
+                            if not member.isfile():
+                                raise exceptions.NotFound
+
+                            f = tar.extractfile(member)
+                            content_type = mtypes.get(os.path.splitext(subpath)[1])
+                            return generate_file_response(f, content_type, force_download)
+                        except KeyError:
+                            raise exceptions.NotFound
+
+            content_type = mtypes.get(os.path.splitext(fullpath)[1])
+            return generate_file_response(open(fullpath), content_type, force_download)
+
+        if os.path.isfile(fullpath):
+            content_type = mtypes.get(os.path.splitext(fullpath)[1])
+            download = request.query_params.get('download', False)
+            return generate_file_response(open(fullpath), content_type, force_download=download)
+
+        for entry in get_files_and_dirs(fullpath):
+            entry_type = "dir" if entry.is_dir() else "file"
+
+            if entry_type == 'file' and re.search(r'\_\d+$', entry.name) is not None:  # file chunk
+                continue
+
+            size, _ = get_tree_size_and_count(entry.path)
+
+            entries.append(
+                {
+                    "name": os.path.basename(entry.path),
+                    "type": entry_type,
+                    "size": size,
+                    "modified": timestamp_to_datetime(entry.stat().st_mtime),
+                }
+            )
+
+        sorted_entries = sorted(entries, key=itemgetter('name'))
+        return Response(sorted_entries)
