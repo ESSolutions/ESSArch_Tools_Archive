@@ -134,6 +134,22 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                     }],
                 }
             })
+            .state('home.workarea', {
+                url: 'workarea',
+                templateUrl: '/static/frontend/views/workarea.html',
+                controller: 'WorkareaCtrl as vm',
+                resolve: {
+                    authenticated: ['djangoAuth', function(djangoAuth){
+                        return djangoAuth.authenticationStatus();
+                    }],
+                },
+                data: {
+                    permissions: {
+                        only: nestedPermissions(Object.resolve("home.workarea", permissionConfig)),
+                        redirectTo: 'home.restricted'
+                    }
+                },
+            })
             .state('home.transferSip', {
                 url: 'transfer-SIP',
                 templateUrl: '/static/frontend/views/receive_sip_transfer_sip.html',

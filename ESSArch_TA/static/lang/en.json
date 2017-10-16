@@ -216,5 +216,6 @@
     "CREATE_DATE_END": "Create date end",
     "ARCHIVAL_TYPE": "Archival type",
     "ARCHIVAL_LOCATION": "Archival location",
-    "RETRY_CONNECTION": "Retry connection"
+    "RETRY_CONNECTION": "Retry connection",
+    "WORKAREA": "Workarea"
 }

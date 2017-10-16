@@ -22,23 +22,29 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').factory('listViewService', function (IP, IPReception, Event, Step, Task, EventType, $q, $http, $state, $log, appConfig, $rootScope, $filter, linkHeaderParser) {
+angular.module('myApp').factory('listViewService', function (IP, WorkareaFiles, IPReception, Event, Step, Task, EventType, $q, $http, $state, $log, appConfig, $rootScope, $filter, linkHeaderParser) {
     //Go to Given state
     function changePath(state) {
         $state.go(state);
     }
     //Gets data for list view i.e information packages
-    function getListViewData(pageNumber, pageSize, filters, sortString, searchString, state, columnFilters) {
-        return IP.query(angular.extend({
-                page: pageNumber,
-                page_size: pageSize,
-                archival_institution: filters.institution,
-                archivist_organization: filters.organization,
-                other: filters.other,
-                ordering: sortString,
-                search: searchString,
-                state: state
-        }, columnFilters)).$promise.then(function (resource) {
+    function getListViewData(pageNumber, pageSize, filters, sortString, searchString, state, columnFilters, workarea) {
+        var data = angular.extend({
+            page: pageNumber,
+            page_size: pageSize,
+            archival_institution: filters.institution,
+            archivist_organization: filters.organization,
+            other: filters.other,
+            ordering: sortString,
+            search: searchString,
+            state: state
+        }, columnFilters);
+
+        if (workarea) {
+            data = angular.extend(data, { workarea: workarea });
+        }
+
+        return IP.query(data).$promise.then(function (resource) {
             count = resource.$httpHeaders('Count');
             if (count == null) {
                 count = resource.length;
@@ -173,6 +179,34 @@ angular.module('myApp').factory('listViewService', function (IP, IPReception, Ev
         });
     }
 
+    function getWorkareaDir(workareaType, pathStr) {
+        var sendData;
+        if (pathStr == "") {
+            sendData = {
+                type: workareaType
+            };
+        } else {
+            sendData = {
+                path: pathStr,
+                type: workareaType
+            };
+        }
+        return $http.get(appConfig.djangoUrl + "workarea-files/",{ params: sendData }).then(function (response) {
+            if(response.headers()['content-disposition']) {
+                return $q.reject(response);
+            } else {
+                return response.data;
+            }
+        });
+    }
+    function addNewWorkareaFolder(workareaType, path, file) {
+        return WorkareaFiles.addDirectory({
+            type: workareaType,
+            path: path + file.name,
+        }).$promise.then(function(response) {
+            return response;
+        });
+    }
     /*******************/
     /*HELPER FUNCTIONS*/
     /*****************/
@@ -321,6 +355,8 @@ angular.module('myApp').factory('listViewService', function (IP, IPReception, Ev
         getFileList: getFileList,
         getReceptionIps: getReceptionIps,
         getFile: getFile,
+        getWorkareaDir: getWorkareaDir,
+        addNewWorkareaFolder: addNewWorkareaFolder
     };
 
 });
