@@ -369,8 +369,11 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ip = InformationPackage.objects.create(
             object_identifier_value=objid, label=parsed.get("label"), state="Receiving",
             responsible=self.request.user, object_path=parsed['object_path'],
-            object_size=parsed['object_size'], create_date=parsed['create_date'],
+            object_size=parsed['object_size'],
         )
+
+        ip.create_date = parsed['create_date']
+        ip.save(update_fields=['create_date'])
 
         step = ProcessStep.objects.create(
             name="Receive SIP",
