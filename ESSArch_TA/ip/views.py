@@ -369,7 +369,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ip = InformationPackage.objects.create(
             object_identifier_value=objid, label=parsed.get("label"), state="Receiving",
             responsible=self.request.user, object_path=parsed['object_path'],
-            object_size=parsed['object_size'],
+            object_size=parsed['object_size'], start_date=parsed['start_date'], end_date=parsed['end_date'],
         )
 
         ip.create_date = parsed['create_date']
