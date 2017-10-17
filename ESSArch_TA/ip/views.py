@@ -373,7 +373,8 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         )
 
         ip.create_date = parsed['create_date']
-        ip.save(update_fields=['create_date'])
+        ip.entry_date = ip.create_date
+        ip.save(update_fields=['create_date', 'entry_date'])
 
         step = ProcessStep.objects.create(
             name="Receive SIP",
