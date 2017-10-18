@@ -217,5 +217,22 @@
     "ARCHIVAL_TYPE": "Archival type",
     "ARCHIVAL_LOCATION": "Archival location",
     "RETRY_CONNECTION": "Retry connection",
-    "WORKAREA": "Workarea"
+    "WORKAREA": "Workarea",
+    "ENTRY_DATE": "Entry date",
+    "OBJECT_IDENTIFIER_VALUE_DESC": "IP identifier",
+    "LABEL_DESC": "IP label",
+    "RESPONSIBLE_DESC": "Responsible user for IP",
+    "CREATE_DATE_DESC": "Date of IP creation",
+    "STATE_DESC": "IP state",
+    "EVENTS_DESC": "See events for IP",
+    "STATUS_DESC": "IP status",
+    "DELETE_DESC": "Delete IP",
+    "OBJECT_SIZE_DESC": "Size of IP object",
+    "ARCHIVAL_INSTITUTION_DESC": "Archival institution",
+    "ARCHIVIST_ORGANIZATION_DESC": "Archivist organization",
+    "START_DATE_DESC": "Start date",
+    "END_DATE_DESC": "End date",
+    "STORAGE_STATUS_DESC": "Storage status, cached or archived",
+    "FILEBROWSER_DESC": "Browse files in IP",
+    "ENTRY_DATE_DESC": "Date of creation of original SIP"
 }
