@@ -32,6 +32,7 @@ import os
 import re
 import shutil
 import tarfile
+import tempfile
 import uuid
 import zipfile
 
@@ -376,6 +377,25 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ip.entry_date = ip.create_date
         ip.save(update_fields=['create_date', 'entry_date'])
 
+        events_xmlfile = None
+        if tarfile.is_tarfile(objpath):
+            with tarfile.open(objpath) as tarf:
+                tmp = tempfile.NamedTemporaryFile(delete=False)
+                tmp.close()
+                tarf.extract('%s/ipevents.xml' % pk, os.path.dirname(tmp.name))
+                extracted = os.path.join(os.path.dirname(tmp.name), '%s/ipevents.xml' % pk)
+                os.rename(extracted, tmp.name)
+                events_xmlfile = tmp.name
+
+        if zipfile.is_zipfile(objpath):
+            with zipfile.open(objpath) as zipf:
+                tmp = tempfile.NamedTemporaryFile(delete=False)
+                tmp.close()
+                zipf.extract('%s/ipevents.xml' % pk, os.path.dirname(tmp.name))
+                extracted = os.path.join(os.path.dirname(tmp.name), '%s/ipevents.xml' % pk)
+                os.rename(extracted, tmp.name)
+                events_xmlfile = tmp.name
+
         step = ProcessStep.objects.create(
             name="Receive SIP",
             information_package=ip,
@@ -453,6 +473,16 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             responsible=self.request.user,
             processstep=receive_step,
         )
+        if events_xmlfile is not None:
+            ProcessTask.objects.create(
+                name="ESSArch_Core.tasks.ParseEvents",
+                args=[events_xmlfile],
+                params={'delete_file': True},
+                processstep_pos=3,
+                information_package=ip,
+                responsible=self.request.user,
+                processstep=receive_step,
+            )
         ProcessTask.objects.create(
             name="ESSArch_Core.tasks.UpdateIPSizeAndCount",
             args=[ip.pk],
