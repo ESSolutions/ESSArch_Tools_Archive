@@ -63,6 +63,7 @@ var vendorFiles = [
         'node_modules/angular-translate-storage-cookie/angular-translate-storage-cookie.js',
         'node_modules/angular-translate-loader-static-files/angular-translate-loader-static-files.js',
         'node_modules/angular-sanitize/angular-sanitize.js',
+        'node_modules/angular-websocket/dist/angular-websocket.js',
         'node_modules/ui-select/dist/select.js',
         'node_modules/bootstrap/dist/js/bootstrap.js',
         'bower_components/angular-link-header-parser/release/angular-link-header-parser.js',
