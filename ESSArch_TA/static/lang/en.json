@@ -234,5 +234,6 @@
     "END_DATE_DESC": "End date",
     "STORAGE_STATUS_DESC": "Storage status, cached or archived",
     "FILEBROWSER_DESC": "Browse files in IP",
-    "ENTRY_DATE_DESC": "Date of creation of original SIP"
+    "ENTRY_DATE_DESC": "Date of creation of original SIP",
+    "INFO": "Info"
 }

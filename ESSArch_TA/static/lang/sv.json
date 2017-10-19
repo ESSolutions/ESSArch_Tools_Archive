@@ -234,5 +234,6 @@
     "END_DATE_DESC": "Slutdatum",
     "STORAGE_STATUS_DESC": "Lagringsstatus, cachad eller arkiverad",
     "FILEBROWSER_DESC": "Bläddra i filer för IP",
-    "ENTRY_DATE_DESC": "Datum för skapande av original-SIP"
+    "ENTRY_DATE_DESC": "Datum för skapande av original-SIP",
+    "INFO": "Info"
 }
