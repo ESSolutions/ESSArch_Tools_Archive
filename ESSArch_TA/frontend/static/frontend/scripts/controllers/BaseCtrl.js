@@ -18,6 +18,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
     // Init intervals
     $rootScope.$on('$stateChangeStart', function() {
         $interval.cancel(stateInterval);
+        $interval.cancel(listViewInterval);
     });
 
     $rootScope.$on('REFRESH_LIST_VIEW', function (event, data) {
@@ -31,9 +32,48 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             stateInterval = $interval(function(){$scope.statusViewUpdate($scope.ip)}, appConfig.stateInterval);
         } else {
             $interval.cancel(stateInterval);
-            $interval.cancel(listViewInterval);
         }
     });
+
+    // Update list view interval
+    //Update only if status < 100 and no step has failed in any IP
+
+    var listViewInterval;
+    vm.updateListViewConditional = function () {
+        $interval.cancel(listViewInterval);
+        listViewInterval = $interval(function () {
+            var updateVar = false;
+            vm.displayedIps.forEach(function (ip, idx) {
+                if (ip.status < 100) {
+                    if (ip.step_state != "FAILURE") {
+                        updateVar = true;
+                    }
+                }
+            });
+            if (updateVar) {
+                $scope.getListViewData();
+            } else {
+                $interval.cancel(listViewInterval);
+                listViewInterval = $interval(function () {
+                    var updateVar = false;
+                    vm.displayedIps.forEach(function (ip, idx) {
+                        if (ip.status < 100) {
+                            if (ip.step_state != "FAILURE") {
+                                updateVar = true;
+                            }
+                        }
+                    });
+                    if (!updateVar) {
+                        $scope.getListViewData();
+                    } else {
+                        vm.updateListViewConditional();
+                    }
+
+                }, appConfig.ipIdleInterval);
+            }
+        }, appConfig.ipInterval);
+    };
+    vm.updateListViewConditional();
 
     // Click functions
 
@@ -98,45 +138,6 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             }
         }
     }
-
-    // Update list view interval
-
-    var listViewInterval;
-    vm.updateListViewConditional = function() {
-        $interval.cancel(listViewInterval);
-        listViewInterval = $interval(function() {
-            var updateVar = false;
-            vm.displayedIps.forEach(function(ip, idx) {
-                if(ip.status < 100) {
-                    if(ip.step_state != "FAILURE") {
-                        updateVar = true;
-                    }
-                }
-            });
-            if(updateVar) {
-                $scope.getListViewData();
-            } else {
-                $interval.cancel(listViewInterval);
-                listViewInterval = $interval(function() {
-                    var updateVar = false;
-                    vm.displayedIps.forEach(function(ip, idx) {
-                        if(ip.status < 100) {
-                            if(ip.step_state != "FAILURE") {
-                                updateVar = true;
-                            }
-                        }
-                    });
-                    if(!updateVar) {
-                        $scope.getListViewData();
-                    } else {
-                        vm.updateListViewConditional();
-                    }
-
-                }, appConfig.ipIdleInterval);
-            }
-        }, appConfig.ipInterval);
-    };
-    vm.updateListViewConditional();
 
     // List view
 
