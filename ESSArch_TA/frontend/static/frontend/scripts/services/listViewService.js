@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').factory('listViewService', function (IP, WorkareaFiles, IPReception, Event, Step, Task, EventType, $q, $http, $state, $log, appConfig, $rootScope, $filter, linkHeaderParser) {
+angular.module('myApp').factory('listViewService', function (IP, Workarea, WorkareaFiles, IPReception, Event, Step, Task, EventType, $q, $http, $state, $log, appConfig, $rootScope, $filter, linkHeaderParser) {
     //Go to Given state
     function changePath(state) {
         $state.go(state);
@@ -176,6 +176,29 @@ angular.module('myApp').factory('listViewService', function (IP, WorkareaFiles, 
             path: path + file.name
         }).$promise.then(function(response) {
             return response;
+        });
+    }
+
+    //Fetches IP's for given workarea (ingest or access)
+    function getWorkareaData(workarea, pageNumber, pageSize, filters, sortString, searchString, columnFilters) {
+        return Workarea.query(
+            angular.extend({
+                type: workarea,
+                page: pageNumber,
+                page_size: pageSize,
+                ordering: sortString,
+                search: searchString,
+                tag: $rootScope.selectedTag != null ? $rootScope.selectedTag.id : null,
+            }, columnFilters)
+        ).$promise.then(function (resource) {
+            count = resource.$httpHeaders('Count');
+            if (count == null) {
+                count = resource.length;
+            }
+            return {
+                count: count,
+                data: resource
+            };
         });
     }
 
@@ -355,6 +378,7 @@ angular.module('myApp').factory('listViewService', function (IP, WorkareaFiles, 
         getFileList: getFileList,
         getReceptionIps: getReceptionIps,
         getFile: getFile,
+        getWorkareaData: getWorkareaData,
         getWorkareaDir: getWorkareaDir,
         addNewWorkareaFolder: addNewWorkareaFolder
     };

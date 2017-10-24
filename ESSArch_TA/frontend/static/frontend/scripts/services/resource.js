@@ -100,10 +100,25 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
         });
 	}
 
+    function getWorkareaIps(workarea, start, number, pageNumber, params, sort, search, expandedAics, columnFilters) {
+        var sortString = sort.predicate;
+        if(sort.reverse) {
+            sortString = "-"+sortString;
+        }
+        return listViewService.getWorkareaData(workarea, pageNumber, number, $rootScope.navigationFilter, sortString, search, columnFilters).then(function(value) {
+            var ipCollection = value.data;
+            return {
+                data: ipCollection,
+                numberOfPages: Math.ceil(value.count / number)
+            };
+        });
+    }
+
 	return {
 		getEventPage: getEventPage,
         getIpPage: getIpPage,
         getReceptionIps: getReceptionIps,
+        getWorkareaIps: getWorkareaIps,
 	};
 
 });

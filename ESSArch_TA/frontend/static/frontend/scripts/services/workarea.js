@@ -1,4 +1,21 @@
-angular.module('myApp').factory('WorkareaFiles', function ($resource, appConfig) {
+angular.module('myApp').factory('Workarea', function ($resource, appConfig) {
+    return $resource(appConfig.djangoUrl + 'workareas/:id/:action/', {}, {
+        query: {
+            method: 'GET',
+            isArray: true,
+            interceptor: {
+                response: function (response) {
+                    response.resource.$httpHeaders = response.headers;
+                    return response.resource;
+                }
+            },
+        },
+        delete: {
+            method: 'DELETE',
+            params: { id: "@id" }
+        },
+    });
+}).factory('WorkareaFiles', function ($resource, appConfig) {
     return $resource(appConfig.djangoUrl + 'workarea-files/:action/', {}, {
         addToDip: {
             method: "POST",
