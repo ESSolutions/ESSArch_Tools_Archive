@@ -28,13 +28,14 @@ from rest_framework import serializers
 
 from ESSArch_Core.configuration.models import EventType
 
-from ESSArch_Core.ip.models import InformationPackage
+from ESSArch_Core.ip.models import InformationPackage, Workarea
 
 from ESSArch_Core.ip.serializers import (
     ArchivalInstitutionSerializer,
     ArchivistOrganizationSerializer,
     ArchivalTypeSerializer,
     ArchivalLocationSerializer,
+    WorkareaSerializer,
 )
 
 from ESSArch_Core.serializers import DynamicHyperlinkedModelSerializer
@@ -54,6 +55,13 @@ class InformationPackageSerializer(serializers.HyperlinkedModelSerializer):
     archivist_organization = ArchivistOrganizationSerializer(read_only=True)
     archival_type = ArchivalTypeSerializer(read_only=True)
     archival_location = ArchivalLocationSerializer(read_only=True)
+    workarea = serializers.SerializerMethodField()
+
+    def get_workarea(self, obj):
+        workarea = obj.workareas.first()
+
+        if workarea is not None:
+            return WorkareaSerializer(workarea, context=self.context).data
 
     def to_representation(self, obj):
         data = super(InformationPackageSerializer, self).to_representation(obj)
@@ -85,5 +93,5 @@ class InformationPackageSerializer(serializers.HyperlinkedModelSerializer):
             'object_num_items', 'start_date', 'end_date', 'package_type',
             'submission_agreement', 'archival_institution',
             'archivist_organization', 'archival_type', 'archival_location',
-            'submission_agreement_locked', 'profiles'
+            'submission_agreement_locked', 'profiles', 'workarea',
         )

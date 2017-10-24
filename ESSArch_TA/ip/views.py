@@ -101,7 +101,7 @@ from ESSArch_Core.util import (
 )
 
 from ip.filters import InformationPackageFilter
-from ip.serializers import InformationPackageSerializer
+from ip.serializers import InformationPackageSerializer, WorkareaSerializer
 
 from rest_framework import viewsets
 
@@ -913,6 +913,13 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     def files(self, request, pk=None):
         ip = self.get_object()
         return ip.files(request.query_params.get('path', '').rstrip('/'))
+
+
+class WorkareaViewSet(InformationPackageViewSet):
+    def get_queryset(self):
+        user = self.request.user
+        qs = super(WorkareaViewSet, self).get_queryset()
+        return qs.filter(workareas__user=user)
 
 
 class WorkareaFilesViewSet(viewsets.ViewSet):

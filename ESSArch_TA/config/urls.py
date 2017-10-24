@@ -64,6 +64,7 @@ from ESSArch_Core.ip.views import (
     ArchivalTypeViewSet,
     ArchivalLocationViewSet,
     EventIPViewSet,
+    WorkareaEntryViewSet,
 )
 
 from ESSArch_Core.WorkflowEngine.views import (
@@ -78,6 +79,7 @@ from ip.views import (
     InformationPackageViewSet,
     InformationPackageReceptionViewSet,
     WorkareaFilesViewSet,
+    WorkareaViewSet,
 )
 
 from profiles.views import (
@@ -130,6 +132,8 @@ router.register(r'profile-ip', ProfileIPViewSet)
 router.register(r'agents', AgentViewSet)
 router.register(r'parameters', ParameterViewSet)
 router.register(r'paths', PathViewSet)
+router.register(r'workareas', WorkareaViewSet, base_name='workarea')
+router.register(r'workarea-entries', WorkareaEntryViewSet, base_name='workarea-entries')
 router.register(r'workarea-files', WorkareaFilesViewSet, base_name='workarea-files')
 
 urlpatterns = [
