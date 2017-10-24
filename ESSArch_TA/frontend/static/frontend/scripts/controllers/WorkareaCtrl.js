@@ -241,4 +241,43 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
     $scope.getFileExtension = function (file) {
         return file.name.split(".").pop().toUpperCase();
     }
+
+    $scope.removeIpModal = function (ipObject) {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'static/frontend/views/remove-workarea-ip-modal.html',
+            controller: 'ModalInstanceCtrl',
+            controllerAs: '$ctrl'
+        })
+        modalInstance.result.then(function (data) {
+            $scope.removeIp(ipObject);
+        }, function () {
+            $log.info('modal-component dismissed at: ' + new Date());
+        });
+    }
+    // Remove ip
+    $scope.removeIp = function (ipObject, workarea, reception) {
+        if (ipObject.package_type == 1) {
+            ipObject.information_packages.forEach(function (ip) {
+                $scope.removeIp(ip);
+            });
+        } else {
+            $http.delete(appConfig.djangoUrl + "workarea-entries/" + ipObject.workarea.id + "/")
+                .then(function () {
+                    $scope.edit = false;
+                    $scope.select = false;
+                    $scope.eventlog = false;
+                    $scope.eventShow = false;
+                    $scope.statusShow = false;
+                    $scope.filebrowser = false;
+                    $scope.requestForm = false;
+                    if (vm.displayedIps.length == 0) {
+                        $state.reload();
+                    }
+                    $scope.getListViewData();
+                });
+        }
+    }
 });
