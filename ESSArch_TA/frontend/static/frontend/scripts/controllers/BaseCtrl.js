@@ -20,6 +20,10 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
         $interval.cancel(stateInterval);
     });
 
+    $rootScope.$on('REFRESH_LIST_VIEW', function (event, data) {
+        $scope.getListViewData();
+    });
+
     var stateInterval;
     $scope.$watch(function(){return $scope.statusShow;}, function(newValue, oldValue) {
         if(newValue) {
