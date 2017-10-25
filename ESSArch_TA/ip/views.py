@@ -497,6 +497,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
             args=[ip.pk],
             params={
                 "status": "Received",
+                "prev": ip.state,
             },
             processstep_pos=10,
             log=EventIP,
@@ -622,6 +623,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                 params={
                     "ip": ip.pk,
                     "status": "Transferring",
+                    "prev": ip.state,
                 },
                 processstep_pos=10,
                 log=EventIP,
@@ -780,6 +782,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                 params={
                     "ip": ip.pk,
                     "status": "Transferred",
+                    "prev": "Transferring",
                 },
                 processstep_pos=50,
                 log=EventIP,
