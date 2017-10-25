@@ -24,6 +24,7 @@
 
 from __future__ import absolute_import
 
+import errno
 import os
 import shutil
 
@@ -109,7 +110,13 @@ class ReceiveSIP(DBTask):
         objid, container_type = os.path.splitext(os.path.basename(container))
         ip = InformationPackage.objects.get(object_identifier_value=objid)
         ingest_work = Path.objects.get(entity="ingest_workarea").value
-        shutil.rmtree(os.path.join(ingest_work, ip.object_identifier_value))
+
+        try:
+            shutil.rmtree(os.path.join(ingest_work, ip.object_identifier_value))
+        except OSError as e:
+            if e.errno != errno.ENOENT:
+                raise
+
         InformationPackage.objects.filter(pk=ip).delete()
 
     def event_outcome_success(self, ip, xml, container):
