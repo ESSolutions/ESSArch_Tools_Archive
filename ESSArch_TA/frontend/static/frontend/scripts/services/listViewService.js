@@ -278,7 +278,9 @@ angular.module('myApp').factory('listViewService', function (IP, Workarea, Worka
             id: step.id,
                 page: step.page_number,
                 page_size: page_size,
-                hidden: false
+                hidden: false,
+                retried: false,
+                undo_type: false,
         }).$promise.then(function (resource) {
             var link = linkHeaderParser.parse(resource.$httpHeaders('Link'));
             var count = resource.$httpHeaders('Count');
