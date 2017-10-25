@@ -4,7 +4,7 @@
 
   - [Introduction ESSArch](introduction-essarch)
   - [Installation](installation)
-  - [ESSArch Tools for Producer (ETP)](essarch-tools-for-producer)
+  - [ESSArch Tools for Archive (ETA)](essarch-tools-for-archive)
     - [List view](list-view)
     - [Reception](reception)
     - [Transfer SIP](transfer-sip)
