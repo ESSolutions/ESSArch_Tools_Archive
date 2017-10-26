@@ -11,7 +11,6 @@ body {
     height: 100%;
     background-color: $body-background;
     margin: 0px auto;
-    min-width: 680px;
     overflow: auto;
 }
 body.modal-open {
@@ -87,6 +86,7 @@ body.modal-open[style] {
 .body-wrapper {
     display: flex;
     flex-direction: column;
+    min-width: 680px;
     width: 100%;
     border-radius: 1px;
     min-height: 1131px;
