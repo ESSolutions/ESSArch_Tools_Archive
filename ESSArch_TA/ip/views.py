@@ -842,6 +842,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         delete_from_workarea = request.data.get('workarea', False)
 
         objid = self.get_object().object_identifier_value
+        paths = []
 
         if delete_from_reception:
             reception = Path.objects.get(entity="path_ingest_reception").value
@@ -861,44 +862,35 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                 el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
                 objpath = get_value_from_path(el, "@href").split('file:///')[1]
                 path = os.path.join(srcdir, objpath)
+                no_ext = os.path.splitext(path)[0]
 
-                try:
-                    shutil.rmtree(path)
-                except OSError as e:
-                    if e.errno == errno.ENOTDIR:
-                        os.remove(path)
-                    elif e.errno == errno.ENOENT:
-                        pass
-                    else:
-                        raise
-                finally:
-                    paths = [os.path.splitext(xmlfile)[0] + '.' + ext for ext in ['xml', 'tar', 'zip']]
-
-                    for path in paths:
-                        try:
-                            os.remove(path)
-                        except OSError as e:
-                            if e.errno != errno.ENOENT:
-                                raise
+                paths.append(path)
+                paths += [no_ext + '.' + ext for ext in ['xml', 'tar', 'zip']]
 
         if delete_from_workarea:
             workarea = Path.objects.get(entity="ingest_workarea").value
-            objpath = os.path.join(workarea, objid)
+            path = os.path.join(workarea, objid)
+            no_ext = os.path.splitext(path)[0]
 
-            paths = [objpath + '.' + ext for ext in ['xml', 'tar', 'zip']]
+            paths.append(path)
+            paths += [no_ext + '.' + ext for ext in ['xml', 'tar', 'zip']]
 
-            for path in paths:
-                try:
-                    os.remove(path)
-                except OSError as e:
-                    if e.errno != errno.ENOENT:
-                        raise
 
-            try:
-                shutil.rmtree(objpath)
-            except OSError as e:
-                if e.errno != errno.ENOENT:
-                    raise
+        step = ProcessStep.objects.create(
+            name="Delete files",
+            eager=False,
+            parallel=True,
+        )
+
+        for path in paths:
+            t = ProcessTask.objects.create(
+                name='ESSArch_Core.tasks.DeleteFiles',
+                params={'path': path},
+                processstep=step,
+                responsible=request.user,
+            )
+
+        step.run()
 
         return super(InformationPackageViewSet, self).destroy(request, pk=pk)
 
