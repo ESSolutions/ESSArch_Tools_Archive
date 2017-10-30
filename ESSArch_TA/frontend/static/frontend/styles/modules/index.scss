@@ -545,6 +545,11 @@ body.modal-open[style] {
 }
 .file-list-view {
     margin-top: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+    thead, tbody {
+        border: 1px solid $border-color;
+    }
     .type-name-column {
         display: flex;
         align-items: center;
