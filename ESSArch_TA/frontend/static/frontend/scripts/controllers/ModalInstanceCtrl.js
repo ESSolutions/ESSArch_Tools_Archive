@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInstance, djangoAuth) {
+angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInstance, djangoAuth, $scope, $http, appConfig, $translate) {
     var $ctrl = this;
     $ctrl.error_messages_old = [];
     $ctrl.error_messages_pw1 = [];
@@ -49,6 +49,18 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
         };
         $uibModalInstance.close($ctrl.data);
     };
+    $ctrl.receive = function () {
+        $ctrl.data = {
+            ip: $scope.displayedIps
+        };
+        $uibModalInstance.close($ctrl.data);
+    }
+    $ctrl.transfer = function () {
+        $ctrl.data = {
+            ip: $scope.ip
+        };
+        $uibModalInstance.close($ctrl.data);
+    }
     $ctrl.lock = function () {
         $ctrl.data = {
             status: "locked"

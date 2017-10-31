@@ -38,12 +38,7 @@
                 <div ng-if="includedIps.length">
                     <div ng-include src="'static/frontend/views/validator_choices.html'"></div>
                     <form class="receive-sip-eventlog-form">
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" ng-model="approvedToReceive">{{'APPROVEDTORECEIVE' | translate}}</input>
-                            </label>
-                        </div>
-                        <button ng-disabled="receiveDisabled || !approvedToReceive" class="btn btn-info receive-button" ng-click="receiveSip(includedIps)" ng-dblClick="">{{'RECEIVESIP' | translate}}</button>
+                        <button ng-disabled="receiveDisabled" class="btn btn-info receive-button" ng-click="vm.receiveModal(includedIps)" ng-dblClick="">{{'RECEIVESIP' | translate}}</button>
                     </form>
                 </div>
             </div>

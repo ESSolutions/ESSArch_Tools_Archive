@@ -1,0 +1,25 @@
+<div class="enter-profile-name" style="padding: 5px;">
+    <h3 class="modal-title" id="modal-title">{{'RECEIVESIP' | translate}}</h3>
+</div>
+<form ng-submit="$ctrl.receive()">
+    <div class="modal-body" id="modal-body">
+        {{'RECEIVE_SIP_DESC' | translate}}
+        <br/>
+        <table class="table">
+            <thead>
+                <th>{{'OBJECT_IDENTIFIER_VALUE' | translate}}</th>
+                <th>{{'LABEL' | translate}}</th>
+            </thead>
+            <tbody>
+                <tr  ng-repeat="x in includedIps">
+                    <td>{{x.object_identifier_value}}</td>
+                    <td>{{x.label}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="$ctrl.receive()">{{'RECEIVESIP' | translate}}</button>
+        <button class="btn btn-warning" type="button" ng-click="$ctrl.cancel()">{{'CANCEL' | translate}}</button>
+    </div>
+</form>

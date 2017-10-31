@@ -520,4 +520,20 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http,
             }, 1000);
         });
     };
+    vm.receiveModal = function (ips) {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'static/frontend/views/receive_modal.html',
+            scope: $scope,
+            controller: 'ModalInstanceCtrl',
+            controllerAs: '$ctrl'
+        })
+        modalInstance.result.then(function (data) {
+            $scope.receiveSip($scope.includedIps);
+        }, function () {
+            $log.info('modal-component dismissed at: ' + new Date());
+        });
+    }
 });

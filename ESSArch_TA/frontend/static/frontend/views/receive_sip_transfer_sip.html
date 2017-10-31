@@ -10,13 +10,8 @@
         <div class="select-sub-edit-eventlog-wrapper" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
             <div class="select-view" id="select-view" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
                 <p style="margin: 5px;">IP: {{ip.label}}</p>
-                <form class="receive-sip-eventlog-form" ng-submit="transferSip(ip)">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" ng-disabled="!checkPermission('ip.transfer_sip')" ng-model="approvedToTransfer">{{'APPROVEDTOTRANSFER' | translate}}</input>
-                        </label>
-                    </div>
-                    <button type="submit" ng-dblClick="" ng-disabled="transferDisabled || !approvedToTransfer || !checkPermission('ip.transfer_sip')" class="btn btn-info submit-button">{{'TRANSFERSIP' | translate}}</button>
+                <form class="receive-sip-eventlog-form" ng-submit="vm.transferModal(ip)">
+                    <button type="submit" ng-dblClick="" ng-disabled="transferDisabled || !checkPermission('ip.transfer_sip')" class="btn btn-info submit-button">{{'TRANSFERSIP' | translate}}</button>
                 </form>
             </div>
         </div>

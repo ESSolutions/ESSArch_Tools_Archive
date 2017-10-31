@@ -73,4 +73,20 @@ angular.module('myApp').controller('TransferSipCtrl', function(IP, $http, $scope
             templateUrl: "static/frontend/views/reception_delivery_description.html"
         },
     ];
+    vm.transferModal = function (ips) {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'static/frontend/views/transfer_sip_modal.html',
+            scope: $scope,
+            controller: 'ModalInstanceCtrl',
+            controllerAs: '$ctrl'
+        })
+        modalInstance.result.then(function (data) {
+            $scope.transferSip(data.ip);
+        }, function () {
+            $log.info('modal-component dismissed at: ' + new Date());
+        });
+    }
 });

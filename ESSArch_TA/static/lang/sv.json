@@ -237,5 +237,7 @@
     "ENTRY_DATE_DESC": "Datum för skapande av original-SIP",
     "INFO": "Info",
     "LIST_VIEW": "Lista",
-    "GRID_VIEW": "Rutnät"
+    "GRID_VIEW": "Rutnät",
+    "RECEIVE_SIP_DESC": "Vill du ta emot SIPar?",
+    "TRANSFER_SIP_DESC": "Vill du överföra SIP {{label}}?"
 }
