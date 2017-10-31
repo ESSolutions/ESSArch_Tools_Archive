@@ -108,7 +108,7 @@ from ip.serializers import InformationPackageSerializer, WorkareaSerializer
 from rest_framework import viewsets
 
 
-class InformationPackageReceptionViewSet(viewsets.ViewSet):
+class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
     def list(self, request):
         logger = logging.getLogger('essarch.reception')
 
@@ -177,10 +177,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         except KeyError:
             pass
 
-        paginator = LinkHeaderPagination()
-        page = paginator.paginate_queryset(ips, request)
-        if page is not None:
-            return paginator.get_paginated_response(page)
+        if self.paginator is not None:
+            paginated = self.paginator.paginate_queryset(ips, request)
+            return self.paginator.get_paginated_response(paginated)
 
         return Response(ips)
 
@@ -235,6 +234,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                                 "size": member.size,
                                 "modified": timestamp_to_datetime(member.mtime),
                             })
+                        if self.paginator is not None:
+                            paginated = self.paginator.paginate_queryset(entries, request)
+                            return self.paginator.get_paginated_response(paginated)
                         return Response(entries)
                     else:
                         subpath = fullpath[len(container)+1:]
@@ -268,6 +270,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                                 "size": member.file_size,
                                 "modified": datetime.datetime(*member.date_time),
                             })
+                        if self.paginator is not None:
+                            paginated = self.paginator.paginate_queryset(entries, request)
+                            return self.paginator.get_paginated_response(paginated)
                         return Response(entries)
                     else:
                         subpath = fullpath[len(container)+1:]
