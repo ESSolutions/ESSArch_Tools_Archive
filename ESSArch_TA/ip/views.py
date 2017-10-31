@@ -909,7 +909,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['get'])
     def files(self, request, pk=None):
         ip = self.get_object()
-        return ip.files(request.query_params.get('path', '').rstrip('/'))
+        return ip.files(request.query_params.get('path', '').rstrip('/'), paginator=self.paginator, request=request)
 
 
 class WorkareaViewSet(InformationPackageViewSet):
