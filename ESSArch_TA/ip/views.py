@@ -74,6 +74,8 @@ from ESSArch_Core.ip.permissions import (
 
 from ESSArch_Core.ip.serializers import EventIPSerializer
 
+from ESSArch_Core.mixins import PaginatedViewMixin
+
 from ESSArch_Core.pagination import LinkHeaderPagination
 
 from ESSArch_Core.profiles.utils import fill_specification_data
@@ -917,7 +919,7 @@ class WorkareaViewSet(InformationPackageViewSet):
         return qs.filter(workareas__user=user)
 
 
-class WorkareaFilesViewSet(viewsets.ViewSet):
+class WorkareaFilesViewSet(viewsets.ViewSet, PaginatedViewMixin):
     def validate_path(self, path, root, existence=True):
         relpath = os.path.relpath(path, root)
 
@@ -1009,4 +1011,9 @@ class WorkareaFilesViewSet(viewsets.ViewSet):
             )
 
         sorted_entries = sorted(entries, key=itemgetter('name'))
+
+        if self.paginator is not None:
+            paginated = self.paginator.paginate_queryset(sorted_entries, request)
+            return self.paginator.get_paginated_response(paginated)
+
         return Response(sorted_entries)
