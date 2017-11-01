@@ -169,16 +169,29 @@ angular.module('myApp').factory('listViewService', function (IP, Workarea, Worka
                 path: pathStr,
             };
         }
-        return IP.files(sendData).$promise.then(function(data) {
-            var count = data.$httpHeaders('Count');
-            if (count == null) {
-                count = data.length;
-            }
-            return {
-                numberOfPages: Math.ceil(count/pageSize),
-                data: data
-            };
-        });
+        if (ip.state == "At reception") {
+            return IPReception.files(sendData).$promise.then(function(data) {
+                var count = data.$httpHeaders('Count');
+                if (count == null) {
+                    count = data.length;
+                }
+                return {
+                    numberOfPages: Math.ceil(count/pageSize),
+                    data: data
+                };
+            });
+        } else {
+            return IP.files(sendData).$promise.then(function(data) {
+                var count = data.$httpHeaders('Count');
+                if (count == null) {
+                    count = data.length;
+                }
+                return {
+                    numberOfPages: Math.ceil(count/pageSize),
+                    data: data
+                };
+            });
+        }
     }
 
     function getFile(ip, path, file) {
