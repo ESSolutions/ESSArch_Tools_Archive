@@ -966,6 +966,9 @@ class WorkareaFilesViewSet(viewsets.ViewSet, PaginatedViewMixin):
                         "size": member.size,
                         "modified": timestamp_to_datetime(member.mtime),
                     })
+                if self.paginator is not None:
+                    paginated = self.paginator.paginate_queryset(entries, request)
+                    return self.paginator.get_paginated_response(paginated)
                 return Response(entries)
 
         try:
