@@ -154,20 +154,28 @@ angular.module('myApp').factory('listViewService', function (IP, Workarea, Worka
          return array;
     }
 
-    function getDir(ip, pathStr) {
-        var sendData = { 'id': ip.id };
-        if (pathStr != "") {
-            sendData = angular.extend(sendData, { path: pathStr });
-        }
-        if (ip.state == "At reception") {
-            return IPReception.files(sendData).$promise.then(function (data) {
-                return data;
-            });
+    function getDir(ip, pathStr, pageNumber, pageSize) {
+        if(pathStr == "") {
+            sendData = {};
         } else {
-            return IP.files(sendData).$promise.then(function (data) {
-                return data;
-            });
+            sendData = {path: pathStr};
         }
+        return IP.files(
+            angular.extend({
+                    id: ip.id,
+                    page: pageNumber,
+                    page_size: pageSize
+                }, sendData)
+        ).$promise.then(function(data) {
+            count = data.$httpHeaders('Count');
+            if (count == null) {
+                count = data.length;
+            }
+            return {
+                numberOfPages: Math.ceil(count/pageSize),
+                data: data
+            };
+        });
     }
 
     function getFile(ip, path, file) {
