@@ -2,7 +2,8 @@
     <div class="nav-refresh-wrapper">
         <div class="file-explorer-nav">
             <li ng-class="{'arrow-disabled': previousGridArrays.length == 0}" class="fa fa-arrow-circle-o-left fa-2x clickable" ng-click="previousGridArray()"></li>
-            <b class="dir-path">{{ip.object_identifier_value + '/' + previousGridArraysString()}}</b>
+            <b ng-if="!('home.workarea' | isState)" class="dir-path">{{ip.object_identifier_value + '/' + previousGridArraysString()}}</b>
+            <b ng-if="('home.workarea' | isState)" class="dir-path">{{previousGridArraysString()}}</b>
         </div>
         <div class="file-view-options btn-group">
             <button class="btn btn-default btn-sm" ng-class="{'active': listView}" ng-click="useListView()"

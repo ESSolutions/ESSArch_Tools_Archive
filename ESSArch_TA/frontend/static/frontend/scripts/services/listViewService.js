@@ -156,18 +156,21 @@ angular.module('myApp').factory('listViewService', function (IP, Workarea, Worka
 
     function getDir(ip, pathStr, pageNumber, pageSize) {
         if(pathStr == "") {
-            sendData = {};
+            sendData = {
+                id: ip.id,
+                page: pageNumber,
+                page_size: pageSize,
+            };
         } else {
-            sendData = {path: pathStr};
+            sendData = {
+                id: ip.id,
+                page: pageNumber,
+                page_size: pageSize,
+                path: pathStr,
+            };
         }
-        return IP.files(
-            angular.extend({
-                    id: ip.id,
-                    page: pageNumber,
-                    page_size: pageSize
-                }, sendData)
-        ).$promise.then(function(data) {
-            count = data.$httpHeaders('Count');
+        return IP.files(sendData).$promise.then(function(data) {
+            var count = data.$httpHeaders('Count');
             if (count == null) {
                 count = data.length;
             }
@@ -210,23 +213,35 @@ angular.module('myApp').factory('listViewService', function (IP, Workarea, Worka
         });
     }
 
-    function getWorkareaDir(workareaType, pathStr) {
+    function getWorkareaDir(workareaType, pathStr, pageNumber, pageSize) {
         var sendData;
         if (pathStr == "") {
             sendData = {
+                page: pageNumber,
+                page_size: pageSize,
                 type: workareaType
             };
         } else {
             sendData = {
+                page: pageNumber,
+                page_size: pageSize,
                 path: pathStr,
                 type: workareaType
             };
         }
+
         return $http.get(appConfig.djangoUrl + "workarea-files/",{ params: sendData }).then(function (response) {
+            var count = response.headers('Count');
+            if (count == null) {
+                count = response.data.length;
+            }
             if(response.headers()['content-disposition']) {
                 return $q.reject(response);
             } else {
-                return response.data;
+                return {
+                    numberOfPages: Math.ceil(count/pageSize),
+                    data: response.data
+                };
             }
         });
     }
