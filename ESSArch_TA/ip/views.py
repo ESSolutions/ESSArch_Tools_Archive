@@ -74,6 +74,8 @@ from ESSArch_Core.ip.permissions import (
 
 from ESSArch_Core.ip.serializers import EventIPSerializer
 
+from ESSArch_Core.mixins import PaginatedViewMixin
+
 from ESSArch_Core.pagination import LinkHeaderPagination
 
 from ESSArch_Core.profiles.utils import fill_specification_data
@@ -106,7 +108,7 @@ from ip.serializers import InformationPackageSerializer, WorkareaSerializer
 from rest_framework import viewsets
 
 
-class InformationPackageReceptionViewSet(viewsets.ViewSet):
+class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
     def list(self, request):
         logger = logging.getLogger('essarch.reception')
 
@@ -175,10 +177,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         except KeyError:
             pass
 
-        paginator = LinkHeaderPagination()
-        page = paginator.paginate_queryset(ips, request)
-        if page is not None:
-            return paginator.get_paginated_response(page)
+        if self.paginator is not None:
+            paginated = self.paginator.paginate_queryset(ips, request)
+            return self.paginator.get_paginated_response(paginated)
 
         return Response(ips)
 
@@ -233,6 +234,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                                 "size": member.size,
                                 "modified": timestamp_to_datetime(member.mtime),
                             })
+                        if self.paginator is not None:
+                            paginated = self.paginator.paginate_queryset(entries, request)
+                            return self.paginator.get_paginated_response(paginated)
                         return Response(entries)
                     else:
                         subpath = fullpath[len(container)+1:]
@@ -266,6 +270,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
                                 "size": member.file_size,
                                 "modified": datetime.datetime(*member.date_time),
                             })
+                        if self.paginator is not None:
+                            paginated = self.paginator.paginate_queryset(entries, request)
+                            return self.paginator.get_paginated_response(paginated)
                         return Response(entries)
                     else:
                         subpath = fullpath[len(container)+1:]
@@ -907,7 +914,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['get'])
     def files(self, request, pk=None):
         ip = self.get_object()
-        return ip.files(request.query_params.get('path', '').rstrip('/'))
+        return ip.files(request.query_params.get('path', '').rstrip('/'), paginator=self.paginator, request=request)
 
 
 class WorkareaViewSet(InformationPackageViewSet):
@@ -917,7 +924,7 @@ class WorkareaViewSet(InformationPackageViewSet):
         return qs.filter(workareas__user=user)
 
 
-class WorkareaFilesViewSet(viewsets.ViewSet):
+class WorkareaFilesViewSet(viewsets.ViewSet, PaginatedViewMixin):
     def validate_path(self, path, root, existence=True):
         relpath = os.path.relpath(path, root)
 
@@ -959,6 +966,9 @@ class WorkareaFilesViewSet(viewsets.ViewSet):
                         "size": member.size,
                         "modified": timestamp_to_datetime(member.mtime),
                     })
+                if self.paginator is not None:
+                    paginated = self.paginator.paginate_queryset(entries, request)
+                    return self.paginator.get_paginated_response(paginated)
                 return Response(entries)
 
         try:
@@ -1009,4 +1019,9 @@ class WorkareaFilesViewSet(viewsets.ViewSet):
             )
 
         sorted_entries = sorted(entries, key=itemgetter('name'))
+
+        if self.paginator is not None:
+            paginated = self.paginator.paginate_queryset(sorted_entries, request)
+            return self.paginator.get_paginated_response(paginated)
+
         return Response(sorted_entries)

@@ -154,18 +154,42 @@ angular.module('myApp').factory('listViewService', function (IP, Workarea, Worka
          return array;
     }
 
-    function getDir(ip, pathStr) {
-        var sendData = { 'id': ip.id };
-        if (pathStr != "") {
-            sendData = angular.extend(sendData, { path: pathStr });
+    function getDir(ip, pathStr, pageNumber, pageSize) {
+        if(pathStr == "") {
+            sendData = {
+                id: ip.id,
+                page: pageNumber,
+                page_size: pageSize,
+            };
+        } else {
+            sendData = {
+                id: ip.id,
+                page: pageNumber,
+                page_size: pageSize,
+                path: pathStr,
+            };
         }
         if (ip.state == "At reception") {
-            return IPReception.files(sendData).$promise.then(function (data) {
-                return data;
+            return IPReception.files(sendData).$promise.then(function(data) {
+                var count = data.$httpHeaders('Count');
+                if (count == null) {
+                    count = data.length;
+                }
+                return {
+                    numberOfPages: Math.ceil(count/pageSize),
+                    data: data
+                };
             });
         } else {
-            return IP.files(sendData).$promise.then(function (data) {
-                return data;
+            return IP.files(sendData).$promise.then(function(data) {
+                var count = data.$httpHeaders('Count');
+                if (count == null) {
+                    count = data.length;
+                }
+                return {
+                    numberOfPages: Math.ceil(count/pageSize),
+                    data: data
+                };
             });
         }
     }
@@ -202,23 +226,35 @@ angular.module('myApp').factory('listViewService', function (IP, Workarea, Worka
         });
     }
 
-    function getWorkareaDir(workareaType, pathStr) {
+    function getWorkareaDir(workareaType, pathStr, pageNumber, pageSize) {
         var sendData;
         if (pathStr == "") {
             sendData = {
+                page: pageNumber,
+                page_size: pageSize,
                 type: workareaType
             };
         } else {
             sendData = {
+                page: pageNumber,
+                page_size: pageSize,
                 path: pathStr,
                 type: workareaType
             };
         }
+
         return $http.get(appConfig.djangoUrl + "workarea-files/",{ params: sendData }).then(function (response) {
+            var count = response.headers('Count');
+            if (count == null) {
+                count = response.data.length;
+            }
             if(response.headers()['content-disposition']) {
                 return $q.reject(response);
             } else {
-                return response.data;
+                return {
+                    numberOfPages: Math.ceil(count/pageSize),
+                    data: response.data
+                };
             }
         });
     }

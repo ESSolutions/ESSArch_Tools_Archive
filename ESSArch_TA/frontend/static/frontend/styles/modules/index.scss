@@ -567,6 +567,29 @@ body.modal-open[style] {
     flex-direction: row;
     margin-right: 15px;
 }
+.files-per-page-pagination-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+.file-pagination {
+    a {
+        color: black;
+        float: left;
+        padding: 6px 12px;
+        line-height: 1.428571429;
+        text-decoration: none;
+        border: 1px solid #e8e8e8;
+    }
+    a.active {
+        background-color: rgba(0,0,0,0.03);
+    }
+
+    a:hover:not(.active) {background-color: rgba(0,0,0,0.03);}
+
+}
 .nav-refresh-wrapper {
     width: 100%;
     display: flex;
@@ -587,6 +610,7 @@ body.modal-open[style] {
 }
 .deckgrid {
     margin-top:10px;
+    margin-bottom: 5px;
     padding: 15px;
     width: 100%;
     min-width: 520px;
@@ -595,6 +619,7 @@ body.modal-open[style] {
     overflow-y: scroll;
     border-style: solid;
     border-color: #bbb;
+    border-width: 1px;
 }
 .flex-grid {
     display: flex;
