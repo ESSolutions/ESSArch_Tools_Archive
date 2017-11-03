@@ -800,7 +800,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
         step.run()
 
-        return Response("IP Transferred")
+        return Response("Transferring IP")
 
     @detail_route(methods=['post'], url_path='validate')
     def validate(self, request, pk=None):
