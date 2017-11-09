@@ -48,7 +48,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from lxml import etree
 
-from rest_framework import exceptions, filters, status
+from rest_framework import exceptions, filters, permissions, status
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 
@@ -104,7 +104,7 @@ from ESSArch_Core.util import (
 )
 
 from ip.filters import InformationPackageFilter
-from ip.serializers import InformationPackageSerializer, WorkareaSerializer
+from ip.serializers import InformationPackageSerializer, InformationPackageReadSerializer, WorkareaSerializer
 
 from rest_framework import viewsets
 
@@ -498,6 +498,12 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         'submission_agreement__name', 'start_date', 'end_date',
     )
     filter_class = InformationPackageFilter
+
+    def get_serializer_class(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return InformationPackageReadSerializer
+
+        return InformationPackageSerializer
 
     def get_permissions(self):
         if self.action == 'destroy':
