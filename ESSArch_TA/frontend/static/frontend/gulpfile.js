@@ -90,6 +90,8 @@ var vendorFiles = [
         'styles/modules/login.scss',
         'styles/modules/my_page.scss',
         'styles/modules/receive_sip.scss',
+        'styles/modules/top_alert.scss',
+        'styles/modules/workspace.scss',
         'styles/modules/colors.scss',
         'styles/modules/mixins.scss',
         'styles/modules/tree_control.scss',

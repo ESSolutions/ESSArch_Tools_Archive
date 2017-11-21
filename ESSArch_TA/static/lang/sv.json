@@ -240,5 +240,8 @@
     "GRID_VIEW": "Rutnät",
     "RECEIVE_SIP_DESC": "Vill du ta emot SIPar?",
     "TRANSFER_SIP_DESC": "Vill du överföra SIP {{label}}?",
-    "FILES_PER_PAGE": "Filer per sida"
+    "FILES_PER_PAGE": "Filer per sida",
+    "VALIDATION": "Validering",
+    "CONVERSION": "Konvertering",
+    "TRANSFORMERS": "Transformering"
 }

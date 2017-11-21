@@ -240,5 +240,8 @@
     "GRID_VIEW": "Grid",
     "RECEIVE_SIP_DESC": "Do you want to receive SIP's?",
     "TRANSFER_SIP_DESC": "Do you want to transfer SIP {{label}}?",
-    "FILES_PER_PAGE": "Files per page"
+    "FILES_PER_PAGE": "Files per page",
+    "VALIDATION": "Validations",
+    "CONVERSION": "Conversions",
+    "TRANSFORMERS": "Transformers"
 }

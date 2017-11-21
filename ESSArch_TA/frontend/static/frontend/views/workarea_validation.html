@@ -1,0 +1,56 @@
+<div class="workarea-validation">
+    <div class="content-wrapper">
+        <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'">
+        </div>
+        <div ng-if="statusShow || eventShow"class="events-status-wrapper">
+            <event-table ng-if="eventShow" ip="ip"></event-table>
+            <div ng-if="statusShow" class="status-view" ng-include src="'static/frontend/views/status_tree_view.html'"></div>
+        </div>
+        <div ng-if="filebrowser" class="file-browser" ng-include src="'static/frontend/views/filebrowser.html'"></div>
+        <div class="select-sub-edit-eventlog-wrapper" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
+            <div class="select-view" id="select-view" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
+                <p style="margin: 5px;">IP: {{ip.label}}</p>
+                <div ng-include src="'static/frontend/views/validator_choices.html'"></div>
+                <button class="btn btn-info validate-button" ng-click="vm.validate(ip)">{{'VALIDATE' | translate}}</button>
+            </div>
+            <br/>
+            <hr/>
+            <div class="edit-view">
+                    <div class="table-container" st-table="vm.validations" st-pipe="vm.validationPipe">
+                    <div class="search-prepare-wrapper">
+                            <label for items-per-page></label>
+                            <select class="form-control items-per-page"
+                                ng-model="vm.validationsPerPage" ng-options="x for x in [5,10,20,25,50]" uib-popover="{{'ITEMSPERPAGE' | translate}}" popover-placement="top-left"
+                                popover-popup-delay="500" popover-append-to-body="true"></select>
+                            <div style="width: 50%;" class="input-group margin-bottom-sm">
+                            <input id="search-input" st-search="" class="form-control" ng-attr-placeholder="{{'GLOBALSEARCH' | translate}}" type="text"
+                                uib-popover="{{'GLOBALSEARCHDESC' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"
+                            />
+                                <span ng-if="vm.validationTableState.search.predicateObject && vm.validationTableState.search.predicateObject['$']" class="input-group-addon clickable" ng-click="clearSearch(); getListViewData();"><i class="fa fa-lg fa-times" style="color: red;"></i></span>
+                            </div>
+                        <span ng-click="vm.validationPipe(vm.validationTableState)" class="clickable fa fa-refresh fa-lg"
+                            ng-class="{'fa-refresh-animate': validationLoading }" uib-popover="{{'REFRESHTABLEDESC' | translate}}" popover-placement="left"
+                            popover-popup-delay="500" popover-append-to-body="true"></span>
+                    </div>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>{{'ID' | translate}}</th>
+                                <th>{{'STATE' | translate}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="x in vm.validations" ng-class="{'validation-success': x.state == 'Success', 'validation-failure': x.state == 'Failure'}">
+                                <td>{{x.id}}</td>
+                                <td>
+                                    {{x.state}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="search-pagination" style="float: right;" st-template="static/frontend/views/file_pagination.html" st-pagination="" st-items-by-page="vm.validationsPerPage" st-displayed-pages="7"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

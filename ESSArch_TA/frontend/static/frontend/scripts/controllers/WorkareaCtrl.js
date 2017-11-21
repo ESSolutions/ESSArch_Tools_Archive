@@ -313,4 +313,37 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
                 });
         }
     }
+
+    /*
+     * Validation
+     */
+    $scope.validationLoading = false;
+    vm.validationsPerPage = 10;
+    vm.validate = function(ip) {
+        var string = "Validate " + ip.object_identifier_value + ", with: ";
+        for(var key in vm.validatorModel) {
+            string += key + ", ";
+        }
+        console.log(string);
+    }
+    var testValidations = [
+        {
+            id: 1,
+            state: "Failure"
+        },
+        {
+            id: 2,
+            state: "Success"
+        }
+    ]
+    vm.validations = [];
+    vm.validationPipe = function(tableState) {
+        $scope.validationLoading = true;
+        $timeout(function() {
+            vm.validationTableState = tableState;
+            vm.validations = testValidations;
+            $scope.validationLoading = false;
+
+        }, 500);
+    }
 });

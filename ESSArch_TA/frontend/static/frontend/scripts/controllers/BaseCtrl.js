@@ -242,6 +242,24 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             "defaultValue": true,
             "type": "checkbox",
             "key": "validate_integrity",
+        },
+        {
+            "templateOptions": {
+                "type": "text",
+                "label": "Mediaconch",
+            },
+            "defaultValue": true,
+            "type": "checkbox",
+            "key": "mediaconch",
+        },
+        {
+            "templateOptions": {
+                "type": "text",
+                "label": "VeraPDF",
+            },
+            "defaultValue": true,
+            "type": "checkbox",
+            "key": "verapdf",
         }
     ];
 
