@@ -527,7 +527,6 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http,
     vm.receiveModal = function (ips) {
         $http.get(appConfig.djangoUrl + "submission-agreements").then(function(response) {
             $scope.submissionAgreements = response.data;
-            console.log($scope.submissionAgreements);
             var modalInstance = $uibModal.open({
                 animation: true,
                 ariaLabelledBy: 'modal-title',
