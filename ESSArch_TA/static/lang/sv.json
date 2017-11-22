@@ -243,5 +243,6 @@
     "FILES_PER_PAGE": "Filer per sida",
     "VALIDATION": "Validering",
     "CONVERSION": "Konvertering",
-    "TRANSFORMERS": "Transformering"
+    "TRANSFORMERS": "Transformering",
+    "VALIDATION_RESULT_FOR": "Valideringsresultat för {{id}}"
 }

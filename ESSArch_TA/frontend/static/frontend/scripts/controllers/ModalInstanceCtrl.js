@@ -112,4 +112,16 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     $ctrl.cancel = function () {
         $uibModalInstance.dismiss('cancel');
     };
+})
+.controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data) {
+    var $ctrl = this;
+    $ctrl.data = data;
+    $ctrl.file = data.file;
+    $ctrl.type = data.type;
+    $ctrl.ok = function () {
+        $uibModalInstance.close();
+    };
+    $ctrl.cancel = function () {
+        $uibModalInstance.dismiss('cancel');
+    };
 });

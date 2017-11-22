@@ -243,5 +243,6 @@
     "FILES_PER_PAGE": "Files per page",
     "VALIDATION": "Validations",
     "CONVERSION": "Conversions",
-    "TRANSFORMERS": "Transformers"
+    "TRANSFORMERS": "Transformers",
+    "VALIDATION_RESULT_FOR": "Validation result for {{id}}"
 }

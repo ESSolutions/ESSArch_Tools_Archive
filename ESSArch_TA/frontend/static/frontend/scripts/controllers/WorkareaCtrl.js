@@ -346,4 +346,23 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
 
         }, 500);
     }
+    vm.showValidationResult = function(validation) {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'static/frontend/views/validation_result_modal.html',
+            controller: 'DataModalInstanceCtrl',
+            controllerAs: '$ctrl',
+            resolve: {
+                data: {
+                    validation: validation
+                }
+            }
+        })
+        modalInstance.result.then(function (data) {
+        }, function () {
+            $log.info('modal-component dismissed at: ' + new Date());
+        });
+    }
 });
