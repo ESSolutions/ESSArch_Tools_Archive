@@ -244,7 +244,14 @@
     "VALIDATION": "Validations",
     "CONVERSION": "Conversions",
     "TRANSFORMERS": "Transformers",
-    "VALIDATION_RESULT_FOR": "Validation result for {{id}}","$schema",
+    "VALIDATION_RESULT_FOR": "Validation result for {{id}}",
     "VALIDATOR": "Validator",
-    "MESSAGE": "Message"
+    "MESSAGE": "Message",
+    "IMPORT_URL": "Import URL",
+    "GET_SAS": "Get submission agreements",
+    "IMPORT_SA": "Import submission agreement",
+    "SA_EXISTS": "Submission agreement exists",
+    "SA_EXISTS_DESC": "Submission agreement with same ID already exists. Would you like to overwrite it?",
+    "PROFILE_EXISTS": "Profile exists",
+    "PROFILE_EXISTS_DESC": "Profile with same ID already exists. Would you like to overwrite it?"
 }

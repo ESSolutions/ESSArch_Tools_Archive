@@ -765,3 +765,20 @@ body.modal-open[style] {
 .no-select {
     user-select: none;
 }
+
+.import {
+    @include container(10px);
+    margin-top: 10px;
+    width:100%;
+    min-width: 400px;
+    input {
+        width: 33%;
+    }
+    .alert {
+        width: 33%;
+        margin-top: 10px;
+    }
+    .btn-info {
+        margin-top: 5px;
+    }
+}

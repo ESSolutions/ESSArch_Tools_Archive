@@ -17,9 +17,12 @@
                 </tr>
             </tbody>
         </table>
+        <div>
+            <select class="form-control" required ng-model="$ctrl.sa" ng-options="x as x.name for x in submissionAgreements">{{x}}</select>
+        </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-primary" type="button" ng-click="$ctrl.receive()">{{'RECEIVESIP' | translate}}</button>
+        <button class="btn btn-primary" type="submit">{{'RECEIVESIP' | translate}}</button>
         <button class="btn btn-warning" type="button" ng-click="$ctrl.cancel()">{{'CANCEL' | translate}}</button>
     </div>
 </form>

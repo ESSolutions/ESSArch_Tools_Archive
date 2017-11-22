@@ -246,5 +246,12 @@
     "TRANSFORMERS": "Transformering",
     "VALIDATION_RESULT_FOR": "Valideringsresultat för {{id}}",
     "VALIDATOR": "Validator",
-    "MESSAGE": "Meddelande"
+    "MESSAGE": "Meddelande",
+    "IMPORT_URL": "Import-URL",
+    "GET_SAS": "Hämta Leveransöverenskommelser",
+    "IMPORT_SA": "Importera Leveransöverenskommelse",
+    "SA_EXISTS": "Leveransöverenskommelse finns redan",
+    "SA_EXISTS_DESC": "Leveransöverenskommelse med samma ID finns redan. Vill du skriva över den?",
+    "PROFILE_EXISTS": "Profil finns redan",
+    "PROFILE_EXISTS_DESC": "Profil med samma ID finns redan. Vill du skriva över den?"
 }
