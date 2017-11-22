@@ -78,6 +78,7 @@ from ESSArch_Core.mixins import PaginatedViewMixin
 
 from ESSArch_Core.pagination import LinkHeaderPagination
 
+from ESSArch_Core.profiles.models import ProfileIP, SubmissionAgreement
 from ESSArch_Core.profiles.utils import fill_specification_data
 
 from ESSArch_Core.WorkflowEngine.models import (
@@ -290,6 +291,12 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         if InformationPackage.objects.filter(object_identifier_value=pk).exists():
             raise exceptions.ParseError('IP with id "%s" already exist')
 
+        sa_id = request.data.get('submission_agreement')
+        try:
+            sa = SubmissionAgreement.objects.get(pk=sa_id)
+        except SubmissionAgreement.DoesNotExist:
+            raise exceptions.ParseError('SA with id "%s" does not exist' % sa_id)
+
         reception = Path.objects.get(entity="path_ingest_reception").value
         events_xmlfile = None
 
@@ -341,6 +348,15 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
                     extracted = os.path.join(os.path.dirname(tmp.name), '%s/ipevents.xml' % pk)
                     os.rename(extracted, tmp.name)
                     events_xmlfile = tmp.name
+
+        ip.submission_agreement = sa
+        ip.save()
+
+        for profile_type in ['sip', 'preservation_metadata', 'submit_description', 'mediaconch']:
+            profile = getattr(sa, 'profile_%s' % profile_type, None)
+            if profile is None:
+                continue
+            profile_ip = ProfileIP.objects.create(ip=ip, profile=profile)
 
         step = ProcessStep.objects.create(
             name="Receive SIP",
