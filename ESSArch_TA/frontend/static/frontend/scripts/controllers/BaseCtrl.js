@@ -250,7 +250,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             },
             "defaultValue": true,
             "type": "checkbox",
-            "key": "mediaconch",
+            "key": "validate_mediaconch",
         },
         {
             "templateOptions": {
@@ -259,7 +259,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             },
             "defaultValue": true,
             "type": "checkbox",
-            "key": "verapdf",
+            "key": "validate_verapdf",
         }
     ];
 

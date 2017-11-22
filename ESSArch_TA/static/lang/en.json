@@ -244,5 +244,7 @@
     "VALIDATION": "Validations",
     "CONVERSION": "Conversions",
     "TRANSFORMERS": "Transformers",
-    "VALIDATION_RESULT_FOR": "Validation result for {{id}}"
+    "VALIDATION_RESULT_FOR": "Validation result for {{id}}","$schema",
+    "VALIDATOR": "Validator",
+    "MESSAGE": "Message"
 }

@@ -14,8 +14,8 @@
             </div>
             <br/>
             <hr/>
-            <div class="edit-view">
-                    <div class="table-container" st-table="vm.validations" st-pipe="vm.validationPipe">
+            <div class="validation-view">
+                <div class="table-container" st-table="vm.validations" st-pipe="vm.validationPipe">
                     <div class="search-prepare-wrapper">
                             <select class="form-control items-per-page"
                                 ng-model="vm.validationsPerPage" ng-options="x for x in [5,10,20,25,50]" uib-popover="{{'ITEMSPERPAGE' | translate}}" popover-placement="top-left"
@@ -30,18 +30,20 @@
                             ng-class="{'fa-refresh-animate': validationLoading }" uib-popover="{{'REFRESHTABLEDESC' | translate}}" popover-placement="left"
                             popover-popup-delay="500" popover-append-to-body="true"></span>
                     </div>
-                    <table class="table table-striped">
+                    <table class="table validation-table table-striped">
                         <thead>
                             <tr>
-                                <th>{{'ID' | translate}}</th>
+                                <th>{{'FILENAME' | translate}}</th>
+                                <th>{{'VALIDATOR' | translate}}</th>
                                 <th>{{'STATE' | translate}}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="x in vm.validations" class="clickable" ng-click="vm.showValidationResult(x)" ng-class="{'validation-success': x.state == 'SUCCESS', 'validation-failure': x.state == 'FAILURE'}">
-                                <td>{{x.id}}</td>
+                            <tr ng-repeat="x in vm.validations" class="clickable" ng-click="vm.showValidationResult(x)" ng-class="{'validation-success': x.passed, 'validation-failure': !x.passed}">
+                                <td>{{x.filename}}</td>
+                                <td>{{x.validator}}</td>
                                 <td>
-                                    {{x.state | translate}}
+                                    {{x.passed?'SUCCESS':'FAILURE' | translate}}
                                 </td>
                             </tr>
                         </tbody>

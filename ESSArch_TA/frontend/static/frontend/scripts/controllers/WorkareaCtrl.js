@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, $sce, $window) {
+angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, $sce, $window, TopAlert, WorkareaValidation) {
     var vm = this;
     var ipSortString ="";
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
@@ -36,6 +36,7 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
         } else {
             $scope.ip = row;
             $rootScope.ip = row;
+            vm.validationPipe(vm.validationTableState);
             $scope.select = true;
         }
         $scope.eventShow = false;
@@ -320,31 +321,36 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
     $scope.validationLoading = false;
     vm.validationsPerPage = 10;
     vm.validate = function(ip) {
-        var string = "Validate " + ip.object_identifier_value + ", with: ";
-        for(var key in vm.validatorModel) {
-            string += key + ", ";
-        }
-        console.log(string);
+        $http({
+            method: "POST",
+            url: appConfig.djangoUrl + "workarea-entries/" + ip.workarea.id + "/validate/",
+            data: {
+                validators: vm.validatorModel
+            }
+        }).then(function(response) {
+            TopAlert.add(response.data, "success");
+            vm.validationPipe(vm.validationTableState);
+        }).catch(function(response) {
+            TopAlert.add(response.data.detail, "error");
+        })
     }
-    var testValidations = [
-        {
-            id: 1,
-            state: "FAILURE"
-        },
-        {
-            id: 2,
-            state: "SUCCESS"
-        }
-    ]
+    vm.validationFilters = {};
     vm.validations = [];
-    vm.validationPipe = function(tableState) {
-        $scope.validationLoading = true;
-        $timeout(function() {
+    vm.validationPipe = function (tableState) {
+        if (tableState) {
+            $scope.validationLoading = true;
             vm.validationTableState = tableState;
-            vm.validations = testValidations;
-            $scope.validationLoading = false;
-
-        }, 500);
+            var pagination = tableState.pagination;
+            var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
+            var number = pagination.number;  // Number of entries showed per page.
+            var pageNumber = start / number + 1;
+            WorkareaValidation.getValidationsForIp($scope.ip, pageNumber, number, vm.validationFilters).then(function (response) {
+                vm.validations = response.data;
+                vm.numberOfResults = response.count;
+                tableState.pagination.numberOfPages = response.numberOfPages;//set the number of pages so the pagination can update
+                $scope.validationLoading = false;
+            });
+        }
     }
     vm.showValidationResult = function(validation) {
         var modalInstance = $uibModal.open({
@@ -353,6 +359,7 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
             ariaDescribedBy: 'modal-body',
             templateUrl: 'static/frontend/views/validation_result_modal.html',
             controller: 'DataModalInstanceCtrl',
+            size: "lg",
             controllerAs: '$ctrl',
             resolve: {
                 data: {

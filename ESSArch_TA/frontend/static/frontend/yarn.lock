@@ -152,6 +152,10 @@ angular-permission@~5.3.2:
   dependencies:
     angular ">=1.4.8"
 
+angular-pretty-xml@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/angular-pretty-xml/-/angular-pretty-xml-0.1.1.tgz#7352ceba506ad4ec03aa06fe931719d8661d73dc"
+
 angular-relative-date@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/angular-relative-date/-/angular-relative-date-2.1.1.tgz#b65b302df9a16af8787816fe8f1b0f512602aba4"

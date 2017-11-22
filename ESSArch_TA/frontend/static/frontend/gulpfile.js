@@ -79,6 +79,7 @@ var vendorFiles = [
         'node_modules/angular-bootstrap-datetimepicker/src/js/datetimepicker.templates.js',
         'node_modules/angular-clipboard/angular-clipboard.js',
         'node_modules/angular-resource/angular-resource.js',
+        'node_modules/angular-pretty-xml/src/angular-pretty-xml.js'
     ],
     jsFiles = [
         'scripts/polyfills/*.js', 'scripts/myApp.js', 'scripts/controllers/*.js', 'scripts/components/*.js',
