@@ -9,7 +9,6 @@
         <div ng-if="filebrowser" class="file-browser" ng-include src="'static/frontend/views/filebrowser.html'"></div>
         <div class="select-sub-edit-eventlog-wrapper" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
             <div class="select-view" id="select-view" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
-                <p style="margin: 5px;">IP: {{ip.label}}</p>
                 <div ng-include src="'static/frontend/views/validator_choices.html'"></div>
                 <button class="btn btn-info validate-button" ng-click="vm.validate(ip)">{{'VALIDATE' | translate}}</button>
             </div>
@@ -18,7 +17,6 @@
             <div class="edit-view">
                     <div class="table-container" st-table="vm.validations" st-pipe="vm.validationPipe">
                     <div class="search-prepare-wrapper">
-                            <label for items-per-page></label>
                             <select class="form-control items-per-page"
                                 ng-model="vm.validationsPerPage" ng-options="x for x in [5,10,20,25,50]" uib-popover="{{'ITEMSPERPAGE' | translate}}" popover-placement="top-left"
                                 popover-popup-delay="500" popover-append-to-body="true"></select>
