@@ -58,6 +58,8 @@ from ESSArch_Core.auth.views import (
     UserViewSet,
 )
 
+from ESSArch_Core.fixity.views import ValidationViewSet
+
 from ESSArch_Core.ip.views import (
     ArchivalInstitutionViewSet,
     ArchivistOrganizationViewSet,
@@ -106,6 +108,12 @@ router.register(r'information-packages', InformationPackageViewSet).register(
     EventIPViewSet,
     base_name='ip-events',
     parents_query_lookups=['linkingObjectIdentifierValue']
+)
+router.register(r'information-packages', InformationPackageViewSet).register(
+    r'validations',
+    ValidationViewSet,
+    base_name='ip-validations',
+    parents_query_lookups=['information_package']
 )
 router.register(r'ip-reception', InformationPackageReceptionViewSet, base_name="ip-reception")
 router.register(r'notifications', NotificationViewSet)
