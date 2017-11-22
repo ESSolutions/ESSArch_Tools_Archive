@@ -329,11 +329,11 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
     var testValidations = [
         {
             id: 1,
-            state: "Failure"
+            state: "FAILURE"
         },
         {
             id: 2,
-            state: "Success"
+            state: "SUCCESS"
         }
     ]
     vm.validations = [];

@@ -38,10 +38,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="x in vm.validations" class="clickable" ng-click="vm.showValidationResult(x)" ng-class="{'validation-success': x.state == 'Success', 'validation-failure': x.state == 'Failure'}">
+                            <tr ng-repeat="x in vm.validations" class="clickable" ng-click="vm.showValidationResult(x)" ng-class="{'validation-success': x.state == 'SUCCESS', 'validation-failure': x.state == 'FAILURE'}">
                                 <td>{{x.id}}</td>
                                 <td>
-                                    {{x.state}}
+                                    {{x.state | translate}}
                                 </td>
                             </tr>
                         </tbody>
