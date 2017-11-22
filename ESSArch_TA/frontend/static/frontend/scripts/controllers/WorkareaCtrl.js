@@ -108,7 +108,7 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
         $cookies.put("files-per-page", filesPerPage, { expires: new Date("Fri, 31 Dec 9999 23:59:59 GMT") });
     }
     $scope.previousGridArraysString = function () {
-        var retString = $scope.ip.object_identifier_value + "/";
+        var retString = "";
 
         $scope.previousGridArrays.forEach(function (card) {
             retString = retString.concat(card.name, "/");
@@ -127,7 +127,7 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
             var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
             var number = pagination.number;  // Number of entries showed per page.
             var pageNumber = start / number + 1;
-            listViewService.getWorkareaDir("ingest", $scope.previousGridArraysString(), pageNumber, number).then(function(dir) {
+            listViewService.getWorkareaDir("ingest", $scope.ip.object_identifier_value + "/" + $scope.previousGridArraysString(), pageNumber, number).then(function(dir) {
                 $scope.deckGridData = dir.data;
                 tableState.pagination.numberOfPages = dir.numberOfPages;//set the number of pages so the pagination can update
                 $scope.gridArrayLoading = false;
@@ -200,7 +200,7 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
             }
         });
         if (!fileExists) {
-            listViewService.addNewWorkareaFolder("ingest", $scope.previousGridArraysString(), folder)
+            listViewService.addNewWorkareaFolder("ingest", $scope.ip.object_identifier_value + "/" + $scope.previousGridArraysString(), folder)
                 .then(function (response) {
                     $scope.updateGridArray();
                 });
@@ -208,7 +208,7 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
     }
 
     $scope.getFile = function (file) {
-        file.content = $sce.trustAsResourceUrl(appConfig.djangoUrl + "workarea-files/?type=ingest&path=" + $scope.previousGridArraysString() + file.name);
+        file.content = $sce.trustAsResourceUrl(appConfig.djangoUrl + "workarea-files/?type=ingest&path=" + $scope.ip.object_identifier_value + "/" + $scope.previousGridArraysString() + file.name);
         $window.open(file.content, '_blank');
     }
     function folderNameExistsModal(index, folder, fileToOverwrite) {
@@ -230,9 +230,9 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
             },
         })
         modalInstance.result.then(function (data) {
-            listViewService.deleteWorkareaFile("ingest", $scope.previousGridArraysString(), fileToOverwrite)
+            listViewService.deleteWorkareaFile("ingest", $scope.ip.object_identifier_value + "/" + $scope.previousGridArraysString(), fileToOverwrite)
                 .then(function () {
-                    listViewService.addNewFolder($scope.ip, $scope.previousGridArraysString(), folder)
+                    listViewService.addNewFolder($scope.ip, $scope.ip.object_identifier_value + "/" + $scope.previousGridArraysString(), folder)
                         .then(function () {
                             $scope.updateGridArray();
                         });
@@ -255,7 +255,7 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
     }
     $scope.removeFiles = function () {
         $scope.selectedCards.forEach(function (file) {
-            listViewService.deleteWorkareaFile("ingest", $scope.previousGridArraysString(), file)
+            listViewService.deleteWorkareaFile("ingest", $scope.ip.object_identifier_value + "/" + $scope.previousGridArraysString(), file)
                 .then(function () {
                     $scope.updateGridArray();
                 });
