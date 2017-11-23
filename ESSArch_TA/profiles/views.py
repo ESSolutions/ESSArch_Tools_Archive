@@ -26,6 +26,8 @@ from django.db.models import Prefetch
 
 from ESSArch_Core.profiles.serializers import (
     ProfileSerializer,
+    ProfileDetailSerializer,
+    ProfileWriteSerializer,
     ProfileSASerializer,
     ProfileIPSerializer,
     SubmissionAgreementSerializer
@@ -66,7 +68,15 @@ class ProfileViewSet(viewsets.ModelViewSet):
     API endpoint that allows profiles to be viewed or edited.
     """
     queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ProfileSerializer
+
+        if self.action == 'retrieve':
+            return ProfileDetailSerializer
+
+        return ProfileWriteSerializer
 
     def get_queryset(self):
         queryset = Profile.objects.all()
