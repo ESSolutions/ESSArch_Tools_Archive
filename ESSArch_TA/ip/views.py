@@ -893,8 +893,13 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 class WorkareaViewSet(InformationPackageViewSet):
     def get_queryset(self):
         user = self.request.user
+        see_all = self.request.user.has_perm('ip.see_all_in_workspaces')
         qs = super(WorkareaViewSet, self).get_queryset()
-        return qs.filter(workareas__user=user)
+
+        if not see_all:
+            qs = qs.filter(workareas__user=user)
+
+        return qs
 
 
 class WorkareaFilesViewSet(viewsets.ViewSet, PaginatedViewMixin):
