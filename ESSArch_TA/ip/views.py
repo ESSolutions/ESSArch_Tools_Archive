@@ -301,21 +301,27 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         events_xmlfile = None
         if tarfile.is_tarfile(objpath):
             with tarfile.open(objpath) as tarf:
-                tmp = tempfile.NamedTemporaryFile(delete=False)
-                tmp.close()
-                tarf.extract('%s/ipevents.xml' % pk, os.path.dirname(tmp.name))
-                extracted = os.path.join(os.path.dirname(tmp.name), '%s/ipevents.xml' % pk)
-                os.rename(extracted, tmp.name)
-                events_xmlfile = tmp.name
+                try:
+                    tmp = tempfile.NamedTemporaryFile(delete=False)
+                    tmp.close()
+                    tarf.extract('%s/ipevents.xml' % pk, os.path.dirname(tmp.name))
+                    extracted = os.path.join(os.path.dirname(tmp.name), '%s/ipevents.xml' % pk)
+                    os.rename(extracted, tmp.name)
+                    events_xmlfile = tmp.name
+                except KeyError:
+                    pass
 
         if zipfile.is_zipfile(objpath):
             with zipfile.open(objpath) as zipf:
-                tmp = tempfile.NamedTemporaryFile(delete=False)
-                tmp.close()
-                zipf.extract('%s/ipevents.xml' % pk, os.path.dirname(tmp.name))
-                extracted = os.path.join(os.path.dirname(tmp.name), '%s/ipevents.xml' % pk)
-                os.rename(extracted, tmp.name)
-                events_xmlfile = tmp.name
+                try:
+                    tmp = tempfile.NamedTemporaryFile(delete=False)
+                    tmp.close()
+                    zipf.extract('%s/ipevents.xml' % pk, os.path.dirname(tmp.name))
+                    extracted = os.path.join(os.path.dirname(tmp.name), '%s/ipevents.xml' % pk)
+                    os.rename(extracted, tmp.name)
+                    events_xmlfile = tmp.name
+                except KeyError:
+                    pass
 
         step = ProcessStep.objects.create(
             name="Receive SIP",
