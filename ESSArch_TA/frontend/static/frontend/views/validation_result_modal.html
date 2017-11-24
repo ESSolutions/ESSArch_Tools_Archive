@@ -35,7 +35,7 @@
             </tbody>
         </table>
         <div ng-if="$ctrl.data.validation.message">
-            <div class="validation-message"><pre ng-bind="$ctrl.data.validation.prettyMessage"></pre></div>
+            <div class="validation-message"><pre ng-bind-html="$ctrl.data.validation.prettyMessage"></pre></div>
         </div>
     </div>
     <div class="modal-footer">

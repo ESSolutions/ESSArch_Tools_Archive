@@ -346,7 +346,7 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
             var pageNumber = start / number + 1;
             WorkareaValidation.getValidationsForIp($scope.ip, pageNumber, number, vm.validationFilters).then(function (response) {
                 response.data.forEach(function(val) {
-                    val.prettyMessage = $filter("prettyXml")(val.message);
+                    val.prettyMessage = $sce.trustAsHtml(formatXml(val.message));
                 });
                 vm.validations = response.data;
                 vm.numberOfResults = response.count;
@@ -354,6 +354,17 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
                 $scope.validationLoading = false;
             });
         }
+    }
+    String.prototype.replaceAll = function(search, replacement) {
+        var target = this;
+        return target.replace(new RegExp(search, 'g'), replacement);
+    };
+    function formatXml(message) {
+        var pretty = $filter("prettyXml")(message);
+        return pretty.replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('outcome="fail"', 'outcome="<span style="color: red;">fail</span>"')
+        .replaceAll('outcome="pass"', 'outcome="<span style="color: green;">pass</span>"')
     }
     vm.showValidationResult = function(validation) {
         var modalInstance = $uibModal.open({
