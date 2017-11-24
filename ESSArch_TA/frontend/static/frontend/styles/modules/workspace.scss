@@ -71,10 +71,8 @@
     }
 }
 .validation-message {
-    word-break: break-word;
     pre {
         overflow: auto;
-        white-space: pre-wrap;
         max-height:300px;
     }
 }

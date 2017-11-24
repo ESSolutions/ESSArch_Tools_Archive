@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, $sce, $window, TopAlert, WorkareaValidation) {
+angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, $sce, $window, TopAlert, WorkareaValidation, $filter) {
     var vm = this;
     var ipSortString ="";
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
@@ -345,6 +345,9 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
             var number = pagination.number;  // Number of entries showed per page.
             var pageNumber = start / number + 1;
             WorkareaValidation.getValidationsForIp($scope.ip, pageNumber, number, vm.validationFilters).then(function (response) {
+                response.data.forEach(function(val) {
+                    val.prettyMessage = $filter("prettyXml")(val.message);
+                });
                 vm.validations = response.data;
                 vm.numberOfResults = response.count;
                 tableState.pagination.numberOfPages = response.numberOfPages;//set the number of pages so the pagination can update
