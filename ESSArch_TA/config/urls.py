@@ -58,7 +58,7 @@ from ESSArch_Core.auth.views import (
     UserViewSet,
 )
 
-from ESSArch_Core.fixity.views import ValidationViewSet
+from ESSArch_Core.fixity.views import ValidationViewSet, ValidationFilesViewSet
 
 from ESSArch_Core.ip.views import (
     ArchivalInstitutionViewSet,
@@ -111,7 +111,7 @@ router.register(r'information-packages', InformationPackageViewSet).register(
 )
 router.register(r'information-packages', InformationPackageViewSet).register(
     r'validations',
-    ValidationViewSet,
+    ValidationFilesViewSet,
     base_name='ip-validations',
     parents_query_lookups=['information_package']
 )
@@ -140,6 +140,7 @@ router.register(r'profile-ip', ProfileIPViewSet)
 router.register(r'agents', AgentViewSet)
 router.register(r'parameters', ParameterViewSet)
 router.register(r'paths', PathViewSet)
+router.register(r'validations', ValidationViewSet)
 router.register(r'workareas', WorkareaViewSet, base_name='workarea')
 router.register(r'workarea-entries', WorkareaEntryViewSet, base_name='workarea-entries')
 router.register(r'workarea-files', WorkareaFilesViewSet, base_name='workarea-files')
