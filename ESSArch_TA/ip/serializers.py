@@ -24,6 +24,8 @@
 
 from _version import get_versions
 
+from guardian.shortcuts import get_perms
+
 from rest_framework import serializers
 
 from ESSArch_Core.configuration.models import EventType
@@ -55,7 +57,15 @@ class InformationPackageSerializer(serializers.HyperlinkedModelSerializer):
     archivist_organization = ArchivistOrganizationSerializer(read_only=True)
     archival_type = ArchivalTypeSerializer(read_only=True)
     archival_location = ArchivalLocationSerializer(read_only=True)
+    permissions = serializers.SerializerMethodField()
     workarea = serializers.SerializerMethodField()
+
+    def get_permissions(self, obj):
+        request = self.context.get('request')
+        if hasattr(request, 'user'):
+            return get_perms(request.user, obj)
+
+        return []
 
     def get_workarea(self, obj):
         workarea = obj.workareas.first()
@@ -71,7 +81,7 @@ class InformationPackageSerializer(serializers.HyperlinkedModelSerializer):
             'object_num_items', 'start_date', 'end_date', 'package_type',
             'submission_agreement', 'archival_institution',
             'archivist_organization', 'archival_type', 'archival_location',
-            'submission_agreement_locked', 'profiles', 'workarea',
+            'submission_agreement_locked', 'profiles', 'permissions', 'workarea',
         )
 
 
