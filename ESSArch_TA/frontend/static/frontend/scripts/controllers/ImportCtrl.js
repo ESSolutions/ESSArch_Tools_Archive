@@ -94,11 +94,15 @@ angular.module('myApp').controller('ImportCtrl', function($q, $rootScope, $scope
     }
 
     $scope.$watch(function(){return vm.saFromFile}, function() {
-        vm.addSaFromFile(vm.saFromFile);
+        if(vm.saFromFile) {
+            vm.addSaFromFile(vm.saFromFile);
+        }
     });
 
     $scope.$watch(function(){return vm.profileFromFile}, function() {
-        vm.addProfileFromFile(vm.profileFromFile);
+        if(vm.profileFromFile){
+            vm.addProfileFromFile(vm.profileFromFile);
+        }
     });
 
     function saProfileExistsModal(profile) {
