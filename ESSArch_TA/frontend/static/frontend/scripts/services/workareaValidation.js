@@ -1,18 +1,15 @@
-angular.module('myApp').factory('WorkareaValidation', function ($rootScope, $q, appConfig, $http, $sce, $filter) {
-    String.prototype.replaceAll = function(search, replacement) {
-        var target = this;
-        return target.replace(new RegExp(search, 'g'), replacement);
-    };
+angular.module('myApp').factory('WorkareaValidation', function ($rootScope, $q, appConfig, $http, $sce, $filter, myService) {
+    var service = {};
 
     function formatXml(message) {
         var pretty = $filter("prettyXml")(message);
-        return pretty.replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('outcome="fail"', 'outcome="<span style="background-color: red; color: white; font-weight: bold;">fail</span>"')
-        .replaceAll('outcome="pass"', 'outcome="<span style="background-color: green; color: white; font-weight: bold;">pass</span>"')
+        pretty = myService.replaceAll(pretty, "<", "&lt;")
+        pretty = myService.replaceAll(pretty, ">", "&gt;")
+        pretty = myService.replaceAll(pretty, 'outcome="fail"', 'outcome="<span style="background-color: red; color: white; font-weight: bold;">fail</span>"')
+        pretty = myService.replaceAll(pretty, 'outcome="pass"', 'outcome="<span style="background-color: green; color: white; font-weight: bold;">pass</span>"')
+        return pretty;
     }
 
-    var service = {};
     service.getValidationsForIp = function (ip, pageNumber, pageSize, filters) {
         return $http({
             method: 'GET',
@@ -36,6 +33,7 @@ angular.module('myApp').factory('WorkareaValidation', function ($rootScope, $q, 
             return response;
         })
     }
+
     service.getChildren = function(validation, ip) {
         return $http.get(
             appConfig.djangoUrl + "validations/",

@@ -85,6 +85,15 @@ angular.module('myApp').factory('myService', function(Sysinfo, $location, PermPe
         });
         return {activeColumns: activeColumns, allColumns: allColumns};
     }
+
+    function escapeRegExp(str) {
+        return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+    }
+
+    function replaceAll(target, search, replacement) {
+        return target.replace(new RegExp(escapeRegExp(search), 'g'), replacement);
+    };
+
     return {
         changePath: changePath,
         getPermissions: getPermissions,
@@ -92,6 +101,7 @@ angular.module('myApp').factory('myService', function(Sysinfo, $location, PermPe
         getActiveColumns: getActiveColumns,
         generateColumns: generateColumns,
         checkPermission: checkPermission,
-        checkPermissions: checkPermissions
+        checkPermissions: checkPermissions,
+        replaceAll: replaceAll,
     }
 });
