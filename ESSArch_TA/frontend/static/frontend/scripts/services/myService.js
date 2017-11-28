@@ -27,6 +27,7 @@ angular.module('myApp').factory('myService', function(Sysinfo, $location, PermPe
         $state.go(state);
     };
     function getPermissions(permissions){
+        PermPermissionStore.clearStore();
         PermPermissionStore.defineManyPermissions(permissions, /*@ngInject*/ function (permissionName) {
             return permissions.includes(permissionName);
         });
@@ -43,6 +44,8 @@ angular.module('myApp').factory('myService', function(Sysinfo, $location, PermPe
         });
     }
     function checkPermissions(permissions) {
+        if (permissions.length == 0) {return true;}
+
         var hasPermissions = false;
         permissions.forEach(function(permission) {
             if(checkPermission(permission)) {
@@ -74,14 +77,8 @@ angular.module('myApp').factory('myService', function(Sysinfo, $location, PermPe
             {label: "filebrowser", sortString: "", template: "static/frontend/views/columns/column_filebrowser.html"},
             {label: "entry_date", sortString: "entry_date", template: "static/frontend/views/columns/column_entry_date.html"},
         ];
-        var activeColumns = [];
-        var simpleColumns = allColumns.map(function(a){return a.label});
-        columns.forEach(function(column) {
-            for(i=0; i < simpleColumns.length; i++) {
-                if(column === simpleColumns[i]) {
-                    activeColumns.push(allColumns[i]);
-                }
-            }
+        var activeColumns = allColumns.filter(function(c) {
+            return columns.indexOf(c.label) >= 0;
         });
         return {activeColumns: activeColumns, allColumns: allColumns};
     }
