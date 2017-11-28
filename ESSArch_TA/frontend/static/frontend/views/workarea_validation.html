@@ -33,17 +33,27 @@
                     <table class="table validation-table table-striped">
                         <thead>
                             <tr>
+                                <th></th>
                                 <th>{{'FILENAME' | translate}}</th>
-                                <th>{{'VALIDATOR' | translate}}</th>
                                 <th>{{'STATE' | translate}}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="x in vm.validations" class="clickable" ng-click="vm.showValidationResult(x)" ng-class="{'validation-success': x.passed, 'validation-failure': !x.passed}">
-                                <td>{{x.filename}}</td>
-                                <td>{{x.validator}}</td>
+                            <tr ng-repeat-start="row in vm.validations" class="clickable" ng-click="vm.collapseExpandRow(row)" ng-class="{'validation-success': row.passed, 'validation-failure': !row.passed}">
                                 <td>
-                                    {{x.passed?'SUCCESS':'FAILURE' | translate}}
+                                    <i ng-if="row.collapsed" class="fa fa-plus"></i>
+                                    <i ng-if="!row.collapsed" class="fa fa-minus"></i>
+                                </td>
+                                <td>{{row.filename}}</td>
+                                <td>
+                                    {{row.passed?'SUCCESS':'FAILURE' | translate}}
+                                </td>
+                            </tr>
+                            <tr ng-if="!row.collapsed" ng-repeat="subrow in row.children" ng-repeat-end ng-click="vm.showValidationResult(subrow)" ng-class="{'validation-success': subrow.passed, 'validation-failure': !subrow.passed}">
+                                <td></td>
+                                <td class="validation-subrow clickable">{{subrow.validator}}</td>
+                                <td>
+                                    {{subrow.passed?'SUCCESS':'FAILURE' | translate}}
                                 </td>
                             </tr>
                         </tbody>

@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, $sce, $window, TopAlert, WorkareaValidation, $filter) {
+angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, $sce, $window, TopAlert, WorkareaValidation, $filter,  $q) {
     var vm = this;
     var ipSortString ="";
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
@@ -318,6 +318,33 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
     /*
      * Validation
      */
+
+    vm.expandedRows = [];
+
+    vm.collapseExpandRow = function(row) {
+        if(row.collapsed) {
+            vm.expandRow(row);
+        } else {
+            vm.collapseRow(row);
+        }
+    }
+    vm.expandRow = function (row) {
+        WorkareaValidation.getChildren(row, $scope.ip).then(function (children) {
+            row.collapsed = false;
+            row.children = children;
+            vm.expandedRows.push({ filename: row.filename });
+        })
+    }
+
+    vm.collapseRow = function(row) {
+        row.collapsed = true;
+        vm.expandedRows.forEach(function(x, idx, array) {
+            if(x.id == row.id) {
+                array.splice(idx, 1);
+            }
+        })
+    }
+
     $scope.validationLoading = false;
     vm.validationsPerPage = 10;
     vm.validate = function(ip) {
@@ -345,27 +372,30 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
             var number = pagination.number;  // Number of entries showed per page.
             var pageNumber = start / number + 1;
             WorkareaValidation.getValidationsForIp($scope.ip, pageNumber, number, vm.validationFilters).then(function (response) {
-                response.data.forEach(function(val) {
-                    val.prettyMessage = $sce.trustAsHtml(formatXml(val.message));
+                var promises = [];
+                response.data.forEach(function (val) {
+                    val.collapsed = true;
+                    vm.expandedRows.forEach(function(x) {
+                        if(x.filename == val.filename) {
+                            val.collapsed = false;
+                            promises.push(
+                                WorkareaValidation.getChildren(val, $scope.ip).then(function (children) {
+                                    val.children = children;
+                                })
+                            )
+                        }
+                    })
                 });
-                vm.validations = response.data;
-                vm.numberOfResults = response.count;
-                tableState.pagination.numberOfPages = response.numberOfPages;//set the number of pages so the pagination can update
-                $scope.validationLoading = false;
+                $q.all(promises).then(function() {
+                    vm.validations = response.data;
+                    vm.numberOfResults = response.count;
+                    tableState.pagination.numberOfPages = response.numberOfPages;//set the number of pages so the pagination can update
+                    $scope.validationLoading = false;
+                })
             });
         }
     }
-    String.prototype.replaceAll = function(search, replacement) {
-        var target = this;
-        return target.replace(new RegExp(search, 'g'), replacement);
-    };
-    function formatXml(message) {
-        var pretty = $filter("prettyXml")(message);
-        return pretty.replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('outcome="fail"', 'outcome="<span style="color: red;">fail</span>"')
-        .replaceAll('outcome="pass"', 'outcome="<span style="color: green;">pass</span>"')
-    }
+
     vm.showValidationResult = function(validation) {
         var modalInstance = $uibModal.open({
             animation: true,

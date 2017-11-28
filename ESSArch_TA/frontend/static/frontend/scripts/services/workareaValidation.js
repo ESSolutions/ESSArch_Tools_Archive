@@ -1,4 +1,17 @@
-angular.module('myApp').factory('WorkareaValidation', function ($rootScope, $q, appConfig, $http) {
+angular.module('myApp').factory('WorkareaValidation', function ($rootScope, $q, appConfig, $http, $sce, $filter) {
+    String.prototype.replaceAll = function(search, replacement) {
+        var target = this;
+        return target.replace(new RegExp(search, 'g'), replacement);
+    };
+
+    function formatXml(message) {
+        var pretty = $filter("prettyXml")(message);
+        return pretty.replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('outcome="fail"', 'outcome="<span style="background-color: red; color: white; font-weight: bold;">fail</span>"')
+        .replaceAll('outcome="pass"', 'outcome="<span style="background-color: green; color: white; font-weight: bold;">pass</span>"')
+    }
+
     var service = {};
     service.getValidationsForIp = function (ip, pageNumber, pageSize, filters) {
         return $http({
@@ -22,6 +35,24 @@ angular.module('myApp').factory('WorkareaValidation', function ($rootScope, $q, 
         }).catch(function (response) {
             return response;
         })
+    }
+    service.getChildren = function(validation, ip) {
+        return $http.get(
+            appConfig.djangoUrl + "validations/",
+            {
+                params: {
+                    information_package: ip.id,
+                    filename: validation.filename,
+                    pager: "none"
+                }
+            }).then(function(response) {
+                response.data.forEach(function(child) {
+                    child.prettyMessage = $sce.trustAsHtml(formatXml(child.message));
+                })
+                return response.data;
+            }).catch(function(response) {
+                return response;
+            });
     }
     return service;
 });
