@@ -27,6 +27,14 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
     var ipSortString ="";
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
     vm.workarea = "ingest";
+    var watchers=[];
+    $rootScope.$on('$stateChangeStart', function () {
+        $interval.cancel(validationInterval);
+        watchers.forEach(function(watcher) {
+            watcher();
+        });
+    });
+
     $scope.ipTableClick = function(row) {
         if($scope.select && $scope.ip.id== row.id){
             $scope.select = false;
@@ -361,8 +369,15 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
             TopAlert.add(response.data.detail, "error");
         })
     }
+
+    var validationInterval = $interval(function() {
+        vm.validationPipe(vm.validationTableState);
+    }, appConfig.ipInterval);
+
     vm.validationFilters = {};
+
     vm.validations = [];
+
     vm.validationPipe = function (tableState) {
         if (tableState) {
             $scope.validationLoading = true;
@@ -395,6 +410,7 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
             });
         }
     }
+
 
     vm.showValidationResult = function(validation) {
         var modalInstance = $uibModal.open({
