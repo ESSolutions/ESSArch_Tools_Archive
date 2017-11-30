@@ -4,6 +4,9 @@
             "reception": {
                 "_permissions": []
             },
+            "workarea": {
+                "_permissions": []
+            },
             "transferSip": {
                 "_permissions": []
             }
