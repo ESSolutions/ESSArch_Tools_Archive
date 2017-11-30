@@ -148,7 +148,6 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                 url: 'workarea',
                 templateUrl: '/static/frontend/views/workarea.html',
                 controller: 'WorkareaCtrl as vm',
-                redirectTo: 'home.workarea.validation',
                 resolve: {
                     authenticated: ['djangoAuth', function(djangoAuth){
                         return djangoAuth.authenticationStatus();
@@ -474,7 +473,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                     $state.transitionTo('home.info');
                 }
             }
-            if(to.name == "home.administration") {
+            if(to.name == "home.administration" || to.name == "home.workarea") {
                 evt.preventDefault();
                 var resolved = Object.resolve(to.name, permissionConfig);
                 for( var key in resolved) {

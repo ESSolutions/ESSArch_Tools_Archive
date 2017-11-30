@@ -41,7 +41,7 @@
                 <p class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.reception')}" ui-sref="home.reception" ng-if="checkPermissions('home.reception')">{{('RECEPTION' | translate)}}</p>
                 <p class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.workarea')}" ui-sref="home.workarea" ng-if="checkPermissions('home.workarea')">{{('WORKAREA' | translate)}}</p>
                 <p class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.transferSip')}" ui-sref="home.transferSip" ng-if="checkPermissions('home.transferSip')">{{('TRANSFERSIP' | translate)}}</p>
-                <p class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.administration.import')}" ui-sref="home.administration.import">{{('Import' | translate)}}</p>
+                <p class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.administration.import')}" ui-sref="home.administration.import" ng-if="checkPermissions('home.administration.import')">{{('Import' | translate)}}</p>
             </div>
             <div ng-controller="UtilCtrl" class="tasks-icons">
                 <span ng-click="reloadPage()" class="fa fa-refresh fa-refresh-animate-once info-popover" uib-popover="{{'REFRESHPAGE' | translate}}"
