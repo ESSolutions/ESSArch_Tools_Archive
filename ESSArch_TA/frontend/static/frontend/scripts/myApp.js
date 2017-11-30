@@ -29,14 +29,33 @@ Object.resolve = function (path, obj) {
 }
 
 function nestedPermissions(page) {
+    // If page is an array it means that page is the field _permissions
     if (Array.isArray(page)) {
         return page;
     } else if (typeof (page) == "object") {
         var temp = [];
         for (var entry in page) {
+            // Recursively build permission list
             temp = temp.concat(nestedPermissions(page[entry]));
         }
         return temp;
+    }
+}
+
+/**
+ * Check if state has a sub state that requires no permissions
+ * @param {*} page
+ */
+function nestedEmptyPermissions(page) {
+    if(Array.isArray(page)) {
+        return page.length == 0;
+    } else if(typeof(page) == "object") {
+        for(var entry in page) {
+            if(nestedEmptyPermissions(page[entry])) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

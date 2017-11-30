@@ -92,7 +92,29 @@ INSTALLED_APPS = [
     'ESSArch_Core.fixity',
     'ESSArch_Core.storage',
     'ESSArch_Core.WorkflowEngine',
+    'guardian',
+    'groups_manager',
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
+)
+
+GROUPS_MANAGER = {
+    'AUTH_MODELS_SYNC': True,
+    'PERMISSIONS': {
+        'owner': [],
+        'group': [],
+        'groups_upstream': [],
+        'groups_downstream': [],
+        'groups_siblings': [],
+    },
+    'GROUP_NAME_PREFIX': '',
+    'GROUP_NAME_SUFFIX': '',
+    'USER_USERNAME_PREFIX': '',
+    'USER_USERNAME_SUFFIX': '',
+}
 
 CHANNEL_LAYERS = {
     "default": {
@@ -114,7 +136,6 @@ MIDDLEWARE_CLASSES = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]

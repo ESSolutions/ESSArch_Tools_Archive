@@ -2,14 +2,13 @@
     "permissionConfig": {
         "home": {
             "reception": {
-                "_permissions": [
-                    "ip.receive"
-                ]
+                "_permissions": []
+            },
+            "workarea": {
+                "_permissions": []
             },
             "transferSip": {
-                "_permissions": [
-                    "ip.transfer_sip"
-                ]
+                "_permissions": []
             }
         }
     }

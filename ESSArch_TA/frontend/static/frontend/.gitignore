@@ -2,8 +2,10 @@ bower_components/
 node_modules/
 scripts/scripts.min.js
 scripts/scripts.min.js.map
+scripts/polyfills.min.js
 scripts/vendors.min.js
 scripts/vendors.min.js.map
+scripts/polyfills.min.js.map
 styles/styles.css
 styles/styles.css.map
 fonts

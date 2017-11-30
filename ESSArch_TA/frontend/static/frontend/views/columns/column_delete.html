@@ -1,6 +1,6 @@
 <div ng-click="ipRowClick(row)">
     <button
-     ng-if="row.state != 'At reception' && (checkPermission('ip.delete_informationpackage') || row.responsible.id == auth.id)"
+     ng-if="row.state != 'At reception' && (row.permissions.includes('delete_informationpackage'))"
      ng-click="removeIpModal(row)"
      class="fa fa-trash"
      uib-popover="{{'REMOVEIP' | translate}}: {{row.label}}"

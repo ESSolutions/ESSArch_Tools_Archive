@@ -46,11 +46,16 @@ from django.db.models import Prefetch
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 
+from groups_manager.models import Member
+from guardian.shortcuts import get_objects_for_group
+
 from lxml import etree
 
 from rest_framework import exceptions, filters, permissions, status
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
+
+from ESSArch_Core.auth.util import get_membership_descendants
 
 from ESSArch_Core.configuration.models import (
     EventType,
@@ -331,6 +336,15 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             ip.entry_date = ip.create_date
             ip.save(update_fields=['create_date', 'entry_date'])
 
+            member = Member.objects.get(django_user=self.request.user)
+            try:
+                perms = settings.IP_CREATION_PERMS_MAP
+            except AttributeError:
+                raise ValueError('Missing IP_CREATION_PERMS_MAP in settings')
+
+            organization = member.django_user.user_profile.current_organization
+            member.assign_object(organization, ip, custom_permissions=perms)
+
             events_xmlfile = None
             if tarfile.is_tarfile(objpath):
                 with tarfile.open(objpath) as tarf:
@@ -539,11 +553,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows information packages to be viewed or edited.
     """
-    queryset = InformationPackage.objects.all().prefetch_related(
-        Prefetch('profileip_set', to_attr='profiles'), 'profiles__profile',
-        'archival_institution', 'archivist_organization', 'archival_type', 'archival_location',
-        'responsible__user_permissions', 'responsible__groups__permissions', 'steps',
-    ).select_related('submission_agreement')
+    queryset = InformationPackage.objects.none()
     serializer_class = InformationPackageSerializer
     filter_backends = (
         filters.OrderingFilter, DjangoFilterBackend, filters.SearchFilter,
@@ -572,7 +582,14 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         return super(InformationPackageViewSet, self).get_permissions()
 
     def get_queryset(self):
-        queryset = self.queryset
+        user = self.request.user
+        queryset = InformationPackage.objects.visible_to_user(user)
+
+        queryset = queryset.prefetch_related(
+            Prefetch('profileip_set', to_attr='profiles'), 'profiles__profile',
+            'archival_institution', 'archivist_organization', 'archival_type', 'archival_location',
+            'responsible__user_permissions', 'responsible__groups__permissions', 'steps',
+        ).select_related('submission_agreement')
 
         other = self.request.query_params.get('other')
 

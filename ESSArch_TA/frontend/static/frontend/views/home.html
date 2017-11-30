@@ -38,9 +38,9 @@
         </div>
         <div class="menu-task-wrapper">
             <div class="nav" ng-controller="UtilCtrl">
-                <p class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.reception')}" ui-sref="home.reception" ng-if="checkPermissions(getPermissions('home.reception'))">{{('RECEPTION' | translate)}}</p>
-                <p class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.workarea')}" ui-sref="home.workarea" ng-if="checkPermissions(getPermissions('home.reception'))">{{('WORKAREA' | translate)}}</p>
-                <p class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.transferSip')}" ui-sref="home.transferSip"  ng-if="checkPermissions(getPermissions('home.transferSip'))">{{('TRANSFERSIP' | translate)}}</p>
+                <p class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.reception')}" ui-sref="home.reception" ng-if="checkPermissions('home.reception')">{{('RECEPTION' | translate)}}</p>
+                <p class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.workarea')}" ui-sref="home.workarea" ng-if="checkPermissions('home.workarea')">{{('WORKAREA' | translate)}}</p>
+                <p class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.transferSip')}" ui-sref="home.transferSip" ng-if="checkPermissions('home.transferSip')">{{('TRANSFERSIP' | translate)}}</p>
                 <p class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.administration.import')}" ui-sref="home.administration.import">{{('Import' | translate)}}</p>
             </div>
             <div ng-controller="UtilCtrl" class="tasks-icons">
@@ -54,6 +54,9 @@
                     <i class="fa fa-bell"></i>
                     <div ng-if="unseenNotifications != 0 && unseenNotifications <= 999" class="unseen-text">{{unseenNotifications}}</div>
                     <div ng-if="unseenNotifications > 999" class="unseen-text">{{999}}+</div>
+                </div>
+                <div ng-controller="OrganizationCtrl">
+                    <select style="width: auto; margin-left: 10px;" class="form-control" ng-model="currentOrganization" ng-change="changeOrganization(); updateListView()" ng-options="x as x.name for x in availableOrganizations track by x.id"></select>
                 </div>
                 <div ng-controller="LanguageCtrl" class="language-select" style="width: 100px; margin-left: 10px;">
                     <select class="form-control" ng-model="currentLanguage" ng-change="changeLanguage(currentLanguage)" ng-options="x | translate for x in availableLanguages"
