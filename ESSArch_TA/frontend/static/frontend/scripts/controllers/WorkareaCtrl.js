@@ -28,7 +28,7 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
     vm.workarea = "ingest";
     var watchers=[];
-    $rootScope.$on('$stateChangeStart', function () {
+    $scope.$on('$stateChangeStart', function () {
         $interval.cancel(validationInterval);
         watchers.forEach(function(watcher) {
             watcher();

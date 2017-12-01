@@ -12,12 +12,12 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
     watchers.push($scope.$watch(function(){return $rootScope.navigationFilter;}, function(newValue, oldValue) {
         $scope.getListViewData();
     }, true));
-    $rootScope.$on('$translateChangeSuccess', function () {
+    $scope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
 
     // Init intervals
-    $rootScope.$on('$stateChangeStart', function() {
+    $scope.$on('$stateChangeStart', function() {
         $interval.cancel(stateInterval);
         $interval.cancel(listViewInterval);
         watchers.forEach(function(watcher) {
@@ -25,7 +25,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
         });
     });
 
-    $rootScope.$on('REFRESH_LIST_VIEW', function (event, data) {
+    $scope.$on('REFRESH_LIST_VIEW', function (event, data) {
         $scope.getListViewData();
     });
 
