@@ -34,6 +34,11 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
             watcher();
         });
     });
+    $scope.$on('REFRESH_LIST_VIEW', function (event, data) {
+        if($scope.ip != null && $scope.select) {
+            vm.validationPipe(vm.validationTableState);
+        }
+    });
 
     $scope.ipTableClick = function(row) {
         if($scope.select && $scope.ip.id== row.id){
