@@ -257,5 +257,6 @@
     "SUBMISSION_AGREEMENT": "Leveransöverenskommelse",
     "IMPORT_SA_FROM_FILE": "Import SA from file",
     "IMPORT_PROFILE_FROM_FILE": "Import profile from file",
-    "IMPORT_PROFILE": "Import profile"
+    "IMPORT_PROFILE": "Import profile",
+    "IMPORT": "Import"
 }
