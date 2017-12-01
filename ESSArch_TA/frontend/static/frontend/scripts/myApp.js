@@ -147,7 +147,6 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
             .state('home.workarea', {
                 url: 'workarea',
                 templateUrl: '/static/frontend/views/workarea.html',
-                controller: 'WorkareaCtrl as vm',
                 resolve: {
                     authenticated: ['djangoAuth', function(djangoAuth){
                         return djangoAuth.authenticationStatus();
