@@ -130,15 +130,15 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http,
         $scope.statusShow = false;
         $scope.eventShow = false;
         var temp = true;
-        $scope.includedIps.forEach(function(included) {
+        $scope.includedIps.forEach(function(included, index, array) {
 
-            if(included.object_identifier_value == row.object_identifier_value) {
-                $scope.includedIps.splice($scope.includedIps.indexOf(row), 1);
+            if(included.id == row.id) {
+                $scope.includedIps.splice(index, 1);
                 temp = false;
             }
         });
         if(temp) {
-            $scope.includedIps.push(row);
+            $scope.includedIps.push({ id: row.id });
         }
         if($scope.includedIps == []) {
             $scope.receiveShow = true;
