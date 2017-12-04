@@ -57,6 +57,22 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http,
                 tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
                 $scope.ipLoading = false;
                 $scope.initLoad = false;
+            }).catch(function(response) {
+                if(response.status == 404) {
+                    var filters = angular.extend({
+                        state: ipSortString
+                    }, $scope.columnFilters)
+
+                    if(vm.workarea) {
+                        filters.workarea = vm.workarea;
+                    }
+
+                    listViewService.checkPages("reception", number, filters).then(function (result) {
+                        tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
+                        tableState.pagination.start = (result.numberOfPages*number) - number;
+                        vm.callServer(tableState);
+                    });
+                }
             });
         }
     };
