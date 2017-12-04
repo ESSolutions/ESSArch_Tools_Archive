@@ -152,10 +152,10 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
             $scope.initLoad = true;
         }
         if (!angular.isUndefined(tableState)) {
-            $scope.tableState = tableState;
+            $scope.fileTableState = tableState;
             var pagination = tableState.pagination;
             var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
-            var number = pagination.number;  // Number of entries showed per page.
+            var number = pagination.number || vm.filesPerPage;  // Number of entries showed per page.
             var pageNumber = start / number + 1;
             listViewService.getWorkareaDir("ingest", $scope.ip.object_identifier_value + "/" + $scope.previousGridArraysString(), pageNumber, number).then(function(dir) {
                 $scope.deckGridData = dir.data;
@@ -167,31 +167,31 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
     }
     $scope.deckGridInit = function (ip) {
         $scope.previousGridArrays = [];
-        if($scope.tableState) {
-            $scope.dirPipe($scope.tableState);
+        if($scope.fileTableState) {
+            $scope.dirPipe($scope.fileTableState);
             $scope.selectedCards = [];
         }
     };
 
     $scope.previousGridArray = function () {
         $scope.previousGridArrays.pop();
-        if($scope.tableState) {
-            $scope.dirPipe($scope.tableState);
+        if($scope.fileTableState) {
+            $scope.dirPipe($scope.fileTableState);
             $scope.selectedCards = [];
         }
     };
     $scope.gridArrayLoading = false;
     $scope.updateGridArray = function (ip) {
-        if($scope.tableState) {
-            $scope.dirPipe($scope.tableState);
+        if($scope.fileTableState) {
+            $scope.dirPipe($scope.fileTableState);
         }
     };
     $scope.expandFile = function (ip, card) {
         if (card.type == "dir" || card.name.endsWith('.tar') || card.name.endsWith('.zip')) {
             $scope.previousGridArrays.push(card);
-            if($scope.tableState) {
-                $scope.tableState.pagination.start = 0;
-                $scope.dirPipe($scope.tableState);
+            if($scope.fileTableState) {
+                $scope.fileTableState.pagination.start = 0;
+                $scope.dirPipe($scope.fileTableState);
                 $scope.selectedCards = [];
             }
         } else {
