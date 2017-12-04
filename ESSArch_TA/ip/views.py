@@ -336,15 +336,6 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             ip.entry_date = ip.create_date
             ip.save(update_fields=['create_date', 'entry_date'])
 
-            member = Member.objects.get(django_user=self.request.user)
-            try:
-                perms = settings.IP_CREATION_PERMS_MAP
-            except AttributeError:
-                raise ValueError('Missing IP_CREATION_PERMS_MAP in settings')
-
-            organization = member.django_user.user_profile.current_organization
-            member.assign_object(organization, ip, custom_permissions=perms)
-
             events_xmlfile = None
             if tarfile.is_tarfile(objpath):
                 with tarfile.open(objpath) as tarf:
@@ -369,6 +360,15 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
                         events_xmlfile = tmp.name
                     except KeyError:
                         pass
+
+        member = Member.objects.get(django_user=self.request.user)
+        try:
+            perms = settings.IP_CREATION_PERMS_MAP
+        except AttributeError:
+            raise ValueError('Missing IP_CREATION_PERMS_MAP in settings')
+
+        organization = member.django_user.user_profile.current_organization
+        member.assign_object(organization, ip, custom_permissions=perms)
 
         ip.submission_agreement = sa
         ip.save()
