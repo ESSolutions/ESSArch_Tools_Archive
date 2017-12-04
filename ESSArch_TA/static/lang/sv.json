@@ -238,7 +238,7 @@
     "INFO": "Info",
     "LIST_VIEW": "Lista",
     "GRID_VIEW": "Rutnät",
-    "RECEIVE_SIP_DESC": "Vill du ta emot SIPar?",
+    "RECEIVE_SIP_DESC": "Ta emot SIP: ",
     "TRANSFER_SIP_DESC": "Vill du överföra SIP {{label}}?",
     "FILES_PER_PAGE": "Filer per sida",
     "VALIDATION": "Validering",
@@ -258,5 +258,6 @@
     "IMPORT_SA_FROM_FILE": "Import SA from file",
     "IMPORT_PROFILE_FROM_FILE": "Import profile from file",
     "IMPORT_PROFILE": "Import profile",
-    "IMPORT": "Import"
+    "IMPORT": "Import",
+    "SKIP": "Hoppa över"
 }

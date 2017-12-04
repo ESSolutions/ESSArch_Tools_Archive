@@ -267,3 +267,13 @@ input[type="checkbox"] {
     @include container(10px);
     margin-top: 10px;
 }
+
+.receive-footer {
+    margin-top: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    * {
+        margin-right: 3px;
+    }
+}

@@ -155,4 +155,51 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     $ctrl.cancel = function () {
         $uibModalInstance.dismiss('cancel');
     };
+})
+.controller('ReceiveModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, $scope, IPReception) {
+    var $ctrl = this;
+    $ctrl.$onInit = function() {
+        $ctrl.data = data;
+        $ctrl.file = data.file;
+        $ctrl.type = data.type;
+        if($ctrl.data.ip.altrecordids.SUBMISSIONAGREEMENT) {
+            $ctrl.data.submissionAgreements.forEach(function(sa) {
+                if(sa.id == $ctrl.data.ip.altrecordids.SUBMISSIONAGREEMENT[0]) {
+                    $ctrl.sa = sa;
+                    $ctrl.saDisabled = true;
+                }
+            });
+            if(!$ctrl.saDisabled) {
+                $ctrl.sa = $ctrl.data.submissionAgreements[0];
+            }
+        }
+    }
+    $ctrl.receive = function () {
+        var payload = {
+            id: $ctrl.data.ip.id,
+            validators: $ctrl.data.validatorModel
+        }
+        if($ctrl.sa && $ctrl.sa != null) {
+            payload.submission_agreement = $ctrl.sa.id;
+        }
+        IPReception.receive(payload).$promise.then(function(response) {
+            $ctrl.data = {
+                status: "receive",
+                ip: $ctrl.data.ip,
+                sa: $ctrl.sa,
+            };
+            $uibModalInstance.close($ctrl.data);
+        }, function(response) {
+            $scope.receiveDisabled = false;
+        });
+    }
+    $ctrl.skip = function () {
+        $ctrl.data = {
+            status: "skip"
+        };
+        $uibModalInstance.close($ctrl.data);
+    }
+    $ctrl.cancel = function () {
+        $uibModalInstance.dismiss('cancel');
+    };
 });

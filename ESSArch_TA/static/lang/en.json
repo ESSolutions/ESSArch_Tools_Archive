@@ -238,7 +238,7 @@
     "INFO": "Info",
     "LIST_VIEW": "List",
     "GRID_VIEW": "Grid",
-    "RECEIVE_SIP_DESC": "Do you want to receive SIP's?",
+    "RECEIVE_SIP_DESC": "Receive SIP: ",
     "TRANSFER_SIP_DESC": "Do you want to transfer SIP {{label}}?",
     "FILES_PER_PAGE": "Files per page",
     "VALIDATION": "Validations",
@@ -258,5 +258,6 @@
     "IMPORT_SA_FROM_FILE": "Import SA from file",
     "IMPORT_PROFILE_FROM_FILE": "Import profile from file",
     "IMPORT_PROFILE": "Import profile",
-    "IMPORT": "Import"
+    "IMPORT": "Import",
+    "SKIP": "Skip"
 }

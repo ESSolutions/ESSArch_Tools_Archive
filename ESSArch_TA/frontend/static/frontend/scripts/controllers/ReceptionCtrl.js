@@ -540,23 +540,36 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http,
             }, 1000);
         });
     };
-    vm.receiveModal = function (ips) {
-        $http.get(appConfig.djangoUrl + "submission-agreements").then(function(response) {
-            $scope.submissionAgreements = response.data;
-            var modalInstance = $uibModal.open({
-                animation: true,
-                ariaLabelledBy: 'modal-title',
-                ariaDescribedBy: 'modal-body',
-                templateUrl: 'static/frontend/views/receive_modal.html',
-                scope: $scope,
-                controller: 'ModalInstanceCtrl',
-                controllerAs: '$ctrl'
+    vm.receiveModal = function (ip) {
+        IPReception.get({id: ip.id }).$promise.then(function(resource) {
+            $http.get(appConfig.djangoUrl + "submission-agreements").then(function(response) {
+                //$scope.submissionAgreements = response.data;
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    ariaLabelledBy: 'modal-title',
+                    ariaDescribedBy: 'modal-body',
+                    templateUrl: 'static/frontend/views/receive_modal.html',
+                    scope: $scope,
+                    controller: 'ReceiveModalInstanceCtrl',
+                    controllerAs: '$ctrl',
+                    resolve: {
+                        data: {
+                            ip: resource,
+                            validatorModel: vm.validatorModel,
+                            submissionAgreements: response.data
+                        }
+                    }
+                })
+                modalInstance.result.then(function (data) {
+                    $scope.includedIps.shift();
+                    $scope.getListViewData();
+                    if($scope.includedIps.length > 0) {
+                        vm.receiveModal($scope.includedIps[0]);
+                    }
+                }, function () {
+                    $log.info('modal-component dismissed at: ' + new Date());
+                });
             })
-            modalInstance.result.then(function (data) {
-                $scope.receiveSip($scope.includedIps, data.sa);
-            }, function () {
-                $log.info('modal-component dismissed at: ' + new Date());
-            });
         })
     }
 });

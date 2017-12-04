@@ -37,7 +37,7 @@
             <div class="select-view" ng-if="prepareUnidentifiedIp || includedIps.length">
                 <div ng-if="includedIps.length">
                     <form class="receive-sip-eventlog-form">
-                        <button ng-disabled="receiveDisabled" class="btn btn-info receive-button" ng-click="vm.receiveModal(includedIps)" ng-dblClick="">{{'RECEIVESIP' | translate}}</button>
+                        <button ng-disabled="receiveDisabled" class="btn btn-info receive-button" ng-click="vm.receiveModal(includedIps[0])" ng-dblClick="">{{'RECEIVESIP' | translate}}</button>
                     </form>
                 </div>
             </div>
