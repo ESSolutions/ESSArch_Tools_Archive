@@ -223,7 +223,9 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
     vm.validators = function() {
         var list = [];
         for(key in vm.validatorModel) {
-            list.push(key);
+            if(vm.validatorModel[key]) {
+                list.push(key);
+            }
         }
         return list;
     }
