@@ -113,6 +113,7 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     }
     $ctrl.overwriteProfile = function() {
         return Profile.update($ctrl.profile).$promise.then(function(resource) {
+            TopAlert.add("Profile: \"" + resource.name + "\" has been imported" , "success", 5000);
             $ctrl.data = {
                 status: "overwritten"
             }
@@ -125,6 +126,7 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     $ctrl.overwriteSa = function() {
         $ctrl.profile.published = false;
         return SA.update($ctrl.profile).$promise.then(function(resource) {
+            TopAlert.add("Submission agreement: \"" + resource.name + "\" has been imported" , "success", 5000);
             $ctrl.data = {
                 status: "overwritten"
             }
