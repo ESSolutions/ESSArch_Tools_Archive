@@ -431,7 +431,16 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
             });
         }
     }
-
+    vm.validationStatusMessage = function (row) {
+        switch (row.passed) {
+            case true:
+                return "SUCCESS";
+            case false:
+                return "FAILURE";
+            case null:
+                return "INPROGRESS";
+        };
+    }
 
     vm.showValidationResult = function(validation) {
         var modalInstance = $uibModal.open({

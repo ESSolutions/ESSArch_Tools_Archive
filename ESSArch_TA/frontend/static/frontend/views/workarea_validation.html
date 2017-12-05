@@ -46,14 +46,14 @@
                                 </td>
                                 <td>{{row.filename}}</td>
                                 <td>
-                                    {{row.passed?'SUCCESS':'FAILURE' | translate}}
+                                    {{vm.validationStatusMessage(row) | translate}}
                                 </td>
                             </tr>
                             <tr ng-if="!row.collapsed" ng-repeat="subrow in row.children" ng-repeat-end ng-click="vm.showValidationResult(subrow)" ng-class="{'validation-success': subrow.passed, 'validation-failure': subrow.passed == false}">
                                 <td></td>
                                 <td class="validation-subrow clickable">{{subrow.validator}}</td>
                                 <td>
-                                    {{subrow.passed?'SUCCESS':'FAILURE' | translate}}
+                                    {{vm.validationStatusMessage(subrow) | translate}}
                                 </td>
                             </tr>
                         </tbody>
