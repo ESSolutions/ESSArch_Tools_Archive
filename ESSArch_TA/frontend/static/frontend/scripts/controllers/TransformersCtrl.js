@@ -1,4 +1,4 @@
-angular.module('myApp').controller('TransformersCtrl', function($scope, $controller, Resource, listViewService, TopAlert, $http, $sce, $rootScope, $cookies, $timeout) {
+angular.module('myApp').controller('TransformersCtrl', function($scope, $controller, Resource, listViewService, TopAlert, $http, $sce, $rootScope, $cookies, $timeout, appConfig) {
     var vm = this;
     var ipSortString ="";
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
@@ -314,7 +314,7 @@ angular.module('myApp').controller('TransformersCtrl', function($scope, $control
     }
 
     vm.transform = function(ip) {
-        $timeout(function() {
+        $http.post(appConfig.djangoUrl + "workarea-entries/" + ip.workarea.id+"/transform/").then(function(response) {
             $scope.getListViewData();
         });
     }
