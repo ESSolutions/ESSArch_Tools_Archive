@@ -177,7 +177,6 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     $ctrl.receive = function () {
         var payload = {
             id: $ctrl.data.ip.id,
-            validators: $ctrl.data.validatorModel
         }
         if($ctrl.sa && $ctrl.sa != null) {
             payload.submission_agreement = $ctrl.sa.id;

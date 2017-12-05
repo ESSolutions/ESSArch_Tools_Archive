@@ -381,7 +381,7 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
             method: "POST",
             url: appConfig.djangoUrl + "workarea-entries/" + ip.workarea.id + "/validate/",
             data: {
-                validators: vm.validatorModel
+                validators: vm.validators()
             }
         }).then(function(response) {
             TopAlert.add(response.data, "success");

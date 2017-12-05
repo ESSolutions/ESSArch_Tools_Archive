@@ -85,7 +85,6 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http,
         ips.forEach(function(ip) {
             var payload = {
                 id: ip.id,
-                validators: vm.validatorModel
             }
             if(sa && sa != null) {
                 payload.submission_agreement = sa.id;
@@ -555,7 +554,7 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http,
                     resolve: {
                         data: {
                             ip: resource,
-                            validatorModel: vm.validatorModel,
+                            validators: vm.validators(),
                             submissionAgreements: response.data
                         }
                     }

@@ -97,7 +97,7 @@
     "VALIDATEFILEFORMAT": "Validera filformat",
     "VALIDATEXMLFILE": "Validera XML-fil",
     "VALIDATELOGICALPHYSICALREPRESENTATION": "Validera logisk fysisk representation",
-    "VALIDATEINTEGRITY": "Validera Integritet",
+    "VALIDATECHECKSUM": "Validera checksumma",
     "ARCHIVISTORGANIZATION": "Arkivorganisation",
     "ARCHIVALINSTITUTION": "Arkivinstitution",
     "VALIDATE": "Validera",

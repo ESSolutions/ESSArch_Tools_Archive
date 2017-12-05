@@ -220,7 +220,13 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
     };
 
     // Validators
-
+    vm.validators = function() {
+        var list = [];
+        for(key in vm.validatorModel) {
+            list.push(key);
+        }
+        return list;
+    }
     vm.validatorModel = {};
     vm.validatorFields = [
         {
@@ -230,7 +236,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             },
             "defaultValue": true,
             "type": "checkbox",
-            "key": "validate_file_format",
+            "key": "file_format",
         },
         {
             "templateOptions": {
@@ -239,7 +245,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             },
             "defaultValue": true,
             "type": "checkbox",
-            "key": "validate_xml_file",
+            "key": "xml_file",
         },
         {
             "templateOptions": {
@@ -248,16 +254,16 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             },
             "defaultValue": true,
             "type": "checkbox",
-            "key": "validate_logical_physical_representation",
+            "key": "logical_physical_representation",
         },
         {
             "templateOptions": {
                 "type": "text",
-                "label": $translate.instant('VALIDATEINTEGRITY'),
+                "label": $translate.instant('VALIDATECHECKSUM'),
             },
             "defaultValue": true,
             "type": "checkbox",
-            "key": "validate_integrity",
+            "key": "checksum",
         },
         {
             "templateOptions": {
@@ -266,7 +272,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             },
             "defaultValue": true,
             "type": "checkbox",
-            "key": "validate_mediaconch",
+            "key": "mediaconch",
         },
         {
             "templateOptions": {
@@ -275,7 +281,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             },
             "defaultValue": true,
             "type": "checkbox",
-            "key": "validate_verapdf",
+            "key": "verapdf",
         }
     ];
 
