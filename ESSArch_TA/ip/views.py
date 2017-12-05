@@ -68,7 +68,7 @@ from ESSArch_Core.essxml.util import (
     parse_submit_description,
 )
 
-from ESSArch_Core.fixity.validation import validate_checksum
+from ESSArch_Core.fixity.validation.backends.checksum import ChecksumValidator
 
 from ESSArch_Core.ip.models import InformationPackage, EventIP, Workarea
 
@@ -287,7 +287,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         filepath = request.data['path']
         filepath = os.path.join(path, filepath)
 
-        validate_checksum(filepath, algorithm='MD5', checksum=md5)
+        options = {'expected': md5, 'algorithm': 'md5'}
+        validator = ChecksumValidator(context='checksum_str', options=options)
+        validator.validate(filepath)
 
         return Response('Upload of %s complete' % filepath)
 
