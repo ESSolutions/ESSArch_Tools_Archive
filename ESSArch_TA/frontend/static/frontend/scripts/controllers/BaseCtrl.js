@@ -270,6 +270,15 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
         {
             "templateOptions": {
                 "type": "text",
+                "label": $translate.instant('VALIDATEDIRECTORYSTRUCTURE'),
+            },
+            "defaultValue": true,
+            "type": "checkbox",
+            "key": "structure",
+        },
+        {
+            "templateOptions": {
+                "type": "text",
                 "label": "Mediaconch",
             },
             "defaultValue": true,
@@ -284,7 +293,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             "defaultValue": true,
             "type": "checkbox",
             "key": "verapdf",
-        }
+        },
     ];
 
     // Basic functions
