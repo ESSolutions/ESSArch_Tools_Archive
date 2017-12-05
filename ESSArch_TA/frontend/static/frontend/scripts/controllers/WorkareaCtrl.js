@@ -49,6 +49,7 @@ angular.module('myApp').controller('WorkareaCtrl', function(IP, $http, $scope, $
         } else {
             $scope.ip = row;
             $rootScope.ip = row;
+            vm.expandedRows = [];
             vm.validationPipe(vm.validationTableState);
             $scope.select = true;
         }
