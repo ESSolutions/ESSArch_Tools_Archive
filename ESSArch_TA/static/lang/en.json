@@ -260,5 +260,6 @@
     "IMPORT_PROFILE_FROM_FILE": "Import profile from file",
     "IMPORT_PROFILE": "Import profile",
     "IMPORT": "Import",
-    "SKIP": "Skip"
+    "SKIP": "Skip",
+    "TRANSFORM": "Transform"
 }

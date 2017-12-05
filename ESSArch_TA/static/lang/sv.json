@@ -260,5 +260,6 @@
     "IMPORT_PROFILE_FROM_FILE": "Import profile from file",
     "IMPORT_PROFILE": "Import profile",
     "IMPORT": "Import",
-    "SKIP": "Hoppa över"
+    "SKIP": "Hoppa över",
+    "TRANSFORM": "Transformera"
 }

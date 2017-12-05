@@ -168,6 +168,28 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                         return djangoAuth.authenticationStatus();
                     }],
                 },
+                data: {
+                    permissions: {
+                        only: nestedPermissions(Object.resolve("home.workarea.validation", permissionConfig)),
+                        redirectTo: 'home.restricted'
+                    }
+                },
+            })
+            .state('home.workarea.transformers', {
+                url: '/transformers',
+                templateUrl: '/static/frontend/views/workarea_transformers.html',
+                controller: 'TransformersCtrl as vm',
+                resolve: {
+                    authenticated: ['djangoAuth', function(djangoAuth){
+                        return djangoAuth.authenticationStatus();
+                    }],
+                },
+                data: {
+                    permissions: {
+                        only: nestedPermissions(Object.resolve("home.workarea.transformers", permissionConfig)),
+                        redirectTo: 'home.restricted'
+                    }
+                },
             })
             .state('home.transferSip', {
                 url: 'transfer-SIP',
