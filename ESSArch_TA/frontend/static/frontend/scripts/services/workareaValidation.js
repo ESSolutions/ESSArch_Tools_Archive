@@ -45,6 +45,7 @@ angular.module('myApp').factory('WorkareaValidation', function ($rootScope, $q, 
                 }
             }).then(function(response) {
                 response.data.forEach(function(child) {
+                    child.duration = moment(child.time_done).diff(moment(child.time_started));
                     child.prettyMessage = $sce.trustAsHtml(formatXml(child.message));
                 })
                 return response.data;
