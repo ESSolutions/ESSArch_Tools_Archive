@@ -39,7 +39,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat-start="row in vm.validations" class="clickable" ng-click="vm.collapseExpandRow(row)" ng-class="{'validation-success': row.passed, 'validation-failure': !row.passed}">
+                            <tr ng-repeat-start="row in vm.validations" class="clickable" ng-click="vm.collapseExpandRow(row)" ng-class="{'validation-success': row.passed, 'validation-failure': row.passed == false}">
                                 <td>
                                     <i ng-if="row.collapsed" class="fa fa-plus"></i>
                                     <i ng-if="!row.collapsed" class="fa fa-minus"></i>
@@ -49,7 +49,7 @@
                                     {{row.passed?'SUCCESS':'FAILURE' | translate}}
                                 </td>
                             </tr>
-                            <tr ng-if="!row.collapsed" ng-repeat="subrow in row.children" ng-repeat-end ng-click="vm.showValidationResult(subrow)" ng-class="{'validation-success': subrow.passed, 'validation-failure': !subrow.passed}">
+                            <tr ng-if="!row.collapsed" ng-repeat="subrow in row.children" ng-repeat-end ng-click="vm.showValidationResult(subrow)" ng-class="{'validation-success': subrow.passed, 'validation-failure': subrow.passed == false}">
                                 <td></td>
                                 <td class="validation-subrow clickable">{{subrow.validator}}</td>
                                 <td>
