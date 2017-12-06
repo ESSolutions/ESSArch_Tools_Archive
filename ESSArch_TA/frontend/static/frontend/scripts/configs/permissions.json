@@ -11,7 +11,7 @@
                 "conversion": {
                     "_permissions": []
                 },
-                "transformers": {
+                "transformation": {
                     "_permissions": []
                 }
             },

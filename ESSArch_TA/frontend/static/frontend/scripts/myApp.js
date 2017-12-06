@@ -175,10 +175,10 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                     }
                 },
             })
-            .state('home.workarea.transformers', {
-                url: '/transformers',
-                templateUrl: '/static/frontend/views/workarea_transformers.html',
-                controller: 'TransformersCtrl as vm',
+            .state('home.workarea.transformation', {
+                url: '/transformation',
+                templateUrl: '/static/frontend/views/workarea_transformation.html',
+                controller: 'TransformationCtrl as vm',
                 resolve: {
                     authenticated: ['djangoAuth', function(djangoAuth){
                         return djangoAuth.authenticationStatus();
@@ -186,7 +186,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                 },
                 data: {
                     permissions: {
-                        only: nestedPermissions(Object.resolve("home.workarea.transformers", permissionConfig)),
+                        only: nestedPermissions(Object.resolve("home.workarea.transformation", permissionConfig)),
                         redirectTo: 'home.restricted'
                     }
                 },

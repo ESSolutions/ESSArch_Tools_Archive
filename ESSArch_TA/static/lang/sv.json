@@ -244,7 +244,7 @@
     "FILES_PER_PAGE": "Filer per sida",
     "VALIDATION": "Validering",
     "CONVERSION": "Konvertering",
-    "TRANSFORMERS": "Transformering",
+    "TRANSFORMATION": "Transformering",
     "VALIDATION_RESULT_FOR": "Valideringsresultat för {{id}}",
     "VALIDATOR": "Validator",
     "MESSAGE": "Meddelande",
