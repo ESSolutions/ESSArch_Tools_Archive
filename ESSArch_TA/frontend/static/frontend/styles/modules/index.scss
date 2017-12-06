@@ -786,3 +786,9 @@ body.modal-open[style] {
 .sa-select {
     width: 100% !important;
 }
+
+.workarea-validation, .workarea-transformation {
+    .content-wrapper > div {
+        margin-left: 0px;
+    }
+}
