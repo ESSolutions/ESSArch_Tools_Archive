@@ -104,7 +104,7 @@ class ReceiveSIP(DBTask):
         dst = os.path.join(dst_dir, "%s.xml" % objid)
         shutil.copy(src, dst)
 
-        Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=True)
+        Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=False)
 
     def undo(self, ip, xml, container):
         objid, container_type = os.path.splitext(os.path.basename(container))
@@ -132,7 +132,7 @@ class ReceiveDir(DBTask):
         dst = os.path.join(workarea_user, ip.object_identifier_value)
 
         shutil.copytree(objpath, dst)
-        Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=True)
+        Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=False)
 
     def undo(self, ip, objpath):
         ip = InformationPackage.objects.get(pk=ip)
