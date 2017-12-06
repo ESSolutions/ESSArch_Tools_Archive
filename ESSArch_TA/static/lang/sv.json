@@ -261,5 +261,7 @@
     "IMPORT_PROFILE": "Import profile",
     "IMPORT": "Import",
     "SKIP": "Hoppa över",
-    "TRANSFORM": "Transformera"
+    "TRANSFORM": "Transformera",
+    "TRANSFORM_SIP_DESC": "Vill du transformera IP: "
+
 }

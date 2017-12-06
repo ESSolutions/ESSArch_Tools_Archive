@@ -146,7 +146,7 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
         $uibModalInstance.dismiss('cancel');
     };
 })
-.controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data) {
+.controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, $http, appConfig, TopAlert) {
     var $ctrl = this;
     $ctrl.data = data;
     $ctrl.file = data.file;
@@ -154,6 +154,14 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     $ctrl.ok = function () {
         $uibModalInstance.close();
     };
+    $ctrl.transform = function() {
+        $http.post(appConfig.djangoUrl + "workarea-entries/" + $ctrl.data.ip.workarea.id+"/transform/").then(function(response) {
+            TopAlert.add(response.data, "success");
+            $uibModalInstance.close(response.data);
+        }).catch(function(response) {
+            TopAlert.add(response.data.detail, "error");
+        })
+    }
     $ctrl.cancel = function () {
         $uibModalInstance.dismiss('cancel');
     };

@@ -314,7 +314,23 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
     }
 
     vm.transform = function(ip) {
-        $http.post(appConfig.djangoUrl + "workarea-entries/" + ip.workarea.id+"/transform/").then(function(response) {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'static/frontend/views/transform_modal.html',
+            controller: 'DataModalInstanceCtrl',
+            controllerAs: '$ctrl',
+            resolve: {
+                data: {
+                    ip: ip
+                }
+            }
+        })
+        modalInstance.result.then(function (data) {
+            $scope.select = false;
+            $scope.ip = null;
+            $rootScope.ip = null;
             $scope.getListViewData();
         });
     }

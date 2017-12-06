@@ -261,5 +261,6 @@
     "IMPORT_PROFILE": "Import profile",
     "IMPORT": "Import",
     "SKIP": "Skip",
-    "TRANSFORM": "Transform"
+    "TRANSFORM": "Transform",
+    "TRANSFORM_SIP_DESC": "Do you want to transform IP: "
 }
