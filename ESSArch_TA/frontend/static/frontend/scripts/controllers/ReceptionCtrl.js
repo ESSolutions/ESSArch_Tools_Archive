@@ -542,7 +542,14 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http,
     vm.receiveModal = function (ip) {
         IPReception.get({id: ip.id }).$promise.then(function(resource) {
             $http.get(appConfig.djangoUrl + "submission-agreements").then(function(response) {
-                //$scope.submissionAgreements = response.data;
+                var data = {
+                    ip: ip.id,
+                    validators: vm.validators(),
+                    submissionAgreements: response.data
+                }
+                if(resource.altrecordids && resource.altrecordids.SUBMISSIONAGREEMENT) {
+                    angular.extend(data, {sa: resource.altrecordids.SUBMISSIONAGREEMENT[0]})
+                }
                 var modalInstance = $uibModal.open({
                     animation: true,
                     ariaLabelledBy: 'modal-title',
@@ -552,11 +559,7 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http,
                     controller: 'ReceiveModalInstanceCtrl',
                     controllerAs: '$ctrl',
                     resolve: {
-                        data: {
-                            ip: resource,
-                            validators: vm.validators(),
-                            submissionAgreements: response.data
-                        }
+                        data: data
                     }
                 })
                 modalInstance.result.then(function (data) {

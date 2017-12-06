@@ -164,21 +164,21 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
         $ctrl.data = data;
         $ctrl.file = data.file;
         $ctrl.type = data.type;
-        if($ctrl.data.ip.altrecordids.SUBMISSIONAGREEMENT) {
+        if($ctrl.data.sa) {
             $ctrl.data.submissionAgreements.forEach(function(sa) {
-                if(sa.id == $ctrl.data.ip.altrecordids.SUBMISSIONAGREEMENT[0]) {
+                if(sa.id == $ctrl.data.sa) {
                     $ctrl.sa = sa;
                     $ctrl.saDisabled = true;
                 }
             });
-            if(!$ctrl.saDisabled) {
-                $ctrl.sa = $ctrl.data.submissionAgreements[0];
-            }
+        }
+        if(!$ctrl.saDisabled) {
+            $ctrl.sa = $ctrl.data.submissionAgreements[0];
         }
     }
     $ctrl.receive = function () {
         var payload = {
-            id: $ctrl.data.ip.id,
+            id: $ctrl.data.ip,
         }
         if($ctrl.sa && $ctrl.sa != null) {
             payload.submission_agreement = $ctrl.sa.id;
