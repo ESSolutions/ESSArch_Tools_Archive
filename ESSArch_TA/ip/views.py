@@ -97,6 +97,7 @@ from ESSArch_Core.WorkflowEngine.serializers import (
 
 from ESSArch_Core.util import (
     creation_date,
+    flatten,
     generate_file_response,
     get_files_and_dirs,
     get_event_spec,
@@ -117,66 +118,94 @@ from rest_framework import viewsets
 
 
 class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
-    def list(self, request):
-        logger = logging.getLogger('essarch.reception')
 
-        reception = Path.objects.get(entity="path_ingest_reception").value
-        uip = Path.objects.get(entity="path_ingest_unidentified").value
+    def __init__(self, *args, **kwargs):
+        self.logger = logging.getLogger('essarch.reception')
+        self.reception = Path.objects.get(entity="path_ingest_reception").value
+        self.uip = Path.objects.get(entity="path_ingest_unidentified").value
+        super(InformationPackageReceptionViewSet, self).__init__(*args, **kwargs)
+
+    def parse_ip_with_xmlfile(self, xmlfile):
+        if xmlfile.startswith(self.uip):
+            srcdir = self.uip
+        else:
+            srcdir = self.reception
+
+        try:
+            ip = parse_submit_description(xmlfile, srcdir)
+        except ValueError as e:
+            self.logger.warn('Failed to parse %s: %s' % (xmlfile, e.message))
+            raise
+
+        ip['state'] = 'At reception'
+        ip['status'] = 100
+        ip['step_state'] = celery_states.SUCCESS
+        return ip
+
+    def parse_unidentified_ip(self, container_file):
+        ip = {
+            'object_identifier_value': os.path.basename(container_file),
+            'label': os.path.basename(container_file),
+            'create_date': str(timestamp_to_datetime(creation_date(container_file)).isoformat()),
+            'state': 'Unidentified',
+            'status': 0,
+            'step_state': celery_states.SUCCESS,
+        }
+
+        for xmlfile in glob.glob(os.path.join(self.uip, "*.xml")):
+            if os.path.isfile(xmlfile):
+                doc = etree.parse(xmlfile)
+                root = doc.getroot()
+
+                el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
+                if ip['label'] == get_value_from_path(el, "@href").split('file:///')[1]:
+                    raise exceptions.NotFound()
+
+        return ip
+
+    def parse_directory_ip(self, directory):
+        ip = {
+            'id': directory.name,
+            'object_identifier_value': directory.name,
+            'label': directory.name,
+            'state': 'At reception',
+            'status': 100,
+            'step_state': celery_states.SUCCESS,
+        }
+        return ip
+
+    def get_xml_files(self):
+        return glob.glob(os.path.join(self.reception, "*.xml")) + glob.glob(os.path.join(self.uip, "*.xml"))
+
+    def get_container_files(self):
+        return glob.glob(os.path.join(self.uip, "*.tar")) + glob.glob(os.path.join(self.uip, "*.zip"))
+
+    def get_directories(self):
+        return get_immediate_subdirectories(self.reception)
+
+    def list(self, request):
         ips = []
 
-        for xmlfile in glob.glob(os.path.join(reception, "*.xml")) + glob.glob(os.path.join(uip, "*.xml")):
+        for xmlfile in self.get_xml_files():
             if os.path.isfile(xmlfile):
-                if xmlfile.startswith(uip):
-                    srcdir = uip
-                else:
-                    srcdir = reception
-
                 try:
-                    ip = parse_submit_description(xmlfile, srcdir)
-                except ValueError as e:
-                    logger.warn('Failed to parse %s: %s' % (xmlfile, e.message))
+                    ip = self.parse_ip_with_xmlfile(xmlfile)
+                except ValueError:
                     continue
 
-                ip['state'] = 'At reception'
-                ip['status'] = 100
-                ip['step_state'] = celery_states.SUCCESS
                 if not InformationPackage.objects.filter(object_identifier_value=ip['object_identifier_value']).exists():
                     ips.append(ip)
 
-        for container_file in glob.glob(os.path.join(uip, "*.tar")) + glob.glob(os.path.join(uip, "*.zip")):
-            ip = {
-                'object_identifier_value': os.path.basename(container_file),
-                'label': os.path.basename(container_file),
-                'create_date': str(timestamp_to_datetime(creation_date(container_file)).isoformat()),
-                'state': 'Unidentified',
-                'status': 0,
-                'step_state': celery_states.SUCCESS,
-            }
-
-            include = True
-
-            for xmlfile in glob.glob(os.path.join(uip, "*.xml")):
-                if os.path.isfile(xmlfile):
-                    doc = etree.parse(xmlfile)
-                    root = doc.getroot()
-
-                    el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
-                    if ip['label'] == get_value_from_path(el, "@href").split('file:///')[1]:
-                        include = False
-                        break
-
-            if include:
+        for container_file in self.get_container_files():
+            try:
+                ip = self.parse_unidentified_ip(container_file)
+            except exceptions.NotFound:
+                pass
+            else:
                 ips.append(ip)
 
-        for directory in get_immediate_subdirectories(reception):
-            ip = {
-                'id': directory.name,
-                'object_identifier_value': directory.name,
-                'label': directory.name,
-                'state': 'At reception',
-                'status': 100,
-                'step_state': celery_states.SUCCESS,
-            }
+        for directory in self.get_directories():
+            ip = self.parse_directory_ip(directory)
             if not InformationPackage.objects.filter(object_identifier_value=ip['object_identifier_value']).exists():
                 ips.append(ip)
 
@@ -204,13 +233,29 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         return Response(ips)
 
     def retrieve(self, request, pk=None):
-        path = Path.objects.get(entity="path_ingest_reception").value
-        fullpath = os.path.join(path, "%s.xml" % pk)
+        reception_path = os.path.join(self.reception, pk)
+        uip_path = os.path.join(self.uip, pk)
+        paths = [reception_path, uip_path]
 
-        if not os.path.exists(fullpath):
-            return Response({})
+        xml_paths = [p + '.xml' for p in paths]
+        container_paths = flatten([[p + '.tar', p + '.zip'] for p in paths])
 
-        return Response(parse_submit_description(fullpath, srcdir=path))
+        for xml in self.get_xml_files():
+            for path in xml_paths:
+                if path == xml:
+                    return Response(self.parse_ip_with_xmlfile(xml))
+
+        for container in self.get_container_files():
+            for path in container_paths:
+                if path + p == container:
+                    return Response(self.parse_unidentified_ip(container))
+
+        for directory in self.get_directories():
+            for path in paths:
+                if path == directory.path:
+                    return Response(self.parse_directory_ip(directory))
+
+        raise exceptions.NotFound()
 
     @detail_route(methods=['get'])
     def files(self, request, pk=None):
