@@ -208,7 +208,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         fullpath = os.path.join(path, "%s.xml" % pk)
 
         if not os.path.exists(fullpath):
-            raise exceptions.NotFound
+            return Response({})
 
         return Response(parse_submit_description(fullpath, srcdir=path))
 
