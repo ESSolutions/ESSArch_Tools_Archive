@@ -9,8 +9,8 @@
         <div ng-if="filebrowser" class="file-browser" ng-include src="'static/frontend/views/filebrowser.html'"></div>
         <div class="select-sub-edit-eventlog-wrapper" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
             <div class="select-view" id="select-view" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
-                <div ng-include src="'static/frontend/views/validator_choices.html'"></div>
-                <button class="btn btn-info validate-button" ng-click="vm.validate(ip)">{{'VALIDATE' | translate}}</button>
+                <div ng-include src="'static/frontend/views/validator_choices.html'" ng-if="ip.profile_validation != null"></div>
+                <button class="btn btn-info validate-button" ng-click="vm.validate(ip)" ng-disabled="ip.profile_validation == null">{{'VALIDATE' | translate}}</button>
             </div>
             <br/>
             <hr/>

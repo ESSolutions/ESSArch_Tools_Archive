@@ -1,4 +1,4 @@
-angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $controller, $interval, $http, appConfig, $rootScope, WorkareaValidation, $q, TopAlert, $uibModal, $window, $log) {
+angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $controller, $interval, $http, appConfig, $rootScope, WorkareaValidation, $q, TopAlert, $uibModal, $window, $log, Profile) {
     var vm = this;
     var ipSortString ="";
     $controller('WorkareaCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
@@ -26,8 +26,18 @@ angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $c
             $scope.ip = row;
             $rootScope.ip = row;
             vm.expandedRows = [];
-            vm.validationPipe(vm.validationTableState);
-            $scope.select = true;
+            if(row.profile_validation) {
+                Profile.get({id: row.profile_validation.profile}).$promise.then(function(resource) {
+                    vm.buildValidationForm(resource.specification);
+                    vm.validationPipe(vm.validationTableState);
+                    $scope.select = true;
+                })
+            } else {
+                TopAlert.add("IP " + row.label + " has no validation profile!", "info", 10000)
+                vm.validatorModel = {};
+                vm.validatorFields = [];
+                $scope.select = true;
+            }
         }
         $scope.eventShow = false;
         $scope.statusShow = false;
@@ -36,6 +46,26 @@ angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $c
     /*
      * Validation
      */
+
+    vm.buildValidationForm = function(structure) {
+        var fields = [];
+        for(key in structure) {
+            fields.push(
+                {
+                    "templateOptions": {
+                        "type": "text",
+                        "label": key,
+                    },
+                    "defaultValue": true,
+                    "type": "checkbox",
+                    "key": key,
+                }
+            );
+        }
+        vm.validatorModel = {};
+        vm.validatorFields = fields;
+        return fields;
+    }
 
     vm.expandedRows = [];
 
