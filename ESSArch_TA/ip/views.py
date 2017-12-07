@@ -420,7 +420,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         ip.submission_agreement = sa
         ip.save()
 
-        for profile_type in ['sip', 'preservation_metadata', 'submit_description', 'mediaconch']:
+        for profile_type in ['sip', 'preservation_metadata', 'submit_description', 'validation', 'transformation']:
             profile = getattr(sa, 'profile_%s' % profile_type, None)
             if profile is None:
                 continue
