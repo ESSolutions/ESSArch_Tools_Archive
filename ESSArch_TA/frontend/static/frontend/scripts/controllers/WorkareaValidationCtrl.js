@@ -100,7 +100,8 @@ angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $c
             method: "POST",
             url: appConfig.djangoUrl + "workarea-entries/" + ip.workarea.id + "/validate/",
             data: {
-                validators: vm.validators()
+                validators: vm.validators(),
+                stop_at_failure: vm.stop_at_failure
             }
         }).then(function(response) {
             TopAlert.add(response.data, "success");

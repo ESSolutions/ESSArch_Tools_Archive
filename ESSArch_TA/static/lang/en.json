@@ -263,5 +263,6 @@
     "SKIP": "Skip",
     "TRANSFORM": "Transform",
     "TRANSFORM_SIP_DESC": "Do you want to transform IP: ",
-    "CLEAR_ALL": "Clear all"
+    "CLEAR_ALL": "Clear all",
+    "STOP_AT_FAILURE": "Stop at failure"
 }

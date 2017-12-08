@@ -263,5 +263,6 @@
     "SKIP": "Hoppa över",
     "TRANSFORM": "Transformera",
     "TRANSFORM_SIP_DESC": "Vill du transformera IP: ",
-    "CLEAR_ALL": "Avmarkera alla"
+    "CLEAR_ALL": "Avmarkera alla",
+    "STOP_AT_FAILURE": "Stoppa vid fel"
 }

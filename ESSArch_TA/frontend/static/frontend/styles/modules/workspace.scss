@@ -45,9 +45,14 @@
     .select-sub-edit-eventlog-wrapper  {
         margin-left: 0px !important;
     }
-    .validate-button {
+    .validate-button-wrapper {
         float: right;
         margin-bottom: 10px;
+        vertical-align: middle;
+        label {
+            vertical-align: middle;
+            margin-bottom: 0;
+        }
     }
     .validation-table {
         .validation-success {

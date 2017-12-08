@@ -10,7 +10,13 @@
         <div class="select-sub-edit-eventlog-wrapper" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
             <div class="select-view" id="select-view" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
                 <div ng-include src="'static/frontend/views/validator_choices.html'" ng-if="ip.profile_validation != null"></div>
-                <button class="btn btn-info validate-button" ng-click="vm.validate(ip)" ng-disabled="ip.profile_validation == null">{{'VALIDATE' | translate}}</button>
+                <div class="validate-button-wrapper">
+                    <label>
+                        <input type="checkbox" ng-model="vm.stop_at_failure">
+                        {{'STOP_AT_FAILURE' | translate}}
+                    </label>
+                    <button class="btn btn-info" ng-click="vm.validate(ip)" ng-disabled="ip.profile_validation == null">{{'VALIDATE' | translate}}</button>
+                </div>
             </div>
             <br/>
             <hr/>
