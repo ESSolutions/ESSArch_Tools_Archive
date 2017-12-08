@@ -172,6 +172,14 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http,
             }
         }
     }
+
+    vm.uncheckAll = function() {
+        $scope.includedIps = [];
+        vm.displayedIps.forEach(function(row) {
+            row.checked = false;
+        });
+    }
+
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
     $scope.submitDescription = $translate.instant('SUBMITDESCRIPTION');
     $scope.package = $translate.instant('PACKAGE');

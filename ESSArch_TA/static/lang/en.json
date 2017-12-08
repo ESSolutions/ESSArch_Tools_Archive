@@ -262,5 +262,6 @@
     "IMPORT": "Import",
     "SKIP": "Skip",
     "TRANSFORM": "Transform",
-    "TRANSFORM_SIP_DESC": "Do you want to transform IP: "
+    "TRANSFORM_SIP_DESC": "Do you want to transform IP: ",
+    "CLEAR_ALL": "Clear all"
 }

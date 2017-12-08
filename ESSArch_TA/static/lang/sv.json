@@ -262,6 +262,6 @@
     "IMPORT": "Import",
     "SKIP": "Hoppa över",
     "TRANSFORM": "Transformera",
-    "TRANSFORM_SIP_DESC": "Vill du transformera IP: "
-
+    "TRANSFORM_SIP_DESC": "Vill du transformera IP: ",
+    "CLEAR_ALL": "Avmarkera alla"
 }
