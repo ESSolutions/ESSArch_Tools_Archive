@@ -39,7 +39,12 @@
             </tbody>
         </table>
         <div ng-if="$ctrl.data.validation.message">
-            <div class="validation-message"><pre ng-bind-html="$ctrl.data.validation.prettyMessage"></pre></div>
+            <div class="validation-message">
+                    <pre ng-if="$ctrl.data.validation.validator == 'MediaconchValidator' || $ctrl.data.validation.validator == 'VeraPDFValidator'"
+                    ng-bind-html="$ctrl.data.validation.prettyMessage"></pre>
+                    <pre ng-if="$ctrl.data.validation.validator != 'MediaconchValidator' && $ctrl.data.validation.validator != 'VeraPDFValidator'"
+                    ng-bind="$ctrl.data.validation.message"></pre>
+            </div>
         </div>
     </div>
     <div class="modal-footer">

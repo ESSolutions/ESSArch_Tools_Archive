@@ -1,12 +1,22 @@
 angular.module('myApp').factory('WorkareaValidation', function ($rootScope, $q, appConfig, $http, $sce, $filter, myService) {
     var service = {};
 
-    function formatXml(message) {
-        var pretty = $filter("prettyXml")(message);
-        pretty = myService.replaceAll(pretty, "<", "&lt;")
-        pretty = myService.replaceAll(pretty, ">", "&gt;")
-        pretty = myService.replaceAll(pretty, 'outcome="fail"', 'outcome="<span style="background-color: red; color: white; font-weight: bold;">fail</span>"')
-        pretty = myService.replaceAll(pretty, 'outcome="pass"', 'outcome="<span style="background-color: green; color: white; font-weight: bold;">pass</span>"')
+    function formatXml(validation) {
+        var pretty = $filter("prettyXml")(validation.message);
+        pretty = myService.replaceAll(pretty, "<", "&lt;"); //Replace open tags with "<" character
+        pretty = myService.replaceAll(pretty, ">", "&gt;"); //Replace end tags with ">" character
+        // Mediaconch validation message highlighing
+        if(validation.validator == "MediaconchValidator") {
+            pretty = myService.replaceAll(pretty, 'outcome="fail"', '<span style="background-color: red; color: white; font-weight: bold;">outcome="fail"</span>')
+            pretty = myService.replaceAll(pretty, 'outcome="pass"', '<span style="background-color: green; color: white; font-weight: bold;">outcome="pass"</span>')
+        }
+        // VeraPDF validation message highlighting
+        if(validation.validator == "VeraPDFValidator") {
+            pretty = myService.replaceAll(pretty, 'isCompliant="false"', '<span style="background-color: red; color: white; font-weight: bold;">isCompliant="false"</span>')
+            pretty = myService.replaceAll(pretty, 'isCompliant="true"', '<span style="background-color: green; color: white; font-weight: bold;">isCompliant="true"</span>')
+            pretty = pretty.replace(/passedChecks="([\d]+)" failedChecks="([^0])"/g, '<span style="background-color: red; color: white;">passedChecks="$1" failedChecks="$2"</span>')
+            pretty = pretty.replace(/passedChecks="([\d]+)" failedChecks="0"/g, '<span style="background-color: green; color: white;">passedChecks="$1" failedChecks="0"</span>')
+        }
         return pretty;
     }
 
@@ -46,7 +56,9 @@ angular.module('myApp').factory('WorkareaValidation', function ($rootScope, $q, 
             }).then(function(response) {
                 response.data.forEach(function(child) {
                     child.duration = moment(child.time_done).diff(moment(child.time_started));
-                    child.prettyMessage = $sce.trustAsHtml(formatXml(child.message));
+                    if(child.validator == "MediaconchValidator" || child.validator == "VeraPDFValidator") {
+                        child.prettyMessage = $sce.trustAsHtml(formatXml(child));
+                    }
                 })
                 return response.data;
             }).catch(function(response) {
