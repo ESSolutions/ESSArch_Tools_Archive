@@ -146,11 +146,31 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
         $uibModalInstance.dismiss('cancel');
     };
 })
-.controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, $http, appConfig, TopAlert) {
+.controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, $http, appConfig, TopAlert, $uibModal, $log) {
     var $ctrl = this;
     $ctrl.data = data;
     $ctrl.file = data.file;
     $ctrl.type = data.type;
+    $ctrl.showFullscreenMessage = function() {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'static/frontend/views/validation_fullscreen_message.html',
+            controller: 'DataModalInstanceCtrl',
+            controllerAs: '$ctrl',
+            windowClass: 'fullscreen-modal',
+            resolve: {
+                data: {
+                    validation: $ctrl.data.validation
+                }
+            }
+        })
+        modalInstance.result.then(function (data) {
+        }, function () {
+            $log.info('modal-component dismissed at: ' + new Date());
+        });
+    }
     $ctrl.ok = function () {
         $uibModalInstance.close();
     };

@@ -264,5 +264,7 @@
     "TRANSFORM": "Transformera",
     "TRANSFORM_SIP_DESC": "Vill du transformera IP: ",
     "CLEAR_ALL": "Avmarkera alla",
-    "STOP_AT_FAILURE": "Stoppa vid fel"
+    "STOP_AT_FAILURE": "Stoppa vid fel",
+    "FULLSCREEN": "Fullskärm",
+    "PRESS_ESCAPE_TO_CLOSE": "Tryck på ESC för att stänga"
 }

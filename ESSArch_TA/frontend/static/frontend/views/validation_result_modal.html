@@ -41,9 +41,10 @@
         <div ng-if="$ctrl.data.validation.message">
             <div class="validation-message">
                     <pre ng-if="$ctrl.data.validation.validator == 'MediaconchValidator' || $ctrl.data.validation.validator == 'VeraPDFValidator'"
-                    ng-bind-html="$ctrl.data.validation.prettyMessage"></pre>
+                        ng-bind-html="$ctrl.data.validation.prettyMessage"></pre>
                     <pre ng-if="$ctrl.data.validation.validator != 'MediaconchValidator' && $ctrl.data.validation.validator != 'VeraPDFValidator'"
-                    ng-bind="$ctrl.data.validation.message"></pre>
+                        ng-bind="$ctrl.data.validation.message"></pre>
+                    <a ng-click="$ctrl.showFullscreenMessage()">{{'FULLSCREEN' | translate}}</a>
             </div>
         </div>
     </div>
