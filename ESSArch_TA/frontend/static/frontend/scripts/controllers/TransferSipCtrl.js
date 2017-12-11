@@ -24,7 +24,7 @@
 
 angular.module('myApp').controller('TransferSipCtrl', function(IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller) {
     var vm = this;
-    var ipSortString = "Received,Transferring,Transferred";
+    var ipSortString = "Received,Transformed,Transferring,Transferred";
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
 
     $scope.ipTableClick = function(row) {
