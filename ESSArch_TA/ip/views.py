@@ -653,6 +653,10 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['post'], url_path='transfer', permission_classes=[CanTransferSIP])
     def transfer(self, request, pk=None):
         ip = self.get_object()
+
+        if ip.get_profile('transformation') is not None and ip.state.lower() != 'transformed':
+            raise exceptions.ParseError('"{ip}" cannot be transferred without first being transformed'.format(ip=ip.object_identifier_value))
+
         dstdir = Path.objects.get(entity="path_gate_reception").value
 
         info = fill_specification_data(ip=ip)
