@@ -33,7 +33,9 @@ angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $c
                     $scope.select = true;
                 })
             } else {
-                TopAlert.add("IP " + row.label + " has no validation profile!", "info", 10000)
+                TopAlert.add("IP " + row.label + " has no validation profile!", "info", 10000);
+                vm.validations = [];
+                vm.validationPipe(vm.validationTableState);
                 vm.validatorModel = {};
                 vm.validatorFields = [];
                 $scope.select = true;
