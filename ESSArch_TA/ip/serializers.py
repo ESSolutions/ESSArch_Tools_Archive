@@ -93,7 +93,7 @@ class InformationPackageReadSerializer(InformationPackageSerializer):
         data['profiles'] = {}
 
         for ptype in profile_types:
-            data['profile_%s' % ptype.lower()] = None
+            data['profile_%s' % ptype.lower().replace(' ', '_')] = None
 
         for p in profiles:
             data['profile_%s' % p['profile_type']] = p
