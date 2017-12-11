@@ -134,6 +134,9 @@ class ReceiveDir(DBTask):
         shutil.copytree(objpath, dst)
         Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=False)
 
+        ip.object_path = dst
+        ip.save(update_fields=['object_path'])
+
     def undo(self, ip, objpath):
         ip = InformationPackage.objects.get(pk=ip)
         workarea = Path.objects.get(entity='ingest_workarea').value
