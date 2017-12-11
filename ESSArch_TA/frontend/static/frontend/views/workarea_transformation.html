@@ -9,7 +9,7 @@
         <div ng-if="filebrowser" class="file-browser" ng-include src="'static/frontend/views/filebrowser.html'"></div>
         <div class="select-sub-edit-eventlog-wrapper" ng-if="select">
             <div class="select-view">
-                <button ng-click="vm.transform(ip)" class="btn btn-info" style="float: right; margin-bottom: 10px;">{{'TRANSFORM' | translate}}</button>
+                <button ng-disabled="!ip.profile_transformation" ng-click="vm.transform(ip)" class="btn btn-info" style="float: right; margin-bottom: 10px;">{{'TRANSFORM' | translate}}</button>
             </div>
         </div>
     </div>
