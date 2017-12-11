@@ -266,5 +266,6 @@
     "CLEAR_ALL": "Avmarkera alla",
     "STOP_AT_FAILURE": "Stoppa vid fel",
     "FULLSCREEN": "Fullskärm",
-    "PRESS_ESCAPE_TO_CLOSE": "Tryck på ESC för att stänga"
+    "PRESS_ESCAPE_TO_CLOSE": "Tryck på ESC för att stänga",
+    "CANNOT_RECEIVE_ERROR": "Ogiltig leveransöverenskommelse i XML-fil"
 }

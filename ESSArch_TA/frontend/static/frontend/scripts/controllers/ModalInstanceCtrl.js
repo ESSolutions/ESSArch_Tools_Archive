@@ -186,7 +186,7 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
         $uibModalInstance.dismiss('cancel');
     };
 })
-.controller('ReceiveModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, $scope, IPReception) {
+.controller('ReceiveModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, $scope, IPReception, $translate) {
     var $ctrl = this;
     $ctrl.$onInit = function() {
         $ctrl.data = data;
@@ -199,9 +199,12 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
                     $ctrl.saDisabled = true;
                 }
             });
-        }
-        if(!$ctrl.saDisabled) {
+        } else {
             $ctrl.sa = $ctrl.data.submissionAgreements[0];
+        }
+        if(!$ctrl.sa) {
+            $ctrl.receiveSaError = $translate.instant('CANNOT_RECEIVE_ERROR');
+            $ctrl.saDisabled = true;
         }
     }
     $ctrl.receive = function () {

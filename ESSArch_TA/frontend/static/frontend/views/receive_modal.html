@@ -8,6 +8,7 @@
             {{'SUBMISSION_AGREEMENT' | translate}}
             <select class="form-control" ng-disabled="$ctrl.saDisabled" required ng-model="$ctrl.sa" ng-options="x as x.name for x in $ctrl.data.submissionAgreements">{{x}}</select>
         </label>
+        <div uib-alert ng-if="$ctrl.receiveSaError" class="alert-danger">{{$ctrl.receiveSaError}}</div>
     </div>
     <div class="modal-footer">
         <button class="btn btn-default" type="button" ng-click="$ctrl.skip()">{{'SKIP' | translate}} <i class=" fa fa-angle-double-right"></i></button>
