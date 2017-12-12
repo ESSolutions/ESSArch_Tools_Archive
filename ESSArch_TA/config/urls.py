@@ -111,8 +111,14 @@ router.register(r'information-packages', InformationPackageViewSet).register(
 )
 router.register(r'information-packages', InformationPackageViewSet).register(
     r'validations',
-    ValidationFilesViewSet,
+    ValidationViewSet,
     base_name='ip-validations',
+    parents_query_lookups=['information_package']
+)
+router.register(r'information-packages', InformationPackageViewSet).register(
+    r'validation-files',
+    ValidationFilesViewSet,
+    base_name='ip-validation-files',
     parents_query_lookups=['information_package']
 )
 router.register(r'ip-reception', InformationPackageReceptionViewSet, base_name="ip-reception")
