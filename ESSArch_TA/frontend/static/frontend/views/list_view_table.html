@@ -45,7 +45,6 @@
                         <div ng-if="row.state == 'At reception'"class="checkbox table-col">
                             <label>
                                 <input ng-disabled="row.state == 'Receiving'" type="checkbox" ng-model="row.checked" ng-change="includeIp(row)" uib-popover="{{'MARKFORRECEIVE' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true">
-                                </input>
                             </label>
                         </div>
                     </td>
