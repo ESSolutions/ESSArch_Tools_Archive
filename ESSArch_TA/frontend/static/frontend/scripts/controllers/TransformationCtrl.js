@@ -1,4 +1,4 @@
-angular.module('myApp').controller('TransformationCtrl', function($scope, $controller, Resource, listViewService, TopAlert, $http, $sce, $rootScope, $cookies, $timeout, appConfig, $uibModal, $window) {
+angular.module('myApp').controller('TransformationCtrl', function($scope, $controller, Resource, listViewService, TopAlert, $http, $sce, $rootScope, $cookies, $timeout, appConfig, $uibModal, $window, Profile, $q) {
     var vm = this;
     var ipSortString ="";
     $controller('WorkareaCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
@@ -18,11 +18,49 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
         } else {
             $scope.ip = row;
             $rootScope.ip = row;
+            if(row.profile_validation) {
+                Profile.get({id: row.profile_validation.profile}).$promise.then(function(resource) {
+                    vm.buildValidatorTable(resource.specification, row);
+                });
+            }
+            if(!row.profile_transformation) {
+                TopAlert.add("IP "+row.label+" has no transformation profile!", "info");
+            }
             $scope.select = true;
         }
         $scope.eventShow = false;
         $scope.statusShow = false;
     };
+
+    vm.buildValidatorTable = function(specification, row) {
+        var promises = [];
+        angular.forEach(specification, function (value, key, object) {
+            if (key.startsWith('_')) return;
+            var val = {
+                name: key,
+                passed: true
+            }
+            if(object._required && object._required.includes(key)) {
+                val.required = true;
+            }
+            promises.push($http.head(appConfig.djangoUrl + "information-packages/" + row.id + "/validations/",
+                {
+                    params: {
+                        validator: key,
+                        passed: false,
+                    }
+                }).then(function (response) {
+                    val.failed_count = response.headers('Count');
+                    if (val.failed_count > 0) {
+                        val.passed = false;
+                    }
+                    return val;
+                }))
+        })
+        $q.all(promises).then(function (validators) {
+            vm.validators = validators;
+        });
+    }
 
     vm.transform = function(ip) {
         var modalInstance = $uibModal.open({

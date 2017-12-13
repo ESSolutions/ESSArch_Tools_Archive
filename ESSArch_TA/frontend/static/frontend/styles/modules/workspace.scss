@@ -75,6 +75,11 @@
         }
     }
 }
+.validator-table {
+    td {
+        padding: 7px!important;
+    }
+}
 .validation-message {
     pre {
         overflow: auto;

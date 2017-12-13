@@ -267,5 +267,6 @@
     "STOP_AT_FAILURE": "Stop at failure",
     "FULLSCREEN": "Fullscreen",
     "PRESS_ESCAPE_TO_CLOSE": "Press ESC to close",
-    "CANNOT_RECEIVE_ERROR": "Invalid submission agreement in XML-file"
+    "CANNOT_RECEIVE_ERROR": "Invalid submission agreement in XML-file",
+    "FAILED": "Failed"
 }
