@@ -31,6 +31,7 @@
                             </tr>
                         </tbody>
                     </table>
+                    <span style="color: red">*</span> {{'REQUIRED' | translate}}
                 </div>
                 <button ng-disabled="!ip.profile_transformation || (ip.profile_validation && !ip.workarea.successfully_validated)" ng-click="vm.transform(ip)" class="btn btn-info" style="float: right; margin-bottom: 10px;">{{'TRANSFORM' | translate}}</button>
             </div>

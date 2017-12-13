@@ -269,5 +269,6 @@
     "PRESS_ESCAPE_TO_CLOSE": "Tryck på ESC för att stänga",
     "CANNOT_RECEIVE_ERROR": "Ogiltig leveransöverenskommelse i XML-fil",
     "FAILED": "Misslyckade",
-    "NO_RESULTS_FOUND": "Inga resultat hittade"
+    "NO_RESULTS_FOUND": "Inga resultat hittade",
+    "REQUIRED": "Obligatorisk"
 }
