@@ -23,7 +23,7 @@ angular.module('myApp').factory('WorkareaValidation', function ($rootScope, $q, 
     service.getValidationsForIp = function (ip, pageNumber, pageSize, filters) {
         return $http({
             method: 'GET',
-            url: appConfig.djangoUrl + "information-packages/" + ip.id + "/validations/",
+            url: appConfig.djangoUrl + "information-packages/" + ip.id + "/validation-files/",
             params: angular.extend(
                 {
                     page: pageNumber,
