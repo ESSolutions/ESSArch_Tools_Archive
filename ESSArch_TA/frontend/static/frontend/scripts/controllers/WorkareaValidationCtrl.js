@@ -49,9 +49,9 @@ angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $c
      * Validation
      */
 
-    vm.buildValidationForm = function(structure) {
+    vm.buildValidationForm = function(specification) {
         var fields = [];
-        for(key in structure) {
+        for(key in specification) {
             if (key.startsWith('_')) continue;
             fields.push(
                 {
