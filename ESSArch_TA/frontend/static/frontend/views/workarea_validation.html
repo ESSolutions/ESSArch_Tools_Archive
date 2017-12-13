@@ -12,10 +12,10 @@
                 <div ng-include src="'static/frontend/views/validator_choices.html'" ng-if="ip.profile_validation != null"></div>
                 <div class="validate-button-wrapper">
                     <label>
-                        <input type="checkbox" ng-model="vm.stop_at_failure">
+                        <input type="checkbox" ng-model="vm.stop_at_failure" ng-disabled="ip.state == 'Transforming' || ip.state == 'Transformed' || ip.state == 'Transferring' || ip.state == 'Transferred'">
                         {{'STOP_AT_FAILURE' | translate}}
                     </label>
-                    <button class="btn btn-info" ng-click="vm.validate(ip)" ng-disabled="ip.profile_validation == null">{{'VALIDATE' | translate}}</button>
+                    <button class="btn btn-info" ng-click="vm.validate(ip)" ng-disabled="ip.profile_validation == null || ip.state == 'Transforming' || ip.state == 'Transformed' || ip.state == 'Transferring' || ip.state == 'Transferred'">{{'VALIDATE' | translate}}</button>
                 </div>
             </div>
             <br/>
