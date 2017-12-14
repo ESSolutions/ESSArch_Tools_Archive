@@ -16,6 +16,7 @@ angular.module('myApp').factory('WorkareaValidation', function ($rootScope, $q, 
             pretty = myService.replaceAll(pretty, 'isCompliant="true"', '<span style="background-color: green; color: white; font-weight: bold;">isCompliant="true"</span>')
             pretty = pretty.replace(/passedChecks="([\d]+)" failedChecks="([^0])"/g, '<span style="background-color: red; color: white;">passedChecks="$1" failedChecks="$2"</span>')
             pretty = pretty.replace(/passedChecks="([\d]+)" failedChecks="0"/g, '<span style="background-color: green; color: white;">passedChecks="$1" failedChecks="0"</span>')
+            pretty = pretty.replace(/&lt;exceptionMessage&gt;([\s\S]*?)&lt;\/exceptionMessage\&gt;/g, '<span style="background-color: red; color: white;">&lt;exceptionMessage&gt;$1&lt;/exceptionMessage&gt;</span>')
         }
         return pretty;
     }
