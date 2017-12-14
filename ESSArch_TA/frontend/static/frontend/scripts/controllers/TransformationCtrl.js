@@ -21,6 +21,18 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
             if(row.profile_validation) {
                 Profile.get({id: row.profile_validation.profile}).$promise.then(function(resource) {
                     vm.buildValidatorTable(resource.specification, row);
+                    var validationComplete = true;
+                    angular.forEach(resource.specification, function(value, key, object) {
+                        if (key.startsWith('_')) return;
+                        if (row.workarea.successfully_validated[key] == false || row.workarea.successfully_validated[key] == null || angular.isUndefined(row.workarea.successfully_validated[key])) {
+                            validationComplete = false;
+                        }
+                    });
+                    if(validationComplete) {
+                        vm.validation_complete = true;
+                    } else {
+                        vm.validation_complete = false;
+                    }
                 });
             }
             if(!row.profile_transformation) {
@@ -47,15 +59,11 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
                 {
                     params: {
                         validator: key,
-                        passed: false,
                     }
                 }).then(function (response) {
                     val.failed_count = response.headers('Count');
-                    if (val.failed_count > 0) {
-                        val.passed = false;
-                    }
                     return val;
-                }))
+                }));
         })
         $q.all(promises).then(function (validators) {
             vm.validators = validators;

@@ -22,8 +22,8 @@
                             <tr ng-repeat="validator in vm.validators track by $index">
                                 <td>{{validator.name}} <span style="color: red;">{{validator.required?'*':''}}</span></td>
                                 <td>
-                                    <i ng-if="validator.passed == true" class="fa fa-check" style="color: green;" uib-popover="{{'SUCCESS' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"></i>
-                                    <i ng-if="validator.passed == false" class="fa fa-times" style="color: red;" uib-popover="{{'FAILURE' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"></i>
+                                    <i ng-if="ip.workarea.successfully_validated[validator.name] == true" class="fa fa-check" style="color: green;" uib-popover="{{'SUCCESS' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"></i>
+                                    <i ng-if="ip.workarea.successfully_validated[validator.name] == false" class="fa fa-times" style="color: red;" uib-popover="{{'FAILURE' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"></i>
                                 </td>
                                 <td>
                                     {{validator.failed_count}}
@@ -33,7 +33,7 @@
                     </table>
                     <span style="color: red">*</span> {{'REQUIRED' | translate}}
                 </div>
-                <button ng-disabled="!ip.profile_transformation || (ip.profile_validation && !ip.workarea.successfully_validated) || ip.state == 'Transforming' || ip.state == 'Transformed' || ip.state == 'Transferring' || ip.state == 'Transferred'"
+                <button ng-disabled="!ip.profile_transformation || (ip.profile_validation && !vm.validation_complete) || ip.state == 'Transforming' || ip.state == 'Transformed' || ip.state == 'Transferring' || ip.state == 'Transferred'"
                     ng-click="vm.transform(ip)" class="btn btn-info" style="float: right; margin-bottom: 10px;">{{'TRANSFORM' | translate}}</button>
             </div>
         </div>
