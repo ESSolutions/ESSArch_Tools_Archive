@@ -22,17 +22,14 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
                 Profile.get({id: row.profile_validation.profile}).$promise.then(function(resource) {
                     vm.buildValidatorTable(resource.specification, row);
                     var validationComplete = true;
-                    angular.forEach(resource.specification, function(value, key, object) {
-                        if (key.startsWith('_')) return;
-                        if (row.workarea.successfully_validated[key] == false || row.workarea.successfully_validated[key] == null || angular.isUndefined(row.workarea.successfully_validated[key])) {
-                            validationComplete = false;
-                        }
-                    });
-                    if(validationComplete) {
-                        vm.validation_complete = true;
-                    } else {
-                        vm.validation_complete = false;
+                    if(resource.specification._required) {
+                        resource.specification._required.forEach( function(value) {
+                            if (row.workarea.successfully_validated[value] == false || row.workarea.successfully_validated[value] == null || angular.isUndefined(row.workarea.successfully_validated[value])) {
+                                validationComplete = false;
+                            }
+                        });
                     }
+                        vm.validation_complete = validationComplete;
                 });
             }
             if(!row.profile_transformation) {
