@@ -10,7 +10,7 @@
         <div class="select-sub-edit-eventlog-wrapper" ng-if="select">
             <div class="select-view">
                 <div ng-if="ip.profile_validation" class="table-container" st-table="vm.validators" st-pipe="vm.validatorListPipe">
-                    <div class="search-prepare-wrapper" style="height: 32px;">
+                    <div class="search-prepare-wrapper transformation-refresh-header">
                         <span ng-click="vm.validatorListPipe(vm.validatorTableState)" class="clickable fa fa-refresh fa-lg"
                             ng-class="{'fa-refresh-animate': validatorsLoading }" uib-popover="{{'REFRESHTABLEDESC' | translate}}" popover-placement="left"
                             popover-popup-delay="500" popover-append-to-body="true"></span>
