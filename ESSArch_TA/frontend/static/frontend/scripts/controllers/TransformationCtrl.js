@@ -56,6 +56,7 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
                 {
                     params: {
                         validator: key,
+                        passed: false,
                     }
                 }).then(function (response) {
                     val.failed_count = response.headers('Count');
