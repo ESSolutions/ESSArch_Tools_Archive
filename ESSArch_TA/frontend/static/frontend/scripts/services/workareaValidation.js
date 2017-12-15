@@ -46,15 +46,33 @@ angular.module('myApp').factory('WorkareaValidation', function ($rootScope, $q, 
         pretty = pretty.replace(/&lt;exceptionMessage&gt;([\s\S]*?)&lt;\/exceptionMessage\&gt;/g, '<span style="background-color: red; color: white;">&lt;exceptionMessage&gt;$1&lt;/exceptionMessage&gt;</span>')
 
         // Mark validationReports element
-        var regex = /&lt;validationReports compliant="([\d])" nonCompliant="([\d])" failedJobs="([\d])"&gt;([\s\S]*?)&lt;\/validationReports&gt;/g;
-        var match = regex.exec(pretty);
-        if (match[2] != "0" || match[3] != "0") {
-            var replace = '<span style="background-color: red; color: white;">&lt;validationReports compliant="$1" nonCompliant="$2" failedJobs="$3"&gt;$4&lt;\/validationReports&gt;</span>';
-            pretty = pretty.replace(regex, replace);
-        } else {
-            var replace = '<span style="background-color: green; color: white;">&lt;validationReports compliant="$1" nonCompliant="$2" failedJobs="$3"&gt;$4&lt;\/validationReports&gt;</span>';
-            pretty = pretty.replace(regex, replace)
+        function validationReports(pretty) {
+            var regex = /&lt;validationReports compliant="([\d])" nonCompliant="([\d])" failedJobs="([\d])"&gt;([\s\S]*?)&lt;\/validationReports&gt;/g;
+            var match = regex.exec(pretty);
+            if (match[2] != "0" || match[3] != "0") {
+                var replace = '<span style="background-color: red; color: white;">&lt;validationReports compliant="$1" nonCompliant="$2" failedJobs="$3"&gt;$4&lt;\/validationReports&gt;</span>';
+                pretty = pretty.replace(regex, replace);
+            } else {
+                var replace = '<span style="background-color: green; color: white;">&lt;validationReports compliant="$1" nonCompliant="$2" failedJobs="$3"&gt;$4&lt;\/validationReports&gt;</span>';
+                pretty = pretty.replace(regex, replace)
+            }
+            return pretty;
         }
+        pretty = validationReports(pretty);
+
+        // Mark featureReports element
+        pretty = pretty.replace(/&lt;featureReports failedJobs="([1-9][0-9]*)"&gt;([\s\S]*)&lt;\/featureReports&gt;/g, '<span style="background-color: red; color: white;">&lt;featureReports failedJobs="$1"&gt;$2&lt;\/featureReports&gt;</span>')
+        pretty = pretty.replace(/&lt;featureReports failedJobs="0"&gt;([\s\S]*)&lt;\/featureReports&gt;/g, '<span style="background-color: green; color: white;">&lt;featureReports failedJobs="0"&gt;$1&lt;\/featureReports&gt;</span>')
+
+        // Mark repairReports element
+        pretty = pretty.replace(/&lt;repairReports failedJobs="([1-9][0-9]*)"&gt;([\s\S]*)&lt;\/repairReports&gt;/g, '<span style="background-color: red; color: white;">&lt;repairReports failedJobs="$1"&gt;$2&lt;\/repairReports&gt;</span>')
+        pretty = pretty.replace(/&lt;repairReports failedJobs="0"&gt;([\s\S]*)&lt;\/repairReports&gt;/g, '<span style="background-color: green; color: white;">&lt;repairReports failedJobs="0"&gt;$1&lt;\/repairReports&gt;</span>')
+
+        // Mark taskResult element
+        pretty = pretty.replace(/&lt;taskResult ([\s\S]*) isSuccess="false"&gt;/g, '<span style="background-color: red; color: white;">&lt;taskResult $1 isSuccess="false"&gt;</span>')
+        pretty = pretty.replace(/&lt;taskResult ([\s\S]*) isSuccess="true"&gt;/g, '<span style="background-color: green; color: white;">&lt;taskResult $1 isSuccess="true"&gt;</span>')
+
+
         return pretty;
     }
 
