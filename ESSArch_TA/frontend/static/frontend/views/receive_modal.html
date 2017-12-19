@@ -18,7 +18,7 @@
                     <input type="checkBox" ng-disabled="receiveDisabled || $ctrl.form.$invalid" ng-model="approvedToReceive">{{'APPROVEDTORECEIVE' | translate}}</input>
                 </label>
             </div>
-            <button class="btn btn-primary" type="submit" ng-disabled="!approvedToReceive">{{'RECEIVESIP' | translate}}</button>
+            <button class="btn btn-primary" type="submit" ng-disabled="!approvedToReceive" focused="true">{{'RECEIVESIP' | translate}}</button>
             <button class="btn btn-warning" type="button" ng-click="$ctrl.cancel()">{{'CANCEL' | translate}}</button>
         </div>
     </div>
