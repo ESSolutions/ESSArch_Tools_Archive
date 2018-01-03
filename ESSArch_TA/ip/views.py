@@ -131,7 +131,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
                 try:
                     ip = parse_submit_description(xmlfile, srcdir)
-                except ValueError as e:
+                except (etree.LxmlError, ValueError) as e:
                     logger.warn('Failed to parse %s: %s' % (xmlfile, e.message))
                     continue
 
