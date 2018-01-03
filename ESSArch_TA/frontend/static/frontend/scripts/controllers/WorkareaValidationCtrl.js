@@ -61,6 +61,9 @@ angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $c
                     },
                     "defaultValue": true,
                     "type": "checkbox",
+                    "ngModelElAttrs": {
+                        "tabindex": '-1'
+                    },
                     "key": key,
                 }
             );
@@ -186,5 +189,58 @@ angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $c
         }, function () {
             $log.info('modal-component dismissed at: ' + new Date());
         });
+    }
+
+    // Keyboard shortcuts
+
+    var arrowLeft = 37;
+    var arrowUp = 38;
+    var arrowRight = 39;
+    var arrowDown = 40;
+    var escape = 27;
+    var enter = 13;
+    var space = 32;
+
+    /**
+     * Handle keydown events in list view
+     * @param {Event} e
+     */
+    vm.vaildationListKeydownListener = function(e, row) {
+        switch(e.keyCode) {
+            case arrowDown:
+                e.preventDefault();
+                e.target.nextElementSibling.focus();
+                break;
+            case arrowUp:
+                e.preventDefault();
+                e.target.previousElementSibling.focus();
+                break;
+            case arrowLeft:
+                e.preventDefault();
+                var pagination = $scope.tableState.pagination;
+                if(pagination.start != 0) {
+                    pagination.start -= pagination.number;
+                    vm.validationPipe(vm.validationTableState);
+                }
+                break;
+            case arrowRight:
+                e.preventDefault();
+                var pagination = $scope.tableState.pagination;
+                if ((pagination.start / pagination.number + 1) < pagination.numberOfPages) {
+                    pagination.start += pagination.number;
+                    vm.validationPipe(vm.validationTableState);
+                }
+                break;
+            case enter:
+                e.preventDefault();
+                if(row.validator) {
+                    vm.showValidationResult(row)
+                }
+                break;
+            case space:
+                e.preventDefault();
+                vm.collapseExpandRow(row)
+                break;
+        }
     }
 });

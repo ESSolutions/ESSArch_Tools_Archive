@@ -25,6 +25,7 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
         } else {
             $scope.ip = row;
             $rootScope.ip = row;
+            vm.validatorListPipe(vm.validatorTableState);
             $scope.select = true;
         }
         $scope.eventShow = false;

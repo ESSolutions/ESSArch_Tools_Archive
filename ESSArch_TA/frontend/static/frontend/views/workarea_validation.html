@@ -2,19 +2,19 @@
     <div class="content-wrapper">
         <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'">
         </div>
-        <div ng-if="statusShow || eventShow"class="events-status-wrapper">
+        <div ng-if="statusShow || eventShow"class="events-status-wrapper" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
             <event-table ng-if="eventShow" ip="ip"></event-table>
             <div ng-if="statusShow" class="status-view" ng-include src="'static/frontend/views/status_tree_view.html'"></div>
         </div>
-        <div ng-if="filebrowser" class="file-browser">
+        <div ng-if="filebrowser" class="file-browser" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
             <filebrowser ip="ip" workarea="vm.workarea"></filebrowser>
         </div>
-        <div class="select-sub-edit-eventlog-wrapper" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
+        <div class="select-sub-edit-eventlog-wrapper" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
             <div class="select-view" id="select-view" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
                 <div ng-include src="'static/frontend/views/validator_choices.html'" ng-if="ip.profile_validation != null"></div>
                 <div class="validate-button-wrapper">
                     <label>
-                        <input type="checkbox" ng-model="vm.stop_at_failure" ng-disabled="ip.state == 'Transforming' || ip.state == 'Transformed' || ip.state == 'Transferring' || ip.state == 'Transferred'">
+                        <input type="checkbox" tabindex="-1" ng-model="vm.stop_at_failure" ng-disabled="ip.state == 'Transforming' || ip.state == 'Transformed' || ip.state == 'Transferring' || ip.state == 'Transferred'">
                         {{'STOP_AT_FAILURE' | translate}}
                     </label>
                     <button class="btn btn-info" ng-click="vm.validate(ip)" ng-disabled="ip.profile_validation == null || ip.state == 'Transforming' || ip.state == 'Transformed' || ip.state == 'Transferring' || ip.state == 'Transferred'">{{'VALIDATE' | translate}}</button>
@@ -25,7 +25,7 @@
             <div class="validation-view">
                 <div class="table-container" st-table="vm.validations" st-pipe="vm.validationPipe">
                     <div class="search-prepare-wrapper">
-                            <select class="form-control items-per-page"
+                            <select tabindex="-1" class="form-control items-per-page"
                                 ng-model="vm.validationsPerPage" ng-options="x for x in [5,10,20,25,50]" uib-popover="{{'ITEMSPERPAGE' | translate}}" popover-placement="top-left"
                                 popover-popup-delay="500" popover-append-to-body="true"></select>
                             <div style="width: 50%;" class="input-group margin-bottom-sm">
@@ -47,7 +47,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat-start="row in vm.validations" class="clickable" ng-click="vm.collapseExpandRow(row)" ng-class="{'validation-success': row.passed, 'validation-failure': row.passed == false}">
+                            <tr ng-repeat-start="row in vm.validations" class="clickable" ng-click="vm.collapseExpandRow(row)"
+                                tabindex="0" ng-keydown="vm.vaildationListKeydownListener($event, row)" ng-class="{'validation-success': row.passed, 'validation-failure': row.passed == false}">
                                 <td>
                                     <i ng-if="row.collapsed" class="fa fa-plus"></i>
                                     <i ng-if="!row.collapsed" class="fa fa-minus"></i>
@@ -57,7 +58,8 @@
                                     {{vm.validationStatusMessage(row) | translate}}
                                 </td>
                             </tr>
-                            <tr ng-if="!row.collapsed" ng-repeat="subrow in row.children" ng-repeat-end ng-click="vm.showValidationResult(subrow)" ng-class="{'validation-success': subrow.passed, 'validation-failure': subrow.passed == false}">
+                            <tr ng-if="!row.collapsed" ng-repeat="subrow in row.children" ng-repeat-end ng-click="vm.showValidationResult(subrow)"
+                                tabindex="0" ng-keydown="vm.vaildationListKeydownListener($event, subrow)" ng-class="{'validation-success': subrow.passed, 'validation-failure': subrow.passed == false}">
                                 <td></td>
                                 <td class="validation-subrow clickable">{{subrow.validator}}</td>
                                 <td>

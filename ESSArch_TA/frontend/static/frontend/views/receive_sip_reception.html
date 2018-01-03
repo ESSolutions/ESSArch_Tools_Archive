@@ -2,14 +2,14 @@
     <div class="content-wrapper">
         <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'">
         </div>
-        <div ng-if="statusShow || eventShow" class="events-status-wrapper">
+        <div ng-if="statusShow || eventShow" class="events-status-wrapper" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
             <div ng-include src="'static/frontend/views/event_table.html'"></div>
             <div ng-if="statusShow" class="status-view" ng-include src="'static/frontend/views/status_tree_view.html'"></div>
         </div>
-        <div ng-if="filebrowser" class="file-browser">
+        <div ng-if="filebrowser" class="file-browser" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
             <filebrowser ip="ip"></filebrowser>
         </div>
-        <div class="select-sub-edit-eventlog-wrapper" ng-if="prepareUnidentifiedIp || includedIps.length || edit">
+        <div class="select-sub-edit-eventlog-wrapper" ng-if="prepareUnidentifiedIp || includedIps.length || edit" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
             <div ng-if="edit" class="edit-view">
                 <h4 style="margin-left: 10px;">Submit Description</h4>
                 <form>
