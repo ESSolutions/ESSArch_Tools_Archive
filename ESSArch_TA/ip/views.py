@@ -133,7 +133,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         try:
             ip = parse_submit_description(xmlfile, srcdir)
-        except ValueError as e:
+        except (etree.LxmlError, ValueError) as e:
             self.logger.warn('Failed to parse %s: %s' % (xmlfile, e.message))
             raise
 
@@ -190,7 +190,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             if os.path.isfile(xmlfile):
                 try:
                     ip = self.parse_ip_with_xmlfile(xmlfile)
-                except ValueError:
+                except (etree.LxmlError, ValueError) as e:
                     continue
 
                 if not InformationPackage.objects.filter(object_identifier_value=ip['object_identifier_value']).exists():
@@ -591,6 +591,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
                 },
                 'folderToParse': container_file,
             },
+            responsible=request.user,
         ).run()
 
         return Response({'status': 'Identified IP, created %s' % infoxml})
