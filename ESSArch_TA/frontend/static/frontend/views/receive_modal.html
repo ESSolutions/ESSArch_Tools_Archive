@@ -4,7 +4,7 @@
 <form name="$ctrl.form" ng-submit="$ctrl.receive()">
     <div class="modal-body" id="modal-body">
         <br/>
-        <label class="sa-select">
+        <label class="sa-select" ng-if="$ctrl.data.submissionAgreements.length && !$ctrl.receiveSaError">
             {{'SUBMISSION_AGREEMENT' | translate}}
             <select class="form-control" ng-disabled="$ctrl.saDisabled" required ng-model="$ctrl.sa" ng-options="x as x.name for x in $ctrl.data.submissionAgreements">{{x}}</select>
         </label>

@@ -200,9 +200,15 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
                 }
             });
         } else {
-            $ctrl.sa = $ctrl.data.submissionAgreements[0];
+            if($ctrl.data.submissionAgreements.length > 0) {
+                $ctrl.sa = $ctrl.data.submissionAgreements[0];
+            } else {
+                $ctrl.sa = null;
+                $ctrl.receiveSaError = $translate.instant('NO_SUBMISSION_AGREEMENT_AVAILABLE');
+            }
         }
-        if(!$ctrl.sa) {
+
+        if(angular.isUndefined($ctrl.sa)) {
             $ctrl.receiveSaError = $translate.instant('CANNOT_RECEIVE_ERROR');
             $ctrl.saDisabled = true;
         }

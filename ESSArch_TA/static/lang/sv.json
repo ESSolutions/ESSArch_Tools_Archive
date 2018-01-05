@@ -288,5 +288,6 @@
     "INCLUDE_IP_FOR_RECEIVE": "Inkludera IP för att ta emot",
     "SEE_VALIDATION_REPORT": "Se valideringsrapport",
     "OPEN_KEYBOARD_SHORTCUT_INFO": "Öppna tangentbordsgenväg-sida",
-    "VALIDATION_TABLE": "Valideringslista"
+    "VALIDATION_TABLE": "Valideringslista",
+    "NO_SUBMISSION_AGREEMENT_AVAILABLE": "Inga leveransöverenskommelser tillgängliga"
 }
