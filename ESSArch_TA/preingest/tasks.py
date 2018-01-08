@@ -104,7 +104,7 @@ class ReceiveSIP(DBTask):
         dst = os.path.join(dst_dir, "%s.xml" % objid)
         shutil.copy(src, dst)
 
-        Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=True)
+        Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=False)
 
     def undo(self, ip, xml, container):
         objid, container_type = os.path.splitext(os.path.basename(container))
@@ -113,6 +113,39 @@ class ReceiveSIP(DBTask):
 
         try:
             shutil.rmtree(os.path.join(ingest_work, ip.object_identifier_value))
+        except OSError as e:
+            if e.errno != errno.ENOENT:
+                raise
+
+        InformationPackage.objects.filter(pk=ip).delete()
+
+    def event_outcome_success(self, ip, xml, container):
+        return "Received IP '%s'" % str(ip)
+
+
+class ReceiveDir(DBTask):
+    def run(self, ip, objpath):
+        ip = InformationPackage.objects.get(pk=ip)
+        workarea = Path.objects.get(entity='ingest_workarea').value
+        username = User.objects.get(pk=self.responsible).username
+        workarea_user = os.path.join(workarea, username)
+        dst = os.path.join(workarea_user, ip.object_identifier_value)
+
+        shutil.copytree(objpath, dst)
+        Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=False)
+
+        ip.object_path = dst
+        ip.save(update_fields=['object_path'])
+
+    def undo(self, ip, objpath):
+        ip = InformationPackage.objects.get(pk=ip)
+        workarea = Path.objects.get(entity='ingest_workarea').value
+        username = User.objects.get(pk=self.responsible).username
+        workarea_user = os.path.join(workarea, username)
+        workarea_ip = os.path.join(workarea_user, ip.object_identifier_value)
+
+        try:
+            shutil.rmtree(workarea_ip)
         except OSError as e:
             if e.errno != errno.ENOENT:
                 raise

@@ -85,6 +85,7 @@ var vendorFiles = [
         'node_modules/angular-bootstrap-datetimepicker/src/js/datetimepicker.templates.js',
         'node_modules/angular-clipboard/angular-clipboard.js',
         'node_modules/angular-resource/angular-resource.js',
+        'node_modules/angular-pretty-xml/src/angular-pretty-xml.js'
     ],
     jsFiles = [
         'scripts/myApp.js', 'scripts/controllers/*.js', 'scripts/components/*.js',
@@ -96,6 +97,8 @@ var vendorFiles = [
         'styles/modules/login.scss',
         'styles/modules/my_page.scss',
         'styles/modules/receive_sip.scss',
+        'styles/modules/top_alert.scss',
+        'styles/modules/workspace.scss',
         'styles/modules/colors.scss',
         'styles/modules/mixins.scss',
         'styles/modules/tree_control.scss',

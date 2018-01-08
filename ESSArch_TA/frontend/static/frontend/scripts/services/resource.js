@@ -88,7 +88,7 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
             ipCollection.forEach(function(ip) {
                 ip.checked = false;
                 checked.forEach(function(checkedIp) {
-                    if(ip.object_identifier_value === checkedIp.object_identifier_value) {
+                    if(ip.id == checkedIp.id) {
                         ip.checked = true;
                     }
                 });

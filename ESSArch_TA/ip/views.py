@@ -68,7 +68,7 @@ from ESSArch_Core.essxml.util import (
     parse_submit_description,
 )
 
-from ESSArch_Core.fixity.validation import validate_checksum
+from ESSArch_Core.fixity.validation.backends.checksum import ChecksumValidator
 
 from ESSArch_Core.ip.models import InformationPackage, EventIP, Workarea
 
@@ -83,6 +83,7 @@ from ESSArch_Core.mixins import PaginatedViewMixin
 
 from ESSArch_Core.pagination import LinkHeaderPagination
 
+from ESSArch_Core.profiles.models import ProfileIP, SubmissionAgreement
 from ESSArch_Core.profiles.utils import fill_specification_data
 
 from ESSArch_Core.WorkflowEngine.models import (
@@ -96,9 +97,11 @@ from ESSArch_Core.WorkflowEngine.serializers import (
 
 from ESSArch_Core.util import (
     creation_date,
+    flatten,
     generate_file_response,
     get_files_and_dirs,
     get_event_spec,
+    get_immediate_subdirectories,
     get_tree_size_and_count,
     get_value_from_path,
     in_directory,
@@ -115,55 +118,95 @@ from rest_framework import viewsets
 
 
 class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
-    def list(self, request):
-        logger = logging.getLogger('essarch.reception')
 
-        reception = Path.objects.get(entity="path_ingest_reception").value
-        uip = Path.objects.get(entity="path_ingest_unidentified").value
+    def __init__(self, *args, **kwargs):
+        self.logger = logging.getLogger('essarch.reception')
+        self.reception = Path.objects.get(entity="path_ingest_reception").value
+        self.uip = Path.objects.get(entity="path_ingest_unidentified").value
+        super(InformationPackageReceptionViewSet, self).__init__(*args, **kwargs)
+
+    def parse_ip_with_xmlfile(self, xmlfile):
+        if xmlfile.startswith(self.uip):
+            srcdir = self.uip
+        else:
+            srcdir = self.reception
+
+        try:
+            ip = parse_submit_description(xmlfile, srcdir)
+        except (etree.LxmlError, ValueError) as e:
+            self.logger.warn('Failed to parse %s: %s' % (xmlfile, e.message))
+            raise
+
+        ip['state'] = 'At reception'
+        ip['status'] = 100
+        ip['step_state'] = celery_states.SUCCESS
+        return ip
+
+    def parse_unidentified_ip(self, container_file):
+        ip = {
+            'object_identifier_value': os.path.basename(container_file),
+            'label': os.path.basename(container_file),
+            'create_date': str(timestamp_to_datetime(creation_date(container_file)).isoformat()),
+            'state': 'Unidentified',
+            'status': 0,
+            'step_state': celery_states.SUCCESS,
+        }
+
+        for xmlfile in glob.glob(os.path.join(self.uip, "*.xml")):
+            if os.path.isfile(xmlfile):
+                doc = etree.parse(xmlfile)
+                root = doc.getroot()
+
+                el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
+                if ip['label'] == get_value_from_path(el, "@href").split('file:///')[1]:
+                    raise exceptions.NotFound()
+
+        return ip
+
+    def parse_directory_ip(self, directory):
+        ip = {
+            'id': directory.name,
+            'object_identifier_value': directory.name,
+            'label': directory.name,
+            'state': 'At reception',
+            'status': 100,
+            'step_state': celery_states.SUCCESS,
+        }
+        return ip
+
+    def get_xml_files(self):
+        return glob.glob(os.path.join(self.reception, "*.xml")) + glob.glob(os.path.join(self.uip, "*.xml"))
+
+    def get_container_files(self):
+        return glob.glob(os.path.join(self.uip, "*.tar")) + glob.glob(os.path.join(self.uip, "*.zip"))
+
+    def get_directories(self):
+        return get_immediate_subdirectories(self.reception)
+
+    def list(self, request):
         ips = []
 
-        for xmlfile in glob.glob(os.path.join(reception, "*.xml")) + glob.glob(os.path.join(uip, "*.xml")):
+        for xmlfile in self.get_xml_files():
             if os.path.isfile(xmlfile):
-                if xmlfile.startswith(uip):
-                    srcdir = uip
-                else:
-                    srcdir = reception
-
                 try:
-                    ip = parse_submit_description(xmlfile, srcdir)
+                    ip = self.parse_ip_with_xmlfile(xmlfile)
                 except (etree.LxmlError, ValueError) as e:
-                    logger.warn('Failed to parse %s: %s' % (xmlfile, e.message))
                     continue
 
-                ip['state'] = 'At reception'
-                ip['status'] = 100
-                ip['step_state'] = celery_states.SUCCESS
                 if not InformationPackage.objects.filter(object_identifier_value=ip['object_identifier_value']).exists():
                     ips.append(ip)
 
-        for container_file in glob.glob(os.path.join(uip, "*.tar")) + glob.glob(os.path.join(uip, "*.zip")):
-            ip = {
-                'object_identifier_value': os.path.basename(container_file),
-                'label': os.path.basename(container_file),
-                'create_date': str(timestamp_to_datetime(creation_date(container_file)).isoformat()),
-                'state': 'Unidentified',
-                'status': 0,
-                'step_state': celery_states.SUCCESS,
-            }
+        for container_file in self.get_container_files():
+            try:
+                ip = self.parse_unidentified_ip(container_file)
+            except exceptions.NotFound:
+                pass
+            else:
+                ips.append(ip)
 
-            include = True
-
-            for xmlfile in glob.glob(os.path.join(uip, "*.xml")):
-                if os.path.isfile(xmlfile):
-                    doc = etree.parse(xmlfile)
-                    root = doc.getroot()
-
-                    el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
-                    if ip['label'] == get_value_from_path(el, "@href").split('file:///')[1]:
-                        include = False
-                        break
-
-            if include:
+        for directory in self.get_directories():
+            ip = self.parse_directory_ip(directory)
+            if not InformationPackage.objects.filter(object_identifier_value=ip['object_identifier_value']).exists():
                 ips.append(ip)
 
         from_db = InformationPackage.objects.filter(state='Receiving').prefetch_related(
@@ -190,17 +233,40 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         return Response(ips)
 
     def retrieve(self, request, pk=None):
-        path = Path.objects.get(entity="path_ingest_reception").value
-        fullpath = os.path.join(path, "%s.xml" % pk)
+        reception_path = os.path.join(self.reception, pk)
+        uip_path = os.path.join(self.uip, pk)
+        paths = [reception_path, uip_path]
 
-        if not os.path.exists(fullpath):
-            raise exceptions.NotFound
+        xml_paths = [p + '.xml' for p in paths]
+        container_paths = flatten([[p + '.tar', p + '.zip'] for p in paths])
 
-        return Response(parse_submit_description(fullpath, srcdir=path))
+        for xml in self.get_xml_files():
+            for path in xml_paths:
+                if path == xml:
+                    return Response(self.parse_ip_with_xmlfile(xml))
+
+        for container in self.get_container_files():
+            for path in container_paths:
+                if path + p == container:
+                    return Response(self.parse_unidentified_ip(container))
+
+        for directory in self.get_directories():
+            for path in paths:
+                if path == directory.path:
+                    return Response(self.parse_directory_ip(directory))
+
+        raise exceptions.NotFound()
 
     @detail_route(methods=['get'])
     def files(self, request, pk=None):
         reception = Path.objects.get(entity="path_ingest_reception").value
+        path = request.query_params.get('path', '').rstrip('/ ')
+        download = request.query_params.get('download', False)
+
+        if os.path.isdir(os.path.join(reception, pk)):
+            path = os.path.join(reception, pk, path)
+            return list_files(path, download, paginator=self.paginator, request=request)
+
         xml = os.path.join(reception, "%s.xml" % pk)
 
         if not os.path.exists(xml):
@@ -208,9 +274,6 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         ip = parse_submit_description(xml, srcdir=reception)
         container = ip['object_path']
-
-        path = request.query_params.get('path', '').rstrip('/ ')
-        download = request.query_params.get('download', False)
 
         if len(path):
             path = os.path.join(os.path.dirname(container), path)
@@ -269,7 +332,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         filepath = request.data['path']
         filepath = os.path.join(path, filepath)
 
-        validate_checksum(filepath, algorithm='MD5', checksum=md5)
+        options = {'expected': md5, 'algorithm': 'md5'}
+        validator = ChecksumValidator(context='checksum_str', options=options)
+        validator.validate(filepath)
 
         return Response('Upload of %s complete' % filepath)
 
@@ -278,31 +343,70 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         if InformationPackage.objects.filter(object_identifier_value=pk).exists():
             raise exceptions.ParseError('IP with id "%s" already exist')
 
+        sa_id = request.data.get('submission_agreement')
+        try:
+            sa = SubmissionAgreement.objects.get(pk=sa_id)
+        except SubmissionAgreement.DoesNotExist:
+            raise exceptions.ParseError('SA with id "%s" does not exist' % sa_id)
+
         reception = Path.objects.get(entity="path_ingest_reception").value
-        uip = Path.objects.get(entity="path_ingest_unidentified").value
-        xmlfile = os.path.join(reception, "%s.xml" % pk)
-        srcdir = reception
-        if not os.path.isfile(xmlfile):
-            xmlfile = os.path.join(uip, "%s.xml" % pk)
-            srcdir = uip
+        events_xmlfile = None
 
-        doc = etree.parse(xmlfile)
-        root = doc.getroot()
-        objpath = os.path.join(srcdir, get_objectpath(root))
+        if os.path.isdir(os.path.join(reception, pk)):
+            objpath = os.path.join(reception, pk)
+            ip = InformationPackage.objects.create(
+                object_identifier_value=pk, label=pk, state="Receiving",
+                responsible=self.request.user, object_path=objpath,
+            )
+        else:
+            uip = Path.objects.get(entity="path_ingest_unidentified").value
+            xmlfile = os.path.join(reception, "%s.xml" % pk)
+            srcdir = reception
+            if not os.path.isfile(xmlfile):
+                xmlfile = os.path.join(uip, "%s.xml" % pk)
+                srcdir = uip
 
-        objid, container_type = os.path.splitext(os.path.basename(objpath))
-        parsed = parse_submit_description(xmlfile, srcdir=os.path.split(objpath)[0])
+            doc = etree.parse(xmlfile)
+            root = doc.getroot()
+            objpath = os.path.join(srcdir, get_objectpath(root))
 
-        ip = InformationPackage.objects.create(
-            object_identifier_value=objid, label=parsed.get("label"), state="Receiving",
-            responsible=self.request.user, object_path=parsed['object_path'],
-            object_size=parsed['object_size'], start_date=parsed['start_date'], end_date=parsed['end_date'],
-        )
+            objid, container_type = os.path.splitext(os.path.basename(objpath))
+            parsed = parse_submit_description(xmlfile, srcdir=os.path.split(objpath)[0])
 
-        ip.create_date = parsed['create_date']
-        ip.entry_date = ip.create_date
-        ip.save(update_fields=['create_date', 'entry_date'])
+            ip = InformationPackage.objects.create(
+                object_identifier_value=objid, label=parsed.get("label"), state="Receiving",
+                responsible=self.request.user, object_path=parsed['object_path'],
+                object_size=parsed['object_size'], start_date=parsed['start_date'], end_date=parsed['end_date'],
+            )
 
+            ip.create_date = parsed['create_date']
+            ip.entry_date = ip.create_date
+            ip.save(update_fields=['create_date', 'entry_date'])
+
+            events_xmlfile = None
+            if tarfile.is_tarfile(objpath):
+                with tarfile.open(objpath) as tarf:
+                    try:
+                        tmp = tempfile.NamedTemporaryFile(delete=False)
+                        tmp.close()
+                        tarf.extract('%s/ipevents.xml' % pk, os.path.dirname(tmp.name))
+                        extracted = os.path.join(os.path.dirname(tmp.name), '%s/ipevents.xml' % pk)
+                        os.rename(extracted, tmp.name)
+                        events_xmlfile = tmp.name
+                    except KeyError:
+                        pass
+
+            if zipfile.is_zipfile(objpath):
+                with zipfile.open(objpath) as zipf:
+                    try:
+                        tmp = tempfile.NamedTemporaryFile(delete=False)
+                        tmp.close()
+                        zipf.extract('%s/ipevents.xml' % pk, os.path.dirname(tmp.name))
+                        extracted = os.path.join(os.path.dirname(tmp.name), '%s/ipevents.xml' % pk)
+                        os.rename(extracted, tmp.name)
+                        events_xmlfile = tmp.name
+                    except KeyError:
+                        pass
 
         member = Member.objects.get(django_user=self.request.user)
         try:
@@ -313,30 +417,14 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         organization = member.django_user.user_profile.current_organization
         member.assign_object(organization, ip, custom_permissions=perms)
 
-        events_xmlfile = None
-        if tarfile.is_tarfile(objpath):
-            with tarfile.open(objpath) as tarf:
-                try:
-                    tmp = tempfile.NamedTemporaryFile(delete=False)
-                    tmp.close()
-                    tarf.extract('%s/ipevents.xml' % pk, os.path.dirname(tmp.name))
-                    extracted = os.path.join(os.path.dirname(tmp.name), '%s/ipevents.xml' % pk)
-                    os.rename(extracted, tmp.name)
-                    events_xmlfile = tmp.name
-                except KeyError:
-                    pass
+        ip.submission_agreement = sa
+        ip.save()
 
-        if zipfile.is_zipfile(objpath):
-            with zipfile.open(objpath) as zipf:
-                try:
-                    tmp = tempfile.NamedTemporaryFile(delete=False)
-                    tmp.close()
-                    zipf.extract('%s/ipevents.xml' % pk, os.path.dirname(tmp.name))
-                    extracted = os.path.join(os.path.dirname(tmp.name), '%s/ipevents.xml' % pk)
-                    os.rename(extracted, tmp.name)
-                    events_xmlfile = tmp.name
-                except KeyError:
-                    pass
+        for profile_type in ['sip', 'preservation_metadata', 'submit_description', 'validation', 'transformation']:
+            profile = getattr(sa, 'profile_%s' % profile_type, None)
+            if profile is None:
+                continue
+            profile_ip = ProfileIP.objects.create(ip=ip, profile=profile)
 
         step = ProcessStep.objects.create(
             name="Receive SIP",
@@ -406,15 +494,27 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             name="Receive",
         )
 
-        ProcessTask.objects.create(
-            name="preingest.tasks.ReceiveSIP",
-            args=[ip.pk, xmlfile, objpath],
-            processstep_pos=0,
-            log=EventIP,
-            information_package=ip,
-            responsible=self.request.user,
-            processstep=receive_step,
-        )
+        if os.path.isdir(objpath):
+            ProcessTask.objects.create(
+                name="preingest.tasks.ReceiveDir",
+                args=[ip.pk, objpath],
+                processstep_pos=0,
+                log=EventIP,
+                information_package=ip,
+                responsible=self.request.user,
+                processstep=receive_step,
+            )
+        elif tarfile.is_tarfile(objpath) or zipfile.is_zipfile(objpath):
+            ProcessTask.objects.create(
+                name="preingest.tasks.ReceiveSIP",
+                args=[ip.pk, xmlfile, objpath],
+                processstep_pos=0,
+                log=EventIP,
+                information_package=ip,
+                responsible=self.request.user,
+                processstep=receive_step,
+            )
+
         if events_xmlfile is not None:
             ProcessTask.objects.create(
                 name="ESSArch_Core.tasks.ParseEvents",
@@ -554,6 +654,10 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['post'], url_path='transfer', permission_classes=[CanTransferSIP])
     def transfer(self, request, pk=None):
         ip = self.get_object()
+
+        if ip.get_profile('transformation') is not None and ip.state.lower() != 'transformed':
+            raise exceptions.ParseError('"{ip}" cannot be transferred without first being transformed'.format(ip=ip.object_identifier_value))
+
         dstdir = Path.objects.get(entity="path_gate_reception").value
 
         info = fill_specification_data(ip=ip)

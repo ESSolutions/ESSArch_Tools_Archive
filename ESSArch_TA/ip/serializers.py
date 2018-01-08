@@ -47,6 +47,7 @@ from ESSArch_Core.auth.serializers import UserSerializer
 from ESSArch_Core.profiles.serializers import (
     ProfileIPSerializer,
 )
+from ESSArch_Core.profiles.utils import profile_types
 
 VERSION = get_versions()['version']
 
@@ -91,15 +92,8 @@ class InformationPackageReadSerializer(InformationPackageSerializer):
         profiles = data['profiles']
         data['profiles'] = {}
 
-        types = [
-            'transfer_project', 'content_type', 'data_selection',
-            'authority_information', 'archival_description',
-            'import', 'submit_description', 'sip', 'aip',
-            'dip', 'workflow', 'preservation_metadata', 'event',
-        ]
-
-        for ptype in types:
-            data['profile_%s' % ptype] = None
+        for ptype in profile_types:
+            data['profile_%s' % ptype.lower().replace(' ', '_')] = None
 
         for p in profiles:
             data['profile_%s' % p['profile_type']] = p

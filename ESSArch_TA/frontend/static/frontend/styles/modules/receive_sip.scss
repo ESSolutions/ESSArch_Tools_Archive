@@ -10,7 +10,7 @@
 .column-label {
     margin: auto;
 }
-.content-wrapper>div {
+.content-wrapper > div {
     margin-bottom: 10px;
     margin-left: 5px;
 }
@@ -58,9 +58,15 @@
 .select-sub-edit-eventlog-wrapper {
     @include container;
     position: relative;
+    &:focus {
+        outline: 0;
+    }
 }
 .events-status-wrapper {
     @include container;
+    &:focus {
+        outline: 0;
+    }
 }
 .event-view {
     margin: 5px;
@@ -266,4 +272,14 @@ input[type="checkbox"] {
 .version-info-page {
     @include container(10px);
     margin-top: 10px;
+}
+
+.receive-footer {
+    margin-top: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    * {
+        margin-right: 3px;
+    }
 }

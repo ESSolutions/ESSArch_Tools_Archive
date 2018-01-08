@@ -59,7 +59,7 @@ function nestedEmptyPermissions(page) {
     }
 }
 
-angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'formlyBootstrap', 'smart-table', 'treeGrid', 'ui.router', 'ngCookies', 'permission', 'permission.ui', 'pascalprecht.translate', 'ngSanitize', 'ui.bootstrap.datetimepicker', 'ui.dateTimeInput', 'ngAnimate', 'ngMessages', 'myApp.config', 'ig.linkHeaderParser', 'hc.marked', 'ngFilesizeFilter', 'angular-clipboard', 'ngResource', 'relativeDate', 'permission.config', 'ngWebSocket'])
+angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'formlyBootstrap', 'smart-table', 'treeGrid', 'ui.router', 'ngCookies', 'permission', 'permission.ui', 'pascalprecht.translate', 'ngSanitize', 'ui.bootstrap.datetimepicker', 'ui.dateTimeInput', 'ngAnimate', 'ngMessages', 'myApp.config', 'ig.linkHeaderParser', 'hc.marked', 'ngFilesizeFilter', 'angular-clipboard', 'ngResource', 'relativeDate', 'permission.config', 'ngWebSocket', 'prettyXml'])
     .config(function($routeProvider, formlyConfigProvider, $stateProvider, $urlRouterProvider, $rootScopeProvider, $uibTooltipProvider, $urlMatcherFactoryProvider, permissionConfig) {
 
         $urlMatcherFactoryProvider.strictMode(false);
@@ -147,7 +147,6 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
             .state('home.workarea', {
                 url: 'workarea',
                 templateUrl: '/static/frontend/views/workarea.html',
-                controller: 'WorkareaCtrl as vm',
                 resolve: {
                     authenticated: ['djangoAuth', function(djangoAuth){
                         return djangoAuth.authenticationStatus();
@@ -156,6 +155,38 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                 data: {
                     permissions: {
                         only: nestedPermissions(Object.resolve("home.workarea", permissionConfig)),
+                        redirectTo: 'home.restricted'
+                    }
+                },
+            })
+            .state('home.workarea.validation', {
+                url: '/validation',
+                templateUrl: '/static/frontend/views/workarea_validation.html',
+                controller: 'WorkareaValidationCtrl as vm',
+                resolve: {
+                    authenticated: ['djangoAuth', function(djangoAuth){
+                        return djangoAuth.authenticationStatus();
+                    }],
+                },
+                data: {
+                    permissions: {
+                        only: nestedPermissions(Object.resolve("home.workarea.validation", permissionConfig)),
+                        redirectTo: 'home.restricted'
+                    }
+                },
+            })
+            .state('home.workarea.transformation', {
+                url: '/transformation',
+                templateUrl: '/static/frontend/views/workarea_transformation.html',
+                controller: 'TransformationCtrl as vm',
+                resolve: {
+                    authenticated: ['djangoAuth', function(djangoAuth){
+                        return djangoAuth.authenticationStatus();
+                    }],
+                },
+                data: {
+                    permissions: {
+                        only: nestedPermissions(Object.resolve("home.workarea.transformation", permissionConfig)),
                         redirectTo: 'home.restricted'
                     }
                 },
@@ -174,6 +205,26 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                         only: nestedPermissions(Object.resolve("home.transferSip", permissionConfig)),
                         redirectTo: 'home.restricted'
                     }
+                }
+            })
+            .state('home.administration', {
+                url: 'administration',
+                templateUrl: '/static/frontend/views/administration.html',
+                redirectTo: 'home.administration.import',
+                resolve: {
+                    authenticated: ['djangoAuth', function(djangoAuth){
+                        return djangoAuth.authenticationStatus();
+                    }],
+                }
+            })
+            .state('home.administration.import', {
+                url: '/import',
+                templateUrl: '/static/frontend/views/import.html',
+                controller: 'ImportCtrl as vm',
+                resolve: {
+                    authenticated: ['djangoAuth', function(djangoAuth){
+                        return djangoAuth.authenticationStatus();
+                    }],
                 }
             })
             .state('home.restricted', {
@@ -443,7 +494,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                     $state.transitionTo('home.info');
                 }
             }
-            if(to.name == "home.administration") {
+            if(to.name == "home.administration" || to.name == "home.workarea") {
                 evt.preventDefault();
                 var resolved = Object.resolve(to.name, permissionConfig);
                 for( var key in resolved) {

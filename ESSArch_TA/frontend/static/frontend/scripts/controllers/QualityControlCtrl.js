@@ -84,7 +84,7 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
             $interval.cancel(stateInterval);
         }
      });
-     $rootScope.$on('$stateChangeStart', function() {
+     $scope.$on('$stateChangeStart', function() {
          $interval.cancel(stateInterval);
         $interval.cancel(listViewInterval);
      });

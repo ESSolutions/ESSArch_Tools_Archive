@@ -5,10 +5,23 @@
                 "_permissions": []
             },
             "workarea": {
-                "_permissions": []
+                "validation": {
+                    "_permissions": []
+                },
+                "conversion": {
+                    "_permissions": []
+                },
+                "transformation": {
+                    "_permissions": []
+                }
             },
             "transferSip": {
                 "_permissions": []
+            },
+            "administration": {
+                "import": {
+                    "_permissions": []
+                }
             }
         }
     }

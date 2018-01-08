@@ -5,6 +5,7 @@ angular.module('myApp').factory('TopAlert', function ($rootScope, $q, appConfig,
     var currentCallbackId = 0;
     // Create our websocket object with the address to the websocket
     var ws = $websocket(appConfig.webSocketProtocol + "://" + $window.location.host + "/ws/", null, { reconnectIfNotNormalClose: true });
+
     ws.onOpen(function () {
         $rootScope.useWebsocket = true;
     });
@@ -28,7 +29,6 @@ angular.module('myApp').factory('TopAlert', function ($rootScope, $q, appConfig,
         if(messageObj.refresh) {
             $rootScope.$broadcast('REFRESH_LIST_VIEW', {});
         }
-
         // If an object exists with callback_id in our callbacks object, resolve it
         if (callbacks.hasOwnProperty(messageObj.callback_id)) {
             $rootScope.$apply(callbacks[messageObj.callback_id].cb.resolve(messageObj.data));

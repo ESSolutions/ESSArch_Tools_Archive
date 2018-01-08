@@ -512,6 +512,7 @@ body.modal-open[style] {
 }
 .nav-item {
     cursor: pointer;
+    user-select: none;
     margin: 0 15px 0 0 !important;
 }
 
@@ -526,6 +527,9 @@ body.modal-open[style] {
 }
 .file-browser {
     @include container(10px);
+    &:focus {
+        outline: 0;
+    }
 }
 .file-explorer {
     margin-top: 10px;
@@ -566,7 +570,7 @@ body.modal-open[style] {
     width: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-end;
     margin-bottom: 5px;
 }
 .file-pagination {
@@ -764,4 +768,102 @@ body.modal-open[style] {
 }
 .no-select {
     user-select: none;
+}
+
+.import {
+    @include container(10px);
+    margin-top: 10px;
+    width:100%;
+    min-width: 400px;
+    input {
+        width: 33%;
+    }
+    .alert {
+        width: 33%;
+        margin-top: 10px;
+    }
+    .btn-info {
+        margin-top: 5px;
+    }
+}
+
+.sa-select {
+    width: 100% !important;
+}
+
+.workarea-validation, .workarea-transformation {
+    .content-wrapper > div {
+        margin-left: 0px;
+    }
+}
+
+.fullscreen-modal {
+    .modal-dialog {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .modal-content {
+        height: auto;
+        min-height: 100%;
+        border-radius: 0;
+      }
+      .modal-footer {
+          max-height: 100px;
+      }
+}
+
+// Remove scroll on main page when modal is open
+body.modal-open {
+    overflow: hidden;
+}
+
+.empty-table-indicator {
+    text-align: center;
+    background-color: #b6c8e4;
+    color: #757575;
+}
+
+.loading-column:after {
+    content: "...";
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: bottom;
+    text-align: left;
+    animation: ellipsis-dot 1s infinite .3s;
+    animation-fill-mode: fowards;
+    width: 1.25em;
+  }
+
+
+  @keyframes ellipsis-dot {
+    25% {
+        content: "";
+    }
+    50% {
+        content: ".";
+    }
+    75% {
+        content: "..";
+    }
+    100% {
+        content: "...";
+    }
+  }
+
+  .keyboard-button {
+    display: inline-block;
+    margin: 0 .1em;
+    padding: .1em .6em;
+    font-family: Arial,"Helvetica Neue",Helvetica,sans-serif;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #242729;
+    text-shadow: 0 1px 0 #FFF;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid #adb3b9;
+    border-radius: 3px;
+    box-shadow: 0 1px 0 rgba(12,13,14,0.2), 0 0 0 2px #FFF inset;
+    white-space: nowrap;
 }

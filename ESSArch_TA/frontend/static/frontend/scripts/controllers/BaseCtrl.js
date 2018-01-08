@@ -5,6 +5,10 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
     $scope.eventShow = false;
     $scope.ip = null;
     $rootScope.ip = null;
+
+    $scope.myTreeControl = {};
+    $scope.myTreeControl.scope = this;
+
     vm.itemsPerPage = $cookies.get('eta-ips-per-page') || 10;
     var watchers = [];
 
@@ -12,12 +16,12 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
     watchers.push($scope.$watch(function(){return $rootScope.navigationFilter;}, function(newValue, oldValue) {
         $scope.getListViewData();
     }, true));
-    $rootScope.$on('$translateChangeSuccess', function () {
+    $scope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
 
     // Init intervals
-    $rootScope.$on('$stateChangeStart', function() {
+    $scope.$on('$stateChangeStart', function() {
         $interval.cancel(stateInterval);
         $interval.cancel(listViewInterval);
         watchers.forEach(function(watcher) {
@@ -25,7 +29,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
         });
     });
 
-    $rootScope.$on('REFRESH_LIST_VIEW', function (event, data) {
+    $scope.$on('REFRESH_LIST_VIEW', function (event, data) {
         $scope.getListViewData();
     });
 
@@ -171,6 +175,22 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
                 $scope.ipLoading = false;
                 $scope.initLoad = false;
                 ipExists();
+            }).catch(function(response) {
+                if(response.status == 404) {
+                    var filters = angular.extend({
+                        state: ipSortString
+                    }, $scope.columnFilters)
+
+                    if(vm.workarea) {
+                        filters.workarea = vm.workarea;
+                    }
+
+                    listViewService.checkPages("ip", number, filters).then(function (result) {
+                        tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
+                        tableState.pagination.start = (result.numberOfPages*number) - number;
+                        vm.callServer(tableState);
+                    });
+                }
             });
         }
     };
@@ -203,8 +223,164 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
         }
     };
 
-    // Validators
+    // Keyboard shortcuts
+    function selectNextIp() {
+        var index = 0;
+        if($scope.ip) {
+            vm.displayedIps.forEach(function(ip, idx, array) {
+                if($scope.ip.id === ip.id) {
+                    index = idx+1;
+                }
+            });
+        }
+        if(index !== vm.displayedIps.length) {
+            $scope.ipTableClick(vm.displayedIps[index]);
+        }
+    }
 
+    function previousIp() {
+        var index = vm.displayedIps.length-1;
+        if($scope.ip) {
+            vm.displayedIps.forEach(function(ip, idx, array) {
+                if($scope.ip.id === ip.id) {
+                    index = idx-1;
+                }
+            });
+        }
+        if(index >= 0) {
+            $scope.ipTableClick(vm.displayedIps[index]);
+        }
+    }
+
+    function closeContentViews() {
+        $scope.stepTaskInfoShow = false;
+        $scope.statusShow = false;
+        $scope.eventShow = false;
+        $scope.select = false;
+        $scope.subSelect = false;
+        $scope.edit = false;
+        $scope.eventlog = false;
+        $scope.filebrowser = false;
+        $scope.ip = null;
+        $rootScope.ip = null;
+    }
+    var arrowLeft = 37;
+    var arrowUp = 38;
+    var arrowRight = 39;
+    var arrowDown = 40;
+    var escape = 27;
+    var enter = 13;
+    var space = 32;
+
+    /**
+     * Handle keydown events in list view
+     * @param {Event} e
+     */
+    vm.ipListKeydownListener = function(e) {
+        switch(e.keyCode) {
+            case arrowDown:
+                e.preventDefault();
+                selectNextIp();
+                break;
+            case arrowUp:
+                e.preventDefault();
+                previousIp();
+                break;
+            case arrowLeft:
+                e.preventDefault();
+                var pagination = $scope.tableState.pagination;
+                if(pagination.start != 0) {
+                    pagination.start -= pagination.number;
+                    $scope.getListViewData();
+                }
+                break;
+            case arrowRight:
+                e.preventDefault();
+                var pagination = $scope.tableState.pagination;
+                if((pagination.start / pagination.number + 1) < pagination.numberOfPages) {
+                    pagination.start+=pagination.number;
+                    $scope.getListViewData();
+                }
+                break;
+            case space:
+                e.preventDefault();
+                if($state.is('home.reception')) {
+                    $scope.includeIp($scope.ip);
+                    $scope.getListViewData();
+                }
+                break;
+            case escape:
+                if($scope.ip) {
+                    closeContentViews();
+                }
+                break;
+        }
+    }
+
+    /**
+     * Handle keydown events in views outside list view
+     * @param {Event} e
+     */
+    vm.contentViewsKeydownListener = function(e) {
+        switch(e.keyCode) {
+            case escape:
+                if($scope.ip) {
+                    closeContentViews();
+                }
+                document.getElementById("list-view").focus();
+                break;
+        }
+    }
+
+    /**
+     * Handle keydown events for state view table
+     * @param {Event} e
+     */
+    $scope.myTreeControl.scope.stateTableKeydownListener = function(e, branch) {
+        switch(e.keyCode) {
+            case arrowDown:
+                e.preventDefault();
+                e.target.nextElementSibling.focus();
+                break;
+            case arrowUp:
+                e.preventDefault();
+                e.target.previousElementSibling.focus();
+                break;
+            case enter:
+                e.preventDefault();
+                $scope.stepTaskClick(branch)
+                break;
+            case space:
+                e.preventDefault();
+                if(branch.flow_type != "task") {
+                    if(branch.expanded) {
+                        branch.expanded = false;
+                    } else {
+                        branch.expanded = true;
+                        $scope.statusViewUpdate($scope.ip);
+                    }
+                }
+                break;
+            case escape:
+                e.preventDefault();
+                if($scope.ip) {
+                    closeContentViews();
+                }
+                document.getElementById("list-view").focus();
+                break;
+        }
+    }
+
+    // Validators
+    vm.validators = function() {
+        var list = [];
+        for(key in vm.validatorModel) {
+            if(vm.validatorModel[key]) {
+                list.push(key);
+            }
+        }
+        return list;
+    }
     vm.validatorModel = {};
     vm.validatorFields = [
         {
@@ -214,7 +390,10 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             },
             "defaultValue": true,
             "type": "checkbox",
-            "key": "validate_file_format",
+            "ngModelElAttrs": {
+                "tabindex": '-1'
+            },
+            "key": "file_format",
         },
         {
             "templateOptions": {
@@ -223,7 +402,10 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             },
             "defaultValue": true,
             "type": "checkbox",
-            "key": "validate_xml_file",
+            "ngModelElAttrs": {
+                "tabindex": '-1'
+            },
+            "key": "xml_file",
         },
         {
             "templateOptions": {
@@ -232,17 +414,59 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             },
             "defaultValue": true,
             "type": "checkbox",
-            "key": "validate_logical_physical_representation",
+            "ngModelElAttrs": {
+                "tabindex": '-1'
+            },
+            "key": "logical_physical_representation",
         },
         {
             "templateOptions": {
                 "type": "text",
-                "label": $translate.instant('VALIDATEINTEGRITY'),
+                "label": $translate.instant('VALIDATECHECKSUM'),
             },
             "defaultValue": true,
             "type": "checkbox",
-            "key": "validate_integrity",
-        }
+            "ngModelElAttrs": {
+                "tabindex": '-1'
+            },
+            "key": "checksum",
+        },
+        {
+            "templateOptions": {
+                "type": "text",
+                "label": $translate.instant('VALIDATEDIRECTORYSTRUCTURE'),
+            },
+            "defaultValue": true,
+            "type": "checkbox",
+            "ngModelElAttrs": {
+                "tabindex": '-1'
+            },
+            "key": "structure",
+        },
+        {
+            "templateOptions": {
+                "type": "text",
+                "label": "Mediaconch",
+            },
+            "defaultValue": true,
+            "type": "checkbox",
+            "ngModelElAttrs": {
+                "tabindex": '-1'
+            },
+            "key": "mediaconch",
+        },
+        {
+            "templateOptions": {
+                "type": "text",
+                "label": "VeraPDF",
+            },
+            "defaultValue": true,
+            "type": "checkbox",
+            "ngModelElAttrs": {
+                "tabindex": '-1'
+            },
+            "key": "verapdf",
+        },
     ];
 
     // Basic functions
@@ -319,8 +543,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             });
         }
     });
-    $scope.myTreeControl = {};
-    $scope.myTreeControl.scope = this;
+
     //Undo step/task
     $scope.myTreeControl.scope.taskStepUndo = function(branch) {
         branch.$undo().then(function(response) {

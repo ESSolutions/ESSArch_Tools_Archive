@@ -63,7 +63,7 @@ angular.module('myApp').controller('EventCtrl', ['Resource', '$scope', '$rootSco
     $scope.closeAlert = function() {
         $scope.addEventAlert = null;
     }
-    $rootScope.$on('$stateChangeStart', function() {
+    $scope.$on('$stateChangeStart', function() {
         $interval.cancel(eventInterval);
     });
     $scope.$on("$destroy", function() {
@@ -148,7 +148,15 @@ angular.module('myApp').controller('EventCtrl', ['Resource', '$scope', '$rootSco
             $scope.tableState = tableState;
             $scope.eventLoading = false;
             $scope.initLoad = false;
-        });
+        }).catch(function(response) {
+            if(response.status == 404) {
+                listViewService.checkPages("events", number, $scope.columnFilters).then(function (result) {
+                    tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
+                    tableState.pagination.start = (result.numberOfPages*number) - number;
+                    $scope.stCtrl.pipe();
+                });
+            }
+        })
     };
 
       //advanced filter form data

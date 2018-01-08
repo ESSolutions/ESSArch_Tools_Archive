@@ -57,20 +57,39 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http,
                 tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
                 $scope.ipLoading = false;
                 $scope.initLoad = false;
+            }).catch(function(response) {
+                if(response.status == 404) {
+                    var filters = angular.extend({
+                        state: ipSortString
+                    }, $scope.columnFilters)
+
+                    if(vm.workarea) {
+                        filters.workarea = vm.workarea;
+                    }
+
+                    listViewService.checkPages("reception", number, filters).then(function (result) {
+                        tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
+                        tableState.pagination.start = (result.numberOfPages*number) - number;
+                        vm.callServer(tableState);
+                    });
+                }
             });
         }
     };
     $scope.receiveDisabled = false;
-    $scope.receiveSip = function(ips) {
+    $scope.receiveSip = function(ips, sa) {
         $scope.receiveDisabled = true;
         if(ips == []) {
             return;
         }
         ips.forEach(function(ip) {
-            IPReception.receive({
+            var payload = {
                 id: ip.id,
-                validators: vm.validatorModel
-            }).$promise.then(function(response) {
+            }
+            if(sa && sa != null) {
+                payload.submission_agreement = sa.id;
+            }
+            IPReception.receive(payload).$promise.then(function(response) {
                 $scope.includedIps = [];
                 $timeout(function() {
                     $scope.getListViewData();
@@ -110,15 +129,15 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http,
         $scope.statusShow = false;
         $scope.eventShow = false;
         var temp = true;
-        $scope.includedIps.forEach(function(included) {
+        $scope.includedIps.forEach(function(included, index, array) {
 
-            if(included.object_identifier_value == row.object_identifier_value) {
-                $scope.includedIps.splice($scope.includedIps.indexOf(row), 1);
+            if(included.id == row.id) {
+                $scope.includedIps.splice(index, 1);
                 temp = false;
             }
         });
         if(temp) {
-            $scope.includedIps.push(row);
+            $scope.includedIps.push({ id: row.id });
         }
         if($scope.includedIps == []) {
             $scope.receiveShow = true;
@@ -153,6 +172,14 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http,
             }
         }
     }
+
+    vm.uncheckAll = function() {
+        $scope.includedIps = [];
+        vm.displayedIps.forEach(function(row) {
+            row.checked = false;
+        });
+    }
+
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
     $scope.submitDescription = $translate.instant('SUBMITDESCRIPTION');
     $scope.package = $translate.instant('PACKAGE');
@@ -520,20 +547,39 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, $http,
             }, 1000);
         });
     };
-    vm.receiveModal = function (ips) {
-        var modalInstance = $uibModal.open({
-            animation: true,
-            ariaLabelledBy: 'modal-title',
-            ariaDescribedBy: 'modal-body',
-            templateUrl: 'static/frontend/views/receive_modal.html',
-            scope: $scope,
-            controller: 'ModalInstanceCtrl',
-            controllerAs: '$ctrl'
+    vm.receiveModal = function (ip) {
+        IPReception.get({id: ip.id }).$promise.then(function(resource) {
+            $http.get(appConfig.djangoUrl + "submission-agreements").then(function(response) {
+                var data = {
+                    ip: ip.id,
+                    validators: vm.validators(),
+                    submissionAgreements: response.data
+                }
+                if(resource.altrecordids && resource.altrecordids.SUBMISSIONAGREEMENT) {
+                    angular.extend(data, {sa: resource.altrecordids.SUBMISSIONAGREEMENT[0]})
+                }
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    ariaLabelledBy: 'modal-title',
+                    ariaDescribedBy: 'modal-body',
+                    templateUrl: 'static/frontend/views/receive_modal.html',
+                    scope: $scope,
+                    controller: 'ReceiveModalInstanceCtrl',
+                    controllerAs: '$ctrl',
+                    resolve: {
+                        data: data
+                    }
+                })
+                modalInstance.result.then(function (data) {
+                    $scope.includedIps.shift();
+                    $scope.getListViewData();
+                    if($scope.includedIps.length > 0) {
+                        vm.receiveModal($scope.includedIps[0]);
+                    }
+                }, function () {
+                    $log.info('modal-component dismissed at: ' + new Date());
+                });
+            })
         })
-        modalInstance.result.then(function (data) {
-            $scope.receiveSip($scope.includedIps);
-        }, function () {
-            $log.info('modal-component dismissed at: ' + new Date());
-        });
     }
 });

@@ -2,12 +2,14 @@
     <div class="content-wrapper">
         <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'">
         </div>
-        <div ng-if="statusShow || eventShow" class="events-status-wrapper">
+        <div ng-if="statusShow || eventShow" class="events-status-wrapper" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
             <div ng-include src="'static/frontend/views/event_table.html'"></div>
             <div ng-if="statusShow" class="status-view" ng-include src="'static/frontend/views/status_tree_view.html'"></div>
         </div>
-        <div ng-if="filebrowser" class="file-browser" ng-controller="FilebrowserController" ng-include src="'static/frontend/views/filebrowser.html'"></div>
-        <div class="select-sub-edit-eventlog-wrapper" ng-if="prepareUnidentifiedIp || includedIps.length || edit">
+        <div ng-if="filebrowser" class="file-browser" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
+            <filebrowser ip="ip"></filebrowser>
+        </div>
+        <div class="select-sub-edit-eventlog-wrapper" ng-if="prepareUnidentifiedIp || includedIps.length || edit" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
             <div ng-if="edit" class="edit-view">
                 <h4 style="margin-left: 10px;">Submit Description</h4>
                 <form>
@@ -36,9 +38,8 @@
             </div>
             <div class="select-view" ng-if="prepareUnidentifiedIp || includedIps.length">
                 <div ng-if="includedIps.length">
-                    <div ng-include src="'static/frontend/views/validator_choices.html'"></div>
                     <form class="receive-sip-eventlog-form">
-                        <button ng-disabled="receiveDisabled" class="btn btn-info receive-button" ng-click="vm.receiveModal(includedIps)" ng-dblClick="">{{'RECEIVESIP' | translate}}</button>
+                        <button ng-disabled="receiveDisabled" class="btn btn-info receive-button" ng-click="vm.receiveModal(includedIps[0])" ng-dblClick="">{{'RECEIVESIP' | translate}}</button>
                     </form>
                 </div>
             </div>
