@@ -47,7 +47,10 @@ from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 
 from groups_manager.models import Member
-from guardian.shortcuts import get_objects_for_group
+from groups_manager.utils import get_permission_name
+
+from guardian.shortcuts import assign_perm, get_objects_for_group
+
 
 from lxml import etree
 
@@ -414,8 +417,14 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         except AttributeError:
             raise ValueError('Missing IP_CREATION_PERMS_MAP in settings')
 
+        user_perms = perms.pop('owner', [])
+
         organization = member.django_user.user_profile.current_organization
-        member.assign_object(organization, ip, custom_permissions=perms)
+        organization.assign_object(ip, custom_permissions=perms)
+
+        for perm in user_perms:
+            perm_name = get_permission_name(perm, ip)
+            assign_perm(perm_name, member.django_user, ip)
 
         ip.submission_agreement = sa
         ip.save()
