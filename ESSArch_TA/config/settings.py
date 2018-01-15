@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'frontend',
     'ESSArch_Core.auth',
+    'ESSArch_Core.docs',
     'ESSArch_Core.configuration',
     'ESSArch_Core.ip',
     'ESSArch_Core.profiles',
@@ -282,6 +283,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+# Documentation
+DOCS_ROOT = os.path.join(BASE_DIR, 'docs/_build/html')
 
 # Add etp vhost to rabbitmq:
 # rabbitmqctl add_user guest guest
