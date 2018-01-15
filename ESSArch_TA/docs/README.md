@@ -5,6 +5,12 @@ Install requirements using `pip install -r requirements_docs.txt` in the parent 
 
 ## Generating documentation
 
+Create a symlink named `core` pointing to the ESSArch Core docs
+
+```
+ln -s /path/to/core/ESSArch_Core/docs core
+```
+
 Start by generating the source files
 
 ```
