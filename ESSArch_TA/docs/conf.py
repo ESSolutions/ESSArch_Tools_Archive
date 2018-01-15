@@ -149,7 +149,7 @@ extensions = ['sphinxtogithub', 'sphinx.ext.autodoc', 'sphinx.ext.autosectionlab
 autosectionlabel_prefix_document = True
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.5', None),
+    'python': ('https://docs.python.org/2.7', None),
     'sphinx': ('http://sphinx.pocoo.org/', None),
     'django': ('https://docs.djangoproject.com/en/dev/', 'https://docs.djangoproject.com/en/dev/_objects/'),
     'celery': ('https://celery.readthedocs.org/en/latest/', None),
@@ -274,9 +274,3 @@ texinfo_documents = [
      author, 'ESSArchToolsArchive', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-
-
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
