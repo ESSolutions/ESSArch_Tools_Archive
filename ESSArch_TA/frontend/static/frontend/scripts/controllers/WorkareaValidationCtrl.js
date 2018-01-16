@@ -57,7 +57,7 @@ angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $c
                 {
                     "templateOptions": {
                         "type": "text",
-                        "label": key,
+                        "label": key+ (specification._required.includes(key)?" *":""),
                     },
                     "defaultValue": true,
                     "type": "checkbox",
