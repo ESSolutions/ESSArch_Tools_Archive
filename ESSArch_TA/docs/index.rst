@@ -10,6 +10,7 @@ ESSArch Tools Archive
    :maxdepth: 10
 
    core/profiles
+   core/xml-generator
    configuration/index
    restapi/index
    source/modules
