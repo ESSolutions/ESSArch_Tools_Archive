@@ -9,6 +9,7 @@ ESSArch Tools Archive
 .. toctree::
    :maxdepth: 10
 
+   core/profiles
    configuration/index
    restapi/index
    source/modules
