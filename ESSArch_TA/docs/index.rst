@@ -14,6 +14,7 @@ ESSArch Tools Archive
    configuration/index
    restapi/index
    source/modules
+   user_guide/index
 
 
 
