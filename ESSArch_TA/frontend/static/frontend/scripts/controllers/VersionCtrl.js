@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('VersionCtrl', function($scope, myService, $window, marked, $anchorScroll, $location, $translate) {
+angular.module('myApp').controller('VersionCtrl', function($scope, myService, $window, marked, $anchorScroll, $location, $translate, appConfig) {
     myService.getVersionInfo().then(function(result) {
         $scope.sysInfo = result;
     });
@@ -32,8 +32,13 @@ angular.module('myApp').controller('VersionCtrl', function($scope, myService, $w
     $scope.scrollToLink = function(link) {
         $location.hash(link);
         $anchorScroll();
+    }
+
+    $scope.gotoDocs = function() {
+        $window.open("/docs/user_guide/index.html", '_blank');
 
     }
+
     $scope.docs = $translate.instant('DOCS');
     $scope.sysInfo = $translate.instant('SYSTEMINFORMATION');
     $scope.support = $translate.instant('SUPPORT');
