@@ -151,7 +151,9 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     $ctrl.data = data;
     $ctrl.file = data.file;
     $ctrl.type = data.type;
+    $ctrl.fullscreenActive = false;
     $ctrl.showFullscreenMessage = function() {
+        $ctrl.fullscreenActive = true;
         var modalInstance = $uibModal.open({
             animation: true,
             ariaLabelledBy: 'modal-title',
@@ -167,7 +169,9 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
             }
         })
         modalInstance.result.then(function (data) {
+            $ctrl.fullscreenActive = false;
         }, function () {
+            $ctrl.fullscreenActive = false;
             $log.info('modal-component dismissed at: ' + new Date());
         });
     }
