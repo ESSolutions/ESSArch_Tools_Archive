@@ -227,7 +227,7 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
                 sa: $ctrl.sa,
             };
             $uibModalInstance.close($ctrl.data);
-        }, function(response) {
+        }).catch(function(response) {
             $scope.receiveDisabled = false;
         });
     }
