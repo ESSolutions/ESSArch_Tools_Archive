@@ -1,7 +1,7 @@
-<div class="enter-profile-name">
+<div class="enter-profile-name" ng-style="$ctrl.fullscreenActive ? {'visibility': 'hidden'}:{'visibility': 'visible'}">
     <h3 class="modal-title" id="modal-title">{{'VALIDATION_RESULT_FOR' | translate:$ctrl.data.validation}}</h3>
 </div>
-<form ng-submit="$ctrl.receive()">
+<form ng-submit="$ctrl.receive()" ng-style="$ctrl.fullscreenActive ? {'visibility': 'hidden'}:{'visibility': 'visible'}">
     <div class="modal-body" id="modal-body">
         <table class="table table-striped">
             <tbody>
