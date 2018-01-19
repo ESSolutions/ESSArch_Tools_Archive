@@ -41,6 +41,7 @@ from operator import itemgetter
 from celery import states as celery_states
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.db.models import Prefetch
 from django.http import HttpResponse
@@ -346,6 +347,13 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         if InformationPackage.objects.filter(object_identifier_value=pk).exists():
             raise exceptions.ParseError('IP with id "%s" already exist')
 
+        try:
+            perms = settings.IP_CREATION_PERMS_MAP
+        except AttributeError:
+            msg = 'IP_CREATION_PERMS_MAP not defined in settings'
+            self.logger.error(msg)
+            raise ImproperlyConfigured(msg)
+
         sa_id = request.data.get('submission_agreement')
         try:
             sa = SubmissionAgreement.objects.get(pk=sa_id)
@@ -412,13 +420,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
                         pass
 
         member = Member.objects.get(django_user=self.request.user)
-        try:
-            perms = settings.IP_CREATION_PERMS_MAP
-        except AttributeError:
-            raise ValueError('Missing IP_CREATION_PERMS_MAP in settings')
-
         user_perms = perms.pop('owner', [])
-
         organization = member.django_user.user_profile.current_organization
         organization.assign_object(ip, custom_permissions=perms)
 
