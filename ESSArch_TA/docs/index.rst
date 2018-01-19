@@ -9,6 +9,7 @@ ESSArch Tools Archive
 .. toctree::
    :maxdepth: 10
 
+   core/introduction
    core/profiles
    core/xml-generator
    configuration/index

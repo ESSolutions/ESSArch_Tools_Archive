@@ -8,6 +8,7 @@
 .. toctree::
     :maxdepth: 2
 
+    /core/user_guide/user-interface
     reception
     workspace
     transfer-sip
