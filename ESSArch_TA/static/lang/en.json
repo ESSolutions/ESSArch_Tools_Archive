@@ -289,5 +289,6 @@
     "SEE_VALIDATION_REPORT": "See validation report",
     "OPEN_KEYBOARD_SHORTCUT_INFO": "Open keyboard shortcut info page",
     "VALIDATION_TABLE": "Validation table",
-    "NO_SUBMISSION_AGREEMENT_AVAILABLE": "No Submission Agreement available"
+    "NO_SUBMISSION_AGREEMENT_AVAILABLE": "No Submission Agreement available",
+    "VERSIONINFO": "Version info"
 }
