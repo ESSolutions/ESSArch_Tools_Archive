@@ -22,6 +22,7 @@
     Email - essarch@essolutions.se
 """
 
+import copy
 import datetime
 import errno
 import glob
@@ -348,7 +349,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             raise exceptions.ParseError('IP with id "%s" already exist')
 
         try:
-            perms = settings.IP_CREATION_PERMS_MAP
+            perms = copy.deepcopy(settings.IP_CREATION_PERMS_MAP)
         except AttributeError:
             msg = 'IP_CREATION_PERMS_MAP not defined in settings'
             self.logger.error(msg)
