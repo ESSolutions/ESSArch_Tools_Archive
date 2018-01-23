@@ -43,6 +43,7 @@ var jsPolyfillFiles = [
     'node_modules/string.prototype.startswith/startswith.js',
     'node_modules/string.prototype.endswith/endswith.js',
     'node_modules/string.prototype.contains/contains.js',
+    'node_modules/console-polyfill/index.js',
     'scripts/polyfills/*.js',
 ]
 var vendorFiles = [
