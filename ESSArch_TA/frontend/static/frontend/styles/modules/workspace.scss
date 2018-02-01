@@ -94,3 +94,8 @@
 .transformation-refresh-header {
     height: 36px;
 }
+.workarea-route {
+    &:focus {
+        outline: 0;
+    }
+}

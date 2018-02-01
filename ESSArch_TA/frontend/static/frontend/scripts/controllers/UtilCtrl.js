@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('UtilCtrl', function($scope, $state, $location, $window, $http, appConfig, TopAlert, permissionConfig, myService) {
+angular.module('myApp').controller('UtilCtrl', function($scope, $state, $location, $window, $http, appConfig, TopAlert, permissionConfig, myService, $timeout, $anchorScroll) {
     $scope.$state = $state;
     $scope.reloadPage = function (){
         $state.reload();
@@ -40,5 +40,66 @@ angular.module('myApp').controller('UtilCtrl', function($scope, $state, $locatio
         }
         var permissions = nestedPermissions(Object.resolve(page, permissionConfig));
         return myService.checkPermissions(permissions);
+    }
+    $scope.navigateToState = function(state) {
+        $state.go(state);
+        $scope.focusRouterView();
+    }
+
+    var enter = 13;
+    var space = 32;
+
+    var stateChangeListeners = [];
+    function resetStateListeners() {
+        stateChangeListeners.forEach(function(listener) {
+            listener();
+        });
+        stateChangeListeners = [];
+    }
+
+    /**
+     * Handle keydown events navigation
+     * @param {Event} e
+     */
+    $scope.navKeydownListener = function(e, state) {
+        switch(e.keyCode) {
+            case space:
+            case enter:
+                event.preventDefault();
+                stateChangeListeners.push($scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState) {
+                    event.preventDefault();
+                    if(state =="home.workarea") {
+                        $scope.focusWorkareaSubmenu();
+                    } else if (state.match(/home\.workarea/)) {
+                        $scope.focusWorkareaRouterView();
+                    } else {
+                        $scope.focusRouterView();
+                    }
+                    resetStateListeners();
+                }));
+                $state.go(state);
+                break;
+        }
+    }
+    $scope.focusRouterView = function() {
+        $timeout(function() {
+            var elm = document.getElementsByClassName('dynamic-part')[0];
+            elm.focus();
+            $anchorScroll();
+        })
+    }
+    $scope.focusWorkareaSubmenu = function() {
+        $timeout(function() {
+            var elm = document.getElementsByClassName('workspace-sub-menu')[0];
+            angular.element(elm)[0].children[0].focus();
+            $anchorScroll();
+        })
+    }
+    $scope.focusWorkareaRouterView = function() {
+        $timeout(function() {
+            var elm = document.getElementsByClassName('workarea-route')[0];
+            angular.element(elm)[0].focus();
+            $anchorScroll();
+        })
     }
 });

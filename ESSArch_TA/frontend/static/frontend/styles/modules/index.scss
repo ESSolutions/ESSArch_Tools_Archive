@@ -239,6 +239,9 @@ body.modal-open[style] {
     }
     .dynamic-part {
         width: 100%!important;
+        &:focus {
+            outline: 0;
+        }
     }
 }
 .calendar {
@@ -297,6 +300,9 @@ body.modal-open[style] {
 .dynamic-part {
     min-height: 100%;
     overflow: hidden;
+    &:focus {
+        outline: 0;
+    }
 }
 .fa.fa-refresh {
     font-size: 21px;
@@ -514,6 +520,14 @@ body.modal-open[style] {
     cursor: pointer;
     user-select: none;
     margin: 0 15px 0 0 !important;
+    white-space: nowrap;
+    &:focus {
+        outline: 0;
+        color: #b4caf8;
+        &:after {
+            color: #b4caf8;
+        }
+    }
 }
 
 .enter-profile-name {
