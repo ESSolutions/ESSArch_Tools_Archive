@@ -1,13 +1,13 @@
 .. _transfer-sip:
 
 ******************
- Transfer SIP
+ Överför SIP
 ******************
 
-The final part of ETA is Transferring the SIP.
-The SIP is transferred to the next step in the archiving process.
+Den sista delen i ETA är överföring av SIP.
+SIPen överförs då till nästa steg i arkiveringsprocessen.
 
-Select SIP in the transfer-SIP list view and
-click the **Transfer SIP**-button.
+Välj en SIP i **Överför SIP**'s listvy för överföring.
+Klicka sedan på **Överför SIP**.
 
 .. image:: images/transfer_sip_button.png
