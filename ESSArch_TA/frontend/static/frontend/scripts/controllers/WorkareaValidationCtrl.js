@@ -51,13 +51,15 @@ angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $c
 
     vm.buildValidationForm = function(specification) {
         var fields = [];
+        var required = specification._required || [];
+
         for(key in specification) {
             if (key.startsWith('_')) continue;
             fields.push(
                 {
                     "templateOptions": {
                         "type": "text",
-                        "label": key+ (specification._required.includes(key)?" *":""),
+                        "label": key + (required.includes(key) ? " *" : ""),
                     },
                     "defaultValue": true,
                     "type": "checkbox",
