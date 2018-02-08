@@ -200,6 +200,11 @@ CACHES = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s %(levelname)s %(message)s'
+        },
+    },
     'handlers': {
         'core': {
             'level': 'DEBUG',
@@ -207,11 +212,32 @@ LOGGING = {
             'application': 'ESSArch Tools for Archive',
             'agent_role': 'Archivist',
         }
+        'file_eta': {
+            'level': 'DEBUG',
+            'formatter': 'verbose',
+            'class' : 'logging.handlers.RotatingFileHandler',
+            'filename': '/ESSArch/log/eta.log',
+            'maxBytes': 1024*1024*100, # 100MB
+            'backupCount': 5,
+        },
+        'log_file_auth': {
+            'level': 'DEBUG',
+            'class' : 'logging.handlers.RotatingFileHandler',
+            'formatter': 'verbose',
+            'filename': '/ESSArch/log/auth_eta.log',
+            'maxBytes': 1024*1024*100, # 100MB
+            'backupCount': 5,
+        },
     },
     'loggers': {
         'essarch': {
-            'handlers': ['core'],
+            'handlers': ['core', 'file_eta'],
             'level': 'DEBUG',
+        },
+        'essarch.auth': {
+            'level': 'DEBUG',
+            'handlers': ['log_file_auth'],
+            'propagate': True,
         },
     },
 }
