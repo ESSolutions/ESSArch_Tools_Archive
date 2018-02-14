@@ -292,5 +292,8 @@
     "NO_SUBMISSION_AGREEMENT_AVAILABLE": "Inga leveransöverenskommelser tillgängliga",
     "VERSIONINFO": "Version-info",
     "NO_VALIDATION_PROFILE": "IP {{label}} har ingen valideringsprofil!",
-    "NO_TRANSFORMATION_PROFILE": "IP {{label}} har ingen transformeringsprofil!"
+    "NO_TRANSFORMATION_PROFILE": "IP {{label}} har ingen transformeringsprofil!",
+    "IP_IS_ALREADY_TRANSFERRED": "IP {{label}} är redan överförd",
+    "IP_IS_ALREADY_TRANSFERRING": "IP {{label}} överförs redan",
+    "HAS_TRANSFORMATION_PROFILE_NOT_TRANSFORMED": "IP {{label}} har en transformeringsprofil men är inte transformerad"
 }

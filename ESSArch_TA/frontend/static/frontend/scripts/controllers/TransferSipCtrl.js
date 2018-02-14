@@ -26,25 +26,51 @@ angular.module('myApp').controller('TransferSipCtrl', function(IP, $http, $scope
     var vm = this;
     var ipSortString = "Received,Transformed,Transferring,Transferred";
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
-
+    vm.info = {
+        text: "",
+        values: null,
+        visible: false
+    };
+    $scope.transferDisabled = false;
     $scope.ipTableClick = function(row) {
         if($scope.select && $scope.ip.id== row.id){
+            vm.info.visible = false;
             $scope.select = false;
             $scope.ip = null;
             $rootScope.ip = null;
             $scope.filebrowser = false;
         } else {
+            $scope.transferDisabled = false;
             $scope.ip = row;
             $rootScope.ip = row;
+            vm.info.visible = false;
             $scope.select = true;
-            $scope.transferDisabled = false;
+            if(row.state == "Transferred" || row.state == "Transferring") {
+                vm.info = {
+                    text: "IP_IS_ALREADY_" + row.state.toUpperCase(),
+                    values: {
+                        label: row.label
+                    },
+                    visible: true
+                };
+                $scope.transferDisabled = true;
+            }
+            if(row.profile_transformation != null && row.state != 'Transformed') {
+                vm.info = {
+                    text: "HAS_TRANSFORMATION_PROFILE_NOT_TRANSFORMED",
+                    values: {
+                        label: row.label
+                    },
+                    visible: true
+                };
+                $scope.transferDisabled = true;
+            }
         }
         $scope.eventShow = false;
         $scope.statusShow = false;
     };
 
 
-    $scope.transferDisabled = false;
     $scope.transferSip = function(ip) {
         $scope.transferDisabled = true;
         IP.transfer({

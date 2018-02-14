@@ -13,6 +13,7 @@
             <div class="select-view" id="select-view" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
                 <p style="margin: 5px;">IP: {{ip.label}}</p>
                 <form class="receive-sip-eventlog-form" ng-submit="vm.transferModal(ip)">
+                    <span ng-if="vm.info.visible && transferDisabled" translate="{{vm.info.text}}" translate-values="vm.info.values" class="transfer-info-text"></span>
                     <button type="submit" ng-dblClick="" ng-disabled="transferDisabled || !checkPermission('ip.transfer_sip')" class="btn btn-info submit-button">{{'TRANSFERSIP' | translate}}</button>
                 </form>
             </div>
