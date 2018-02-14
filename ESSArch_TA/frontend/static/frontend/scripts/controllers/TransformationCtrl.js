@@ -3,6 +3,7 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
     var ipSortString ="";
     $controller('WorkareaCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
     var watchers=[];
+    $scope.error = null;
     $scope.$on('$stateChangeStart', function () {
         $interval.cancel(validatorInterval);
         watchers.forEach(function(watcher) {
@@ -22,11 +23,15 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
             $scope.ip = null;
             $rootScope.ip = null;
             $scope.filebrowser = false;
+            $scope.error = null;
         } else {
             $scope.ip = row;
             $rootScope.ip = row;
             vm.validatorListPipe(vm.validatorTableState);
             $scope.select = true;
+            if (!$scope.ip.profile_transformation) {
+                $scope.error = "NO_TRANSFORMATION_PROFILE";
+            }
         }
         $scope.eventShow = false;
         $scope.statusShow = false;
@@ -61,10 +66,6 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
             } else {
                 vm.validators = [];
                 $scope.validatorsLoading = false;
-            }
-
-            if (!$scope.ip.profile_transformation) {
-                TopAlert.add("IP " + $scope.ip.label + " has no transformation profile!", "info");
             }
         });
     }

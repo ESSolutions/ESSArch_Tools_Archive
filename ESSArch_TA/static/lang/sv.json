@@ -290,5 +290,7 @@
     "OPEN_KEYBOARD_SHORTCUT_INFO": "Öppna tangentbordsgenväg-sida",
     "VALIDATION_TABLE": "Valideringslista",
     "NO_SUBMISSION_AGREEMENT_AVAILABLE": "Inga leveransöverenskommelser tillgängliga",
-    "VERSIONINFO": "Version-info"
+    "VERSIONINFO": "Version-info",
+    "NO_VALIDATION_PROFILE": "IP {{label}} har ingen valideringsprofil!",
+    "NO_TRANSFORMATION_PROFILE": "IP {{label}} har ingen transformeringsprofil!"
 }

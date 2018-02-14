@@ -1,8 +1,8 @@
-angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $controller, $interval, $http, appConfig, $rootScope, WorkareaValidation, $q, TopAlert, $uibModal, $window, $log, Profile) {
+angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $controller, $interval, $http, appConfig, $rootScope, WorkareaValidation, $q, TopAlert, $uibModal, $window, $log, Profile, $translate) {
     var vm = this;
     var ipSortString ="";
     $controller('WorkareaCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
-
+    $scope.error = null;
     var watchers=[];
     $scope.$on('$stateChangeStart', function () {
         $interval.cancel(validationInterval);
@@ -18,6 +18,7 @@ angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $c
 
     $scope.ipTableClick = function(row) {
         if($scope.select && $scope.ip.id== row.id){
+            $scope.error = null;
             $scope.select = false;
             $scope.ip = null;
             $rootScope.ip = null;
@@ -31,9 +32,10 @@ angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $c
                     vm.buildValidationForm(resource.specification);
                     vm.validationPipe(vm.validationTableState);
                     $scope.select = true;
+                    $scope.error = null;
                 })
             } else {
-                TopAlert.add("IP " + row.label + " has no validation profile!", "info", 10000);
+                $scope.error = "NO_VALIDATION_PROFILE";
                 vm.validations = [];
                 vm.validationPipe(vm.validationTableState);
                 vm.validatorModel = {};

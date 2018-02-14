@@ -46,12 +46,17 @@
         margin-left: 0px !important;
     }
     .validate-button-wrapper {
-        float: right;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
         margin-bottom: 10px;
         vertical-align: middle;
         label {
             vertical-align: middle;
             margin-bottom: 0;
+        }
+        .alert {
+            margin: 0 5px 0 0;
         }
     }
     .validation-table {
@@ -73,6 +78,14 @@
         .search-pagination {
             margin-bottom: 10px;
         }
+    }
+}
+.transformation-button-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    .alert {
+        margin: 0 5px 0 0;
     }
 }
 .validator-table {

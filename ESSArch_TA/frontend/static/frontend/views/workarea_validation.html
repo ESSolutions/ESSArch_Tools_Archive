@@ -13,14 +13,16 @@
             <div class="select-view" id="select-view" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
                 <div ng-include src="'static/frontend/views/validator_choices.html'" ng-if="ip.profile_validation != null"></div>
                 <div class="validate-button-wrapper">
-                    <label>
-                        <input type="checkbox" tabindex="-1" ng-model="vm.stop_at_failure" ng-disabled="ip.state == 'Transforming' || ip.state == 'Transformed' || ip.state == 'Transferring' || ip.state == 'Transferred'">
-                        {{'STOP_AT_FAILURE' | translate}}
-                    </label>
-                    <button class="btn btn-info" ng-click="vm.validate(ip)" ng-disabled="ip.profile_validation == null || ip.state == 'Transforming' || ip.state == 'Transformed' || ip.state == 'Transferring' || ip.state == 'Transferred'">{{'VALIDATE' | translate}}</button>
+                    <div class="alert alert-danger" ng-show="ip.profile_validation == null && error" translate="{{error}}" translate-values="{ label: ip.label}"></div>
+                    <div>
+                        <label ng-hide="ip.profile_validation == null">
+                            <input type="checkbox" tabindex="-1" ng-model="vm.stop_at_failure" ng-disabled="ip.state == 'Transforming' || ip.state == 'Transformed' || ip.state == 'Transferring' || ip.state == 'Transferred'">
+                            {{'STOP_AT_FAILURE' | translate}}
+                        </label>
+                        <button class="btn btn-info" ng-click="vm.validate(ip)" ng-disabled="ip.profile_validation == null || ip.state == 'Transforming' || ip.state == 'Transformed' || ip.state == 'Transferring' || ip.state == 'Transferred'">{{'VALIDATE' | translate}}</button>
+                    </div>
                 </div>
             </div>
-            <br/>
             <hr/>
             <div class="validation-view">
                 <div class="table-container" st-table="vm.validations" st-pipe="vm.validationPipe">

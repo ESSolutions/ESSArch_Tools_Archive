@@ -290,5 +290,7 @@
     "OPEN_KEYBOARD_SHORTCUT_INFO": "Open keyboard shortcut info page",
     "VALIDATION_TABLE": "Validation table",
     "NO_SUBMISSION_AGREEMENT_AVAILABLE": "No Submission Agreement available",
-    "VERSIONINFO": "Version info"
+    "VERSIONINFO": "Version info",
+    "NO_VALIDATION_PROFILE": "IP {{label}} has not validation profile!",
+    "NO_TRANSFORMATION_PROFILE": "IP {{label}} has not transformation profile!"
 }
