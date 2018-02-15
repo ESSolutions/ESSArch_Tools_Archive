@@ -49,7 +49,7 @@ angular.module('myApp').factory('WorkareaValidation', function ($rootScope, $q, 
         function validationReports(pretty) {
             var regex = /&lt;validationReports compliant="([\d])" nonCompliant="([\d])" failedJobs="([\d])"&gt;([\s\S]*?)&lt;\/validationReports&gt;/g;
             var match = regex.exec(pretty);
-            if (match[2] != "0" || match[3] != "0") {
+            if (match && (match[2] != "0" || match[3] != "0")) {
                 var replace = '<span style="background-color: red; color: white;">&lt;validationReports compliant="$1" nonCompliant="$2" failedJobs="$3"&gt;$4&lt;\/validationReports&gt;</span>';
                 pretty = pretty.replace(regex, replace);
             } else {
