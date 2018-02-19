@@ -318,7 +318,7 @@ STATICFILES_DIRS = (
 )
 
 # Documentation
-DOCS_ROOT = os.path.join(BASE_DIR, 'docs/_build/html')
+DOCS_ROOT = os.path.join(BASE_DIR, 'docs/_build/{lang}/html')
 
 # Add etp vhost to rabbitmq:
 # rabbitmqctl add_user guest guest
