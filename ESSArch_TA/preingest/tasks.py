@@ -30,6 +30,10 @@ import shutil
 
 from django.contrib.auth import get_user_model
 
+import requests
+
+from six.moves import urllib
+
 from ESSArch_Core.configuration.models import Path
 from ESSArch_Core.essxml.util import parse_submit_description
 from ESSArch_Core.ip.models import (
@@ -40,6 +44,7 @@ from ESSArch_Core.ip.models import (
     InformationPackage,
     Workarea,
 )
+from ESSArch_Core.storage.copy import copy_file
 from ESSArch_Core.util import mkdir_p
 from ESSArch_Core.WorkflowEngine.dbtask import DBTask
 from ESSArch_Core.WorkflowEngine.models import ProcessTask, ProcessStep
@@ -160,25 +165,54 @@ class TransferSIP(DBTask):
     event_type = 20600
 
     def run(self, ip=None):
-        objectpath = InformationPackage.objects.values_list('object_path', flat=True).get(pk=ip)
-
-        srcdir, srcfile = os.path.split(objectpath)
+        ip = InformationPackage.objects.get(pk=ip)
+        src = ip.object_path
+        srcdir, srcfile = os.path.split(src)
         epp = Path.objects.get(entity="path_gate_reception").value
-        dst = os.path.join(epp, srcfile)
 
-        shutil.copy(objectpath, dst)
+        try:
+            remote = ip.get_profile_data('transfer_project').get(
+                'preservation_organization_receiver_url_epp'
+            )
+        except AttributeError:
+            remote = None
 
-        InformationPackage.objects.filter(pk=ip).update(object_path=dst)
+        session = None
+
+        if remote:
+            try:
+                dst, remote_user, remote_pass = remote.split(',')
+                dst = urllib.parse.urljoin(dst, 'api/ip-reception/upload/')
+
+                session = requests.Session()
+                session.verify = False
+                session.auth = (remote_user, remote_pass)
+            except ValueError:
+                remote = None
+        else:
+            dst = os.path.join(epp, srcfile)
+
+        block_size = 8 * 1000000 # 8MB
+
+        copy_file(src, dst, requests_session=session, block_size=block_size)
 
         self.set_progress(50, total=100)
 
-        objid = InformationPackage.objects.values_list(
-            'object_identifier_value', flat=True
-        ).get(pk=ip)
+        objid = ip.object_identifier_value
+        src = os.path.join(srcdir, "%s_ipevents.xml" % objid)
+        if not remote:
+            dst = os.path.join(epp, "%s_ipevents.xml" % objid)
 
+        copy_file(src, dst, requests_session=session, block_size=block_size)
+
+        self.set_progress(75, total=100)
+
+        objid = ip.object_identifier_value
         src = os.path.join(srcdir, "%s.xml" % objid)
-        dst = os.path.join(epp, "%s.xml" % objid)
-        shutil.copy(src, dst)
+        if not remote:
+            dst = os.path.join(epp, "%s.xml" % objid)
+
+        copy_file(src, dst, requests_session=session, block_size=block_size)
 
         self.set_progress(100, total=100)
 
