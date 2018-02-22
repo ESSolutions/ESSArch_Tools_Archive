@@ -42,7 +42,7 @@ from operator import itemgetter
 from celery import states as celery_states
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import IntegrityError
 from django.db.models import Prefetch
 from django.http import HttpResponse
@@ -89,7 +89,7 @@ from ESSArch_Core.mixins import PaginatedViewMixin
 
 from ESSArch_Core.pagination import LinkHeaderPagination
 
-from ESSArch_Core.profiles.models import ProfileIP, SubmissionAgreement
+from ESSArch_Core.profiles.models import ProfileIP, ProfileIPData, SubmissionAgreement
 from ESSArch_Core.profiles.utils import fill_specification_data
 
 from ESSArch_Core.WorkflowEngine.models import (
@@ -215,7 +215,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             if not InformationPackage.objects.filter(object_identifier_value=ip['object_identifier_value']).exists():
                 ips.append(ip)
 
-        from_db = InformationPackage.objects.filter(state='Receiving').prefetch_related(
+        from_db = InformationPackage.objects.filter(state__in=['Prepared', 'Receiving']).prefetch_related(
             Prefetch('profileip_set', to_attr='profiles'),
         )
         serializer = InformationPackageSerializer(
@@ -344,11 +344,8 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         return Response('Upload of %s complete' % filepath)
 
-    @detail_route(methods=['post'], url_path='receive')
-    def receive(self, request, pk=None):
-        if InformationPackage.objects.filter(object_identifier_value=pk).exists():
-            raise exceptions.ParseError('IP with id "%s" already exist')
-
+    @detail_route(methods=['post'])
+    def prepare(self, request, pk=None):
         try:
             perms = copy.deepcopy(settings.IP_CREATION_PERMS_MAP)
         except AttributeError:
@@ -356,45 +353,144 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             self.logger.error(msg)
             raise ImproperlyConfigured(msg)
 
-        sa_id = request.data.get('submission_agreement')
-        try:
-            sa = SubmissionAgreement.objects.get(pk=sa_id)
-        except SubmissionAgreement.DoesNotExist:
-            raise exceptions.ParseError('SA with id "%s" does not exist' % sa_id)
+        member = Member.objects.get(django_user=request.user)
 
-        reception = Path.objects.get(entity="path_ingest_reception").value
-        events_xmlfile = None
+        existing = InformationPackage.objects.filter(object_identifier_value=pk).first()
+        if existing is not None:
+            self.logger.warn('Tried to prepare IP with id %s which already exists' % (pk), extra={'user': request.user.pk})
+            raise exceptions.ParseError('IP with id %s already exists: %s' % (pk, str(existing.pk)))
+
+        reception = Path.objects.values_list('value', flat=True).get(entity="path_ingest_reception")
 
         if os.path.isdir(os.path.join(reception, pk)):
+            # A directory with the given id exists, try to prepare it
+            sa = request.data.get('submission_agreement')
+            if sa is None:
+                raise exceptions.ParseError(detail='Missing parameter submission_agreement')
+
+            parsed = {'label': pk}
             objpath = os.path.join(reception, pk)
-            ip = InformationPackage.objects.create(
-                object_identifier_value=pk, label=pk, state="Receiving",
-                responsible=self.request.user, object_path=objpath,
-            )
         else:
-            uip = Path.objects.get(entity="path_ingest_unidentified").value
-            xmlfile = os.path.join(reception, "%s.xml" % pk)
-            srcdir = reception
+            # No directory, look for files instead
+            xmlfile = os.path.join(reception, '%s.xml' % pk)
+
+            if not os.path.isfile(xmlfile):
+                self.logger.warn('Tried to prepare IP with missing XML file %s' % (xmlfile), extra={'user': request.user.pk})
+                raise exceptions.ParseError('%s does not exist' % xmlfile)
+
+            try:
+                container = os.path.join(reception, self.get_container_for_xml(xmlfile))
+                objpath = container
+            except etree.LxmlError:
+                self.logger.warn('Tried to prepare IP with invalid XML file %s' % (xmlfile), extra={'user': request.user.pk})
+                raise exceptions.ParseError('Invalid XML file, %s' % xmlfile)
+
+            if not os.path.isfile(container):
+                self.logger.warn('Tried to prepare IP with missing container file %s' % (container), extra={'user': request.user.pk})
+                raise exceptions.ParseError('%s does not exist' % container)
+
+            objid, _ = os.path.splitext(os.path.basename(container))
+            parsed = parse_submit_description(xmlfile, srcdir=os.path.split(container)[0])
+
+            provided_sa = request.data.get('submission_agreement')
+            parsed_sa = parsed.get('altrecordids', {}).get('SUBMISSIONAGREEMENT', [None])[0]
+
+            if parsed_sa is not None and provided_sa is not None:
+                if provided_sa == parsed_sa:
+                    sa = provided_sa
+                if provided_sa != parsed_sa:
+                    raise exceptions.ParseError(detail='Must use SA specified in XML')
+            elif parsed_sa and not provided_sa:
+                sa = parsed_sa
+            elif provided_sa and not parsed_sa:
+                sa = provided_sa
+            else:
+                raise exceptions.ParseError(detail='Missing parameter submission_agreement')
+
+        try:
+            sa = SubmissionAgreement.objects.get(pk=sa)
+        except (ValidationError, ValueError, SubmissionAgreement.DoesNotExist) as e:
+            raise exceptions.ParseError('Could not find SA "%s"' % sa)
+
+        ip = InformationPackage.objects.create(
+            object_identifier_value=pk,
+            package_type=InformationPackage.SIP,
+            state='Prepared',
+            responsible=request.user,
+            submission_agreement=sa,
+            submission_agreement_locked=True,
+            label=parsed.get('label'),
+            entry_date=parsed.get('entry_date'),
+            start_date=parsed.get('start_date'),
+            end_date=parsed.get('end_date'),
+            object_path=objpath,
+        )
+
+        # refresh date fields to convert them to datetime instances instead of
+        # strings to allow further datetime manipulation
+        ip.refresh_from_db(fields=['entry_date', 'start_date', 'end_date'])
+
+        user_perms = perms.pop('owner', [])
+
+        organization = request.user.user_profile.current_organization
+        organization.assign_object(ip, custom_permissions=perms)
+
+        for perm in user_perms:
+            perm_name = get_permission_name(perm, ip)
+            assign_perm(perm_name, member.django_user, ip)
+
+        extra_data = fill_specification_data(ip=ip, sa=sa)
+
+        for profile_type in ['transfer_project', 'sip', 'preservation_metadata', 'submit_description', 'validation', 'transformation']:
+            profile = getattr(sa, 'profile_%s' % profile_type, None)
+
+            if profile is None:
+                continue
+
+            profile_ip = ProfileIP.objects.create(ip=ip, profile=profile)
+            data = {}
+            for field in profile_ip.profile.template:
+                try:
+                    if field['defaultValue'] in extra_data:
+                        data[field['key']] = extra_data[field['defaultValue']]
+                        continue
+
+                    data[field['key']] = field['defaultValue']
+                except KeyError:
+                    pass
+
+            data_obj = ProfileIPData.objects.create(
+                relation=profile_ip, data=data, version=0, user=request.user,
+            )
+            profile_ip.data = data_obj
+            profile_ip.save()
+
+        data = InformationPackageReadSerializer(ip, context={'request': request}).data
+
+        self.logger.info('Prepared information package %s' % str(ip.pk), extra={'user': request.user.pk})
+        return Response(data, status=status.HTTP_201_CREATED)
+
+
+    @detail_route(methods=['post'], url_path='receive')
+    def receive(self, request, pk=None):
+        try:
+            ip = get_object_or_404(InformationPackage, id=pk)
+        except (ValueError, ValidationError):
+            raise exceptions.NotFound('Information package with id="%s" not found' % pk)
+
+        objpath = ip.object_path
+       
+        if not os.path.isdir(objpath):
+            xmlfile = os.path.splitext(objpath)[0] + '.xml'
             if not os.path.isfile(xmlfile):
                 xmlfile = os.path.join(uip, "%s.xml" % pk)
                 srcdir = uip
 
             doc = etree.parse(xmlfile)
             root = doc.getroot()
-            objpath = os.path.join(srcdir, get_objectpath(root))
 
-            objid, container_type = os.path.splitext(os.path.basename(objpath))
+            objid, _ = os.path.splitext(os.path.basename(objpath))
             parsed = parse_submit_description(xmlfile, srcdir=os.path.split(objpath)[0])
-
-            ip = InformationPackage.objects.create(
-                object_identifier_value=objid, label=parsed.get("label"), state="Receiving",
-                responsible=self.request.user, object_path=parsed['object_path'],
-                object_size=parsed['object_size'], start_date=parsed['start_date'], end_date=parsed['end_date'],
-            )
-
-            ip.create_date = parsed['create_date']
-            ip.entry_date = ip.create_date
-            ip.save(update_fields=['create_date', 'entry_date'])
 
             events_xmlfile = None
             if tarfile.is_tarfile(objpath):
@@ -420,24 +516,8 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
                         events_xmlfile = tmp.name
                     except KeyError:
                         pass
-
-        member = Member.objects.get(django_user=self.request.user)
-        user_perms = perms.pop('owner', [])
-        organization = member.django_user.user_profile.current_organization
-        organization.assign_object(ip, custom_permissions=perms)
-
-        for perm in user_perms:
-            perm_name = get_permission_name(perm, ip)
-            assign_perm(perm_name, member.django_user, ip)
-
-        ip.submission_agreement = sa
-        ip.save()
-
-        for profile_type in ['sip', 'preservation_metadata', 'submit_description', 'validation', 'transformation']:
-            profile = getattr(sa, 'profile_%s' % profile_type, None)
-            if profile is None:
-                continue
-            profile_ip = ProfileIP.objects.create(ip=ip, profile=profile)
+        else:
+            events_xmlfile=None
 
         step = ProcessStep.objects.create(
             name="Receive SIP",
@@ -517,7 +597,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
                 responsible=self.request.user,
                 processstep=receive_step,
             )
-        elif tarfile.is_tarfile(objpath) or zipfile.is_zipfile(objpath):
+        else:
             ProcessTask.objects.create(
                 name="preingest.tasks.ReceiveSIP",
                 args=[ip.pk, xmlfile, objpath],
@@ -702,7 +782,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
         info = fill_specification_data(ip=ip)
 
-        events_path = os.path.join(dstdir, "%s_ipevents.xml" % ip.object_identifier_value)
+        events_path = os.path.splitext(ip.object_path)[0] + '_ipevents.xml'
         filesToCreate = {
             events_path: {'spec': get_event_spec(), 'data': info}
         }
@@ -722,19 +802,6 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     "prev": ip.state,
                 },
                 processstep_pos=10,
-                log=EventIP,
-                information_package=ip,
-                responsible=self.request.user,
-            )
-        )
-
-        step.add_tasks(
-            ProcessTask.objects.create(
-                name="preingest.tasks.TransferSIP",
-                params={
-                    "ip": ip.pk,
-                },
-                processstep_pos=15,
                 log=EventIP,
                 information_package=ip,
                 responsible=self.request.user,
@@ -867,6 +934,19 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                     "index": 0
                 },
                 processstep_pos=40,
+                information_package=ip,
+                responsible=self.request.user,
+            )
+        )
+
+        step.add_tasks(
+            ProcessTask.objects.create(
+                name="preingest.tasks.TransferSIP",
+                params={
+                    "ip": ip.pk,
+                },
+                processstep_pos=45,
+                log=EventIP,
                 information_package=ip,
                 responsible=self.request.user,
             )
