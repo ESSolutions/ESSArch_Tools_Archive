@@ -53,13 +53,17 @@ VERSION = get_versions()['version']
 
 class InformationPackageSerializer(serializers.HyperlinkedModelSerializer):
     responsible = UserSerializer()
-    profiles = ProfileIPSerializer(many=True)
+    profiles = serializers.SerializerMethodField()
     archival_institution = ArchivalInstitutionSerializer(read_only=True)
     archivist_organization = ArchivistOrganizationSerializer(read_only=True)
     archival_type = ArchivalTypeSerializer(read_only=True)
     archival_location = ArchivalLocationSerializer(read_only=True)
     permissions = serializers.SerializerMethodField()
     workarea = serializers.SerializerMethodField()
+
+    def get_profiles(self, obj):
+        profiles = getattr(obj, 'profiles', obj.profileip_set)
+        return ProfileIPSerializer(profiles, many=True, context=self.context).data
 
     def get_permissions(self, obj):
         request = self.context.get('request')
