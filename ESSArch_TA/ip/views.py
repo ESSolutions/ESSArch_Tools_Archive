@@ -483,8 +483,21 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         except (ValueError, ValidationError):
             raise exceptions.NotFound('Information package with id="%s" not found' % pk)
 
+        if ip.state != 'Prepared':
+            self.logger.warn('Tried to receive IP %s from reception which is in state "%s"' % (pk, ip.state), extra={'user': request.user.pk})
+            raise exceptions.ParseError('Information package must be in state "Prepared"')
+
+        for profile_ip in ProfileIP.objects.filter(ip=ip).iterator():
+            try:
+                profile_ip.clean()
+            except ValidationError as e:
+                raise exceptions.ParseError('%s: %s' % (profile_ip.profile.name, e[0]))
+
+            profile_ip.LockedBy = request.user
+            profile_ip.save()
+
         objpath = ip.object_path
-       
+
         if not os.path.isdir(objpath):
             xmlfile = os.path.splitext(objpath)[0] + '.xml'
             if not os.path.isfile(xmlfile):
