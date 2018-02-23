@@ -10,10 +10,10 @@
         <div class="receive-footer">
             <div class="checkbox">
                 <label>
-                    <input type="checkBox" ng-disabled="receiveDisabled || !$ctrl.approvedToReceive()" ng-model="approvedToReceive">{{'APPROVEDTORECEIVE' | translate}}</input>
+                    <input type="checkBox" ng-disabled="receiveDisabled || !$ctrl.approvedToReceive()" ng-model="receiveApproved">{{'APPROVEDTORECEIVE' | translate}}</input>
                 </label>
             </div>
-            <button class="btn btn-primary" ng-click="$ctrl.receive()" ng-disabled="!$ctrl.approvedToReceive() || receiveDisabled" focused="true">{{'RECEIVESIP' | translate}}</button>
+            <button class="btn btn-primary" ng-click="$ctrl.receive()" ng-disabled="!$ctrl.approvedToReceive() || receiveDisabled || !receiveApproved" focused="true">{{'RECEIVESIP' | translate}}</button>
             <button class="btn btn-warning" type="button" ng-click="$ctrl.cancel()">{{'CANCEL' | translate}}</button>
         </div>
     </div>
