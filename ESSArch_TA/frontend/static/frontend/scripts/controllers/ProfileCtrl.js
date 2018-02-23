@@ -52,6 +52,8 @@ angular.module('myApp').controller('ProfileCtrl', function($q, SA, IP, Profile, 
                     $scope.saProfile.disabled = true;
                     $scope.$emit('disable_receive', {});
                 }
+            } else {
+                $scope.saProfile.profile = $scope.saProfile.profiles[0];
             }
         });
     };
@@ -87,6 +89,8 @@ angular.module('myApp').controller('ProfileCtrl', function($q, SA, IP, Profile, 
                     $scope.$emit('disable_receive', {});
                 }
 ;
+            } else {
+                $scope.saProfile.profile = $scope.saProfile.profiles[0];
             }
             vm.loadProfiles($scope.ip);
         });
