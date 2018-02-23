@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').factory('listViewService', function (IP, Workarea, WorkareaFiles, IPReception, Event, Step, Task, EventType, $q, $http, $state, $log, appConfig, $rootScope, $filter, linkHeaderParser) {
+angular.module('myApp').factory('listViewService', function (IP, SA, Profile, Workarea, WorkareaFiles, IPReception, Event, Step, Task, EventType, $q, $http, $state, $log, appConfig, $rootScope, $filter, linkHeaderParser) {
     //Go to Given state
     function changePath(state) {
         $state.go(state);
@@ -315,6 +315,49 @@ angular.module('myApp').factory('listViewService', function (IP, Workarea, Worka
             return response;
         });
     }
+
+     //returns all SA-profiles and current as an object
+     function getSaProfiles(ip) {
+        var sas = [];
+        var saProfile =
+        {
+            entity: "PROFILE_SUBMISSION_AGREEMENT",
+            profile: null,
+            profiles: [
+
+            ],
+        };
+        return SA.query({
+            pager: 'none'
+        }).$promise.then(function (resource) {
+            sas = resource;
+            saProfile.profiles = [];
+            var promises = [];
+            sas.forEach(function (sa) {
+                saProfile.profiles.push(sa);
+                if (ip.submission_agreement == sa.url || (ip.altrecordids && ip.altrecordids["SUBMISSIONAGREEMENT"] == sa.id)){
+                    saProfile.profile = sa;
+                    saProfile.locked = ip.submission_agreement_locked;
+                    if (saProfile.profile.profile_aip) {
+                        promises.push(Profile.get({ id: saProfile.profile.profile_aip })
+                            .$promise.then(function (resource) {
+                                saProfile.profile.profile_aip = resource;
+                            }));
+                    }
+                    if (saProfile.profile.profile_dip) {
+                        promises.push(Profile.get({ id: saProfile.profile.profile_dip })
+                            .$promise.then(function (resource) {
+                                saProfile.profile.profile_dip = resource;
+                            }));
+                    }
+                }
+            });
+            return $q.all(promises).then(function() {
+                return saProfile;
+            })
+        });
+    }
+
     /*******************/
     /*HELPER FUNCTIONS*/
     /*****************/
@@ -469,6 +512,7 @@ angular.module('myApp').factory('listViewService', function (IP, Workarea, Worka
         getWorkareaDir: getWorkareaDir,
         addNewWorkareaFolder: addNewWorkareaFolder,
         checkPages: checkPages,
+        getSaProfiles: getSaProfiles,
     };
 
 });

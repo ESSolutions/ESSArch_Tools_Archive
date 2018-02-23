@@ -192,6 +192,18 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
 })
 .controller('ReceiveModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, $scope, IPReception, $translate) {
     var $ctrl = this;
+    var vm = data.vm;
+    $scope.profileEditor = true;
+    $scope.receiveDisabled = false;
+    $scope.ip = data.ip;
+    $scope.$on('disable_receive', function () {
+        $scope.receiveDisabled = true;
+    });
+    $scope.$on('update_ip', function (event, data) {
+        var temp = angular.copy($scope.ip);
+        $scope.ip = data.ip;
+        vm.updateCheckedIp({id: temp.id}, $scope.ip);
+    });
     $ctrl.$onInit = function() {
         $ctrl.data = data;
         $ctrl.file = data.file;
@@ -203,13 +215,6 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
                     $ctrl.saDisabled = true;
                 }
             });
-        } else {
-            if($ctrl.data.submissionAgreements.length > 0) {
-                $ctrl.sa = $ctrl.data.submissionAgreements[0];
-            } else {
-                $ctrl.sa = null;
-                $ctrl.receiveSaError = $translate.instant('NO_SUBMISSION_AGREEMENT_AVAILABLE');
-            }
         }
 
         if(angular.isUndefined($ctrl.sa)) {
@@ -217,9 +222,30 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
             $ctrl.saDisabled = true;
         }
     }
+    var checkProfileTypes = function(ip, types) {
+        if(types instanceof Array) {
+            return types.every(function(x) {
+                return ip[x] != null;
+            });
+        } else {
+            return ip[types] != null;
+        }
+    }
+    $ctrl.approvedToReceive = function() {
+        var saCheck = $scope.ip.submission_agreement && $scope.ip.submission_agreement_locked;
+        var profileCheck = checkProfileTypes($scope.ip, [
+            'profile_transfer_project',
+            'profile_submit_description',
+            'profile_sip',
+            'profile_preservation_metadata',
+        ]);
+        return saCheck && profileCheck;
+    }
+    $ctrl.getProfileData = function ($event) {
+    }
     $ctrl.receive = function () {
         var payload = {
-            id: $ctrl.data.ip,
+            id: $scope.ip.id,
         }
         if($ctrl.sa && $ctrl.sa != null) {
             payload.submission_agreement = $ctrl.sa.id;
@@ -227,7 +253,7 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
         IPReception.receive(payload).$promise.then(function(response) {
             $ctrl.data = {
                 status: "receive",
-                ip: $ctrl.data.ip,
+                ip: $ctrl.data.ip.id,
                 sa: $ctrl.sa,
             };
             $uibModalInstance.close($ctrl.data);
