@@ -183,6 +183,11 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
     def get_xml_files(self):
         return glob.glob(os.path.join(self.reception, "*.xml")) + glob.glob(os.path.join(self.uip, "*.xml"))
 
+    def get_container_for_xml(self, xmlfile):
+        doc = etree.parse(xmlfile)
+        root = doc.getroot()
+        return get_objectpath(root)
+
     def get_container_files(self):
         return glob.glob(os.path.join(self.uip, "*.tar")) + glob.glob(os.path.join(self.uip, "*.zip"))
 
