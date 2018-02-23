@@ -1046,6 +1046,9 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             xmlfile = os.path.join(reception, "%s.xml" % objid)
             srcdir = reception
 
+            if os.path.isdir(os.path.join(srcdir, objid)):
+                paths.append(os.path.join(srcdir, objid))
+
             if not os.path.isfile(xmlfile):
                 xmlfile = os.path.join(uip, "%s.xml" % objid)
                 srcdir = uip
