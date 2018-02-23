@@ -307,6 +307,6 @@
     "MISSING_PRESERVATION_METADATA": "Preservation Metadata-profil saknas i leveransöverenskommelse",
     "MISSING_VALIDATION": "Validation-profil saknas i leveransöverenskommelse",
     "MISSING_TRANSFORMATION": "Transformation-profil saknas i leveransöverenskommelse",
-    "NO_FORM_TEMPLATE": "Inget formulär tillgängligt"
-
+    "NO_FORM_TEMPLATE": "Inget formulär tillgängligt",
+    "STEP_STATE_DESC": "Step-tillstånd, Slutförd/Fel"
 }
