@@ -11,8 +11,10 @@ angular.module('myApp').controller('ProfileCtrl', function($q, SA, IP, Profile, 
         validationError: { type: 'warning', msg: $translate.instant('MISSING_VALIDATION') },
         transformationError: { type: 'warning', msg: $translate.instant('MISSING_TRANSFORMATION') },
         noSas: { type: 'danger', msg: $translate.instant('NO_SUBMISSION_AGREEMENT_AVAILABLE') },
-
+        templateError: { type: 'warning', msg: $translate.instant('NO_FORM_TEMPLATE') },
     };
+    $scope.templateAlert = null;
+    $scope.saTemplateAlert = null;
     $scope.saAlert = null;
     $scope.tpAlert = $scope.alerts.tpError;
     $scope.sdAlert = $scope.alerts.sdError;
@@ -151,6 +153,12 @@ angular.module('myApp').controller('ProfileCtrl', function($q, SA, IP, Profile, 
             vm.saCancel();
             $scope.editSA = false;
         } else {
+            $scope.saTemplateAlert = null;
+            $scope.templateAlert = null;
+            if(row.profile.template == [] || angular.equals(row.profile.template,{}) || !(row.profile.template instanceof Array)) {
+                $scope.saTemplateAlert = $scope.alerts.templateError;
+                return;
+            }
             $scope.selectedSa = row;
             $scope.eventlog = false;
             $scope.edit = false;
@@ -216,6 +224,12 @@ angular.module('myApp').controller('ProfileCtrl', function($q, SA, IP, Profile, 
         Profile.get({
             id: profileIp.profile,
         }).$promise.then(function (resource) {
+            $scope.saTemplateAlert = null;
+            $scope.templateAlert = null;
+            if(resource.template == [] || angular.equals(resource.template,{})) {
+                $scope.templateAlert = $scope.alerts.templateError;
+                return;
+            }
             resource.profile_name = resource.name;
             row.active = resource;
             row.profiles = [resource];

@@ -28,6 +28,7 @@
                 </tbody>
             </table>
             <div class="sa-edit">
+                    <div uib-alert ng-if="saTemplateAlert != null" style="width: 100%;" ng-class="'alert-' + (saTemplateAlert.type || 'warning')">{{saTemplateAlert.msg}}</div>
                 <form ng-if="vm.saFields.length" class="edit-form">
                     <formly-form ng-if="vm.saFields.length" model="vm.saModel" fields="vm.saFields" options="vm.options" form="vm.editForm">
                     </formly-form>
@@ -72,7 +73,9 @@
                 <div uib-alert ng-if="!saProfile.profile.profile_preservation_metadata" style="width: 100%;" ng-class="'alert-' + (pmAlert.type || 'warning')">{{pmAlert.msg}}</div>
                 <div uib-alert ng-if="!saProfile.profile.profile_validation" style="width: 100%;" ng-class="'alert-' + (validationAlert.type || 'warning')">{{validationAlert.msg}}</div>
                 <div uib-alert ng-if="!saProfile.profile.profile_transformation" style="width: 100%;" ng-class="'alert-' + (transformationAlert.type || 'warning')">{{transformationAlert.msg}}</div>
+                <div uib-alert ng-if="templateAlert != null" style="width: 100%;" ng-class="'alert-' + (templateAlert.type || 'warning')">{{templateAlert.msg}}</div>
                 <hr />
+
                 <div ng-if="vm.profileFields.length">
                     <h4 class="profile-name">{{ vm.profileIp.profile_name }}</h4>
                     <div class="data-version-list">
