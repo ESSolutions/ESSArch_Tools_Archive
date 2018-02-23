@@ -177,6 +177,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             'state': 'At reception',
             'status': 100,
             'step_state': celery_states.SUCCESS,
+            'object_path': directory.path,
         }
         return ip
 
