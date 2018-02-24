@@ -53,12 +53,11 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
                 Profile.get({ id: $scope.ip.profile_validation.profile }).$promise.then(function (resource) {
                     vm.buildValidatorTable(resource.specification, $scope.ip);
                     var validationComplete = true;
-                    if (resource.specification._required) {
-                        resource.specification._required.forEach(function (value) {
-                            if ($scope.ip.workarea.successfully_validated[value] == false || $scope.ip.workarea.successfully_validated[value] == null || angular.isUndefined($scope.ip.workarea.successfully_validated[value])) {
-                                validationComplete = false;
-                            }
-                        });
+                    for (var validator in $scope.ip.workarea.successfully_validated) {
+                        if ($scope.ip.workarea.successfully_validated[validator] == false) {
+                            validationComplete = false;
+                            break;
+                        }
                     }
                     $scope.validatorsLoading = false;
                     vm.validation_complete = validationComplete;
@@ -76,11 +75,14 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
             if (key.startsWith('_')) return;
             var val = {
                 name: key,
-                passed: true
-            }
-            if(object._required && object._required.includes(key)) {
-                val.required = true;
-            }
+                passed: true,
+                required: false,
+            };
+            angular.forEach(value, function (sub_spec, idx, o) {
+                if (!("required" in sub_spec) || sub_spec.required){
+                    val.required = true;
+                }
+            });
             promises.push($http.head(appConfig.djangoUrl + "information-packages/" + row.id + "/validations/",
                 {
                     params: {
@@ -89,6 +91,16 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
                     }
                 }).then(function (response) {
                     val.failed_count = response.headers('Count');
+		    $http.head(appConfig.djangoUrl + "information-packages/" + row.id + "/validations/",
+			{
+			    params: {
+				validator: key,
+				passed: false,
+				required: true,
+			    }
+			}).then(function (response) {
+			    val.failed_required_count = response.headers('Count');
+			});
                     return val;
                 }));
         })

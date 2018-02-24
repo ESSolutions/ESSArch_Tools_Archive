@@ -271,6 +271,7 @@
     "FAILED": "Failed",
     "NO_RESULTS_FOUND": "No results found",
     "REQUIRED": "Required",
+    "REQUIRED_MULTIPLE": "Required",
     "KEYBORD_SHORTCUTS": "Keyboard shortcuts",
     "IP_LIST": "IP list",
     "SELECT_NEXT_IP": "Select next IP",

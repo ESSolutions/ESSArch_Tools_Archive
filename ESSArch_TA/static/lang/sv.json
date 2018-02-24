@@ -271,6 +271,7 @@
     "FAILED": "Misslyckade",
     "NO_RESULTS_FOUND": "Inga resultat hittade",
     "REQUIRED": "Obligatorisk",
+    "REQUIRED_MULTIPLE": "Obligatoriska",
     "KEYBORD_SHORTCUTS": "Tangentbordsgenvägar",
     "IP_LIST": "IP-lista",
     "SELECT_NEXT_IP": "Välj nästa IP",
