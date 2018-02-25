@@ -1,80 +1,80 @@
 .. _workspace:
 
 **********
-Arbetsyta
+Workspace
 **********
 
 .. _workspace_validation:
 
-Validering
+Validation
 ==========
 
-Om ett IP är relaterat till en lerevansöverenskommelse som har en
-valideringsprofil, så kan det bli validerat.
+If an IP is related to a submission agreement that has a validation profile,
+the IP can be validated.
+Click and IP in the list view to see the validation options.
 
-Det finns en lista av olika valideringar som kan genomföras som är
-definerade i valideringsprofilen.
-Valideringar definerade som obligatoriska är markerade med en \*.
-Obligatoriska valideringar måste genomföras innan ett IP kan bli
-:ref:`transformerat <workspace_transformation>`.
+There is a list of validations to choose from that is defined
+by the validation profile.
+Validators defined as required in the profile are marked with a \*.
+Required validators must pass before the IP can be
+:ref:`transformed <workspace_transformation>`.
 
 .. image:: images/validation_choices.png
 
-Markera **Stoppa vid fel** för att stoppa validering när första felet uppstår.
+Check the **Stop at failure**-checkbox to make the validation process
+stop at the first failure.
 
 .. image:: images/validation_stop_at_failure.png
 
-När önskade valideringar är valda, klicka på **Validera**.
-Då börjar valideringsprocessen.
+When validators are chosen click the **validate**-button and the validation
+process will begin.
 
 .. image:: images/validation_validate_button.png
 
-Valideringsresultaten visas i tabellen och uppdateras automatiskt
-när alla valideringar är färdiga.
-Lyckade valideringar markeras med grön färg och misslyckade med röd färg.
-Filer med enbart lyckade valideringar markeras med grön färg och
-filer med minst en misslyckad validering markeras med röd färg.
-Valideringarna visas med följande struktur i tabellen:
-    * Fil
+The validation results are shown in the table and will automatically refresh
+when all validations are done.
+Successfull validations are marked with a green color and unsuccessful
+validations are marked with red. Files with only successful validations
+are marked with green and files that has at least one failed validation
+are marked with red.
+The validations are shown in the following structure:
+    * File
         * Validator 1
         * Validator 2
         ...
     ...
-Klicka på en rad för att expandera en fil och se alla valideringar för filen.
-Klicka igen så kommer fil-raden minimeras och valideringarna kommer försvinna.
+Click on a row to expand the file to see the validators and
+click again to collapse and hide validators.
 
 .. image:: images/validation_expand_row.png
 
-Raderna som representerar en validering kan klickas för att se
-detaljerat resultat,
+The rows representing validators can be clicked to view the validation results.
 
 .. image:: images/validation_open_result.png
 
-valideringsresultatet visas i ett nytt fönster.
+The results of the validation is showed in a new window.
 
 .. image:: images/validation_result.png
 
-För att se resultatet i fullskärmsläge klicka på **Fullskärm**-länken.
-Klicka **Esc** för att gå ur fullskärmsläget.
+To view the results in fullscreen click the **Fullscreen**-link,
+and press **Esc** to exit fullscreen mode.
 
 .. image:: images/validation_result_fullscreen.png
 
 .. _workspace_transformation:
 
-transformering
+Transformation
 ==============
 
-Om ett IP är relaterat till en leveransöverenskommelse som har en
-transformeringsprofil och alla obligatoriska valideringar är lyckade,
-kan ett IP bli transformerat.
-När man klickar på ett IP i listvyn under transformering får man se
-en tabell med valideringsresultat.
-Om en validator har klarat alla filer den har validerat är den markerad
-med en grön bock, om inte, är validatorn markerad med ett rött kryss.
+If an IP is related to a submission agreement that ha a transformation profile
+and all required validations have passed, an IP can be transformed.
+When clicking an IP in the transformation list view, there is a table showing
+the outcome of each validator. If a validator has passed in all cases
+it is marked with a green check, and if not, it is marked with a red cross.
 
 .. image:: images/transformation_table.png
 
-Om alla obligatoriska valideringar har lyckats kan IPt transformeras
-genom att klicka på **Transformera**.
+If all required validators are successfull, It can be transformed
+by clicking the **Transform**-button.
 
 .. image:: images/transformation_transform_button.png

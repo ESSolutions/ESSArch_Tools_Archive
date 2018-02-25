@@ -1,0 +1,40 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2017, ES Solutions
+# This file is distributed under the same license as the ESSArch Tools
+# Archive package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: ESSArch Tools Archive 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-02-25 20:56+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.5.3\n"
+
+#: ../../user_guide/transfer-sip.rst:5
+msgid "Transfer SIP"
+msgstr "Överför SIP"
+
+#: ../../user_guide/transfer-sip.rst:7
+msgid ""
+"The final part of ETA is Transferring the SIP. The SIP is transferred to "
+"the next step in the archiving process."
+msgstr ""
+"Den sista delen i ETA är överföring av SIP. "
+"SIPen överförs då till nästa steg i arkiveringsprocessen."
+
+#: ../../user_guide/transfer-sip.rst:10
+msgid ""
+"Select SIP in the transfer-SIP list view and click the **Transfer "
+"SIP**-button."
+msgstr ""
+"Välj en SIP i **Överför SIP**'s listvy för överföring. "
+"Klicka sedan på **Överför SIP**."
+

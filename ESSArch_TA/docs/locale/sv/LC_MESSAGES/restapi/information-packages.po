@@ -1,0 +1,40 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2017, ES Solutions
+# This file is distributed under the same license as the ESSArch Tools
+# Archive package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: ESSArch Tools Archive 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-02-25 20:56+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.5.3\n"
+
+#: ../../core/restapi/information-packages.rst:3
+msgid "Information Packages"
+msgstr ""
+
+#: ../../core/restapi/information-packages.rst:10
+msgid "The information packages visible to the logged in user"
+msgstr ""
+
+#: ../../restapi/information-packages.rst:5
+msgid "Transfers IP (`ip_id`) to :ref:`path_gate_reception`"
+msgstr ""
+
+#: ../../restapi/information-packages.rst
+msgid "Status Codes"
+msgstr ""
+
+#: ../../restapi/information-packages.rst:7
+msgid "when information package is transferring"
+msgstr ""
+
