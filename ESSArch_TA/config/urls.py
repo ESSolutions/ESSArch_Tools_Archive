@@ -69,6 +69,8 @@ from ESSArch_Core.ip.views import (
     WorkareaEntryViewSet,
 )
 
+from ESSArch_Core.profiles.views import ProfileIPViewSet, ProfileIPDataViewSet
+
 from ESSArch_Core.WorkflowEngine.views import (
     ProcessViewSet,
     ProcessStepViewSet,
@@ -87,7 +89,6 @@ from ip.views import (
 from profiles.views import (
     ProfileViewSet,
     ProfileSAViewSet,
-    ProfileIPViewSet,
     SubmissionAgreementViewSet,
 )
 
@@ -143,6 +144,7 @@ router.register(r'submission-agreements', SubmissionAgreementViewSet)
 router.register(r'profiles', ProfileViewSet)
 router.register(r'profile-sa', ProfileSAViewSet)
 router.register(r'profile-ip', ProfileIPViewSet)
+router.register(r'profile-ip-data', ProfileIPDataViewSet)
 router.register(r'agents', AgentViewSet)
 router.register(r'parameters', ParameterViewSet)
 router.register(r'paths', PathViewSet)

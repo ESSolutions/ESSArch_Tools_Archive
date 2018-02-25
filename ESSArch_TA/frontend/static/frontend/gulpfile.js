@@ -100,6 +100,7 @@ var vendorFiles = [
         'styles/modules/receive_sip.scss',
         'styles/modules/top_alert.scss',
         'styles/modules/workspace.scss',
+        'styles/modules/profile_editor.scss',
         'styles/modules/colors.scss',
         'styles/modules/mixins.scss',
         'styles/modules/tree_control.scss',

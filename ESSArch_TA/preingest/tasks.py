@@ -182,7 +182,6 @@ class TransferSIP(DBTask):
         if remote:
             try:
                 dst, remote_user, remote_pass = remote.split(',')
-                dst = urllib.parse.urljoin(dst, 'api/ip-reception/upload/')
 
                 session = requests.Session()
                 session.verify = False

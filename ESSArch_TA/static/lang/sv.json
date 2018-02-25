@@ -271,6 +271,7 @@
     "FAILED": "Misslyckade",
     "NO_RESULTS_FOUND": "Inga resultat hittade",
     "REQUIRED": "Obligatorisk",
+    "REQUIRED_MULTIPLE": "Obligatoriska",
     "KEYBORD_SHORTCUTS": "Tangentbordsgenvägar",
     "IP_LIST": "IP-lista",
     "SELECT_NEXT_IP": "Välj nästa IP",
@@ -295,5 +296,18 @@
     "NO_TRANSFORMATION_PROFILE": "IP {{label}} har ingen transformeringsprofil!",
     "IP_IS_ALREADY_TRANSFERRED": "IP {{label}} är redan överförd",
     "IP_IS_ALREADY_TRANSFERRING": "IP {{label}} överförs redan",
-    "HAS_TRANSFORMATION_PROFILE_NOT_TRANSFORMED": "IP {{label}} har en transformeringsprofil men är inte transformerad"
+    "HAS_TRANSFORMATION_PROFILE_NOT_TRANSFORMED": "IP {{label}} har en transformeringsprofil men är inte transformerad",
+    "VIEW": "Visa",
+    "EDIT": "Redigera",
+    "PATH": "Sökväg",
+    "SUBMISSIONAGREEMENT": "Leveransöverenskommelse",
+    "SAVE": "Spara",
+    "MISSING_TRANSFER_PROJECT": "Transfer Project-profil saknas i leveransöverenskommelse",
+    "MISSING_SUBMIT_DESCRIPTION": "Submit Description-profil saknas i leveransöverenskommelse",
+    "MISSING_SIP": "SIP-profil saknas i leveransöverenskommelse",
+    "MISSING_PRESERVATION_METADATA": "Preservation Metadata-profil saknas i leveransöverenskommelse",
+    "MISSING_VALIDATION": "Validation-profil saknas i leveransöverenskommelse",
+    "MISSING_TRANSFORMATION": "Transformation-profil saknas i leveransöverenskommelse",
+    "NO_FORM_TEMPLATE": "Inget formulär tillgängligt",
+    "STEP_STATE_DESC": "Step-tillstånd, Slutförd/Fel"
 }

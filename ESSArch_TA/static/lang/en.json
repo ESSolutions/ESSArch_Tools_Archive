@@ -271,6 +271,7 @@
     "FAILED": "Failed",
     "NO_RESULTS_FOUND": "No results found",
     "REQUIRED": "Required",
+    "REQUIRED_MULTIPLE": "Required",
     "KEYBORD_SHORTCUTS": "Keyboard shortcuts",
     "IP_LIST": "IP list",
     "SELECT_NEXT_IP": "Select next IP",
@@ -295,5 +296,18 @@
     "NO_TRANSFORMATION_PROFILE": "IP {{label}} has not transformation profile!",
     "IP_IS_ALREADY_TRANSFERRED": "IP {{label}} is already transferred",
     "IP_IS_ALREADY_TRANSFERRING": "IP {{label}} is already transferring",
-    "HAS_TRANSFORMATION_PROFILE_NOT_TRANSFORMED": "IP {{label}} has transformation profile but is not transformed"
+    "HAS_TRANSFORMATION_PROFILE_NOT_TRANSFORMED": "IP {{label}} has transformation profile but is not transformed",
+    "VIEW": "View",
+    "EDIT": "Edit",
+    "PATH": "Path",
+    "SUBMISSIONAGREEMENT": "Submission Agreement",
+    "SAVE": "Save",
+    "MISSING_TRANSFER_PROJECT": "Transfer Project profile missing in Submission Agreement",
+    "MISSING_SUBMIT_DESCRIPTION": "Submit Description profile missing in Submission Agreement",
+    "MISSING_SIP": "SIP profile missing in Submission Agreement",
+    "MISSING_PRESERVATION_METADATA": "Preservation Metadata profile missing in Submission Agreement",
+    "MISSING_VALIDATION": "Validation profile missing in Submission Agreement",
+    "MISSING_TRANSFORMATION": "Transformation profile missing in Submission Agreement",
+    "NO_FORM_TEMPLATE": "No form available",
+    "STEP_STATE_DESC": "Step state, Success/Failure"
 }

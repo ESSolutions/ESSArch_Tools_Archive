@@ -44,6 +44,7 @@ from ESSArch_Core.serializers import DynamicHyperlinkedModelSerializer
 
 from ESSArch_Core.auth.serializers import UserSerializer
 
+from ESSArch_Core.profiles.models import SubmissionAgreement
 from ESSArch_Core.profiles.serializers import (
     ProfileIPSerializer,
 )
@@ -53,13 +54,18 @@ VERSION = get_versions()['version']
 
 class InformationPackageSerializer(serializers.HyperlinkedModelSerializer):
     responsible = UserSerializer()
-    profiles = ProfileIPSerializer(many=True)
+    profiles = serializers.SerializerMethodField()
     archival_institution = ArchivalInstitutionSerializer(read_only=True)
     archivist_organization = ArchivistOrganizationSerializer(read_only=True)
     archival_type = ArchivalTypeSerializer(read_only=True)
     archival_location = ArchivalLocationSerializer(read_only=True)
     permissions = serializers.SerializerMethodField()
     workarea = serializers.SerializerMethodField()
+    submission_agreement = serializers.PrimaryKeyRelatedField(queryset=SubmissionAgreement.objects.all())
+
+    def get_profiles(self, obj):
+        profiles = getattr(obj, 'profiles', obj.profileip_set)
+        return ProfileIPSerializer(profiles, many=True, context=self.context).data
 
     def get_permissions(self, obj):
         request = self.context.get('request')

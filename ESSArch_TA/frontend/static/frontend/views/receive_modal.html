@@ -1,24 +1,19 @@
 <div class="enter-profile-name">
-    <h3 class="modal-title" id="modal-title">{{'RECEIVE_SIP_DESC' | translate}}<b>{{$ctrl.data.ip}}</b></h3>
+    <h3 class="modal-title" id="modal-title">{{'RECEIVE_SIP_DESC' | translate}}<b>{{$ctrl.data.ip.label}}</b></h3>
 </div>
-<form name="$ctrl.form" ng-submit="$ctrl.receive()">
+<form name="$ctrl.form">
     <div class="modal-body" id="modal-body">
-        <br/>
-        <label class="sa-select" ng-if="$ctrl.data.submissionAgreements.length && !$ctrl.receiveSaError">
-            {{'SUBMISSION_AGREEMENT' | translate}}
-            <select class="form-control" ng-disabled="$ctrl.saDisabled" required ng-model="$ctrl.sa" ng-options="x as x.name for x in $ctrl.data.submissionAgreements">{{x}}</select>
-        </label>
-        <div uib-alert ng-if="$ctrl.receiveSaError" class="alert-danger">{{$ctrl.receiveSaError}}</div>
+        <profile-editor ip="ip" share-data="$ctrl.getProfileData($event)"></profile-editor>
     </div>
     <div class="modal-footer">
         <button class="btn btn-default" type="button" ng-click="$ctrl.skip()">{{'SKIP' | translate}} <i class=" fa fa-angle-double-right"></i></button>
         <div class="receive-footer">
             <div class="checkbox">
                 <label>
-                    <input type="checkBox" ng-disabled="receiveDisabled || $ctrl.form.$invalid || $ctrl.receiveSaError" ng-model="approvedToReceive">{{'APPROVEDTORECEIVE' | translate}}</input>
+                    <input type="checkBox" ng-disabled="receiveDisabled || !$ctrl.approvedToReceive()" ng-model="receiveApproved">{{'APPROVEDTORECEIVE' | translate}}</input>
                 </label>
             </div>
-            <button class="btn btn-primary" type="submit" ng-disabled="!approvedToReceive" focused="true">{{'RECEIVESIP' | translate}}</button>
+            <button class="btn btn-primary" ng-click="$ctrl.receive()" ng-disabled="!$ctrl.approvedToReceive() || receiveDisabled || !receiveApproved" focused="true">{{'RECEIVESIP' | translate}}</button>
             <button class="btn btn-warning" type="button" ng-click="$ctrl.cancel()">{{'CANCEL' | translate}}</button>
         </div>
     </div>
