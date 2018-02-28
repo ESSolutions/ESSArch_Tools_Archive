@@ -115,14 +115,9 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, IP, $h
                 $rootScope.ip = null;
             }
         } else {
-            if (!ip.responsible) {
-                $scope.filebrowser = true;
-                if(!ip.url) {
-                    ip.url = appConfig.djangoUrl + "ip-reception/" + ip.id + "/";
-                }
-                $scope.ip = ip;
-                $rootScope.ip = ip;
-            }
+            $scope.filebrowser = true;
+            $scope.ip = ip;
+            $rootScope.ip = ip;
         }
     }
     $scope.includeIp = function(row) {

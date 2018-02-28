@@ -204,21 +204,22 @@ angular.module('myApp').factory('listViewService', function (IP, SA, Profile, Wo
     }
 
     function getDir(ip, pathStr, pageNumber, pageSize) {
+        var id = ip.state == "Prepared" ? ip.object_identifier_value:ip.id;
         if(pathStr == "") {
             sendData = {
-                id: ip.id,
+                id: id,
                 page: pageNumber,
                 page_size: pageSize,
             };
         } else {
             sendData = {
-                id: ip.id,
+                id: id,
                 page: pageNumber,
                 page_size: pageSize,
                 path: pathStr,
             };
         }
-        if (ip.state == "At reception") {
+        if (ip.state == "At reception" || ip.state == "Prepared") {
             return IPReception.files(sendData).$promise.then(function(data) {
                 var count = data.$httpHeaders('Count');
                 if (count == null) {
