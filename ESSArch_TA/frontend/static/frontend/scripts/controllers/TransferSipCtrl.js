@@ -54,8 +54,7 @@ angular.module('myApp').controller('TransferSipCtrl', function(IP, $http, $scope
                     visible: true
                 };
                 $scope.transferDisabled = true;
-            }
-            if(row.profile_transformation != null && row.state != 'Transformed') {
+            } else if(row.profile_transformation != null && row.state != 'Transformed') {
                 vm.info = {
                     text: "HAS_TRANSFORMATION_PROFILE_NOT_TRANSFORMED",
                     values: {
