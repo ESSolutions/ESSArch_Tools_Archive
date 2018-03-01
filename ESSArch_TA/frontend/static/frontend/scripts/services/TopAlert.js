@@ -53,7 +53,6 @@ angular.module('myApp').factory('TopAlert', function ($rootScope, $q, appConfig,
          * @param time - Adds a duration to the alert
          */
         add: function(message, level, time, options) {
-            console.log(options)
             $rootScope.$broadcast('add_top_alert', { message: message, level: level, time: time, options: options });
         },
         /**
