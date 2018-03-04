@@ -1,9 +1,4 @@
-================
- Paths
-================
-
-.. contents::
-    :local:
+.. include:: /core/configuration/paths.rst
 
 .. _path_gate_reception:
 
