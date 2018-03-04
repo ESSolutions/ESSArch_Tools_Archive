@@ -12,6 +12,7 @@ ESSArch Tools Archive
    core/introduction
    core/profiles
    core/xml-generator
+   core/format-identifier
    configuration/index
    restapi/index
    source/modules
