@@ -31,6 +31,8 @@ import shutil
 import requests
 from django.contrib.auth import get_user_model
 
+# noinspection PyUnresolvedReferences
+from ESSArch_Core import tasks
 from ESSArch_Core.WorkflowEngine.dbtask import DBTask
 from ESSArch_Core.configuration.models import Path
 from ESSArch_Core.essxml.util import parse_submit_description
