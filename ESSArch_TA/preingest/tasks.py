@@ -28,12 +28,10 @@ import errno
 import os
 import shutil
 
+import requests
 from django.contrib.auth import get_user_model
 
-import requests
-
-from six.moves import urllib
-
+from ESSArch_Core.WorkflowEngine.dbtask import DBTask
 from ESSArch_Core.configuration.models import Path
 from ESSArch_Core.essxml.util import parse_submit_description
 from ESSArch_Core.ip.models import (
@@ -46,10 +44,6 @@ from ESSArch_Core.ip.models import (
 )
 from ESSArch_Core.storage.copy import copy_file
 from ESSArch_Core.util import mkdir_p
-from ESSArch_Core.WorkflowEngine.dbtask import DBTask
-from ESSArch_Core.WorkflowEngine.models import ProcessTask, ProcessStep
-from ESSArch_Core import tasks
-
 
 User = get_user_model()
 

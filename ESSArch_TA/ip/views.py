@@ -23,92 +23,59 @@
 """
 
 import copy
-import datetime
-import errno
 import glob
 import json
 import logging
-import mimetypes
 import os
-import re
-import shutil
 import tarfile
 import tempfile
 import uuid
 import zipfile
 
-from operator import itemgetter
-
 from celery import states as celery_states
-
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.db import IntegrityError
 from django.db.models import Prefetch
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-
 from groups_manager.models import Member
 from groups_manager.utils import get_permission_name
-
-from guardian.shortcuts import assign_perm, get_objects_for_group
-
-
+from guardian.shortcuts import assign_perm
+from ip.filters import InformationPackageFilter
+from ip.serializers import InformationPackageSerializer, InformationPackageReadSerializer
 from lxml import etree
-
-from rest_framework import exceptions, filters, permissions, status
+from rest_framework import exceptions, filters, permissions, status, viewsets
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
-
-from ESSArch_Core.auth.util import get_membership_descendants
-
-from ESSArch_Core.configuration.models import (
-    EventType,
-    Path,
-)
-
-from ESSArch_Core.essxml.util import (
-    get_agent,
-    get_objectpath,
-    parse_submit_description,
-)
-
-from ESSArch_Core.fixity.validation.backends.checksum import ChecksumValidator
-
-from ESSArch_Core.ip.models import InformationPackage, EventIP, Workarea
-
-from ESSArch_Core.ip.permissions import (
-    CanDeleteIP,
-    CanTransferSIP,
-)
-
-from ESSArch_Core.ip.serializers import EventIPSerializer
-
-from ESSArch_Core.mixins import PaginatedViewMixin
-
-from ESSArch_Core.pagination import LinkHeaderPagination
-
-from ESSArch_Core.profiles.models import ProfileIP, ProfileIPData, SubmissionAgreement
-from ESSArch_Core.profiles.utils import fill_specification_data
 
 from ESSArch_Core.WorkflowEngine.models import (
     ProcessStep,
     ProcessTask
 )
-
 from ESSArch_Core.WorkflowEngine.serializers import (
     ProcessStepSerializer,
 )
-
+from ESSArch_Core.configuration.models import (
+    Path,
+)
+from ESSArch_Core.essxml.util import (
+    get_objectpath,
+    parse_submit_description,
+)
+from ESSArch_Core.fixity.validation.backends.checksum import ChecksumValidator
+from ESSArch_Core.ip.models import InformationPackage, EventIP
+from ESSArch_Core.ip.permissions import (
+    CanDeleteIP,
+    CanTransferSIP,
+)
+from ESSArch_Core.mixins import PaginatedViewMixin
+from ESSArch_Core.profiles.models import ProfileIP, ProfileIPData, SubmissionAgreement
+from ESSArch_Core.profiles.utils import fill_specification_data
 from ESSArch_Core.util import (
     creation_date,
     flatten,
-    generate_file_response,
-    get_files_and_dirs,
     get_event_spec,
     get_immediate_subdirectories,
-    get_tree_size_and_count,
     get_value_from_path,
     in_directory,
     list_files,
@@ -116,11 +83,6 @@ from ESSArch_Core.util import (
     timestamp_to_datetime,
     remove_prefix
 )
-
-from ip.filters import InformationPackageFilter
-from ip.serializers import InformationPackageSerializer, InformationPackageReadSerializer, WorkareaSerializer
-
-from rest_framework import viewsets
 
 
 class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
