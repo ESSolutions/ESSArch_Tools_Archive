@@ -38,7 +38,6 @@ from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from groups_manager.models import Member
 from groups_manager.utils import get_permission_name
 from guardian.shortcuts import assign_perm
 from ip.filters import InformationPackageFilter
@@ -48,6 +47,7 @@ from rest_framework import exceptions, filters, permissions, status, viewsets
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 
+from ESSArch_Core.auth.models import Member
 from ESSArch_Core.WorkflowEngine.models import (
     ProcessStep,
     ProcessTask

@@ -28,9 +28,10 @@ import django
 django.setup()
 
 from django.contrib.auth.models import Permission
-from groups_manager.models import Group, Member, GroupType
+from groups_manager.models import GroupType
 from django.contrib.contenttypes.models import ContentType
 
+from ESSArch_Core.auth.models import Group, Member
 from ESSArch_Core.configuration.models import Parameter, Path, Agent
 from ESSArch_Core.ip.models import InformationPackage
 
