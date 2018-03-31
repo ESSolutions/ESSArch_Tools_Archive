@@ -474,29 +474,28 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             parsed = parse_submit_description(xmlfile, srcdir=os.path.split(objpath)[0])
 
             events_xmlfile = None
-            if tarfile.is_tarfile(objpath):
-                with tarfile.open(objpath) as tarf:
-                    try:
-                        tmp = tempfile.NamedTemporaryFile(delete=False)
-                        tmp.close()
-                        tarf.extract('%s/ipevents.xml' % pk, os.path.dirname(tmp.name))
-                        extracted = os.path.join(os.path.dirname(tmp.name), '%s/ipevents.xml' % pk)
-                        os.rename(extracted, tmp.name)
-                        events_xmlfile = tmp.name
-                    except KeyError:
-                        pass
 
-            if zipfile.is_zipfile(objpath):
-                with zipfile.open(objpath) as zipf:
-                    try:
-                        tmp = tempfile.NamedTemporaryFile(delete=False)
-                        tmp.close()
-                        zipf.extract('%s/ipevents.xml' % pk, os.path.dirname(tmp.name))
-                        extracted = os.path.join(os.path.dirname(tmp.name), '%s/ipevents.xml' % pk)
-                        os.rename(extracted, tmp.name)
-                        events_xmlfile = tmp.name
-                    except KeyError:
-                        pass
+            tmp = tempfile.NamedTemporaryFile(delete=False)
+            tmp.close()
+            ip_events_src = '%s/ipevents.xml' % objid
+            ip_events_dst = tmp.name
+            try:
+                if tarfile.is_tarfile(objpath):
+                    with tarfile.open(objpath) as tarf:
+                        tarf.extract(ip_events_src, os.path.dirname(ip_events_dst))
+
+                elif zipfile.is_zipfile(objpath):
+                    with zipfile.open(objpath) as zipf:
+                        zipf.extract(ip_events_src, os.path.dirname(ip_events_dst))
+            except KeyError:
+                self.logger.exception('failed to extract ip events file from %s' % objpath)
+            else:
+                self.logger.debug('extracted {xml} from {objpath} to {dst}'.format(xml=ip_events_src, objpath=objpath,
+                                                                                  dst=os.path.dirname(ip_events_dst)))
+                extracted = os.path.join(os.path.dirname(ip_events_dst), ip_events_src)
+                self.logger.debug('moving {src} to {dst}'.format(src=extracted, dst=ip_events_dst))
+                os.rename(extracted, ip_events_dst)
+                events_xmlfile = ip_events_dst
         else:
             events_xmlfile=None
 
