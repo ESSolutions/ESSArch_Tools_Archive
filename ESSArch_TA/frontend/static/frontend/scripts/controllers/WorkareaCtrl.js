@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('WorkareaCtrl', function(vm, ipSortString, IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, $sce, $window, TopAlert, $filter,  $q) {
+angular.module('myApp').controller('WorkareaCtrl', function(vm, ipSortString, IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, $sce, $window, Notifications, $filter,  $q) {
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
     vm.workarea = "ingest";
     var watchers=[];

@@ -309,5 +309,6 @@
     "MISSING_VALIDATION": "Validation profile missing in Submission Agreement",
     "MISSING_TRANSFORMATION": "Transformation profile missing in Submission Agreement",
     "NO_FORM_TEMPLATE": "No form available",
-    "STEP_STATE_DESC": "Step state, Success/Failure"
+    "STEP_STATE_DESC": "Step state, Success/Failure",
+    "POPUP_ENABLED": "Popup enabled"
 }

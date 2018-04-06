@@ -100,7 +100,7 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
         $uibModalInstance.dismiss('cancel');
     };
 })
-.controller('OverwriteModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, SA, Profile, TopAlert) {
+.controller('OverwriteModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, SA, Profile, Notifications) {
     var $ctrl = this;
     if(data.file) {
         $ctrl.file = data.file;
@@ -113,27 +113,27 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     }
     $ctrl.overwriteProfile = function() {
         return Profile.update($ctrl.profile).$promise.then(function(resource) {
-            TopAlert.add("Profile: \"" + resource.name + "\" has been imported. <br/>ID: " + resource.id , "success", 5000, {isHtml: true});
+            Notifications.add("Profile: \"" + resource.name + "\" has been imported. <br/>ID: " + resource.id , "success", 5000, {isHtml: true});
             $ctrl.data = {
                 status: "overwritten"
             }
             $uibModalInstance.close($ctrl.data);
             return resource;
         }).catch(function(repsonse) {
-            TopAlert.add(response.detail, "error");
+            Notifications.add(response.detail, "error");
         })
     }
     $ctrl.overwriteSa = function() {
         $ctrl.profile.published = false;
         return SA.update($ctrl.profile).$promise.then(function(resource) {
-            TopAlert.add("Submission agreement: \"" + resource.name + "\" has been imported. <br/>ID: " + resource.id , "success", 5000, {isHtml: true});
+            Notifications.add("Submission agreement: \"" + resource.name + "\" has been imported. <br/>ID: " + resource.id , "success", 5000, {isHtml: true});
             $ctrl.data = {
                 status: "overwritten"
             }
             $uibModalInstance.close($ctrl.data);
             return resource;
         }).catch(function(response) {
-            TopAlert.add("Submission Agreement " + $ctrl.profile.name + " is Published and can not be overwritten", "error");
+            Notifications.add("Submission Agreement " + $ctrl.profile.name + " is Published and can not be overwritten", "error");
         })
     }
     $ctrl.overwrite = function () {
@@ -146,7 +146,7 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
         $uibModalInstance.dismiss('cancel');
     };
 })
-.controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, $http, appConfig, TopAlert, $uibModal, $log) {
+.controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, $http, appConfig, Notifications, $uibModal, $log) {
     var $ctrl = this;
     $ctrl.data = data;
     $ctrl.file = data.file;
@@ -180,10 +180,10 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     };
     $ctrl.transform = function() {
         $http.post(appConfig.djangoUrl + "workarea-entries/" + $ctrl.data.ip.workarea.id+"/transform/").then(function(response) {
-            TopAlert.add(response.data, "success");
+            Notifications.add(response.data, "success");
             $uibModalInstance.close(response.data);
         }).catch(function(response) {
-            TopAlert.add(response.data.detail, "error");
+            Notifications.add(response.data.detail, "error");
         })
     }
     $ctrl.cancel = function () {

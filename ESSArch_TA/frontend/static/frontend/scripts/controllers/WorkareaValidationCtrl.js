@@ -1,4 +1,4 @@
-angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $controller, $interval, $http, appConfig, $rootScope, WorkareaValidation, $q, TopAlert, $uibModal, $window, $log, Profile, $translate) {
+angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $controller, $interval, $http, appConfig, $rootScope, WorkareaValidation, $q, Notifications, $uibModal, $window, $log, Profile, $translate) {
     var vm = this;
     var ipSortString ="";
     $controller('WorkareaCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
@@ -114,10 +114,10 @@ angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $c
                 stop_at_failure: vm.stop_at_failure
             }
         }).then(function(response) {
-            TopAlert.add(response.data, "success");
+            Notifications.add(response.data, "success");
             vm.validationPipe(vm.validationTableState);
         }).catch(function(response) {
-            TopAlert.add(response.data.detail, "error");
+            Notifications.add(response.data.detail, "error");
         })
     }
 

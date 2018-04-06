@@ -1,4 +1,4 @@
-angular.module('myApp').controller('TransformationCtrl', function($scope, $controller, Resource, listViewService, TopAlert, $http, $sce, $rootScope, $cookies, $timeout, appConfig, $uibModal, $window, Profile, $q, IP, $interval) {
+angular.module('myApp').controller('TransformationCtrl', function($scope, $controller, Resource, listViewService, Notifications, $http, $sce, $rootScope, $cookies, $timeout, appConfig, $uibModal, $window, Profile, $q, IP, $interval) {
     var vm = this;
     var ipSortString ="";
     $controller('WorkareaCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });

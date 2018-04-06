@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('UtilCtrl', function($scope, $state, $location, $window, $http, appConfig, TopAlert, permissionConfig, myService, $timeout, $anchorScroll) {
+angular.module('myApp').controller('UtilCtrl', function($scope, $state, $location, $window, $http, appConfig, Notifications, permissionConfig, myService, $timeout, $anchorScroll) {
     $scope.$state = $state;
     $scope.reloadPage = function (){
         $state.reload();
@@ -31,7 +31,7 @@ angular.module('myApp').controller('UtilCtrl', function($scope, $state, $locatio
         $window.location.href="/admin/";
     }
     $scope.showAlert = function() {
-        TopAlert.show();
+        Notifications.toggle();
     }
     $scope.checkPermissions = function(page) {
         // Check if there is a sub state that does not require permissions

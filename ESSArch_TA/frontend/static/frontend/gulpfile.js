@@ -77,6 +77,8 @@ var vendorFiles = [
         'bower_components/lodash/lodash.js', // required by angular-link-header-parser
         'bower_components/uri-util/dist/uri-util.js', // required by angular-link-header-parser
         'node_modules/marked/lib/marked.js',
+        'node_modules/messenger-hubspot/build/js/messenger.js',
+        'node_modules/messenger-hubspot/build/js/messenger-theme-flat.js',
         'node_modules/angular-relative-date/dist/angular-relative-date.js',
         'node_modules/angular-marked/dist/angular-marked.js',
         'node_modules/angular-filesize-filter/angular-filesize-filter.js',
@@ -98,12 +100,14 @@ var vendorFiles = [
         'styles/modules/login.scss',
         'styles/modules/my_page.scss',
         'styles/modules/receive_sip.scss',
-        'styles/modules/top_alert.scss',
         'styles/modules/workspace.scss',
         'styles/modules/profile_editor.scss',
         'styles/modules/colors.scss',
         'styles/modules/mixins.scss',
         'styles/modules/tree_control.scss',
+        'styles/modules/notifications.scss',
+        'styles/modules/positions.scss',
+        'styles/modules/utils.scss',
         'styles/styles.scss'
     ],
     cssDest = 'styles';
