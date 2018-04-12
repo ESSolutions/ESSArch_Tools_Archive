@@ -472,21 +472,19 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
     // Basic functions
 
     //Remove and ip
-    $scope.removeIp = function (ipObject, workarea, reception) {
-        IP.delete({ id: ipObject.id }, { workarea: workarea, reception: reception }).$promise.then(function() {
-            vm.displayedIps.splice(vm.displayedIps.indexOf(ipObject), 1);
-            $scope.edit = false;
-            $scope.select = false;
-            $scope.eventlog = false;
-            $scope.eventShow = false;
-            $scope.statusShow = false;
-            $scope.filebrowser = false;
-            $rootScope.loadNavigation(ipSortString);
-            if(vm.displayedIps.length == 0) {
-                $state.reload();
-            }
-            $scope.getListViewData();
-        });
+    $scope.removeIp = function (ipObject) {
+        vm.displayedIps.splice(vm.displayedIps.indexOf(ipObject), 1);
+        $scope.edit = false;
+        $scope.select = false;
+        $scope.eventlog = false;
+        $scope.eventShow = false;
+        $scope.statusShow = false;
+        $scope.filebrowser = false;
+        $rootScope.loadNavigation(ipSortString);
+        if(vm.displayedIps.length == 0) {
+            $state.reload();
+        }
+        $scope.getListViewData();
     }
     vm.getEventlogData = function() {
         listViewService.getEventlogData().then(function(value){
@@ -911,11 +909,16 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             ariaLabelledBy: 'modal-title',
             ariaDescribedBy: 'modal-body',
             templateUrl: 'static/frontend/views/remove-ip-modal.html',
-            controller: 'ModalInstanceCtrl',
-            controllerAs: '$ctrl'
+            controller: 'DataModalInstanceCtrl',
+            controllerAs: '$ctrl',
+            resolve: {
+                data: {
+                    ip: ipObject
+                }
+            }
         })
         modalInstance.result.then(function (data) {
-            $scope.removeIp(ipObject, data.workarea, data.reception);
+            $scope.removeIp(ipObject);
         }, function () {
             $log.info('modal-component dismissed at: ' + new Date());
         });

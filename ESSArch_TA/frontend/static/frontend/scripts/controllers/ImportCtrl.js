@@ -31,7 +31,12 @@ angular.module('myApp').controller('ImportCtrl', function($q, $window, $rootScop
             vm.saProfile.profiles = response.data;
             vm.select = true;
         }).catch(function(response) {
-            $scope.error = response.data.detail;
+            if(response.status == -1) {
+                console.log("You must accept SSL certificate, go to: ", vm.url);
+                acceptCertModal(vm.url);
+            } else {
+                $scope.error = response.data;
+            }
         })
     }
 
@@ -180,6 +185,27 @@ angular.module('myApp').controller('ImportCtrl', function($q, $window, $rootScop
         modalInstance.result.then(function (data) {
         });
     }
+
+    function acceptCertModal(url) {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'static/frontend/views/accept-cert-modal.html',
+            controller: 'CertModalInstanceCtrl',
+            controllerAs: '$ctrl',
+            resolve: {
+                data: function () {
+                    return {
+                        url: url,
+                    };
+                }
+            },
+        })
+        modalInstance.result.then(function (data) {
+        });
+    }
+
     vm.triggerProfileUpload = function() {
         document.getElementById('profile-upload').click();
     }

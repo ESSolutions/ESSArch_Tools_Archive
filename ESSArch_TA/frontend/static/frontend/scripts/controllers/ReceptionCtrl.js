@@ -193,22 +193,20 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, IP, $h
         $scope.getListViewData();
     }
 
-    //Remove an ip
-    $scope.removeIp = function (ipObject, workarea, reception) {
-        IP.delete({ id: ipObject.id }, { workarea: workarea, reception: reception }).$promise.then(function() {
-            vm.displayedIps.splice(vm.displayedIps.indexOf(ipObject), 1);
-            $scope.edit = false;
-            $scope.select = false;
-            $scope.eventlog = false;
-            $scope.eventShow = false;
-            $scope.statusShow = false;
-            $scope.filebrowser = false;
-            if(vm.displayedIps.length == 0) {
-                $state.reload();
-            }
-            vm.uncheckIp(ipObject);
-            $scope.getListViewData();
-        });
+    // Executed after IP is removed
+    $scope.removeIp = function (ipObject) {
+        vm.displayedIps.splice(vm.displayedIps.indexOf(ipObject), 1);
+        $scope.edit = false;
+        $scope.select = false;
+        $scope.eventlog = false;
+        $scope.eventShow = false;
+        $scope.statusShow = false;
+        $scope.filebrowser = false;
+        if(vm.displayedIps.length == 0) {
+            $state.reload();
+        }
+        vm.uncheckIp(ipObject);
+        $scope.getListViewData();
     }
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
     $scope.submitDescription = $translate.instant('SUBMITDESCRIPTION');

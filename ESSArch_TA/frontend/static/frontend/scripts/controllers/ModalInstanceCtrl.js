@@ -27,8 +27,6 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     $ctrl.error_messages_old = [];
     $ctrl.error_messages_pw1 = [];
     $ctrl.error_messages_pw2 = [];
-    $ctrl.workareaRemove = true;
-    $ctrl.receptionRemove = true;
     $ctrl.tracebackCopied = false;
     $ctrl.copied = function() {
         $ctrl.tracebackCopied = true;
@@ -146,9 +144,14 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
         $uibModalInstance.dismiss('cancel');
     };
 })
-.controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, $http, appConfig, Notifications, $uibModal, $log) {
+.controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, IP, $scope, data, $http, appConfig, Notifications, $uibModal, $log) {
     var $ctrl = this;
     $ctrl.data = data;
+    if(data.vm) {
+        var vm = data.vm;
+    }
+    $ctrl.workareaRemove = true;
+    $ctrl.receptionRemove = true;
     $ctrl.file = data.file;
     $ctrl.type = data.type;
     $ctrl.fullscreenActive = false;
@@ -189,8 +192,23 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     $ctrl.cancel = function () {
         $uibModalInstance.dismiss('cancel');
     };
+    $ctrl.remove = function (ipObject, workarea, reception) {
+        $ctrl.removing = true;
+        IP.delete({ id: ipObject.id }, { workarea: workarea, reception: reception }).$promise.then(function() {
+            Notifications.add("IP " + ipObject.label + " Removed!", 'success');
+            $ctrl.removing = false;
+            $uibModalInstance.close();
+    }).catch(function(response) {
+            $ctrl.removing = false;
+            if(response.status == 404) {
+                Notifications.add('IP could not be found', 'error');
+            } else {
+                Notifications.add(response.data.detail, 'error');
+            }
+        })
+    };
 })
-.controller('ReceiveModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, $scope, IPReception, $translate) {
+.controller('ReceiveModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, $scope, IPReception, $translate, Notifications) {
     var $ctrl = this;
     var vm = data.vm;
     $scope.profileEditor = true;
@@ -250,15 +268,23 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
         if($ctrl.sa && $ctrl.sa != null) {
             payload.submission_agreement = $ctrl.sa.id;
         }
+        $ctrl.receiving = true;
         IPReception.receive(payload).$promise.then(function(response) {
             $ctrl.data = {
                 status: "receive",
                 ip: $ctrl.data.ip.id,
                 sa: $ctrl.sa,
             };
+            $ctrl.receiving = false;
             $uibModalInstance.close($ctrl.data);
         }).catch(function(response) {
+            $ctrl.receiving = false;
             $scope.receiveDisabled = false;
+            if(response.status == 404) {
+                Notifications.add('IP could not be found', 'error');
+            } else {
+                Notifications.add(response.data.detail, 'error');
+            }
         });
     }
     $ctrl.skip = function () {
