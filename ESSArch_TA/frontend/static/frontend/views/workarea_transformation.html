@@ -50,7 +50,7 @@
                     <div class="alert alert-danger" ng-show="ip.profile_transformation == null && error" translate="{{error}}" translate-values="{ label: ip.label}"></div>
                     <div>
                         <button ng-disabled="!ip.profile_transformation || (ip.profile_validation && !vm.validation_complete) || ip.state == 'Transforming' || ip.state == 'Transformed' || ip.state == 'Transferring' || ip.state == 'Transferred'"
-                        ng-click="vm.transform(ip)" class="btn btn-info" style="float: right; margin-bottom: 10px;">{{'TRANSFORM' | translate}}</button>
+                        ng-click="vm.transform(ip)" class="btn btn-info" style="float: right; margin-bottom: 10px;">{{'TRANSFORM' | translate}} <i ng-if="ip.state == 'Transforming'" class="fa fa-spinner fa-spin"/></button>
                     </div>
                 </div>
             </div>
