@@ -54,12 +54,6 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
         };
         $uibModalInstance.close($ctrl.data);
     }
-    $ctrl.transfer = function () {
-        $ctrl.data = {
-            ip: $scope.ip
-        };
-        $uibModalInstance.close($ctrl.data);
-    }
     $ctrl.lock = function () {
         $ctrl.data = {
             status: "locked"
@@ -155,6 +149,8 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     $ctrl.file = data.file;
     $ctrl.type = data.type;
     $ctrl.fullscreenActive = false;
+
+    // Show fullscreen validation message
     $ctrl.showFullscreenMessage = function() {
         $ctrl.fullscreenActive = true;
         var modalInstance = $uibModal.open({
@@ -181,6 +177,8 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
     $ctrl.ok = function () {
         $uibModalInstance.close();
     };
+
+    // Transform IP
     $ctrl.transform = function() {
         $http.post(appConfig.djangoUrl + "workarea-entries/" + $ctrl.data.ip.workarea.id+"/transform/").then(function(response) {
             Notifications.add(response.data, "success");
@@ -189,9 +187,30 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
             Notifications.add(response.data.detail, "error");
         })
     }
+
+    // Transfer IP
+    $ctrl.transfer = function (ip) {
+        $ctrl.transferring = true;
+        IP.transfer({
+            id: ip.id
+        }).$promise.then(function(response) {
+            $ctrl.transferring = false;
+            $uibModalInstance.close();
+        }).catch(function(response) {
+            $ctrl.transferring = false;
+            if(response.status == 404) {
+                Notifications.add('IP could not be found', "error");
+            } else {
+                Notifications.add(response.data.detail, "error");
+            }
+        });
+    }
+
     $ctrl.cancel = function () {
         $uibModalInstance.dismiss('cancel');
     };
+
+    // Remove IP
     $ctrl.remove = function (ipObject, workarea, reception) {
         $ctrl.removing = true;
         IP.delete({ id: ipObject.id }, { workarea: workarea, reception: reception }).$promise.then(function() {

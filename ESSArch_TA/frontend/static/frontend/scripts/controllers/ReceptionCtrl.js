@@ -194,7 +194,7 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, IP, $h
     }
 
     // Executed after IP is removed
-    $scope.removeIp = function (ipObject) {
+    $scope.ipRemoved = function (ipObject) {
         vm.displayedIps.splice(vm.displayedIps.indexOf(ipObject), 1);
         $scope.edit = false;
         $scope.select = false;

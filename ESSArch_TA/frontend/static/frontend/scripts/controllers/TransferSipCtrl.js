@@ -106,8 +106,13 @@ angular.module('myApp').controller('TransferSipCtrl', function(IP, $http, $scope
             ariaDescribedBy: 'modal-body',
             templateUrl: 'static/frontend/views/transfer_sip_modal.html',
             scope: $scope,
-            controller: 'ModalInstanceCtrl',
-            controllerAs: '$ctrl'
+            controller: 'DataModalInstanceCtrl',
+            controllerAs: '$ctrl',
+            resolve: {
+                data: {
+                    ip: $scope.ip
+                }
+            }
         })
         modalInstance.result.then(function (data) {
             $scope.transferSip(data.ip);

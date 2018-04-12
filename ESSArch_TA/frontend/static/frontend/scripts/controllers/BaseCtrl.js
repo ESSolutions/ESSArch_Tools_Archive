@@ -471,8 +471,8 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
 
     // Basic functions
 
-    //Remove and ip
-    $scope.removeIp = function (ipObject) {
+    // Executed after IP is removed
+    $scope.ipRemoved = function (ipObject) {
         vm.displayedIps.splice(vm.displayedIps.indexOf(ipObject), 1);
         $scope.edit = false;
         $scope.select = false;
@@ -918,7 +918,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             }
         })
         modalInstance.result.then(function (data) {
-            $scope.removeIp(ipObject);
+            $scope.ipRemoved(ipObject);
         }, function () {
             $log.info('modal-component dismissed at: ' + new Date());
         });
