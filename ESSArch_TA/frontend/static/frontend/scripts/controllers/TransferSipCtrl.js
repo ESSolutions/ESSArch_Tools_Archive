@@ -69,23 +69,6 @@ angular.module('myApp').controller('TransferSipCtrl', function(IP, $http, $scope
         $scope.statusShow = false;
     };
 
-
-    $scope.transferSip = function(ip) {
-        $scope.transferDisabled = true;
-        IP.transfer({
-            id: ip.id
-        }).$promise.then(function(response) {
-            $scope.select = false;
-            $timeout(function() {
-                $scope.getListViewData();
-                vm.updateListViewConditional();
-            }, 1000);
-            $scope.transferDisabled = false;
-        }).catch(function(response) {
-            $scope.transferDisabled = false;
-            Notifications.add(response.data.detail, "error");
-        });
-    }
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
     $scope.submitDescription = $translate.instant('SUBMITDESCRIPTION');
     $scope.package = $translate.instant('PACKAGE');
@@ -115,9 +98,13 @@ angular.module('myApp').controller('TransferSipCtrl', function(IP, $http, $scope
             }
         })
         modalInstance.result.then(function (data) {
-            $scope.transferSip(data.ip);
-        }, function () {
-            $log.info('modal-component dismissed at: ' + new Date());
+            $scope.transferDisabled = true;
+            $scope.select = false;
+            $timeout(function () {
+                $scope.getListViewData();
+                vm.updateListViewConditional();
+            }, 1000);
+            $scope.transferDisabled = false;
         });
     }
 });
