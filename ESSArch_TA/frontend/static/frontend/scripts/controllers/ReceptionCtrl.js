@@ -614,11 +614,13 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, IP, $h
 
      //Create and show modal for remove ip
     vm.receiveModal = function (ip) {
+        vm.receiveModalLoading = true;
         if (ip.at_reception) {
             IPReception.get({ id: ip.id }).$promise.then(function (resource) {
                 if (resource.altrecordids && resource.altrecordids.SUBMISSIONAGREEMENT) {
                     IPReception.prepare({ id: resource.id, submission_agreement: resource.altrecordids.SUBMISSIONAGREEMENT[0] }).$promise.then(function (prepared) {
                         vm.updateCheckedIp(ip, prepared);
+                        vm.receiveModalLoading = false;
                         var modalInstance = $uibModal.open({
                             animation: true,
                             ariaLabelledBy: 'modal-title',
@@ -654,6 +656,7 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, IP, $h
                         });
                     })
                         .catch(function (response) {
+                            vm.receiveModalLoading = false;
                             var modalInstance = $uibModal.open({
                                 animation: true,
                                 ariaLabelledBy: 'modal-title',
@@ -689,6 +692,7 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, IP, $h
                             });
                         })
                 } else {
+                    vm.receiveModalLoading = false;
                     var modalInstance = $uibModal.open({
                         animation: true,
                         ariaLabelledBy: 'modal-title',
@@ -726,6 +730,7 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, IP, $h
             })
         } else {
             IP.get({ id: ip.id }).$promise.then(function (resource) {
+                vm.receiveModalLoading = false;
                 var modalInstance = $uibModal.open({
                     animation: true,
                     ariaLabelledBy: 'modal-title',
