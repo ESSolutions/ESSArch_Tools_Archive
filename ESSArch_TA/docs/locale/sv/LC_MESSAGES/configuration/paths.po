@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ESSArch Tools Archive 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-25 20:56+0100\n"
+"POT-Creation-Date: 2018-04-19 13:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,15 +18,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.5.3\n"
 
-#: ../../configuration/paths.rst:3
+#: ../../core/configuration/paths.rst:3
 msgid "Paths"
 msgstr ""
 
-#: ../../configuration/paths.rst:11
+#: ../../core/configuration/paths.rst:11
+msgid "path_mimetypes_definitionfile"
+msgstr ""
+
+#: ../../core/configuration/paths.rst:13
+msgid "The MIME types file that will be used when generating XML files."
+msgstr ""
+
+#: ../../configuration/paths.rst:6
 msgid "path_gate_reception"
 msgstr ""
 
-#: ../../configuration/paths.rst:13
+#: ../../configuration/paths.rst:8
 msgid "Directory where IPs are transferred and picked up by EPP"
 msgstr ""
 
