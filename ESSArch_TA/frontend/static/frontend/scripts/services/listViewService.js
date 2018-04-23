@@ -343,12 +343,16 @@ angular.module('myApp').factory('listViewService', function (IP, SA, Profile, Wo
                         promises.push(Profile.get({ id: saProfile.profile.profile_aip })
                             .$promise.then(function (resource) {
                                 saProfile.profile.profile_aip = resource;
+                            }).catch(function(response){
+                                Notifications.add(response.data.detail, 'error');
                             }));
                     }
                     if (saProfile.profile.profile_dip) {
                         promises.push(Profile.get({ id: saProfile.profile.profile_dip })
                             .$promise.then(function (resource) {
                                 saProfile.profile.profile_dip = resource;
+                            }).catch(function(response){
+                                Notifications.add(response.data.detail, 'error');
                             }));
                     }
                 }
@@ -356,6 +360,8 @@ angular.module('myApp').factory('listViewService', function (IP, SA, Profile, Wo
             return $q.all(promises).then(function() {
                 return saProfile;
             })
+        }).catch(function(response){
+            Notifications.add(response.data.detail, 'error');
         });
     }
 

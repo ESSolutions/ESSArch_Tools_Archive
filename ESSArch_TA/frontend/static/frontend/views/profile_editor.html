@@ -15,13 +15,15 @@
                             <p ng-if="!saProfile.profile || !checkPermission('profiles.create_new_sa_generation')" class="table-col">{{'SUBMISSIONAGREEMENT' | translate}}</p>
                         </td>
                         <td>
-                            <select class="form-control table-col" ng-disabled="(saProfile.disabled)"
+                            <select class="form-control table-col" ng-disabled="(saProfile.disabled || vm.gettingSas)"
                             ng-model="saProfile.profile"
-                            ng-options="x as x.name for x in saProfile.profiles"></select>
+                            ng-options="x as x.name for x in saProfile.profiles">
+                            <option ng-show="vm.gettingSas" value="" disabled selected>{{vm.gettingSas?('LOADING' | translate)+'...':''}}</option>
+                        </select>
                         </td>
                         <td class="flex-row">
-                            <button ng-if="saProfile.profile" class="btn btn-default lock-button btn-sm" ng-click="saClick(saProfile)" uib-popover="{{saProfile.profile.name}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"><i class="fa fa-eye"></i>{{'VIEW' | translate}}</i></button>
-                            <button ng-if="!saProfile.disabled" ng-disabled="!saProfile.profile" class="btn btn-success prepare-button btn-sm" ng-click="prepare(ip)">{{'PREPARE' | translate}}</button>
+                            <button ng-if="saProfile.profile" class="btn btn-default lock-button btn-sm" ng-click="saClick(saProfile)" uib-popover="{{saProfile.profile.name}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"><i class="fa fa-eye"></i>{{'VIEW' | translate}}</i> <i ng-if="vm.loadingSa" class="fa fa-spinner fa-spin"/></button>
+                            <button ng-if="!saProfile.disabled" ng-disabled="!saProfile.profile" class="btn btn-success prepare-button btn-sm" ng-click="prepare(ip)">{{'PREPARE' | translate}} <i ng-if="vm.preparingIp" class="fa fa-spinner fa-spin"/></button>
                         </td>
                         <p>{{'PATH' | translate}}: {{ip.object_path}}</p>
                     </tr>
@@ -60,7 +62,7 @@
                                         {{profileIp.profile_name}}
                                     </td>
                                     <td>
-                                        <button type="button" class="btn btn-default lock-button btn-sm" ng-click="profileClick(profileIp, {})" uib-popover="{{profileIp.profile_name}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"><i class="fa fa-pencil"></i>&nbsp;{{'EDIT' | translate}}</i></button>
+                                        <button type="button" class="btn btn-default lock-button btn-sm" ng-click="profileClick(profileIp, {})" uib-popover="{{profileIp.profile_name}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"><i class="fa fa-pencil"></i>&nbsp;{{'EDIT' | translate}}</i> <i ng-if="vm.loadingProfileData[profileIp.profile_type]" class="fa fa-spinner fa-spin"/></button>
                                     </td>
                                 </div>
                             </tr>
@@ -87,7 +89,7 @@
                 </formly-form>
                 <br />
                 <div class="button-wrapper">
-                    <button ng-if="vm.profileFields.length" type="submit" class="btn btn-info" ng-disabled="vm.editForm.$invalid || angular.equals(vm.profileOldModel, vm.profileModel)" translate="SAVE"></button>
+                    <button ng-if="vm.profileFields.length" type="submit" class="btn btn-info" ng-disabled="vm.editForm.$invalid || angular.equals(vm.profileOldModel, vm.profileModel)">{{'SAVE' | translate}} <i ng-if="vm.savingProfileModel" class="fa fa-spinner fa-spin"/></button>
                     <button ng-if="vm.profileFields.length" ng-click="vm.cancel()" class="btn btn-warning">{{'CANCEL' | translate}}</button>
                 </div>
             </form>
