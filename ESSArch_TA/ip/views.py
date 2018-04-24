@@ -321,6 +321,10 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             self.logger.error(msg)
             raise ImproperlyConfigured(msg)
 
+        organization = request.user.user_profile.current_organization
+        if organization is None:
+            raise exceptions.ParseError('You must be part of an organization to prepare an IP')
+
         member = Member.objects.get(django_user=request.user)
 
         existing = InformationPackage.objects.filter(object_identifier_value=pk).first()
@@ -399,8 +403,6 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         ip.refresh_from_db(fields=['entry_date', 'start_date', 'end_date'])
 
         user_perms = perms.pop('owner', [])
-
-        organization = request.user.user_profile.current_organization
         organization.assign_object(ip, custom_permissions=perms)
 
         for perm in user_perms:
