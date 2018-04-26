@@ -549,16 +549,10 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
                     processstep=validation_step
                 )
 
-            files = [objpath]
-
             if validators.get('validate_logical_physical_representation'):
                 ProcessTask.objects.create(
                     name="ESSArch_Core.tasks.ValidateLogicalPhysicalRepresentation",
-                    params={
-                        "files": files,
-                        "files_reldir": srcdir,
-                        "xmlfile": xmlfile,
-                    },
+                    args=[objpath, xmlfile],
                     log=EventIP,
                     information_package=ip,
                     responsible=self.request.user,
