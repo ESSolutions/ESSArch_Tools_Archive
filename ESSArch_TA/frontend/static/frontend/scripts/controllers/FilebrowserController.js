@@ -103,6 +103,7 @@ angular.module('myApp').controller('FilebrowserController', function ($scope, $w
     $scope.previousGridArray = function () {
         $scope.previousGridArrays.pop();
         if($scope.tableState) {
+            $scope.tableState.pagination.start = 0;
             $scope.dirPipe($scope.tableState);
             $scope.selectedCards = [];
         }
