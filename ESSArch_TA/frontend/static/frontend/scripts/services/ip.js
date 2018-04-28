@@ -67,10 +67,6 @@ angular.module('myApp').factory('IP', function ($resource, appConfig, Event, Ste
             method: "PUT",
             params: { method: "check-profile", id: "@id"}
         },
-        unlockProfile: {
-            method: "POST",
-            params: { action: "unlock-profile", id: "@id" }
-        },
         changeProfile: {
             method: "PUT",
             params: { action: "change-profile", id: "@id" }
@@ -88,10 +84,6 @@ angular.module('myApp').factory('IP', function ($resource, appConfig, Event, Ste
             hasBody: true,
             params: { action: "files", id: "@id" },
             headers: { "Content-type": 'application/json;charset=utf-8' },
-        },
-        changeSa: {
-            method: "PATCH",
-            params: { id: "@id" },
         },
         transfer: {
             method: 'POST',
