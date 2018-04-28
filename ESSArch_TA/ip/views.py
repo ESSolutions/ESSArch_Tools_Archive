@@ -24,6 +24,7 @@
 
 import copy
 import glob
+import itertools
 import json
 import logging
 import os
@@ -52,9 +53,7 @@ from ESSArch_Core.WorkflowEngine.models import (
     ProcessStep,
     ProcessTask
 )
-from ESSArch_Core.WorkflowEngine.serializers import (
-    ProcessStepSerializer,
-)
+from ESSArch_Core.WorkflowEngine.serializers import ProcessStepChildrenSerializer
 from ESSArch_Core.configuration.models import (
     Path,
 )
@@ -1050,12 +1049,14 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         return super(InformationPackageViewSet, self).destroy(request, pk=pk)
 
     @detail_route()
-    def steps(self, request, pk=None):
+    def workflow(self, request, pk=None):
         ip = self.get_object()
-        steps = ip.steps.all()
-        serializer = ProcessStepSerializer(
-            data=steps, many=True, context={'request': request}
-        )
+
+        steps = ip.steps.filter(parent_step__information_package__isnull=True)
+        tasks = ip.processtask_set.filter(processstep__information_package__isnull=True)
+        flow = sorted(itertools.chain(steps, tasks), key=lambda x: (x.get_pos(), x.time_created))
+
+        serializer = ProcessStepChildrenSerializer(data=flow, many=True, context={'request': request})
         serializer.is_valid()
         return Response(serializer.data)
 

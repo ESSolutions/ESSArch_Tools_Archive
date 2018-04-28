@@ -507,12 +507,12 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
         $scope.state = translations.STATE;
         $scope.status = translations.STATUS;
         $scope.expanding_property = {
-            field: "name",
+            field: "label",
             displayName: $scope.label,
         };
         $scope.col_defs = [
             {
-                field: "user",
+                field: "responsible",
                 displayName: $scope.responsible,
             },
             {
