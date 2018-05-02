@@ -25,42 +25,16 @@ angular.module('myApp').controller('ProfileCtrl', function($q, SA, IP, Profile, 
     vm.dataVersion = null;
     // On init
     vm.$onInit = function() {
-        $scope.saProfile = {
-            profile: null,
-            profiles: [],
-            disabled: false
-        };
-        $scope.ip = vm.ip;
-        vm.gettingSas = true;
-        listViewService.getSaProfiles($scope.ip).then(function (result) {
-            vm.gettingSas = false;
-            $scope.saProfile.profiles = result.profiles;
-            var chosen_sa_id = null;
-            if($scope.ip.submission_agreement) {
-                chosen_sa_id = $scope.ip.submission_agreement;
-            } else if ($scope.ip.altrecordids && $scope.ip.altrecordids.SUBMISSIONAGREEMENT) {
-                chosen_sa_id = $scope.ip.altrecordids.SUBMISSIONAGREEMENT[0];
-            }
-            if(result.profiles.length <= 0) {
-                $scope.saAlert = $scope.alerts.noSas;
-            } else
-            if (chosen_sa_id) {
-                var found = $filter('filter')(result.profiles, { id: chosen_sa_id }, true);
-                if (found.length) {
-                    $scope.saProfile.profile = found[0];
-                    $scope.saProfile.disabled = true;
-                } else {
-                    $scope.saAlert = $scope.alerts.receiveError;
-                    $scope.saProfile.disabled = true;
-                    $scope.$emit('disable_receive', {});
-                }
-            } else {
-                $scope.saProfile.profile = $scope.saProfile.profiles[0];
-            }
-        });
+        init();
     };
 
-    vm.$onChanges = function($event) {
+    vm.$onChanges = function(changes) {
+        if(!changes.ip.isFirstChange()) {
+            init();
+        }
+    };
+
+    function init() {
         $scope.saProfile = {
             profile: null,
             profiles: [],
@@ -81,8 +55,7 @@ angular.module('myApp').controller('ProfileCtrl', function($q, SA, IP, Profile, 
             }
             if(result.profiles.length <= 0) {
                 $scope.saAlert = $scope.alerts.noSas;
-            } else
-            if (chosen_sa_id) {
+            } else if (chosen_sa_id) {
                 var found = $filter('filter')(result.profiles, { id: chosen_sa_id }, true);
                 if (found.length) {
                     $scope.saProfile.profile = found[0];
@@ -92,13 +65,12 @@ angular.module('myApp').controller('ProfileCtrl', function($q, SA, IP, Profile, 
                     $scope.saProfile.disabled = true;
                     $scope.$emit('disable_receive', {});
                 }
-;
             } else {
                 $scope.saProfile.profile = $scope.saProfile.profiles[0];
             }
             vm.loadProfiles($scope.ip);
         });
-    };
+    }
 
     vm.loadProfiles = function(ip) {
         $scope.selectRowCollapse = [];
