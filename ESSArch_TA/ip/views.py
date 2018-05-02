@@ -604,11 +604,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         )
         ProcessTask.objects.create(
             name="ESSArch_Core.tasks.UpdateIPStatus",
-            args=[ip.pk],
-            params={
-                "status": "Received",
-                "prev": ip.state,
-            },
+            args=["Received"],
             processstep_pos=10,
             log=EventIP,
             information_package=ip,
@@ -771,11 +767,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         step.add_tasks(
             ProcessTask.objects.create(
                 name="ESSArch_Core.tasks.UpdateIPStatus",
-                params={
-                    "ip": ip.pk,
-                    "status": "Transferring",
-                    "prev": ip.state,
-                },
+                args=["Transferring"],
                 processstep_pos=10,
                 log=EventIP,
                 information_package=ip,
@@ -930,11 +922,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         step.add_tasks(
             ProcessTask.objects.create(
                 name="ESSArch_Core.tasks.UpdateIPStatus",
-                params={
-                    "ip": ip.pk,
-                    "status": "Transferred",
-                    "prev": "Transferring",
-                },
+                args=["Transferred"],
                 processstep_pos=50,
                 log=EventIP,
                 information_package=ip,
