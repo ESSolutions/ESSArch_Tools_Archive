@@ -71,11 +71,9 @@ from ESSArch_Core.ip.permissions import (
 )
 from ESSArch_Core.mixins import PaginatedViewMixin
 from ESSArch_Core.profiles.models import ProfileIP, ProfileIPData, SubmissionAgreement
-from ESSArch_Core.profiles.utils import fill_specification_data
 from ESSArch_Core.util import (
     creation_date,
     flatten,
-    get_event_spec,
     get_immediate_subdirectories,
     get_value_from_path,
     in_directory,
@@ -659,190 +657,47 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         if ip.get_profile('transformation') is not None and ip.state.lower() != 'transformed':
             raise exceptions.ParseError('"{ip}" cannot be transferred without first being transformed'.format(ip=ip.object_identifier_value))
 
-        dstdir = Path.objects.get(entity="path_gate_reception").value
+        workflow_spec = [
+            {
+                "name": "ESSArch_Core.tasks.UpdateIPStatus",
+                "label": "Set status to transferring",
+                "args": ["Transferring"],
+            },
+            {
+                "step": True,
+                "name": "Create Log File",
+                "children": [
+                    {
+                        "name": "ESSArch_Core.ip.tasks.GenerateEventsXML",
+                        "label": "Generate events xml file",
+                    },
+                    {
+                        "name": "ESSArch_Core.tasks.AppendEvents",
+                        "label": "Add events to xml file",
+                    },
+                    {
+                        "name": "ESSArch_Core.ip.tasks.AddPremisIPObjectElementToEventsFile",
+                        "label": "Add premis IP object to xml file",
+                    },
 
-        info = fill_specification_data(ip=ip)
-
-        events_path = os.path.splitext(ip.object_path)[0] + '_ipevents.xml'
-        filesToCreate = {
-            events_path: {'spec': get_event_spec(), 'data': info}
-        }
-
-        step = ProcessStep.objects.create(
-            name="Transfer SIP",
-            information_package=ip,
-            eager=False,
-        )
-
-        step.add_tasks(
-            ProcessTask.objects.create(
-                name="ESSArch_Core.tasks.UpdateIPStatus",
-                args=["Transferring"],
-                processstep_pos=10,
-                log=EventIP,
-                information_package=ip,
-                responsible=self.request.user,
-            )
-        )
-
-        step.add_tasks(
-            ProcessTask.objects.create(
-                name="ESSArch_Core.tasks.GenerateXML",
-                params={
-                    "filesToCreate": filesToCreate,
-                },
-                processstep_pos=20,
-                log=EventIP,
-                information_package=ip,
-                responsible=self.request.user,
-            )
-        )
-
-        step.add_tasks(
-            ProcessTask.objects.create(
-                name="ESSArch_Core.tasks.AppendEvents",
-                params={
-                    "filename": events_path,
-                },
-                processstep_pos=30,
-                log=EventIP,
-                information_package=ip,
-                responsible=self.request.user,
-            )
-        )
-
-        spec = {
-            "-name": "object",
-            "-namespace": "premis",
-            "-children": [
-                {
-                    "-name": "objectIdentifier",
-                    "-namespace": "premis",
-                    "-children": [
-                        {
-                            "-name": "objectIdentifierType",
-                            "-namespace": "premis",
-                            "#content": [{"var": "FIDType"}],
-                            "-children": []
-                        },
-                        {
-                            "-name": "objectIdentifierValue",
-                            "-namespace": "premis",
-                            "#content": [{"var": "FID"}],
-                            "-children": []
-                        }
-                    ]
-                },
-                {
-                    "-name": "objectCharacteristics",
-                    "-namespace": "premis",
-                    "-children": [
-                        {
-                            "-name": "format",
-                            "-namespace": "premis",
-                            "-children": [
-                                {
-                                    "-name": "formatDesignation",
-                                    "-namespace": "premis",
-                                    "-children": [
-                                        {
-                                            "-name": "formatName",
-                                            "-namespace": "premis",
-                                            "#content": [{"var": "FFormatName"}],
-                                            "-children": []
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "-name": "storage",
-                    "-namespace": "premis",
-                    "-children": [
-                        {
-                            "-name": "contentLocation",
-                            "-namespace": "premis",
-                            "-children": [
-                                {
-                                    "-name": "contentLocationType",
-                                    "-namespace": "premis",
-                                    "#content": [{"var": "FLocationType"}],
-                                    "-children": []
-                                },
-                                {
-                                    "-name": "contentLocationValue",
-                                    "-namespace": "premis",
-                                    "#content": [{"text": "file:///%s.tar" % ip.object_identifier_value}],
-                                    "-children": []
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ],
-            "-attr": [
-                {
-                  "-name": "type",
-                  '-namespace': 'xsi',
-                  "-req": "1",
-                  "#content": [{"text": "premis:file"}]
-                }
-            ],
-        }
-
-        info = {
-            'FIDType': "UUID",
-            'FID': "%s" % str(ip.object_identifier_value),
-            'FFormatName': 'TAR',
-            'FLocationType': 'URI',
-            'FName': ip.object_path,
-        }
-
-        step.add_tasks(
-            ProcessTask.objects.create(
-                name="ESSArch_Core.tasks.InsertXML",
-                params={
-                    "filename": events_path,
-                    "elementToAppendTo": "premis",
-                    "spec": spec,
-                    "info": info,
-                    "index": 0
-                },
-                processstep_pos=40,
-                information_package=ip,
-                responsible=self.request.user,
-            )
-        )
-
-        step.add_tasks(
-            ProcessTask.objects.create(
-                name="preingest.tasks.TransferSIP",
-                params={
-                    "ip": ip.pk,
-                },
-                processstep_pos=45,
-                log=EventIP,
-                information_package=ip,
-                responsible=self.request.user,
-            )
-        )
-
-        step.add_tasks(
-            ProcessTask.objects.create(
-                name="ESSArch_Core.tasks.UpdateIPStatus",
-                args=["Transferred"],
-                processstep_pos=50,
-                log=EventIP,
-                information_package=ip,
-                responsible=self.request.user,
-            )
-        )
-
-        step.run()
-
-        return Response("Transferring IP")
+                ]
+            },
+            {
+                "name": "preingest.tasks.TransferSIP",
+                "label": "Transfer SIP",
+            },
+            {
+                "name": "ESSArch_Core.tasks.UpdateIPStatus",
+                "label": "Set status to transferred",
+                "args": ["Transferred"],
+            },
+        ]
+        workflow = create_workflow(workflow_spec, ip)
+        workflow.name = "Transfer SIP"
+        workflow.information_package = ip
+        workflow.save()
+        workflow.run()
+        return Response({'status': 'transferring ip'})
 
     @detail_route(methods=['post'], url_path='validate')
     def validate(self, request, pk=None):

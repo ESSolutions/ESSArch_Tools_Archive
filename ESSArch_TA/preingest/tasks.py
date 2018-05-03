@@ -158,8 +158,8 @@ class ReceiveDir(DBTask):
 class TransferSIP(DBTask):
     event_type = 20600
 
-    def run(self, ip=None):
-        ip = InformationPackage.objects.get(pk=ip)
+    def run(self):
+        ip = InformationPackage.objects.get(pk=self.ip)
         src = ip.object_path
         srcdir, srcfile = os.path.split(src)
         epp = Path.objects.get(entity="path_gate_reception").value
@@ -211,19 +211,19 @@ class TransferSIP(DBTask):
 
         return dst
 
-    def undo(self, ip=None):
-        objectpath = InformationPackage.objects.values_list('object_path', flat=True).get(pk=ip)
+    def undo(self):
+        objectpath = InformationPackage.objects.values_list('object_path', flat=True).get(pk=self.ip)
 
         ipdir, ipfile = os.path.split(objectpath)
         gate_reception = Path.objects.get(entity="path_gate_reception").value
 
         objid = InformationPackage.objects.values_list(
             'object_identifier_value', flat=True
-        ).get(pk=ip)
+        ).get(pk=self.ip)
 
         os.remove(os.path.join(gate_reception, ipfile))
         os.remove(os.path.join(gate_reception, "%s.xml" % objid))
 
-    def event_outcome_success(self, ip=None):
-        label = InformationPackage.objects.values_list('label', flat=True).get(pk=ip)
-        return "Transferred IP '%s' with label '%s'" % (ip, label)
+    def event_outcome_success(self):
+        label = InformationPackage.objects.values_list('label', flat=True).get(pk=self.ip)
+        return "Transferred IP with label '%s'" % (label)
