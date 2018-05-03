@@ -69,7 +69,7 @@ from ESSArch_Core.ip.views import (
     WorkareaEntryViewSet,
 )
 
-from ESSArch_Core.profiles.views import ProfileIPViewSet, ProfileIPDataViewSet
+from ESSArch_Core.profiles.views import ProfileIPViewSet, ProfileIPDataViewSet, SubmissionAgreementViewSet
 
 from ESSArch_Core.WorkflowEngine.views import (
     ProcessViewSet,
@@ -89,7 +89,6 @@ from ip.views import (
 from profiles.views import (
     ProfileViewSet,
     ProfileSAViewSet,
-    SubmissionAgreementViewSet,
 )
 
 admin.site.site_header = 'ESSArch Tools Archive Administration'
