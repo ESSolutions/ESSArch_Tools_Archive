@@ -408,37 +408,13 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             perm_name = get_permission_name(perm, ip)
             assign_perm(perm_name, member.django_user, ip)
 
-        extra_data = fill_specification_data(ip=ip, sa=sa)
-
-        for profile_type in ['transfer_project', 'sip', 'preservation_metadata', 'submit_description', 'validation', 'transformation']:
-            profile = getattr(sa, 'profile_%s' % profile_type, None)
-
-            if profile is None:
-                continue
-
-            profile_ip = ProfileIP.objects.create(ip=ip, profile=profile)
-            data = {}
-            for field in profile_ip.profile.template:
-                try:
-                    if field['defaultValue'] in extra_data:
-                        data[field['key']] = extra_data[field['defaultValue']]
-                        continue
-
-                    data[field['key']] = field['defaultValue']
-                except KeyError:
-                    pass
-
-            data_obj = ProfileIPData.objects.create(
-                relation=profile_ip, data=data, version=0, user=request.user,
-            )
-            profile_ip.data = data_obj
-            profile_ip.save()
+        p_types = ['transfer_project', 'sip', 'preservation_metadata', 'submit_description', 'validation', 'transformation']
+        ip.create_profile_rels(p_types, request.user)
 
         data = InformationPackageReadSerializer(ip, context={'request': request}).data
 
         self.logger.info('Prepared information package %s' % str(ip.pk), extra={'user': request.user.pk})
         return Response(data, status=status.HTTP_201_CREATED)
-
 
     @detail_route(methods=['post'], url_path='receive')
     def receive(self, request, pk=None):
