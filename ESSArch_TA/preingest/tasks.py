@@ -52,10 +52,12 @@ User = get_user_model()
 class ReceiveSIP(DBTask):
     event_type = 20100
 
-    def run(self, ip, xml, container):
-        ip = InformationPackage.objects.get(pk=ip)
-        objid, container_type = os.path.splitext(os.path.basename(container))
-        parsed = parse_submit_description(xml, srcdir=os.path.split(container)[0])
+    def run(self):
+        ip = InformationPackage.objects.get(pk=self.ip)
+        objpath = ip.object_path
+        package_mets = ip.package_mets_path
+        objid, container_type = os.path.splitext(os.path.basename(objpath))
+        parsed = parse_submit_description(package_mets, srcdir=os.path.split(objpath)[0])
 
         archival_institution = parsed.get('archival_institution')
         archivist_organization = parsed.get('archivist_organization')
@@ -97,64 +99,60 @@ class ReceiveSIP(DBTask):
         dst_dir = os.path.join(workarea_user, ip.object_identifier_value)
         mkdir_p(dst_dir)
 
-        srcdir, srcfile = os.path.split(ip.object_path)
-        dst = os.path.join(dst_dir, srcfile)
-        shutil.copy(ip.object_path, dst)
-
-        src = os.path.join(srcdir, "%s.xml" % objid)
-        dst = os.path.join(dst_dir, "%s.xml" % objid)
-        shutil.copy(src, dst)
+        shutil.copy(ip.object_path, dst_dir)
+        shutil.copy(package_mets, dst_dir)
 
         Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=False)
 
-    def undo(self, ip, xml, container):
-        objid, container_type = os.path.splitext(os.path.basename(container))
-        ip = InformationPackage.objects.get(object_identifier_value=objid)
-        ingest_work = Path.objects.get(entity="ingest_workarea").value
+    def undo(self):
+        ip = InformationPackage.objects.get(pk=self.ip)
+        objpath = ip.object_path
+        package_mets = ip.package_mets_path
 
-        try:
-            shutil.rmtree(os.path.join(ingest_work, ip.object_identifier_value))
-        except OSError as e:
-            if e.errno != errno.ENOENT:
-                raise
+        workarea = Path.objects.get(entity='ingest_workarea').value
+        username = User.objects.get(pk=self.responsible).username
+        workarea_user = os.path.join(workarea, username)
 
-        InformationPackage.objects.filter(pk=ip).delete()
+        workarea_obj = os.path.join(workarea_user, os.path.basename(objpath))
+        workarea_package_mets = os.path.join(workarea_user, os.path.basename(package_mets))
 
-    def event_outcome_success(self, ip, xml, container):
-        return "Received IP '%s'" % str(ip)
+        for workarea_file in [workarea_obj, workarea_package_mets]:
+            try:
+                os.remove(workarea_file)
+            except OSError as e:
+                if e.errno != errno.ENOENT:
+                    raise
+
+    def event_outcome_success(self):
+        return "Received IP"
 
 
 class ReceiveDir(DBTask):
-    def run(self, ip, objpath):
-        ip = InformationPackage.objects.get(pk=ip)
+    def get_workarea_path(self):
+        ip = InformationPackage.objects.get(pk=self.ip)
         workarea = Path.objects.get(entity='ingest_workarea').value
         username = User.objects.get(pk=self.responsible).username
         workarea_user = os.path.join(workarea, username)
-        dst = os.path.join(workarea_user, ip.object_identifier_value)
+        return os.path.join(workarea_user, ip.object_identifier_value)
 
-        shutil.copytree(objpath, dst)
+    def run(self):
+        ip = InformationPackage.objects.get(pk=self.ip)
+        objpath = ip.object_path
+        workarea_path = self.get_workarea_path()
+
+        shutil.copytree(objpath, workarea_path)
         Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=False)
 
-        ip.object_path = dst
-        ip.save(update_fields=['object_path'])
-
-    def undo(self, ip, objpath):
-        ip = InformationPackage.objects.get(pk=ip)
-        workarea = Path.objects.get(entity='ingest_workarea').value
-        username = User.objects.get(pk=self.responsible).username
-        workarea_user = os.path.join(workarea, username)
-        workarea_ip = os.path.join(workarea_user, ip.object_identifier_value)
-
+    def undo(self):
+        workarea_path = self.get_workarea_path()
         try:
-            shutil.rmtree(workarea_ip)
+            shutil.rmtree(workarea_path)
         except OSError as e:
             if e.errno != errno.ENOENT:
                 raise
 
-        InformationPackage.objects.filter(pk=ip).delete()
-
-    def event_outcome_success(self, ip, xml, container):
-        return "Received IP '%s'" % str(ip)
+    def event_outcome_success(self):
+        return "Received IP"
 
 
 class TransferSIP(DBTask):

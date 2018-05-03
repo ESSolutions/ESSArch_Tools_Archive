@@ -54,6 +54,7 @@ from ESSArch_Core.WorkflowEngine.models import (
     ProcessTask
 )
 from ESSArch_Core.WorkflowEngine.serializers import ProcessStepChildrenSerializer
+from ESSArch_Core.WorkflowEngine.util import create_workflow
 from ESSArch_Core.configuration.models import (
     Path,
 )
@@ -61,8 +62,9 @@ from ESSArch_Core.essxml.util import (
     get_objectpath,
     parse_submit_description,
 )
+from ESSArch_Core.fixity.checksum import calculate_checksum
 from ESSArch_Core.fixity.validation.backends.checksum import ChecksumValidator
-from ESSArch_Core.ip.models import InformationPackage, EventIP
+from ESSArch_Core.ip.models import InformationPackage, EventIP, MESSAGE_DIGEST_ALGORITHM_CHOICES_DICT
 from ESSArch_Core.ip.permissions import (
     CanDeleteIP,
     CanTransferSIP,
@@ -444,12 +446,15 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
                 xmlfile = os.path.join(uip, "%s.xml" % pk)
                 srcdir = uip
 
-            doc = etree.parse(xmlfile)
-            root = doc.getroot()
+            algorithm = ip.get_checksum_algorithm()
+            ip.package_mets_path = xmlfile
+            ip.package_mets_create_date = timestamp_to_datetime(creation_date(xmlfile)).isoformat()
+            ip.package_mets_size = os.path.getsize(xmlfile)
+            ip.package_mets_digest_algorithm = MESSAGE_DIGEST_ALGORITHM_CHOICES_DICT[algorithm.upper()]
+            ip.package_mets_digest = calculate_checksum(xmlfile, algorithm=algorithm)
+            ip.save()
 
             objid, _ = os.path.splitext(os.path.basename(objpath))
-            parsed = parse_submit_description(xmlfile, srcdir=os.path.split(objpath)[0])
-
             events_xmlfile = None
 
             tmp = tempfile.NamedTemporaryFile(delete=False)
@@ -476,123 +481,52 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         else:
             events_xmlfile=None
 
-        step = ProcessStep.objects.create(
-            name="Receive SIP",
-            information_package=ip,
-            eager=False,
-        )
-
-        validators = request.data.get('validators', {})
-        available_validators = [
-            'validate_xml_file', 'validate_file_format', 'validate_integrity',
-            'validate_logical_physical_representation',
+        workflow_spec = [
+            {
+                "step": True,
+                "name": "Receive",
+                "children": [
+                    {
+                        "name": "ESSArch_Core.tasks.UpdateIPStatus",
+                        "label": "Set status to receiving",
+                        "args": ["Receiving"],
+                    },
+                    {
+                        "name": "preingest.tasks.ReceiveDir",
+                        "if": os.path.isdir(objpath),
+                        "label": "Receive SIP",
+                    },
+                    {
+                        "name": "preingest.tasks.ReceiveSIP",
+                        "if": os.path.isfile(objpath),
+                        "label": "Receive SIP",
+                    },
+                    {
+                        "name": "ESSArch_Core.tasks.ParseEvents",
+                        "if": events_xmlfile is not None,
+                        "label": "Parse events",
+                        "args": [events_xmlfile],
+                        "params": {"delete_file": True}
+                    },
+                    {
+                        "name": "ESSArch_Core.tasks.UpdateIPSizeAndCount",
+                        "label": "Update IP size and file count",
+                    },
+                    {
+                        "name": "ESSArch_Core.tasks.UpdateIPStatus",
+                        "label": "Set status to received",
+                        "args": ["Received"],
+                    },
+                ]
+            },
         ]
+        workflow = create_workflow(workflow_spec, ip)
+        workflow.name = "Receive SIP"
+        workflow.information_package = ip
+        workflow.save()
+        workflow.run()
 
-        if any(v is True and k in available_validators for k, v in validators.iteritems()):
-            validation_step = ProcessStep.objects.create(
-                name="Validate",
-                parent_step=step
-            )
-
-            if validators.get('validate_xml_file', False):
-                ProcessTask.objects.create(
-                    name="ESSArch_Core.tasks.ValidateXMLFile",
-                    params={
-                        "xml_filename": xmlfile
-                    },
-                    log=EventIP,
-                    information_package=ip,
-                    responsible=self.request.user,
-                    processstep=validation_step
-                )
-
-            val_format = validators.get("validate_file_format", False)
-            val_integrity = validators.get("validate_integrity", False)
-
-            if val_format or val_integrity:
-                ProcessTask.objects.create(
-                    name="ESSArch_Core.tasks.ValidateFiles",
-                    params={
-                        "rootdir": srcdir,
-                        "xmlfile": xmlfile,
-                        "validate_fileformat": val_format,
-                        "validate_integrity": val_integrity
-                    },
-                    log=EventIP,
-                    information_package=ip,
-                    responsible=self.request.user,
-                    processstep=validation_step
-                )
-
-            if validators.get('validate_logical_physical_representation'):
-                ProcessTask.objects.create(
-                    name="ESSArch_Core.tasks.ValidateLogicalPhysicalRepresentation",
-                    args=[objpath, xmlfile],
-                    log=EventIP,
-                    information_package=ip,
-                    responsible=self.request.user,
-                    processstep=validation_step
-                )
-
-        receive_step = ProcessStep.objects.create(
-            name="Receive",
-        )
-
-        if os.path.isdir(objpath):
-            ProcessTask.objects.create(
-                name="preingest.tasks.ReceiveDir",
-                args=[ip.pk, objpath],
-                processstep_pos=0,
-                log=EventIP,
-                information_package=ip,
-                responsible=self.request.user,
-                processstep=receive_step,
-            )
-        else:
-            ProcessTask.objects.create(
-                name="preingest.tasks.ReceiveSIP",
-                args=[ip.pk, xmlfile, objpath],
-                processstep_pos=0,
-                log=EventIP,
-                information_package=ip,
-                responsible=self.request.user,
-                processstep=receive_step,
-            )
-
-        if events_xmlfile is not None:
-            ProcessTask.objects.create(
-                name="ESSArch_Core.tasks.ParseEvents",
-                args=[events_xmlfile],
-                params={'delete_file': True},
-                processstep_pos=3,
-                information_package=ip,
-                responsible=self.request.user,
-                processstep=receive_step,
-            )
-        ProcessTask.objects.create(
-            name="ESSArch_Core.tasks.UpdateIPSizeAndCount",
-            args=[ip.pk],
-            processstep_pos=5,
-            log=EventIP,
-            information_package=ip,
-            responsible=self.request.user,
-            processstep=receive_step,
-        )
-        ProcessTask.objects.create(
-            name="ESSArch_Core.tasks.UpdateIPStatus",
-            args=["Received"],
-            processstep_pos=10,
-            log=EventIP,
-            information_package=ip,
-            responsible=self.request.user,
-            processstep=receive_step,
-        )
-
-        step.add_child_steps(receive_step)
-        step.save()
-        step.run()
-
-        return Response("IP Received")
+        return Response("receiving ip")
 
     @list_route(methods=['post'], url_path='identify-ip')
     def identify_ip(self, request):
