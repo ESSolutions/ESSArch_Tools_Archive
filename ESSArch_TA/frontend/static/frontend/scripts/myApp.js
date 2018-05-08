@@ -71,6 +71,9 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
             })
             .state('login', {
                 url: '/login',
+                params: {
+                    requestedPage: '/login',
+                },
                 templateUrl: '/static/frontend/views/login.html',
                 controller: 'LoginCtrl as vm',
                 resolve: {
@@ -486,7 +489,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                 // now, redirect only not authenticated
             });
         }).catch(function (status) {
-            $state.go('login');
+            $state.go('login', {requestedPage: $location.path()});
         });
         $rootScope.$on('$stateChangeStart', function (evt, to, params, from) {
             if (to.redirectTo) {
