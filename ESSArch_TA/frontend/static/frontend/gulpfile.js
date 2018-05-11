@@ -32,6 +32,7 @@ var ngAnnotate = require('gulp-ng-annotate');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
+var stripDebug = require('gulp-strip-debug');
 var cleanCSS = require('gulp-clean-css');
 var gutil = require('gulp-util');
 var license = require('gulp-header-license');
@@ -143,6 +144,7 @@ var buildScripts = function() {
         .pipe(sourcemaps.init())
         .pipe(ngAnnotate())
         .pipe(concat('scripts.min.js'))
+        .pipe(gulpif(isProduction, stripDebug()))
         .pipe(gulpif(isProduction, uglify()))
         .pipe(license('/*\n'+licenseString+'\n*/\n'))
         .pipe(sourcemaps.write('.'))
@@ -161,6 +163,7 @@ var buildVendors = function() {
         .pipe(sourcemaps.init())
         .pipe(ngAnnotate())
         .pipe(concat('vendors.min.js'))
+        .pipe(gulpif(isProduction, stripDebug()))
         .pipe(gulpif(isProduction, uglify()))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(jsDest));
