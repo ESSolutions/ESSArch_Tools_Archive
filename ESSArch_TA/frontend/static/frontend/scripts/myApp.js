@@ -482,6 +482,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                     return;
                 }
                 if (djangoAuth.authenticated !== true) {
+                    console.log('Not authenticated, redirecting to login');
                     event.preventDefault();
                     $state.go('login'); // go to login
                 }
@@ -489,6 +490,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                 // now, redirect only not authenticated
             });
         }).catch(function (status) {
+            console.log('Got error response from auth api, redirecting to login with requested page:', $location.path())
             $state.go('login', {requestedPage: $location.path()});
         });
         $rootScope.$on('$stateChangeStart', function (evt, to, params, from) {
