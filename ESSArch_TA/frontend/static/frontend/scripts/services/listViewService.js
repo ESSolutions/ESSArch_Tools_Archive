@@ -81,8 +81,7 @@ angular.module('myApp').factory('listViewService', function (IP, SA, Profile, Wo
         var data = angular.extend({
             page: pageNumber,
             page_size: pageSize,
-            archival_institution: filters.institution,
-            archivist_organization: filters.organization,
+            agents: filters.agents,
             other: filters.other,
             ordering: sortString,
             search: searchString,
@@ -109,8 +108,7 @@ angular.module('myApp').factory('listViewService', function (IP, SA, Profile, Wo
         return IPReception.query({
             page: pageNumber,
             page_size: pageSize,
-            archival_institution: filters.institution,
-            archivist_organization: filters.organization,
+            agents: filters.agents,
             ordering: sortString,
         }).$promise.then(function (resource) {
             count = resource.$httpHeaders('Count');

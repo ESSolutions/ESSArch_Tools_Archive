@@ -49,39 +49,18 @@ from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 
 from ESSArch_Core.auth.models import Member
-from ESSArch_Core.WorkflowEngine.models import (
-    ProcessStep,
-    ProcessTask
-)
+from ESSArch_Core.WorkflowEngine.models import (ProcessStep, ProcessTask)
 from ESSArch_Core.WorkflowEngine.serializers import ProcessStepChildrenSerializer
 from ESSArch_Core.WorkflowEngine.util import create_workflow
-from ESSArch_Core.configuration.models import (
-    Path,
-)
-from ESSArch_Core.essxml.util import (
-    get_objectpath,
-    parse_submit_description,
-)
+from ESSArch_Core.configuration.models import (Path,)
+from ESSArch_Core.essxml.util import get_agents, get_objectpath, parse_submit_description
 from ESSArch_Core.fixity.checksum import calculate_checksum
 from ESSArch_Core.fixity.validation.backends.checksum import ChecksumValidator
-from ESSArch_Core.ip.models import InformationPackage, EventIP, MESSAGE_DIGEST_ALGORITHM_CHOICES_DICT
-from ESSArch_Core.ip.permissions import (
-    CanDeleteIP,
-    CanTransferSIP,
-)
+from ESSArch_Core.ip.models import Agent, InformationPackage, EventIP, MESSAGE_DIGEST_ALGORITHM_CHOICES_DICT
+from ESSArch_Core.ip.permissions import CanDeleteIP, CanTransferSIP
 from ESSArch_Core.mixins import PaginatedViewMixin
-from ESSArch_Core.profiles.models import ProfileIP, ProfileIPData, SubmissionAgreement
-from ESSArch_Core.util import (
-    creation_date,
-    flatten,
-    get_immediate_subdirectories,
-    get_value_from_path,
-    in_directory,
-    list_files,
-    parse_content_range_header,
-    timestamp_to_datetime,
-    remove_prefix
-)
+from ESSArch_Core.profiles.models import ProfileIP, SubmissionAgreement
+from ESSArch_Core.util import creation_date, flatten, get_immediate_subdirectories, get_value_from_path, in_directory, list_files, parse_content_range_header, timestamp_to_datetime, remove_prefix
 
 
 class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
@@ -332,6 +311,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             raise exceptions.ParseError('IP with id %s already exists: %s' % (pk, str(existing.pk)))
 
         reception = Path.objects.values_list('value', flat=True).get(entity="path_ingest_reception")
+        xmlfile = None
 
         if os.path.isdir(os.path.join(reception, pk)):
             # A directory with the given id exists, try to prepare it
@@ -400,6 +380,11 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         # refresh date fields to convert them to datetime instances instead of
         # strings to allow further datetime manipulation
         ip.refresh_from_db(fields=['entry_date', 'start_date', 'end_date'])
+
+        if xmlfile is not None:
+            for agent_el in get_agents(etree.parse(xmlfile)):
+                agent = Agent.objects.from_mets_element(agent_el)
+                ip.agents.add(agent)
 
         user_perms = perms.pop('owner', [])
         organization.assign_object(ip, custom_permissions=perms)
@@ -633,21 +618,9 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         queryset = InformationPackage.objects.visible_to_user(user)
 
         queryset = queryset.prefetch_related(
-            Prefetch('profileip_set', to_attr='profiles'), 'profiles__profile',
-            'archival_institution', 'archivist_organization', 'archival_type', 'archival_location',
+            Prefetch('profileip_set', to_attr='profiles'), 'profiles__profile', 'agents',
             'responsible__user_permissions', 'responsible__groups__permissions', 'steps',
         ).select_related('submission_agreement')
-
-        other = self.request.query_params.get('other')
-
-        if other is not None:
-            queryset = queryset.filter(
-                archival_institution=None,
-                archivist_organization=None,
-                archival_type=None,
-                archival_location=None
-            )
-
         return queryset
 
     @detail_route(methods=['post'], url_path='transfer', permission_classes=[CanTransferSIP])

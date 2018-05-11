@@ -22,48 +22,20 @@
     Email - essarch@essolutions.se
 """
 
-from guardian.shortcuts import get_perms
 from rest_framework import serializers
 
-from ESSArch_Core.auth.serializers import UserSerializer
-from ESSArch_Core.ip.models import InformationPackage
-from ESSArch_Core.ip.serializers import (
-    ArchivalInstitutionSerializer,
-    ArchivistOrganizationSerializer,
-    ArchivalTypeSerializer,
-    ArchivalLocationSerializer,
-    WorkareaSerializer,
-)
-from ESSArch_Core.profiles.models import SubmissionAgreement
-from ESSArch_Core.profiles.serializers import (
-    ProfileIPSerializer,
-)
+from ESSArch_Core.ip.serializers import InformationPackageSerializer as CoreInformationPackageSerializer, WorkareaSerializer
+from ESSArch_Core.profiles.serializers import ProfileIPSerializer
 from ESSArch_Core.profiles.utils import profile_types
-from _version import get_versions
 
-VERSION = get_versions()['version']
 
-class InformationPackageSerializer(serializers.HyperlinkedModelSerializer):
-    responsible = UserSerializer()
+class InformationPackageSerializer(CoreInformationPackageSerializer):
     profiles = serializers.SerializerMethodField()
-    archival_institution = ArchivalInstitutionSerializer(read_only=True)
-    archivist_organization = ArchivistOrganizationSerializer(read_only=True)
-    archival_type = ArchivalTypeSerializer(read_only=True)
-    archival_location = ArchivalLocationSerializer(read_only=True)
-    permissions = serializers.SerializerMethodField()
     workarea = serializers.SerializerMethodField()
-    submission_agreement = serializers.PrimaryKeyRelatedField(queryset=SubmissionAgreement.objects.all())
 
     def get_profiles(self, obj):
         profiles = getattr(obj, 'profiles', obj.profileip_set)
         return ProfileIPSerializer(profiles, many=True, context=self.context).data
-
-    def get_permissions(self, obj):
-        request = self.context.get('request')
-        if hasattr(request, 'user'):
-            return get_perms(request.user, obj)
-
-        return []
 
     def get_workarea(self, obj):
         workarea = obj.workareas.first()
@@ -71,16 +43,8 @@ class InformationPackageSerializer(serializers.HyperlinkedModelSerializer):
         if workarea is not None:
             return WorkareaSerializer(workarea, context=self.context).data
 
-    class Meta:
-        model = InformationPackage
-        fields = (
-            'url', 'id', 'object_identifier_value', 'label', 'content', 'responsible', 'create_date',
-            'entry_date', 'state', 'status', 'step_state', 'object_path', 'object_size',
-            'object_num_items', 'start_date', 'end_date', 'package_type',
-            'submission_agreement', 'archival_institution',
-            'archivist_organization', 'archival_type', 'archival_location',
-            'submission_agreement_locked', 'profiles', 'permissions', 'workarea',
-        )
+    class Meta(CoreInformationPackageSerializer.Meta):
+        fields = CoreInformationPackageSerializer.Meta.fields + ('profiles', 'workarea')
 
 
 class InformationPackageReadSerializer(InformationPackageSerializer):
@@ -98,7 +62,3 @@ class InformationPackageReadSerializer(InformationPackageSerializer):
         data.pop('profiles', None)
 
         return data
-
-    class Meta:
-        model = InformationPackageSerializer.Meta.model
-        fields = InformationPackageSerializer.Meta.fields

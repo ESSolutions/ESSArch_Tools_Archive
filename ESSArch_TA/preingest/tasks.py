@@ -35,15 +35,7 @@ from django.contrib.auth import get_user_model
 from ESSArch_Core import tasks
 from ESSArch_Core.WorkflowEngine.dbtask import DBTask
 from ESSArch_Core.configuration.models import Path
-from ESSArch_Core.essxml.util import parse_submit_description
-from ESSArch_Core.ip.models import (
-    ArchivalInstitution,
-    ArchivistOrganization,
-    ArchivalLocation,
-    ArchivalType,
-    InformationPackage,
-    Workarea,
-)
+from ESSArch_Core.ip.models import InformationPackage, Workarea
 from ESSArch_Core.storage.copy import copy_file
 from ESSArch_Core.util import mkdir_p
 
@@ -54,44 +46,7 @@ class ReceiveSIP(DBTask):
 
     def run(self):
         ip = InformationPackage.objects.get(pk=self.ip)
-        objpath = ip.object_path
         package_mets = ip.package_mets_path
-        objid, container_type = os.path.splitext(os.path.basename(objpath))
-        parsed = parse_submit_description(package_mets, srcdir=os.path.split(objpath)[0])
-
-        archival_institution = parsed.get('archival_institution')
-        archivist_organization = parsed.get('archivist_organization')
-        archival_type = parsed.get('archival_type')
-        archival_location = parsed.get('archival_location')
-
-        if archival_institution:
-            arch, _ = ArchivalInstitution.objects.get_or_create(
-                name=archival_institution
-            )
-            ip.archival_institution = arch
-
-        if archivist_organization:
-            arch, _ = ArchivistOrganization.objects.get_or_create(
-                name=archivist_organization
-            )
-            ip.archivist_organization = arch
-
-        if archival_type:
-            arch, _ = ArchivalType.objects.get_or_create(
-                name=archival_type
-            )
-            ip.archival_type = arch
-
-        if archival_location:
-            arch, _ = ArchivalLocation.objects.get_or_create(
-                name=archival_location
-            )
-            ip.archival_location = arch
-
-        ip.save(update_fields=[
-            'archival_institution', 'archivist_organization', 'archival_type',
-            'archival_location',
-        ])
 
         workarea = Path.objects.get(entity='ingest_workarea').value
         username = User.objects.get(pk=self.responsible).username
