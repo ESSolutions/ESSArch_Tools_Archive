@@ -442,7 +442,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
             tmp = tempfile.NamedTemporaryFile(delete=False)
             tmp.close()
-            ip_events_src = '%s/ipevents.xml' % objid
+            ip_events_src = '{objid}/{path}'.format(objid=objid, path=ip.get_events_file_path(from_container=True))
             ip_events_dst = tmp.name
             try:
                 if tarfile.is_tarfile(objpath):
