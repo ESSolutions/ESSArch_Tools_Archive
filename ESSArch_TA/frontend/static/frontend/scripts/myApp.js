@@ -59,7 +59,7 @@ function nestedEmptyPermissions(page) {
     }
 }
 
-angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'formlyBootstrap', 'smart-table', 'treeGrid', 'ui.router', 'ngCookies', 'permission', 'permission.ui', 'pascalprecht.translate', 'ngSanitize', 'ui.bootstrap.datetimepicker', 'ui.dateTimeInput', 'ngAnimate', 'ngMessages', 'myApp.config', 'ig.linkHeaderParser', 'hc.marked', 'ngFilesizeFilter', 'angular-clipboard', 'ngResource', 'relativeDate', 'permission.config', 'ngWebSocket', 'prettyXml'])
+angular.module('myApp', ['templates', 'ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'formlyBootstrap', 'smart-table', 'treeGrid', 'ui.router', 'ngCookies', 'permission', 'permission.ui', 'pascalprecht.translate', 'ngSanitize', 'ui.bootstrap.datetimepicker', 'ui.dateTimeInput', 'ngAnimate', 'ngMessages', 'myApp.config', 'ig.linkHeaderParser', 'hc.marked', 'ngFilesizeFilter', 'angular-clipboard', 'ngResource', 'relativeDate', 'permission.config', 'ngWebSocket', 'prettyXml'])
     .config(function($routeProvider, formlyConfigProvider, $stateProvider, $urlRouterProvider, $rootScopeProvider, $uibTooltipProvider, $urlMatcherFactoryProvider, permissionConfig) {
 
         $urlMatcherFactoryProvider.strictMode(false);
@@ -74,7 +74,7 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
                 params: {
                     requestedPage: '/login',
                 },
-                templateUrl: '/static/frontend/views/login.html',
+                templateUrl: 'login.html',
                 controller: 'LoginCtrl as vm',
                 resolve: {
                     authenticated: ['djangoAuth', function(djangoAuth){
@@ -468,6 +468,8 @@ angular.module('myApp', ['ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'fo
     .run(function (djangoAuth, $rootScope, $state, $location, $cookies, PermPermissionStore, PermRoleStore, $http, myService, formlyConfig, formlyValidationMessages, $urlRouter, permissionConfig) {
         formlyConfig.extras.errorExistsAndShouldBeVisibleExpression = 'form.$submitted || fc.$touched || fc[0].$touched';
         formlyValidationMessages.addStringMessage('required', 'This field is required');
+
+        $rootScope.app = 'ESSArch Tools Archive'
 
         djangoAuth.initialize('/rest-auth', false).then(function (response) {
             $rootScope.auth = response.data;
