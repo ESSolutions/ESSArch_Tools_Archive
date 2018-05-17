@@ -96,10 +96,15 @@ class ReceiveDir(DBTask):
         workarea_path = self.get_workarea_path()
 
         shutil.copytree(objpath, workarea_path)
+        ip.object_path = workarea_path
+        ip.save()
         Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=False)
 
     def undo(self):
+        reception = Path.objects.values_list('value', flat=True).get(entity="path_ingest_reception")
         workarea_path = self.get_workarea_path()
+        ip = InformationPackage.objects.get(pk=self.ip)
+        ip.object_path = os.path.join(reception, ip.object_identifier_value)
         try:
             shutil.rmtree(workarea_path)
         except OSError as e:
