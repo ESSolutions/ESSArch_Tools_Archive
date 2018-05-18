@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ESSArch Tools Archive 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-25 20:56+0100\n"
+"POT-Creation-Date: 2018-05-18 10:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,10 +27,10 @@ msgid ""
 "Receive SIP is the first step in ETA. IPs that have arrived to the ETA "
 "reception are listed in the reception list view."
 msgstr ""
-"Ta emot SIP är det första steget i ETA. IPn som har kommit till"
-" ETAs reception finns listade i receptionens listvy."
+"Ta emot SIP är det första steget i ETA. IPn som har kommit till ETAs "
+"reception finns listade i receptionens listvy."
 
-#: ../../user_guide/reception.rst:12
+#: ../../user_guide/reception.rst:12 ../../user_guide/reception.rst:65
 msgid "Receive"
 msgstr "Ta emot"
 
@@ -39,60 +39,118 @@ msgid ""
 "To receive an IP, check the checkbox at the start of the table row of the"
 " IP to include it for receive. Many IPs can be selected at the same time."
 msgstr ""
-"För att ta emot ett IP, markera kryssruran i början på IPts rad"
-" för att markera det för mottagande. Flera IPn kan väljas samtidigt."
+"För att ta emot ett IP, markera kryssruran i början på IPts rad för att "
+"markera det för mottagande. Flera IPn kan väljas samtidigt."
 
 #: ../../user_guide/reception.rst:19
 msgid ""
 "When desired IPs are included click the **Receive**-button in the bottom "
 "right corner."
 msgstr ""
-"När alla IPn som ska tas emot är markerade klicka på **Ta emot** "
-"nere till höger."
+"När alla IPn som ska tas emot är markerade klicka på **Ta emot** nere "
+"till höger."
 
 #: ../../user_guide/reception.rst:24
 msgid ""
 "Clicking the **Receive**-button will open a window to receive the first "
 "included IP."
 msgstr ""
-"När **Ta emot** klickas kommer ett fönster för att ta emot det första IPt "
-"som valdes."
+"När **Ta emot** klickas kommer ett fönster för att ta emot det första IPt"
+" som valdes."
 
-#: ../../user_guide/reception.rst:29
+#: ../../user_guide/reception.rst:28
+msgid "Profile Editor"
+msgstr "Profileditor"
+
+#: ../../user_guide/reception.rst:30
 msgid ""
-"Use the select dropdown to choose what submission agreement to use. If "
-"the dropdown is disabled, the IP already has a related Submission "
-"agreement."
+"Use the select dropdown to choose what submission agreement to use, then "
+"click **Prepare**."
 msgstr ""
 "Använd rullistan för att välja leveransöverenskommelse som ska användas. "
+"Klicka sedan **Förbered**."
+
+#: ../../user_guide/reception.rst:35
+msgid ""
+"If the dropdown is disabled, the IP already has a related Submission "
+"agreement."
+msgstr ""
 "Om rullistan är inaktiverad så är IPt redan kopplat till en "
 "leveransöverenskommelse."
 
-#: ../../user_guide/reception.rst:34
+#: ../../user_guide/reception.rst:39
 msgid ""
-"When selection of Submission agreement is done. Check the **Approved to "
-"receive**-checkbox and click **Receive SIP**. The process of receiving "
-"the IP is started and if more IPs are included a receive window for the "
-"next IP will appear. An IP can be skipped by clicking the "
+"If IP in reception has a defined Submission Agreement that does not exist"
+" in the database, an error message is shown."
+msgstr ""
+"Om IPt i receptionen har en definerad leveransöverenskommelse som inte finns"
+" i databasen, visas ett felmeddelande."
+
+#: ../../user_guide/reception.rst:44
+msgid ""
+"The profile editor is where the user can edit data of a profile for a "
+"specific IP. The Submission agreements data fields can only be viewed by "
+"clicking the **view** button next to the SA dropdown."
+msgstr ""
+"I profileditorn kan en användare editera data i en profil för ett"
+" specifikt IP. Data-fälten för en leveransöverenskommelse kan bara läsas genom"
+" att klicka på **Visa**-knappen bredvid rullistan."
+
+#: ../../user_guide/reception.rst:48
+msgid ""
+"Underneath the Submission agreement row, all relevant profiles are "
+"listed. Click **edit** next to a profile to edit the data of the profile "
+"for the IP to be received."
+msgstr ""
+"Under raden för leveransöverenskommelse finns alla relevanta profiler "
+"listade. Klicka på **Redigera** för att redigera profil-data "
+"för IPt som ska tas emot."
+
+#: ../../user_guide/reception.rst:54
+msgid "When satisfied with the edit click **Save**."
+msgstr "Klicka sedan **Spara** när editeringen är färdig."
+
+#: ../../user_guide/reception.rst:58
+msgid ""
+"When saving profile data, the previous versions are still available in "
+"the version dropdown. Choose between data versions and click save to "
+"apply."
+msgstr ""
+"När man sparar profil-data så sparas alla tidigare versioner av datat "
+"och kan väljas i version-rullistan. Välj mellan versioner och klicka "
+"**Spara** för att spara."
+
+#: ../../user_guide/reception.rst:61
+msgid ""
+"This can be done on each profile type, remember to save the data before "
+"closing the profile form."
+msgstr ""
+"Detta kan göras på alla profiltyper. Kom ihåg att spara datat så "
+"det inte går förlorat."
+
+#: ../../user_guide/reception.rst:67
+msgid ""
+"When selection of Submission agreement and profiles is done. Check the "
+"**Approved to receive**-checkbox and click **Receive SIP**. The process "
+"of receiving the IP is started and if more IPs are included a receive "
+"window for the next IP will appear. An IP can be skipped by clicking the "
 "**Skip**-button, then the receive window for the next included IP will "
 "appear, if there is one."
 msgstr ""
-"När leveransöverenskommelse är vald, markera **Godkänd att ta emot** "
-"och klicka på **Ta emot SIP**. "
-"Mottagande påbörjas och om fler IPn är markerade öppnas ett nytt fönster "
-"för att ta emot nästa markerade IP. Om man klickar **Avbryt** kommer "
-"mottagande-fönstret stängas ned, men samtliga markerade IPn kommer fortfarande "
-"vara markerade. "
-"Klickar vi på **Hoppa över** så avmarkeras det nuvarande IPt och "
-"ett mottagande-fönster för nästa markerade IP visas."
+"När leveransöverenskommelse är vald, markera **Godkänd att ta emot** och "
+"klicka på **Ta emot SIP**. Mottagande påbörjas och om fler IPn är "
+"markerade öppnas ett nytt fönster för att ta emot nästa markerade IP. Om "
+"man klickar **Avbryt** kommer mottagande-fönstret stängas ned, men "
+"samtliga markerade IPn kommer fortfarande vara markerade. Klickar vi på "
+"**Hoppa över** så avmarkeras det nuvarande IPt och ett mottagande-fönster"
+" för nästa markerade IP visas."
 
-#: ../../user_guide/reception.rst:42
+#: ../../user_guide/reception.rst:77
 msgid ""
 "When IP is received it is no longer visible in the reception list view "
 "and can be found in either Workarea list views or the list view in "
 "Transfer SIP."
 msgstr ""
-"När ett IP tagits emot hittas det inte längre i listvyn i reception "
-"utan det kan hittas i :ref:`Arbetsytans <workspace>` "
-"listvyer eller under :ref:`Överför SIP <transfer-sip>`."
-
+"När ett IP tagits emot hittas det inte längre i listvyn i reception utan "
+"det kan hittas i :ref:`Arbetsytans <workspace>` listvyer eller under "
+":ref:`Överför SIP <transfer-sip>`."
