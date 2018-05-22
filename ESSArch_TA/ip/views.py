@@ -36,6 +36,7 @@ import zipfile
 from celery import states as celery_states
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.db import transaction
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -290,6 +291,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         return Response('Upload of %s complete' % filepath)
 
+    @transaction.atomic
     @detail_route(methods=['post'])
     def prepare(self, request, pk=None):
         try:
