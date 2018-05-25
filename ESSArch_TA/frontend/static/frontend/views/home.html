@@ -5,7 +5,8 @@
                 <i class="fa fa-2x fa-bars" aria-hidden="true" ng-click="hamburgerActive = !hamburgerActive"></i>
             </div>
             <div class="logo">
-                <h3 ui-sref="home.info">ESSArch Tools for Archive</h3>
+                <h3 class="page-title" ui-sref="home.info">ESSArch Tools for Archive</h3>
+                <h3 class="page-title-small" ng-click="infoPage()">ETA</h3>
             </div>
             <div class="user-admin">
                 <div ng-controller="UtilCtrl" class="mobile-notification">
@@ -32,7 +33,7 @@
             </div>
         </div>
         <div class="menu-task-wrapper">
-            <div class="nav" ng-controller="UtilCtrl">
+            <div class="nav menu" ng-controller="UtilCtrl">
                 <p tabindex="0" ng-keydown="navKeydownListener($event, 'home.reception')" class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.reception')}" ui-sref="home.reception" ng-if="checkPermissions('home.reception')">{{('RECEPTION' | translate)}}</p>
                 <p tabindex="0" ng-keydown="navKeydownListener($event, 'home.workarea')" class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.workarea')}" ui-sref="home.workarea" ng-if="checkPermissions('home.workarea')">{{('WORKAREA' | translate)}}</p>
                 <p tabindex="0" ng-keydown="navKeydownListener($event, 'home.transferSip')" class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.transferSip')}" ui-sref="home.transferSip" ng-if="checkPermissions('home.transferSip')">{{('TRANSFERSIP' | translate)}}</p>

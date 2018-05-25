@@ -14,28 +14,10 @@
     margin-bottom: 10px;
     margin-left: 5px;
 }
-@media screen and (max-width: 1200px) {
+
+@include medium-screen-down {
     .content-wrapper > div {
         margin-left: 0;
-    }
-}
-.search-prepare-wrapper {
-    display: flex;
-    flex-direction: row;
-    font-weight: bold;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    position: relative;
-    width: 100%;
-    padding: 0 0 10px 0;
-    .btn-info {
-        margin-left: 10px;
-        padding: 2px 12px;
-    }
-    .fa-refresh {
-        position: absolute;
-        top: 10px;
-        right: 0px;
     }
 }
 .text-center {
@@ -62,28 +44,6 @@
         outline: 0;
     }
 }
-.events-status-wrapper {
-    @include container;
-    &:focus {
-        outline: 0;
-    }
-}
-.event-view {
-    margin: 5px;
-    padding: 5px;
-    .table {
-        position: relative;
-        overflow-x: auto;
-    }
-    .submit-button {
-        margin-bottom: 5px;
-    }
-}
-.items-per-page {
-    width: 15%;
-    min-width: 50px;
-
-}
 .select-view {
     margin: 5px;
     padding: 5px;
@@ -104,9 +64,6 @@
     padding-top: 0;
     padding-bottom: 0;
     font-size: 13px;
-}
-.tasks-list {
-    padding: 10px;
 }
 .sub-select-view {
     border-top-style: solid;
@@ -210,32 +167,6 @@ input[type="checkbox"] {
 }
 .receive-sip-eventlog-form .checkbox {
     margin-right: 5px;
-}
-.events-footer {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    height: 60px;
-    margin: 5px;
-    padding: 5px;
-    .signature {
-        width: 250px;
-        height: 35px;
-        margin-left: 5px;
-        margin-right: 5px;
-        resize: none;
-    }
-}
-.events-form {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    width: 100%;
-    margin-left: 10px;
-}
-.events-form .submit-button {
-    height: 35px;
-    margin-top: 25px;
 }
 .control-label {
     font-size: 10px;
