@@ -26,17 +26,15 @@
             <hr/>
             <div class="validation-view">
                 <div class="table-container" st-table="vm.validations" st-pipe="vm.validationPipe">
-                    <div class="toolbar-row">
-                        <div class="search-prepare-wrapper">
-                            <select tabindex="-1" class="form-control items-per-page"
-                                ng-model="vm.validationsPerPage" ng-options="x for x in [5,10,20,25,50]" uib-popover="{{'ITEMSPERPAGE' | translate}}" popover-placement="top-left"
-                                popover-popup-delay="500" popover-append-to-body="true"></select>
-                            <div class="input-group margin-bottom-sm global-search">
-                            <input id="search-input" st-search="" class="form-control" ng-attr-placeholder="{{'GLOBALSEARCH' | translate}}" type="text"
-                                uib-popover="{{'GLOBALSEARCHDESC_VALIDATION' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"
-                            />
-                                <span ng-if="vm.validationTableState.search.predicateObject && vm.validationTableState.search.predicateObject['$']" class="input-group-addon clickable" ng-click="clearSearch(); getListViewData();"><i class="fa fa-lg fa-times" style="color: red;"></i></span>
-                            </div>
+                    <div class="search-prepare-wrapper">
+                        <select tabindex="-1" class="form-control items-per-page"
+                            ng-model="vm.validationsPerPage" ng-options="x for x in [5,10,20,25,50]" uib-popover="{{'ITEMSPERPAGE' | translate}}" popover-placement="top-left"
+                            popover-popup-delay="500" popover-append-to-body="true"></select>
+                        <div class="input-group margin-bottom-sm global-search">
+                        <input id="search-input" st-search="" class="form-control" ng-attr-placeholder="{{'GLOBALSEARCH' | translate}}" type="text"
+                            uib-popover="{{'GLOBALSEARCHDESC_VALIDATION' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"
+                        />
+                            <span ng-if="vm.validationTableState.search.predicateObject && vm.validationTableState.search.predicateObject['$']" class="input-group-addon clickable" ng-click="clearSearch(); getListViewData();"><i class="fa fa-lg fa-times" style="color: red;"></i></span>
                         </div>
                         <div class="refresh-icon">
                             <span ng-click="vm.validationPipe(vm.validationTableState)" class="clickable fa fa-refresh fa-lg"
