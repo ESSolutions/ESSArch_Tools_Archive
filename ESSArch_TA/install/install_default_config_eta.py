@@ -32,7 +32,7 @@ from django.contrib.auth.models import Permission
 from groups_manager.models import GroupType
 from django.contrib.contenttypes.models import ContentType
 
-from ESSArch_Core.auth.models import Group, Member
+from ESSArch_Core.auth.models import Group, Member, GroupMemberRole
 from ESSArch_Core.configuration.models import Parameter, Path, Agent
 from ESSArch_Core.ip.models import InformationPackage
 
@@ -55,9 +55,11 @@ def installDefaultUsers():
     organization, _ = GroupType.objects.get_or_create(label="organization")
     default_org, _ = Group.objects.get_or_create(name='Default', group_type=organization)
 
-    group_user, _ = Group.objects.get_or_create(name='user', parent=default_org)
+    role_user, _ = GroupMemberRole.objects.get_or_create(codename='user')
     permission_list_user = [
         ## ---- app: ip ---- model: informationpackage
+        ['view_informationpackage','ip','informationpackage'],       # Can view information packages
+        ['delete_informationpackage','ip','informationpackage'], # Can delete Information Package (Ingest)
         ['receive','ip','informationpackage'],                    # Can receive IP
         ['transfer_sip','ip','informationpackage'],                    # Can transfer SIP
         ## ---- app: WorkflowEngine ---- model: processtask
@@ -70,26 +72,19 @@ def installDefaultUsers():
                                           codename=p[0], content_type__app_label=p[1],
                                           content_type__model=p[2],
                                           )
-        group_user.django_group.permissions.add(p_obj)
+        role_user.permissions.add(p_obj)
 
-    group_admin, _ = Group.objects.get_or_create(name='admin', parent=default_org)
-    permission_list_admin = [
-        ## ---- app: ip ---- model: informationpackage
-        ['receive','ip','informationpackage'],                    # Can receive IP
-        ['transfer_sip','ip','informationpackage'],                    # Can transfer SIP
-        ## ---- app: WorkflowEngine ---- model: processtask
-        #['can_undo','WorkflowEngine','processtask'],             # Can undo tasks (other)
-        #['can_retry','WorkflowEngine','processtask'],             # Can retry tasks (other)
-    ]
+    role_admin, _ = GroupMemberRole.objects.get_or_create(codename='admin')
+    permission_list_admin = []
 
     for p in permission_list_admin:
         p_obj = Permission.objects.get(
                                           codename=p[0], content_type__app_label=p[1],
                                           content_type__model=p[2],
                                           )
-        group_admin.django_group.permissions.add(p_obj)
+        role_admin.permissions.add(p_obj)
 
-    group_sysadmin, _ = Group.objects.get_or_create(name='sysadmin', parent=default_org)
+    role_sysadmin, _ = GroupMemberRole.objects.get_or_create(codename='sysadmin')
     permission_list_sysadmin = [
         ## ---- app: auth ---- model: group
         ['add_group','auth','group'],                    # Can add group
@@ -130,7 +125,7 @@ def installDefaultUsers():
                                           codename=p[0], content_type__app_label=p[1],
                                           content_type__model=p[2],
                                           )
-        group_sysadmin.django_group.permissions.add(p_obj)
+        role_sysadmin.permissions.add(p_obj)
 
     #####################################
     # Users
@@ -151,7 +146,7 @@ def installDefaultUsers():
     if created:
         user_user.set_password('user')
         user_user.save()
-        group_user.add_member(user_user.essauth_member)
+        default_org.add_member(user_user.essauth_member, roles=[role_user])
 
     user_admin, created = User.objects.get_or_create(
         first_name='admin', last_name='Lastname',
@@ -161,7 +156,7 @@ def installDefaultUsers():
         user_admin.set_password('admin')
         user_admin.is_staff=True
         user_admin.save()
-        group_admin.add_member(user_admin.essauth_member)
+        default_org.add_member(user_admin.essauth_member, roles=[role_user, role_admin])
 
     user_sysadmin, created = User.objects.get_or_create(
         first_name='sysadmin', last_name='Lastname',
@@ -171,7 +166,7 @@ def installDefaultUsers():
         user_sysadmin.set_password('sysadmin')
         user_sysadmin.is_staff=True
         user_sysadmin.save()
-        group_sysadmin.add_member(user_sysadmin.essauth_member)
+        default_org.add_member(user_sysadmin.essauth_member, roles=[role_sysadmin])
 
     return 0
 

@@ -294,12 +294,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
     @transaction.atomic
     @detail_route(methods=['post'])
     def prepare(self, request, pk=None):
-        try:
-            perms = copy.deepcopy(settings.IP_CREATION_PERMS_MAP)
-        except AttributeError:
-            msg = 'IP_CREATION_PERMS_MAP not defined in settings'
-            self.logger.error(msg)
-            raise ImproperlyConfigured(msg)
+        perms = copy.deepcopy(getattr(settings, 'IP_CREATION_PERMS_MAP', {}))
 
         organization = request.user.user_profile.current_organization
         if organization is None:
@@ -390,6 +385,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         user_perms = perms.pop('owner', [])
         organization.assign_object(ip, custom_permissions=perms)
+        organization.add_object(ip, custom_permissions=perms)
 
         for perm in user_perms:
             perm_name = get_permission_name(perm, ip)
