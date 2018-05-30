@@ -1,4 +1,4 @@
-angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSortString, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $q, $window) {
+angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSortString, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $q, $window, ContextMenuBase) {
     // Initialize variables
     $scope.filebrowser = false;
     $scope.statusShow = false;
@@ -42,6 +42,19 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             $interval.cancel(stateInterval);
         }
     }));
+
+    // Context menu
+
+    $scope.menuOptions = function (rowType, row) {
+        return [
+            ContextMenuBase.changeOrganization(
+                function () {
+                    $scope.ip = row;
+                    $rootScope.ip = row;
+                    vm.changeOrganizationModal($scope.ip);
+            })
+        ];
+    }
 
     // Update list view interval
     //Update only if status < 100 and no step has failed in any IP
@@ -920,6 +933,30 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
         modalInstance.result.then(function (data) {
             $scope.ipRemoved(ipObject);
         }, function () {
+            $log.info('modal-component dismissed at: ' + new Date());
+        });
+    }
+
+    vm.changeOrganizationModal = function (ip) {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'modals/change_organization_modal.html',
+            controller: 'OrganizationModalInstanceCtrl',
+            controllerAs: '$ctrl',
+            size: "sm",
+            resolve: {
+                data: function () {
+                    return {
+                        ip: ip,
+                    };
+                }
+            },
+        })
+        modalInstance.result.then(function (data) {
+            $scope.getListViewData();
+        }).catch(function () {
             $log.info('modal-component dismissed at: ' + new Date());
         });
     }

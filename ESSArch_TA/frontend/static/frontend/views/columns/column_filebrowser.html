@@ -1,1 +1,1 @@
-<div ng-if="row.responsible.id == auth.id || !row.responsible"><a tabindex="-1" class="no-select" ng-click="filebrowserClick(row)">{{'FILEBROWSER' | translate}}</a></div>
+<div ng-if="row.responsible.id == auth.id || !row.responsible" context-menu="menuOptions('row', row)"><a tabindex="-1" class="no-select" ng-click="filebrowserClick(row)">{{'FILEBROWSER' | translate}}</a></div>

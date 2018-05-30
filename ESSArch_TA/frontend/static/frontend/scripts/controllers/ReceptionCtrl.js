@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('ReceptionCtrl', function(IPReception, IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller) {
+angular.module('myApp').controller('ReceptionCtrl', function(IPReception, IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, ContextMenuBase) {
     var vm = this;
     var ipSortString = "Receiving";
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
@@ -30,6 +30,21 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, IP, $h
     $scope.includedIps = [];
     $scope.receiveShow = false;
     $scope.validateShow = false;
+
+    $scope.menuOptions = function (rowType, row) {
+        var methods = []
+        if (row.state === 'Prepared') {
+            methods.push(ContextMenuBase.changeOrganization(
+                function () {
+                    $scope.ip = row;
+                    $rootScope.ip = row;
+                    vm.changeOrganizationModal($scope.ip);
+                })
+            );
+        }
+        return methods;
+    }
+
 
     /*******************************************/
     /*Piping and Pagination for List-view table*/

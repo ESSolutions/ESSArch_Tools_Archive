@@ -314,5 +314,7 @@
     "NO_FORM_TEMPLATE": "Inget formulär tillgängligt",
     "STEP_STATE_DESC": "Step-tillstånd, Slutförd/Fel",
     "POPUP_ENABLED": "Popup aktiverad",
-    "USER_SETTINGS": "Användarinställningar"
+    "USER_SETTINGS": "Användarinställningar",
+    "CHANGE_ORGANIZATION": "Byt organisation",
+    "ORGANIZATION_CHANGED": "Organisation bytt"
 }

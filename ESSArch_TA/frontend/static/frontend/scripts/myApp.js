@@ -59,7 +59,7 @@ function nestedEmptyPermissions(page) {
     }
 }
 
-angular.module('myApp', ['templates', 'ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'formlyBootstrap', 'smart-table', 'treeGrid', 'ui.router', 'ngCookies', 'permission', 'permission.ui', 'pascalprecht.translate', 'ngSanitize', 'ui.bootstrap.datetimepicker', 'ui.dateTimeInput', 'ngAnimate', 'ngMessages', 'myApp.config', 'ig.linkHeaderParser', 'hc.marked', 'ngFilesizeFilter', 'angular-clipboard', 'ngResource', 'relativeDate', 'permission.config', 'ngWebSocket', 'prettyXml'])
+angular.module('myApp', ['templates', 'ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'formlyBootstrap', 'smart-table', 'treeGrid', 'ui.router', 'ngCookies', 'permission', 'permission.ui', 'pascalprecht.translate', 'ngSanitize', 'ui.bootstrap.datetimepicker', 'ui.dateTimeInput', 'ngAnimate', 'ngMessages', 'myApp.config', 'ig.linkHeaderParser', 'hc.marked', 'ngFilesizeFilter', 'angular-clipboard', 'ngResource', 'relativeDate', 'permission.config', 'ngWebSocket', 'prettyXml',  'ui.bootstrap.contextMenu'])
     .config(function($routeProvider, formlyConfigProvider, $stateProvider, $urlRouterProvider, $rootScopeProvider, $uibTooltipProvider, $urlMatcherFactoryProvider, permissionConfig) {
 
         $urlMatcherFactoryProvider.strictMode(false);

@@ -1,4 +1,4 @@
-<div ng-click="ipRowClick(row)">
+<div ng-click="ipRowClick(row)" context-menu="menuOptions('row', row)">
     <button
      tabindex="-1"
      ng-if="row.state != 'At reception' && (row.permissions.includes('delete_informationpackage'))"

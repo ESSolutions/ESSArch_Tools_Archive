@@ -314,5 +314,7 @@
     "NO_FORM_TEMPLATE": "No form available",
     "STEP_STATE_DESC": "Step state, Success/Failure",
     "POPUP_ENABLED": "Popup enabled",
-    "USER_SETTINGS": "User settings"
+    "USER_SETTINGS": "User settings",
+    "CHANGE_ORGANIZATION": "Change organization",
+    "ORGANIZATION_CHANGED": "Organization changed"
 }
