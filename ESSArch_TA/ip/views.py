@@ -49,7 +49,8 @@ from rest_framework import exceptions, filters, permissions, status, viewsets
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 
-from ESSArch_Core.auth.models import Member
+from ESSArch_Core.auth.models import Group, Member
+from ESSArch_Core.auth.util import get_organization_groups
 from ESSArch_Core.WorkflowEngine.models import (ProcessStep, ProcessTask)
 from ESSArch_Core.WorkflowEngine.serializers import ProcessStepChildrenSerializer
 from ESSArch_Core.WorkflowEngine.util import create_workflow
@@ -620,6 +621,22 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
             'responsible__user_permissions', 'responsible__groups__permissions', 'steps',
         ).select_related('submission_agreement')
         return queryset
+
+    @detail_route(methods=['post'], url_path='change-organization')
+    def change_organization(self, request, pk=None):
+        ip = self.get_object()
+        try:
+            org_id = request.data['organization']
+        except KeyError:
+            raise exceptions.ParseError(detail='Missing "organization" parameter')
+
+        try:
+            org = get_organization_groups(request.user).get(pk=org_id)
+        except Group.DoesNotExist:
+            raise exceptions.ParseError('Invalid organization')
+
+        ip.change_organization(org)
+        return Response()
 
     @detail_route(methods=['post'], url_path='transfer', permission_classes=[CanTransferSIP])
     def transfer(self, request, pk=None):
