@@ -386,7 +386,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         user_perms = perms.pop('owner', [])
         organization.assign_object(ip, custom_permissions=perms)
-        organization.add_object(ip, custom_permissions=perms)
+        organization.add_object(ip)
 
         for perm in user_perms:
             perm_name = get_permission_name(perm, ip)
