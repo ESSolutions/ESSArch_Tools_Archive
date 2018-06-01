@@ -33,6 +33,24 @@ angular.module('myApp').controller('UtilCtrl', function($scope, $state, $locatio
     $scope.showAlert = function() {
         Notifications.toggle();
     }
+    
+    /**
+     * Check if state has a sub state that requires no permissions
+     * @param {*} page
+     */
+    function nestedEmptyPermissions(page) {
+        if(Array.isArray(page)) {
+            return page.length == 0;
+        } else if(typeof(page) == "object") {
+            for(var entry in page) {
+                if(nestedEmptyPermissions(page[entry])) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
     $scope.checkPermissions = function(page) {
         // Check if there is a sub state that does not require permissions
         if(nestedEmptyPermissions(Object.resolve(page, permissionConfig))) {

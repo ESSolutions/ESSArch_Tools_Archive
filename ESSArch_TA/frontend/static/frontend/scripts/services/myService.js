@@ -80,7 +80,7 @@ angular.module('myApp').factory('myService', function(Sysinfo, $location, PermPe
         var activeColumns = [];
         var simpleColumns = allColumns.map(function (a) { return a.label });
         columns.forEach(function (column) {
-            for (i = 0; i < simpleColumns.length; i++) {
+            for (let i = 0; i < simpleColumns.length; i++) {
                 if (column === simpleColumns[i]) {
                     activeColumns.push(allColumns[i]);
                 }

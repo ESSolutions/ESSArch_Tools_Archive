@@ -22,6 +22,49 @@
     Email - essarch@essolutions.se
     */
 
+import 'angular';
+import 'angular-animate';
+import 'angular-bootstrap-datetimepicker';
+import 'angular-bootstrap-grid-tree';
+import 'angular-clipboard';
+import 'angular-cookies';
+import 'angular-date-time-input';
+import 'angular-filesize-filter';
+import 'angular-formly';
+import 'angular-formly-templates-bootstrap';
+import 'angular-link-header-parser';
+import 'angular-marked';
+import 'angular-messages';
+import 'angular-mocks';
+import 'angular-permission';
+import 'angular-pretty-xml';
+import 'angular-relative-date';
+import 'angular-resource';
+import 'angular-route';
+import 'angular-sanitize';
+import 'angular-smart-table';
+import 'angular-translate';
+import 'angular-translate-loader-static-files';
+import 'angular-translate-storage-cookie';
+import 'angular-tree-control';
+import 'angular-ui-bootstrap';
+import 'angular-ui-router';
+import 'angular-websocket';
+import 'jquery';
+import 'messenger-hubspot';
+import 'moment';
+import  UAParser from 'ua-parser-js';
+import authentication from 'authentication';
+import notification from 'notification';
+import utils from 'utils';
+import 'templates';
+
+console.log("wee");
+var newOne = () => {
+ console.log("Hello World..!");
+}
+newOne();
+
 Object.resolve = function (path, obj) {
     return path.split('.').reduce(function (prev, curr) {
         return prev ? prev[curr] : undefined
@@ -42,24 +85,7 @@ function nestedPermissions(page) {
     }
 }
 
-/**
- * Check if state has a sub state that requires no permissions
- * @param {*} page
- */
-function nestedEmptyPermissions(page) {
-    if(Array.isArray(page)) {
-        return page.length == 0;
-    } else if(typeof(page) == "object") {
-        for(var entry in page) {
-            if(nestedEmptyPermissions(page[entry])) {
-                return true;
-            }
-        }
-        return false;
-    }
-}
-
-angular.module('myApp', ['templates', 'ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'formlyBootstrap', 'smart-table', 'treeGrid', 'ui.router', 'ngCookies', 'permission', 'permission.ui', 'pascalprecht.translate', 'ngSanitize', 'ui.bootstrap.datetimepicker', 'ui.dateTimeInput', 'ngAnimate', 'ngMessages', 'myApp.config', 'ig.linkHeaderParser', 'hc.marked', 'ngFilesizeFilter', 'angular-clipboard', 'ngResource', 'relativeDate', 'permission.config', 'ngWebSocket', 'prettyXml'])
+angular.module('myApp', ['templates', 'ngRoute', 'treeControl', 'ui.bootstrap', 'formly', 'formlyBootstrap', 'smart-table', 'treeGrid', 'ui.router', 'ngCookies', 'permission', 'permission.ui', 'pascalprecht.translate', 'ngSanitize', 'ui.bootstrap.datetimepicker', 'ui.dateTimeInput', 'ngAnimate', 'ngMessages', 'myApp.config', 'ig.linkHeaderParser', 'hc.marked', 'ngFilesizeFilter', 'angular-clipboard', 'ngResource', 'relativeDate', 'permission.config', 'ngWebSocket', 'prettyXml', notification, authentication, utils])
     .config(function($routeProvider, formlyConfigProvider, $stateProvider, $urlRouterProvider, $rootScopeProvider, $uibTooltipProvider, $urlMatcherFactoryProvider, permissionConfig) {
 
         $urlMatcherFactoryProvider.strictMode(false);
@@ -468,6 +494,7 @@ angular.module('myApp', ['templates', 'ngRoute', 'treeControl', 'ui.bootstrap', 
     .run(function (djangoAuth, $rootScope, $state, $location, $cookies, PermPermissionStore, PermRoleStore, $http, myService, formlyConfig, formlyValidationMessages, $urlRouter, permissionConfig) {
         formlyConfig.extras.errorExistsAndShouldBeVisibleExpression = 'form.$submitted || fc.$touched || fc[0].$touched';
         formlyValidationMessages.addStringMessage('required', 'This field is required');
+        console.log('inside app run');
 
         $rootScope.app = 'ESSArch Tools Archive'
 

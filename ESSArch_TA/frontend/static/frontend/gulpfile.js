@@ -23,6 +23,12 @@
 */
 
 var gulp = require('gulp')
+var glob = require("glob")
+var debug = require('gulp-debug');
+var babelify = require('babelify');
+var browserify = require('browserify');
+var vinylSourceStream = require('vinyl-source-stream');
+var vinylBuffer = require('vinyl-buffer');
 var sass = require('gulp-sass');
 var ngConstant = require('gulp-ng-constant');
 var sourcemaps = require('gulp-sourcemaps');
@@ -42,6 +48,8 @@ var path = require('path');
 var argv = require('yargs').argv;
 var isProduction = (argv.production === undefined) ? false : true;
 
+var plugins = require('gulp-load-plugins')();
+
 var core = process.env.EC_FRONTEND;
 var coreHtmlFiles = [path.join(core, 'views/**/*.html')];
 var coreJsFiles = [path.join(core, 'scripts/**/*.js')];
@@ -55,52 +63,8 @@ var jsPolyfillFiles = [
     'node_modules/console-polyfill/index.js',
     'scripts/polyfills/*.js',
 ]
-var vendorFiles = [
-        'node_modules/api-check/dist/api-check.js',
-        'node_modules/jquery/dist/jquery.js',
-        'node_modules/ua-parser-js/src/ua-parser.js',
-        'node_modules/angular/angular.js',
-        'scripts/angular-locale_sv.js',
-        'node_modules/angular-animate/angular-animate.js',
-        'node_modules/angular-messages/angular-messages.js',
-        'node_modules/angular-route/angular-route.js',
-        'node_modules/angular-mocks/angular-mocks.js',
-        'node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
-        'node_modules/angular-tree-control/angular-tree-control.js',
-        'node_modules/angular-formly/dist/formly.js',
-        'node_modules/angular-formly-templates-bootstrap/dist/angular-formly-templates-bootstrap.js',
-        'node_modules/angular-smart-table/dist/smart-table.js',
-        'node_modules/angular-bootstrap-grid-tree/src/tree-grid-directive.js',
-        'node_modules/angular-ui-router/release/angular-ui-router.js',
-        'node_modules/angular-cookies/angular-cookies.js ',
-        'node_modules/angular-permission/dist/angular-permission.js',
-        'node_modules/angular-permission/dist/angular-permission-ui.js',
-        'node_modules/angular-translate/dist/angular-translate.js',
-        'node_modules/angular-translate-storage-cookie/angular-translate-storage-cookie.js',
-        'node_modules/angular-translate-loader-static-files/angular-translate-loader-static-files.js',
-        'node_modules/angular-sanitize/angular-sanitize.js',
-        'node_modules/angular-websocket/dist/angular-websocket.js',
-        'node_modules/ui-select/dist/select.js',
-        'node_modules/bootstrap/dist/js/bootstrap.js',
-        'bower_components/angular-link-header-parser/release/angular-link-header-parser.js',
-        'bower_components/lodash/lodash.js', // required by angular-link-header-parser
-        'bower_components/uri-util/dist/uri-util.js', // required by angular-link-header-parser
-        'node_modules/marked/lib/marked.js',
-        'node_modules/messenger-hubspot/build/js/messenger.js',
-        'node_modules/messenger-hubspot/build/js/messenger-theme-flat.js',
-        'node_modules/angular-relative-date/dist/angular-relative-date.js',
-        'node_modules/angular-marked/dist/angular-marked.js',
-        'node_modules/angular-filesize-filter/angular-filesize-filter.js',
-        'node_modules/moment/min/moment-with-locales.js',
-        'node_modules/angular-date-time-input/src/dateTimeInput.js',
-        'node_modules/angular-bootstrap-datetimepicker/src/js/datetimepicker.js',
-        'node_modules/angular-bootstrap-datetimepicker/src/js/datetimepicker.templates.js',
-        'node_modules/angular-clipboard/angular-clipboard.js',
-        'node_modules/angular-resource/angular-resource.js',
-        'node_modules/angular-pretty-xml/src/angular-pretty-xml.js'
-    ],
-    jsFiles = [
-        'scripts/myApp.js', 'scripts/core/*.js', 'scripts/controllers/*.js', 'scripts/components/*.js',
+var jsFiles = [
+        'scripts/myApp.js', 'scripts/controllers/*.js', 'scripts/components/*.js',
         'scripts/services/*.js', 'scripts/directives/*.js', 'scripts/configs/*.js'
     ],
     jsDest = 'scripts',
@@ -154,46 +118,51 @@ var buildCoreScripts = function() {
 }
 
 var buildScripts = function() {
-    return gulp.src(jsFiles)
-        .pipe(plumber(function(error) {
-          // output an error message
+    var all_files = [];
+    jsFiles.forEach(function(path){
+        try {
+            console.log(path)
+            var is_file = fs.lstatSync(path).isFile();
+            all_files.push(path);
+        } catch (e) {
+            all_files = all_files.concat(glob.sync(path))        }
+    });
+    var sources = browserify({
+        entries: [all_files],
+        paths: ['./node_modules', path.join(core, 'scripts'), './scripts/core'],
+        debug: true, // Build source maps
+        insertGlobalVars: {
+            $: function(file, dir) {
+                return 'require("jquery")';
+            },
+            jQuery: function(file, dir) {
+                return 'require("jquery")';
+            },
+            moment: function(file, dir) {
+                return 'require("moment")';
+            }
+        }
+    })
+    .transform("babelify", {global: true, ignore: /\/node_modules\/(?!angular-link-header-parser|angular-websocket|bufferutil|utf-8-validate\/)/, presets: [require("babel-preset-es2015")], plugins: [require("babel-plugin-angularjs-annotate")]});
 
-          gutil.log(gutil.colors.red('error (' + error.plugin + '): ' + error.message));
-          // emit the end event, to properly end the task
-          this.emit('end');
+    return sources.bundle()
+        .pipe(vinylSourceStream('scripts.min.js'))
+        .pipe(vinylBuffer())
+        .pipe(plugins.sourcemaps.init({
+            loadMaps: true // Load the sourcemaps browserify already generated
         }))
-        .pipe(sourcemaps.init())
-        .pipe(ngAnnotate())
-        .pipe(concat('scripts.min.js'))
-        .pipe(gulpif(isProduction, stripDebug()))
-        .pipe(gulpif(isProduction, uglify()))
-        .pipe(license('/*\n'+licenseString+'\n*/\n'))
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(jsDest));
+        .pipe(plugins.uglify())
+        .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
+        .pipe(plugins.sourcemaps.write('./', {
+            includeContent: true
+        }))
+        .pipe(gulp.dest('scripts'));
 };
 
-var buildVendors = function() {
-    return gulp.src(vendorFiles)
-        .pipe(plumber(function(error) {
-          // output an error message
-
-          gutil.log(gutil.colors.red('error (' + error.plugin + '): ' + error.message));
-          // emit the end event, to properly end the task
-          this.emit('end');
-        }))
-        .pipe(sourcemaps.init())
-        .pipe(ngAnnotate())
-        .pipe(concat('vendors.min.js'))
-        .pipe(gulpif(isProduction, stripDebug()))
-        .pipe(gulpif(isProduction, uglify()))
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(jsDest));
-};
 var compileSass = function() {
  return gulp.src('styles/styles.scss')
-    .pipe(sourcemaps.init())
-    .pipe(sass({includePaths: coreCssFiles}).on('error', sass.logError))
     .pipe(sourcemaps.init({loadMaps: true}))
+    .pipe(sass({includePaths: coreCssFiles}).on('error', sass.logError))
     .pipe(cleanCSS({
       cleanupCharsets: true, // controls `@charset` moving to the front of a stylesheet; defaults to `true`
       normalizeUrls: true, // controls URL normalization; defaults to `true`
@@ -263,8 +232,12 @@ gulp.task('default', ['core_templates', 'core_scripts'], function() {
     copyIcons();
     copyImages()
     buildPolyfills();
-    buildScripts();
-    return buildVendors();
+    return buildScripts();
+});
+
+gulp.task('scripts', function() {
+
+
 });
 
 gulp.task('icons', copyIcons);
@@ -273,7 +246,6 @@ gulp.task('polyfills', buildPolyfills);
 gulp.task('core_templates', buildCoreTemplates);
 gulp.task('core_scripts', buildCoreScripts);
 gulp.task('scripts', buildScripts);
-gulp.task('vendors', buildVendors);
 gulp.task('sass', compileSass);
 gulp.task('config', configConstants);
 
@@ -282,6 +254,5 @@ gulp.task('watch', function(){
     gulp.watch(coreJsFiles, ['core_scripts']);
     gulp.watch(jsFiles, ['scripts']);
     gulp.watch(jsPolyfillFiles, ['polyfills']);
-    gulp.watch(vendorFiles, ['vendors']);
     gulp.watch(cssFiles, ['sass']);
 })

@@ -623,7 +623,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
         if (A.length > B.length) {
             A.splice(0, B.length);
         }
-        for (i = 0; i < B.length; i++) {
+        for (let i = 0; i < B.length; i++) {
             if (A[i]) {
                 for (var prop in B[i]) {
                     if (B[i].hasOwnProperty(prop) && prop != "children") {

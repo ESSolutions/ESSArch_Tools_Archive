@@ -9,6 +9,7 @@ angular.module('myApp').factory('IP', function ($resource, appConfig, Event, Ste
             isArray: true,
             interceptor: {
                 response: function (response) {
+                    console.log('response', response);
                     response.resource.$httpHeaders = response.headers;
                     return response.resource;
                 }

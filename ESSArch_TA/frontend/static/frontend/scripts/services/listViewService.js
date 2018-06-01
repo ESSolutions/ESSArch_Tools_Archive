@@ -93,7 +93,7 @@ angular.module('myApp').factory('listViewService', function (IP, SA, Profile, Wo
         }
 
         return IP.query(data).$promise.then(function (resource) {
-            count = resource.$httpHeaders('Count');
+            let count = resource.$httpHeaders('Count');
             if (count == null) {
                 count = resource.length;
             }
@@ -101,6 +101,8 @@ angular.module('myApp').factory('listViewService', function (IP, SA, Profile, Wo
                 count: count,
                 data: resource
             };
+        }).catch(function(err){
+            console.log(err);
         });
     }
 
@@ -111,7 +113,7 @@ angular.module('myApp').factory('listViewService', function (IP, SA, Profile, Wo
             agents: filters.agents,
             ordering: sortString,
         }).$promise.then(function (resource) {
-            count = resource.$httpHeaders('Count');
+            let count = resource.$httpHeaders('Count');
             if (count == null) {
                 count = resource.length;
             }
@@ -119,6 +121,8 @@ angular.module('myApp').factory('listViewService', function (IP, SA, Profile, Wo
                 count: count,
                 data: resource
             };
+        }).catch(function(err){
+            console.log(err);
         });
     }
 
@@ -161,7 +165,7 @@ angular.module('myApp').factory('listViewService', function (IP, SA, Profile, Wo
             search: searchString,
             ordering: sortString
         }, columnFilters)).$promise.then(function (resource) {
-            count = resource.$httpHeaders('Count');
+            let count = resource.$httpHeaders('Count');
             if (count == null) {
                 count = resource.length;
             }
@@ -262,7 +266,7 @@ angular.module('myApp').factory('listViewService', function (IP, SA, Profile, Wo
                 tag: $rootScope.selectedTag != null ? $rootScope.selectedTag.id : null,
             }, columnFilters)
         ).$promise.then(function (resource) {
-            count = resource.$httpHeaders('Count');
+            let count = resource.$httpHeaders('Count');
             if (count == null) {
                 count = resource.length;
             }
@@ -400,7 +404,7 @@ angular.module('myApp').factory('listViewService', function (IP, SA, Profile, Wo
     // Gets children for a step and processes each child step/task.
     // Returns the updated step
     function getChildrenForStep(step, page_number) {
-        page_size = 10;
+        let page_size = 10;
         if (angular.isUndefined(page_number) || !page_number) {
             step.page_number = 1;
         } else {
