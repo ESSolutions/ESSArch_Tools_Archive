@@ -69,6 +69,7 @@ angular.module('myApp').controller('FilebrowserController', function ($scope, $w
                     tableState.pagination.numberOfPages = dir.numberOfPages;//set the number of pages so the pagination can update
                     $scope.gridArrayLoading = false;
                     $scope.initLoad = false;
+                    $scope.openingNewPage = false;
                 })
             } else {
                 listViewService.getDir($scope.ip, $scope.previousGridArraysString(), pageNumber, number).then(function(dir) {
@@ -76,6 +77,7 @@ angular.module('myApp').controller('FilebrowserController', function ($scope, $w
                     tableState.pagination.numberOfPages = dir.numberOfPages;//set the number of pages so the pagination can update
                     $scope.gridArrayLoading = false;
                     $scope.initLoad = false;
+                    $scope.openingNewPage = false;
                 })
             }
         }
@@ -104,6 +106,7 @@ angular.module('myApp').controller('FilebrowserController', function ($scope, $w
         $scope.previousGridArrays.pop();
         if($scope.tableState) {
             $scope.tableState.pagination.start = 0;
+            $scope.openingNewPage = true;
             $scope.dirPipe($scope.tableState);
             $scope.selectedCards = [];
         }
@@ -118,6 +121,7 @@ angular.module('myApp').controller('FilebrowserController', function ($scope, $w
             $scope.previousGridArrays.push(card);
             if($scope.tableState) {
                 $scope.tableState.pagination.start = 0;
+                $scope.openingNewPage = true;
                 $scope.dirPipe($scope.tableState);
                 $scope.selectedCards = [];
             }
