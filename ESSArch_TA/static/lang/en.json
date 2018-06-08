@@ -316,5 +316,6 @@
     "POPUP_ENABLED": "Popup enabled",
     "USER_SETTINGS": "User settings",
     "CHANGE_ORGANIZATION": "Change organization",
-    "ORGANIZATION_CHANGED": "Organization changed"
+    "ORGANIZATION_CHANGED": "Organization changed",
+    "VERSIONS": "Versions"
 }

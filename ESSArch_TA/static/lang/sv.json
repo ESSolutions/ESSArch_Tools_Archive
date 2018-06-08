@@ -316,5 +316,6 @@
     "POPUP_ENABLED": "Popup aktiverad",
     "USER_SETTINGS": "Användarinställningar",
     "CHANGE_ORGANIZATION": "Byt organisation",
-    "ORGANIZATION_CHANGED": "Organisation bytt"
+    "ORGANIZATION_CHANGED": "Organisation bytt",
+    "VERSIONS": "Versioner"
 }
