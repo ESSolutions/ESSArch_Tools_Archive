@@ -458,7 +458,17 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
                                                                                   dst=os.path.dirname(ip_events_dst)))
                 extracted = os.path.join(os.path.dirname(ip_events_dst), ip_events_src)
                 self.logger.debug('moving {src} to {dst}'.format(src=extracted, dst=ip_events_dst))
-                os.rename(extracted, ip_events_dst)
+
+                if os.name == 'nt':
+                    # In Windows we can't simply override an existing file,
+                    # instead we update the contents of the new path
+                    # and delete the old path
+                    with open(extracted, 'rb') as old_f:
+                        with open(ip_events_dst, 'wb') as new_f:
+                            new_f.write(old_f.read())
+                    os.remove(extracted)
+                else:
+                    os.rename(extracted, ip_events_dst)
                 events_xmlfile = ip_events_dst
         else:
             events_xmlfile=None
