@@ -4,6 +4,7 @@
 dist/
 ESSArch_TA.egg-info/
 MANIFEST
+.idea/
 .settings/
 tools.db
 
