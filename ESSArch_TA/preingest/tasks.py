@@ -73,6 +73,7 @@ class ReceiveSIP(DBTask):
                 shutil.copytree(ip.object_path, dst_dir)
         except Exception:
             shutil.rmtree(dst_dir)
+            raise
 
         Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=False)
 
