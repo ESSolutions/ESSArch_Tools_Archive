@@ -24,92 +24,60 @@
 
 from __future__ import absolute_import
 
-import errno
 import os
 import shutil
 
 import requests
 from django.contrib.auth import get_user_model
+from django.db import transaction
 
 # noinspection PyUnresolvedReferences
 from ESSArch_Core import tasks
 from ESSArch_Core.WorkflowEngine.dbtask import DBTask
 from ESSArch_Core.configuration.models import Path
-from ESSArch_Core.ip.models import InformationPackage, Workarea
+from ESSArch_Core.fixity.checksum import calculate_checksum
+from ESSArch_Core.ip.models import InformationPackage, Workarea, MESSAGE_DIGEST_ALGORITHM_CHOICES_DICT
 from ESSArch_Core.storage.copy import copy_file
-from ESSArch_Core.util import mkdir_p
+from ESSArch_Core.util import creation_date, mkdir_p, timestamp_to_datetime
 
 User = get_user_model()
+
 
 class ReceiveSIP(DBTask):
     event_type = 20100
 
-    def run(self):
-        ip = InformationPackage.objects.get(pk=self.ip)
-        package_mets = ip.package_mets_path
-
-        workarea = Path.objects.get(entity='ingest_workarea').value
-        username = User.objects.get(pk=self.responsible).username
-        workarea_user = os.path.join(workarea, username)
-        dst_dir = os.path.join(workarea_user, ip.object_identifier_value)
-        mkdir_p(dst_dir)
-
-        shutil.copy(ip.object_path, dst_dir)
-        shutil.copy(package_mets, dst_dir)
-
-        Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=False)
-
-    def undo(self):
-        ip = InformationPackage.objects.get(pk=self.ip)
-        objpath = ip.object_path
-        package_mets = ip.package_mets_path
-
-        workarea = Path.objects.get(entity='ingest_workarea').value
-        username = User.objects.get(pk=self.responsible).username
-        workarea_user = os.path.join(workarea, username)
-
-        workarea_obj = os.path.join(workarea_user, os.path.basename(objpath))
-        workarea_package_mets = os.path.join(workarea_user, os.path.basename(package_mets))
-
-        for workarea_file in [workarea_obj, workarea_package_mets]:
-            try:
-                os.remove(workarea_file)
-            except OSError as e:
-                if e.errno != errno.ENOENT:
-                    raise
-
-    def event_outcome_success(self):
-        return "Received IP"
-
-
-class ReceiveDir(DBTask):
-    def get_workarea_path(self):
-        ip = InformationPackage.objects.get(pk=self.ip)
+    def get_workarea_path(self, ip):
         workarea = Path.objects.get(entity='ingest_workarea').value
         username = User.objects.get(pk=self.responsible).username
         workarea_user = os.path.join(workarea, username)
         return os.path.join(workarea_user, ip.object_identifier_value)
 
+    @transaction.atomic
     def run(self):
         ip = InformationPackage.objects.get(pk=self.ip)
-        objpath = ip.object_path
-        workarea_path = self.get_workarea_path()
+        dst_dir = self.get_workarea_path(ip)
+        mkdir_p(dst_dir)
+        try:
+            if not os.path.isdir(ip.object_path):
+                xmlfile = os.path.splitext(ip.object_path)[0] + '.xml'
+                algorithm = ip.get_checksum_algorithm()
+                ip.package_mets_path = xmlfile
+                ip.package_mets_create_date = timestamp_to_datetime(creation_date(xmlfile)).isoformat()
+                ip.package_mets_size = os.path.getsize(xmlfile)
+                ip.package_mets_digest_algorithm = MESSAGE_DIGEST_ALGORITHM_CHOICES_DICT[algorithm.upper()]
+                ip.package_mets_digest = calculate_checksum(xmlfile, algorithm=algorithm)
+                ip.save()
+                shutil.copy(ip.object_path, dst_dir)
+                shutil.copy(ip.package_mets_path, dst_dir)
+            else:
+                shutil.copytree(ip.object_path, dst_dir)
+        except Exception:
+            shutil.rmtree(dst_dir)
 
-        shutil.copytree(objpath, workarea_path)
-        ip.object_path = workarea_path
-        ip.save()
         Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=False)
 
     def undo(self):
-        reception = Path.objects.values_list('value', flat=True).get(entity="path_ingest_reception")
-        workarea_path = self.get_workarea_path()
-        ip = InformationPackage.objects.get(pk=self.ip)
-        ip.object_path = os.path.join(reception, ip.object_identifier_value)
-        try:
-            shutil.rmtree(workarea_path)
-        except OSError as e:
-            if e.errno != errno.ENOENT:
-                raise
+        pass
 
     def event_outcome_success(self):
         return "Received IP"

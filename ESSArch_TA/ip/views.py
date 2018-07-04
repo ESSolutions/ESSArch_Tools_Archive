@@ -484,13 +484,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
                         "args": ["Receiving"],
                     },
                     {
-                        "name": "preingest.tasks.ReceiveDir",
-                        "if": os.path.isdir(objpath),
-                        "label": "Receive SIP",
-                    },
-                    {
                         "name": "preingest.tasks.ReceiveSIP",
-                        "if": os.path.isfile(objpath),
                         "label": "Receive SIP",
                     },
                     {
