@@ -28,14 +28,11 @@ import itertools
 import json
 import logging
 import os
-import tarfile
-import tempfile
 import uuid
-import zipfile
 
 from celery import states as celery_states
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
@@ -56,9 +53,8 @@ from ESSArch_Core.WorkflowEngine.serializers import ProcessStepChildrenSerialize
 from ESSArch_Core.WorkflowEngine.util import create_workflow
 from ESSArch_Core.configuration.models import (Path,)
 from ESSArch_Core.essxml.util import get_agents, get_objectpath, parse_submit_description
-from ESSArch_Core.fixity.checksum import calculate_checksum
 from ESSArch_Core.fixity.validation.backends.checksum import ChecksumValidator
-from ESSArch_Core.ip.models import Agent, InformationPackage, EventIP, MESSAGE_DIGEST_ALGORITHM_CHOICES_DICT
+from ESSArch_Core.ip.models import Agent, InformationPackage, EventIP
 from ESSArch_Core.ip.permissions import CanDeleteIP, CanTransferSIP
 from ESSArch_Core.mixins import PaginatedViewMixin
 from ESSArch_Core.profiles.models import ProfileIP, SubmissionAgreement
@@ -420,59 +416,6 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             profile_ip.LockedBy = request.user
             profile_ip.save()
 
-        objpath = ip.object_path
-
-        if not os.path.isdir(objpath):
-            xmlfile = os.path.splitext(objpath)[0] + '.xml'
-            if not os.path.isfile(xmlfile):
-                xmlfile = os.path.join(uip, "%s.xml" % pk)
-                srcdir = uip
-
-            algorithm = ip.get_checksum_algorithm()
-            ip.package_mets_path = xmlfile
-            ip.package_mets_create_date = timestamp_to_datetime(creation_date(xmlfile)).isoformat()
-            ip.package_mets_size = os.path.getsize(xmlfile)
-            ip.package_mets_digest_algorithm = MESSAGE_DIGEST_ALGORITHM_CHOICES_DICT[algorithm.upper()]
-            ip.package_mets_digest = calculate_checksum(xmlfile, algorithm=algorithm)
-            ip.save()
-
-            objid, _ = os.path.splitext(os.path.basename(objpath))
-            events_xmlfile = None
-
-            tmp = tempfile.NamedTemporaryFile(delete=False)
-            tmp.close()
-            ip_events_src = '{objid}/{path}'.format(objid=objid, path=ip.get_events_file_path(from_container=True))
-            ip_events_dst = tmp.name
-            try:
-                if tarfile.is_tarfile(objpath):
-                    with tarfile.open(objpath) as tarf:
-                        tarf.extract(ip_events_src, os.path.dirname(ip_events_dst))
-
-                elif zipfile.is_zipfile(objpath):
-                    with zipfile.open(objpath) as zipf:
-                        zipf.extract(ip_events_src, os.path.dirname(ip_events_dst))
-            except KeyError:
-                self.logger.exception('failed to extract ip events file from %s' % objpath)
-            else:
-                self.logger.debug('extracted {xml} from {objpath} to {dst}'.format(xml=ip_events_src, objpath=objpath,
-                                                                                  dst=os.path.dirname(ip_events_dst)))
-                extracted = os.path.join(os.path.dirname(ip_events_dst), ip_events_src)
-                self.logger.debug('moving {src} to {dst}'.format(src=extracted, dst=ip_events_dst))
-
-                if os.name == 'nt':
-                    # In Windows we can't simply override an existing file,
-                    # instead we update the contents of the new path
-                    # and delete the old path
-                    with open(extracted, 'rb') as old_f:
-                        with open(ip_events_dst, 'wb') as new_f:
-                            new_f.write(old_f.read())
-                    os.remove(extracted)
-                else:
-                    os.rename(extracted, ip_events_dst)
-                events_xmlfile = ip_events_dst
-        else:
-            events_xmlfile=None
-
         workflow_spec = [
             {
                 "step": True,
@@ -488,11 +431,8 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
                         "label": "Receive SIP",
                     },
                     {
-                        "name": "ESSArch_Core.tasks.ParseEvents",
-                        "if": events_xmlfile is not None,
+                        "name": "ESSArch_Core.ip.tasks.ParseEvents",
                         "label": "Parse events",
-                        "args": [events_xmlfile],
-                        "params": {"delete_file": True}
                     },
                     {
                         "name": "ESSArch_Core.tasks.UpdateIPSizeAndCount",
