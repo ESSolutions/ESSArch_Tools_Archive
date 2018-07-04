@@ -219,7 +219,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         if os.path.isdir(os.path.join(reception, pk)):
             path = os.path.join(reception, pk, path)
-            return list_files(path, download, paginator=self.paginator, request=request)
+            return list_files(path, force_download=download, paginator=self.paginator, request=request)
 
         xml = os.path.join(reception, "%s.xml" % pk)
 
@@ -231,7 +231,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         if len(path):
             path = os.path.join(os.path.dirname(container), path)
-            return list_files(path, download, paginator=self.paginator, request=request)
+            return list_files(path, force_download=download, paginator=self.paginator, request=request)
 
         entry = {
             "name": os.path.basename(container),
@@ -814,7 +814,9 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['get'])
     def files(self, request, pk=None):
         ip = self.get_object()
-        return list_files(ip.files(request.query_params.get('path', '').rstrip('/')), paginator=self.paginator, request=request)
+        path = request.query_params.get('path', '').rstrip('/')
+        download = request.query_params.get('download', False)
+        return ip.get_path_response(path, request, force_download=download, paginator=self.paginator)
 
 
 class WorkareaViewSet(InformationPackageViewSet):
