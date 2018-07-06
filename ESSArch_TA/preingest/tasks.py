@@ -121,19 +121,17 @@ class TransferSIP(DBTask):
         self.set_progress(50, total=100)
 
         objid = ip.object_identifier_value
-        src = os.path.join(srcdir, "%s_ipevents.xml" % objid)
-        if not remote:
-            dst = os.path.join(epp, "%s_ipevents.xml" % objid)
-
-        copy_file(src, dst, requests_session=session, block_size=block_size)
+        src = ip.get_events_file_path()
+        if os.path.isfile(src):
+            if not remote:
+                dst = os.path.join(epp, "%s_ipevents.xml" % objid)
+            copy_file(src, dst, requests_session=session, block_size=block_size)
 
         self.set_progress(75, total=100)
 
-        objid = ip.object_identifier_value
         src = os.path.join(srcdir, "%s.xml" % objid)
         if not remote:
             dst = os.path.join(epp, "%s.xml" % objid)
-
         copy_file(src, dst, requests_session=session, block_size=block_size)
 
         self.set_progress(100, total=100)
@@ -154,5 +152,4 @@ class TransferSIP(DBTask):
         os.remove(os.path.join(gate_reception, "%s.xml" % objid))
 
     def event_outcome_success(self):
-        label = InformationPackage.objects.values_list('label', flat=True).get(pk=self.ip)
-        return "Transferred IP with label '%s'" % (label)
+        return "Transferred IP"
