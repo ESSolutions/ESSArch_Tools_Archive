@@ -53,6 +53,7 @@ from ESSArch_Core.WorkflowEngine.serializers import ProcessStepChildrenSerialize
 from ESSArch_Core.WorkflowEngine.util import create_workflow
 from ESSArch_Core.configuration.models import (Path,)
 from ESSArch_Core.essxml.util import get_agents, get_objectpath, parse_submit_description
+from ESSArch_Core.filters import string_to_bool
 from ESSArch_Core.fixity.validation.backends.checksum import ChecksumValidator
 from ESSArch_Core.ip.models import Agent, InformationPackage, EventIP
 from ESSArch_Core.ip.permissions import CanDeleteIP, CanTransferSIP
@@ -736,9 +737,15 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     @detail_route()
     def workflow(self, request, pk=None):
         ip = self.get_object()
+        hidden = request.query_params.get('hidden')
 
         steps = ip.steps.filter(parent_step__information_package__isnull=True)
         tasks = ip.processtask_set.filter(processstep__information_package__isnull=True)
+
+        if hidden is not None:
+            steps = steps.filter(hidden=string_to_bool(hidden))
+            tasks = tasks.filter(hidden=string_to_bool(hidden))
+
         flow = sorted(itertools.chain(steps, tasks), key=lambda x: (x.get_pos(), x.time_created))
 
         serializer = ProcessStepChildrenSerializer(data=flow, many=True, context={'request': request})
