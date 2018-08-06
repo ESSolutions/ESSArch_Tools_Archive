@@ -46,6 +46,13 @@ PROJECT_NAME = 'ESSArch Tools Archive'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
+ESSARCH_WORKFLOW_POLLERS = {
+    'dir': {
+        'class': 'workflow.polling.backends.directory.DirectoryWorkflowPoller',
+        'path': '/ESSArch/data/eta/reception/eft',
+    }
+}
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '#-f#k7@7eyaez26p-)5$7#+58m79t)yz1@d-s8wn2_downta8*'
 SESSION_COOKIE_NAME = 'eta'
