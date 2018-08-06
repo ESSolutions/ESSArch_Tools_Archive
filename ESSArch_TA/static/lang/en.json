@@ -317,5 +317,6 @@
     "USER_SETTINGS": "User settings",
     "CHANGE_ORGANIZATION": "Change organization",
     "ORGANIZATION_CHANGED": "Organization changed",
-    "VERSIONS": "Versions"
+    "VERSIONS": "Versions",
+    "USERSETTINGS": "User settings"
 }

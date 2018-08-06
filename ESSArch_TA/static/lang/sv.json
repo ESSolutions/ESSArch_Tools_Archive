@@ -317,5 +317,6 @@
     "USER_SETTINGS": "Användarinställningar",
     "CHANGE_ORGANIZATION": "Byt organisation",
     "ORGANIZATION_CHANGED": "Organisation bytt",
-    "VERSIONS": "Versioner"
+    "VERSIONS": "Versioner",
+    "USERSETTINGS": "Användarinställningar"
 }
