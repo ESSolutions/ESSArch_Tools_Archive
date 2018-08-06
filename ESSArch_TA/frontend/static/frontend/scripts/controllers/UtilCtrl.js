@@ -27,9 +27,6 @@ angular.module('myApp').controller('UtilCtrl', function($scope, $state, $locatio
     $scope.reloadPage = function (){
         $state.reload();
     }
-    $scope.redirectAdmin = function () {
-        $window.location.href="/admin/";
-    }
     $scope.showAlert = function() {
         Notifications.toggle();
     }
