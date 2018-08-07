@@ -587,9 +587,6 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     def transfer(self, request, pk=None):
         ip = self.get_object()
 
-        if ip.get_profile('transformation') is not None and ip.state.lower() != 'transformed':
-            raise exceptions.ParseError('"{ip}" cannot be transferred without first being transformed'.format(ip=ip.object_identifier_value))
-
         workflow_spec = [
             {
                 "name": "ESSArch_Core.tasks.UpdateIPStatus",
