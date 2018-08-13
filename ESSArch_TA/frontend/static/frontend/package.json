@@ -25,7 +25,6 @@
     "angular-ui-bootstrap": "~2.5.0",
     "angular-ui-router": "~0.4.2",
     "api-check": "^7.5.5",
-    "bootstrap": "~3.3.7",
     "bootstrap-sass": "~3.3.7",
     "bower": "^1.8",
     "console-polyfill": "^0.3.0",
