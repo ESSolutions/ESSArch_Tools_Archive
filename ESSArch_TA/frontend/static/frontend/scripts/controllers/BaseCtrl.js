@@ -873,7 +873,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             animation: true,
             ariaLabelledBy: 'modal-title',
             ariaDescribedBy: 'modal-body',
-            templateUrl: 'static/frontend/views/task_info_modal.html',
+            templateUrl: 'modals/task_info_modal.html',
             scope: $scope,
             controller: 'ModalInstanceCtrl',
             controllerAs: '$ctrl'
@@ -889,7 +889,7 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
             animation: true,
             ariaLabelledBy: 'modal-title',
             ariaDescribedBy: 'modal-body',
-            templateUrl: 'static/frontend/views/step_info_modal.html',
+            templateUrl: 'modals/step_info_modal.html',
             scope: $scope,
             controller: 'ModalInstanceCtrl',
             controllerAs: '$ctrl'
