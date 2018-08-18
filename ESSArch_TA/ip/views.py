@@ -389,7 +389,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             perm_name = get_permission_name(perm, ip)
             assign_perm(perm_name, member.django_user, ip)
 
-        p_types = ['transfer_project', 'sip', 'preservation_metadata', 'submit_description', 'validation', 'transformation']
+        p_types = ['transfer_project', 'sip', 'preservation_metadata', 'submit_description', 'validation']
         ip.create_profile_rels(p_types, request.user)
 
         data = InformationPackageReadSerializer(ip, context={'request': request}).data

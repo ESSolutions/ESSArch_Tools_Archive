@@ -180,7 +180,7 @@ angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInsta
 
     // Transform IP
     $ctrl.transform = function() {
-        $http.post(appConfig.djangoUrl + "workarea-entries/" + $ctrl.data.ip.workarea.id+"/transform/").then(function(response) {
+        $http.post(appConfig.djangoUrl + "workarea-entries/" + $ctrl.data.ip.workarea.id+"/transform/", {transformer: $ctrl.data.transformer}).then(function(response) {
             Notifications.add(response.data, "success");
             $uibModalInstance.close(response.data);
         }).catch(function(response) {

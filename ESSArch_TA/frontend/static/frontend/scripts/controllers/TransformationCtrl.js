@@ -29,9 +29,7 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
             $rootScope.ip = row;
             vm.validatorListPipe(vm.validatorTableState);
             $scope.select = true;
-            if (!$scope.ip.profile_transformation) {
-                $scope.error = "NO_TRANSFORMATION_PROFILE";
-            }
+            vm.getTransformers();
         }
         $scope.eventShow = false;
         $scope.statusShow = false;
@@ -42,6 +40,15 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
             vm.validatorListPipe(vm.validatorTableState);
         }
     }, appConfig.ipInterval);
+
+    vm.getTransformers = function () {
+        $http({'method': 'OPTIONS', 'url': appConfig.djangoUrl + "workarea-entries/" + $scope.ip.workarea.id+"/transform/"}).then(function(response) {
+            $scope.transformers = response.data.transformers;
+            vm.transformer = $scope.transformers[0];
+        }).catch(function(response) {
+            Notifications.add(response, "error");
+        })
+    };
 
     vm.validatorListPipe = function (tableState) {
         vm.validatorTableState = tableState;
@@ -109,7 +116,7 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
         });
     }
 
-    vm.transform = function(ip) {
+    vm.transform = function(ip, transformer) {
         var modalInstance = $uibModal.open({
             animation: true,
             ariaLabelledBy: 'modal-title',
@@ -119,7 +126,8 @@ angular.module('myApp').controller('TransformationCtrl', function($scope, $contr
             controllerAs: '$ctrl',
             resolve: {
                 data: {
-                    ip: ip
+                    ip: ip,
+                    transformer: transformer
                 }
             }
         })

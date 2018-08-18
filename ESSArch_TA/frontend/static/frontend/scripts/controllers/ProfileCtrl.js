@@ -9,7 +9,6 @@ angular.module('myApp').controller('ProfileCtrl', function($q, SA, IP, Profile, 
         sipError: { type: 'danger', msg: $translate.instant('MISSING_SIP') },
         pmError: { type: 'danger', msg: $translate.instant('MISSING_PRESERVATION_METADATA') },
         validationError: { type: 'warning', msg: $translate.instant('MISSING_VALIDATION') },
-        transformationError: { type: 'warning', msg: $translate.instant('MISSING_TRANSFORMATION') },
         noSas: { type: 'danger', msg: $translate.instant('NO_SUBMISSION_AGREEMENT_AVAILABLE') },
         templateError: { type: 'warning', msg: $translate.instant('NO_FORM_TEMPLATE') },
     };
@@ -21,7 +20,6 @@ angular.module('myApp').controller('ProfileCtrl', function($q, SA, IP, Profile, 
     $scope.sipAlert = $scope.alerts.sipError;
     $scope.pmAlert = $scope.alerts.pmError;
     $scope.validationAlert = $scope.alerts.validationError;
-    $scope.transformationAlert = $scope.alerts.transformationError;
     vm.dataVersion = null;
     // On init
     vm.$onInit = function() {
@@ -372,7 +370,6 @@ angular.module('myApp').controller('ProfileCtrl', function($q, SA, IP, Profile, 
         workflow: "Workflow",
         preservation_metadata: "Preservation Metadata",
         validation: "Validation",
-        transformation: "Transformation",
     }
 
     /**
