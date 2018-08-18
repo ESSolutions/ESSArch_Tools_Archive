@@ -64,7 +64,7 @@ ALLOWED_HOSTS = ['*']
 
 REST_FRAMEWORK = {
     'DEFAULT_METADATA_CLASS': 'ESSArch_Core.metadata.CustomMetadata',
-    'DEFAULT_PAGINATION_CLASS': 'ESSArch_Core.pagination.LinkHeaderPagination',
+    'DEFAULT_PAGINATION_CLASS': 'proxy_pagination.ProxyPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_PERMISSION_CLASSES': (
       'rest_framework.permissions.IsAuthenticated',
@@ -78,6 +78,10 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(seconds=10),
     },
 }
+
+PROXY_PAGINATION_PARAM = 'pager'
+PROXY_PAGINATION_DEFAULT = 'ESSArch_Core.pagination.LinkHeaderPagination'
+PROXY_PAGINATION_MAPPING = {'none': 'ESSArch_Core.pagination.NoPagination'}
 
 
 # Application definition
