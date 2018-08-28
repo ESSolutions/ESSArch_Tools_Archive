@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('ReceptionCtrl', function(IPReception, IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, ContextMenuBase) {
+angular.module('myApp').controller('ReceptionCtrl', function(Notifications, IPReception, IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, ContextMenuBase) {
     var vm = this;
     var ipSortString = "Receiving";
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
@@ -672,39 +672,11 @@ angular.module('myApp').controller('ReceptionCtrl', function(IPReception, IP, $h
                     })
                         .catch(function (response) {
                             vm.receiveModalLoading = false;
-                            var modalInstance = $uibModal.open({
-                                animation: true,
-                                ariaLabelledBy: 'modal-title',
-                                ariaDescribedBy: 'modal-body',
-                                templateUrl: 'static/frontend/views/receive_modal.html',
-                                controller: 'ReceiveModalInstanceCtrl',
-                                size: "lg",
-                                scope: $scope,
-                                controllerAs: '$ctrl',
-                                resolve: {
-                                    data: function () {
-                                        return {
-                                            ip: resource,
-                                            vm: vm
-                                        };
-                                    }
-                                },
-                            })
-                            modalInstance.result.then(function (data) {
-                                $scope.getListViewData();
-                                if (data.status == "received") {
-                                    $scope.eventlog = false;
-                                    $scope.edit = false;
-                                }
-                                $scope.filebrowser = false;
-                                $scope.includedIps.shift();
-                                $scope.getListViewData();
-                                if ($scope.includedIps.length > 0) {
-                                    vm.receiveModal($scope.includedIps[0]);
-                                }
-                            }, function () {
-                                $log.info('modal-component dismissed at: ' + new Date());
-                            });
+                            if(response.data && response.data.detail) {
+                                Notifications.add(response.data.detail, 'error');
+                            } else if(response.status !== 500) {
+                                Notifications.add('Could not prepare IP', 'error');
+                            }
                         })
                 } else {
                     vm.receiveModalLoading = false;
