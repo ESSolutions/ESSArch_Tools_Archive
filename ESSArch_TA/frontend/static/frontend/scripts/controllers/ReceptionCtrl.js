@@ -363,7 +363,7 @@ angular.module('myApp').controller('ReceptionCtrl', function(Notifications, IPRe
         vm.sdModel = {
             "start_date": ip.start_date,
             "end_date": ip.end_date,
-            "archivist_organization": ip.archivist_organization.name,
+            "archivist_organization": ip.archivist_organization,
             "creator": ip.creator_organization,
             "submitter_organization": ip.submitter_organization,
             "submitter_individual": ip.submitter_individual,
