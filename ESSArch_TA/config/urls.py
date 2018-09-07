@@ -95,6 +95,12 @@ router.register(r'steps', ProcessStepViewSet, base_name='steps').register(
     parents_query_lookups=['processstep']
 )
 router.register(r'tasks', ProcessTaskViewSet)
+router.register(r'tasks', ProcessTaskViewSet).register(
+    r'validations',
+    ValidationViewSet,
+    base_name='task-validations',
+    parents_query_lookups=['task']
+)
 router.register(r'events', EventIPViewSet)
 router.register(r'event-types', EventTypeViewSet)
 router.register(r'submission-agreements', SubmissionAgreementViewSet)
