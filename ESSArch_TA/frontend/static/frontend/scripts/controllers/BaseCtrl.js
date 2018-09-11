@@ -726,6 +726,17 @@ angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSo
         }
     };
 
+    // build comma separated args display string
+    vm.getArgsString = function(args) {
+        return args.map(function(x) {
+            if(x === null) {
+                return 'null';
+            } else {
+                return x;
+            }
+        }).join(', ');
+    }
+
     //advanced filter form data
     $scope.columnFilters = {};
     $scope.filterModel = {};
