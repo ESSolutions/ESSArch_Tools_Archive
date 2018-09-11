@@ -7,7 +7,9 @@
     </div>
     <div ng-if="statusShow || eventShow"class="events-status-wrapper">
         <div ng-include src="'static/frontend/views/event_table.html'"></div>
-        <div ng-if="statusShow" class="status-view" ng-include src="'static/frontend/views/status_tree_view.html'"></div>
+        <div ng-if="statusShow" class="status-view">
+            <state-tree-view ip="ip"></state-tree-view>
+        </div>
     </div>
     <!--
     <uib-tabset active="activeTab">
