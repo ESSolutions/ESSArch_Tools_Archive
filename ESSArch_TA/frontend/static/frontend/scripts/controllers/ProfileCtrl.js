@@ -211,6 +211,16 @@ angular.module('myApp').controller('ProfileCtrl', function($q, SA, IP, Profile, 
         }
 };
 
+    vm.fieldsLoading = function() {
+        var val = false;
+        angular.forEach(vm.loadingProfileData, function(value, key) {
+            if(value === true) {
+                val = true;
+            }
+        })
+        return val;
+    }
+
     vm.profileIp = null;
     vm.selectedProfile = null;
     vm.loadingProfileData = {};
