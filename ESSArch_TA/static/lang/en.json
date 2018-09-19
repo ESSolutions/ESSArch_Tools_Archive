@@ -315,5 +315,7 @@
     "CHANGE_ORGANIZATION": "Change organization",
     "ORGANIZATION_CHANGED": "Organization changed",
     "VERSIONS": "Versions",
-    "USERSETTINGS": "User settings"
+    "USERSETTINGS": "User settings",
+    "VALIDATIONS": "Validations",
+    "RUNNING": "Running"
 }

@@ -312,5 +312,7 @@
     "CHANGE_ORGANIZATION": "Byt organisation",
     "ORGANIZATION_CHANGED": "Organisation bytt",
     "VERSIONS": "Versioner",
-    "USERSETTINGS": "Användarinställningar"
+    "USERSETTINGS": "Användarinställningar",
+    "VALIDATIONS": "Valideringar",
+    "RUNNING": "Körs"
 }
