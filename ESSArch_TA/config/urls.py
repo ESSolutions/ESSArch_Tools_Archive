@@ -40,7 +40,6 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from rest_framework_extensions.routers import ExtendedDefaultRouter
 
 from ESSArch_Core.WorkflowEngine.views import ProcessViewSet, ProcessStepViewSet, ProcessTaskViewSet
 from ESSArch_Core.auth.views import GroupViewSet, PermissionViewSet, MeView, NotificationViewSet, UserViewSet
@@ -48,6 +47,7 @@ from ESSArch_Core.configuration.views import ParameterViewSet, PathViewSet, SysI
 from ESSArch_Core.fixity.views import ValidationViewSet, ValidationFilesViewSet
 from ESSArch_Core.ip.views import AgentViewSet, EventIPViewSet, WorkareaEntryViewSet
 from ESSArch_Core.profiles.views import ProfileIPViewSet, ProfileIPDataViewSet, SubmissionAgreementViewSet
+from ESSArch_Core.routers import ESSArchRouter
 from configuration.views import EventTypeViewSet
 from ip.views import InformationPackageViewSet, InformationPackageReceptionViewSet, WorkareaFilesViewSet, WorkareaViewSet
 from profiles.views import ProfileViewSet, ProfileSAViewSet
@@ -55,7 +55,7 @@ from profiles.views import ProfileViewSet, ProfileSAViewSet
 admin.site.site_header = 'ESSArch Tools Archive Administration'
 admin.site.site_title = 'ESSArch Tools Archive Administration'
 
-router = ExtendedDefaultRouter()
+router = ESSArchRouter()
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 router.register(r'agents', AgentViewSet)
