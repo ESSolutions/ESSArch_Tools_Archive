@@ -46,6 +46,7 @@ from rest_framework import exceptions, filters, permissions, status, viewsets
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.response import Response
 
+from ESSArch_Core.auth.decorators import permission_required_or_403
 from ESSArch_Core.auth.models import Group, Member
 from ESSArch_Core.auth.util import get_organization_groups
 from ESSArch_Core.WorkflowEngine.models import (ProcessStep, ProcessTask)
@@ -69,6 +70,10 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         self.reception = Path.objects.get(entity="path_ingest_reception").value
         self.uip = Path.objects.get(entity="path_ingest_unidentified").value
         super(InformationPackageReceptionViewSet, self).__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        user = self.request.user
+        return InformationPackage.objects.visible_to_user(user).filter(state='Prepared')
 
     def parse_ip_with_xmlfile(self, xmlfile):
         if xmlfile.startswith(self.uip):
@@ -397,10 +402,11 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         self.logger.info('Prepared information package %s' % str(ip.pk), extra={'user': request.user.pk})
         return Response(data, status=status.HTTP_201_CREATED)
 
+    @permission_required_or_403(['ip.receive'])
     @detail_route(methods=['post'], url_path='receive')
     def receive(self, request, pk=None):
         try:
-            ip = get_object_or_404(InformationPackage, id=pk)
+            ip = get_object_or_404(self.get_queryset(), id=pk)
         except (ValueError, ValidationError):
             raise exceptions.NotFound('Information package with id="%s" not found' % pk)
 
