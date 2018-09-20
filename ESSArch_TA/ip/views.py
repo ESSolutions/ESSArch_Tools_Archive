@@ -160,7 +160,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             if not InformationPackage.objects.filter(object_identifier_value=ip['object_identifier_value']).exists():
                 ips.append(ip)
 
-        from_db = InformationPackage.objects.filter(state__in=['Prepared', 'Receiving']).prefetch_related(
+        from_db = InformationPackage.objects.visible_to_user(request.user).filter(state__in=['Prepared', 'Receiving']).prefetch_related(
             Prefetch('profileip_set', to_attr='profiles'),
         )
         serializer = InformationPackageSerializer(
