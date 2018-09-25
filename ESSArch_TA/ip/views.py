@@ -35,7 +35,6 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Prefetch
-from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from groups_manager.utils import get_permission_name
 from guardian.shortcuts import assign_perm
@@ -44,6 +43,7 @@ from ip.serializers import InformationPackageSerializer, InformationPackageReadS
 from lxml import etree
 from rest_framework import exceptions, filters, permissions, status, viewsets
 from rest_framework.decorators import detail_route, list_route
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from ESSArch_Core.auth.decorators import permission_required_or_403
