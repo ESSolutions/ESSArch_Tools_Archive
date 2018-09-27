@@ -36,7 +36,6 @@ var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var stripDebug = require('gulp-strip-debug');
 var cleanCSS = require('gulp-clean-css');
-var gutil = require('gulp-util');
 var license = require('gulp-header-license');
 var fs = require('fs');
 var path = require('path');
@@ -132,7 +131,7 @@ var buildPolyfills= function() {
         .pipe(plumber(function(error) {
           // output an error message
 
-          gutil.log(gutil.colors.red('error (' + error.plugin + '): ' + error.message));
+          console.error('error (' + error.plugin + '): ' + error.message);
           // emit the end event, to properly end the task
           this.emit('end');
         }))
@@ -167,7 +166,7 @@ var buildScripts = function() {
         .pipe(plumber(function(error) {
           // output an error message
 
-          gutil.log(gutil.colors.red('error (' + error.plugin + '): ' + error.message));
+          console.error('error (' + error.plugin + '): ' + error.message);
           // emit the end event, to properly end the task
           this.emit('end');
         }))
@@ -186,7 +185,7 @@ var buildVendors = function() {
         .pipe(plumber(function(error) {
           // output an error message
 
-          gutil.log(gutil.colors.red('error (' + error.plugin + '): ' + error.message));
+          console.error('error (' + error.plugin + '): ' + error.message);
           // emit the end event, to properly end the task
           this.emit('end');
         }))
