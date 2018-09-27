@@ -117,7 +117,7 @@ router.register(r'workarea-entries', WorkareaEntryViewSet, base_name='workarea-e
 router.register(r'workarea-files', WorkareaFilesViewSet, base_name='workarea-files')
 
 urlpatterns = [
-    url(r'^', include('frontend.urls'), name='home'),
+    url(r'^', include('ESSArch_Core.frontend.urls'), name='home'),
     url(r'^admin/', admin.site.urls),
     url(r'^api/sysinfo/', SysInfoView.as_view()),
     url(r'^api/me/$', MeView.as_view(), name='me'),
