@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').factory('listViewService', function (IP, SA, Profile, Workarea, WorkareaFiles, IPReception, Event, Step, Task, EventType, $q, $http, $state, $log, appConfig, $rootScope, $filter, linkHeaderParser) {
+angular.module('essarch.services').factory('listViewService', function (IP, SA, Profile, Workarea, WorkareaFiles, IPReception, Event, Step, Task, EventType, $q, $http, $state, $log, appConfig, $rootScope, $filter, linkHeaderParser) {
     //Go to Given state
     function changePath(state) {
         $state.go(state);

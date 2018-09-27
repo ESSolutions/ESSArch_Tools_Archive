@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('ReceptionCtrl', function(Notifications, IPReception, IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, ContextMenuBase) {
+angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notifications, IPReception, IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, ContextMenuBase) {
     var vm = this;
     var ipSortString = "Receiving";
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });

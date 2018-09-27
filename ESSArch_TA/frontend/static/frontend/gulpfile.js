@@ -103,7 +103,7 @@ var vendorFiles = [
         'node_modules/angular-pretty-xml/src/angular-pretty-xml.js'
     ],
     jsFiles = [
-        'scripts/myApp.js', 'scripts/core/*.js', 'scripts/controllers/*.js', 'scripts/components/*.js',
+        'scripts/essarch.module.js', 'scripts/modules/*.module.js', 'scripts/core/*.js', 'scripts/controllers/*.js', 'scripts/components/*.js',
         'scripts/services/*.js', 'scripts/directives/*.js', 'scripts/configs/*.js'
     ],
     jsDest = 'scripts',
@@ -248,11 +248,11 @@ var configConstants = function() {
         var envConfig = myConfig["development"];
     }
     return ngConstant({
-        name: 'myApp.config',
+        name: 'essarch.appConfig',
         constants: envConfig,
         stream: true
     })
-    .pipe(rename('myApp.config.js'))
+    .pipe(rename('essarch.config.js'))
     .pipe(gulp.dest('./scripts/configs'));
 };
 

@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').factory('myService', function(Sysinfo, $location, PermPermissionStore, $anchorScroll, $http, appConfig, djangoAuth, permissionConfig) {
+angular.module('essarch.services').factory('myService', function(Sysinfo, $location, PermPermissionStore, $anchorScroll, $http, appConfig, djangoAuth, permissionConfig) {
     function changePath(state) {
         $state.go(state);
     };

@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('CatalogueCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate) {
+angular.module('essarch.controllers').controller('CatalogueCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate) {
     /*******************************************/
     /*Piping and Pagination for List-view table*/
     /*******************************************/

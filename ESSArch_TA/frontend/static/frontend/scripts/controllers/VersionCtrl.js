@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('VersionCtrl', function($scope, myService, $window, marked, $anchorScroll, $location, $translate, appConfig) {
+angular.module('essarch.controllers').controller('VersionCtrl', function($scope, myService, $window, marked, $anchorScroll, $location, $translate, appConfig) {
     myService.getVersionInfo().then(function(result) {
         $scope.sysInfo = result;
     });

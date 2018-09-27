@@ -1,4 +1,4 @@
-angular.module('myApp').controller("WorkareaValidationCtrl", function($scope, $controller, $interval, $http, appConfig, $rootScope, WorkareaValidation, $q, Notifications, $uibModal, $window, $log, Profile, $translate) {
+angular.module('essarch.controllers').controller("WorkareaValidationCtrl", function($scope, $controller, $interval, $http, appConfig, $rootScope, WorkareaValidation, $q, Notifications, $uibModal, $window, $log, Profile, $translate) {
     var vm = this;
     var ipSortString ="";
     $controller('WorkareaCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });

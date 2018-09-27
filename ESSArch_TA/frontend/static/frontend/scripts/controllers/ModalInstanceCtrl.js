@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('ModalInstanceCtrl', function ($uibModalInstance, djangoAuth, $scope, $http, appConfig, $translate) {
+angular.module('essarch.controllers').controller('ModalInstanceCtrl', function ($uibModalInstance, djangoAuth, $scope, $http, appConfig, $translate) {
     var $ctrl = this;
     $ctrl.error_messages_old = [];
     $ctrl.error_messages_pw1 = [];

@@ -1,4 +1,4 @@
-angular.module('myApp').controller('BaseCtrl', function(IP, Task, Step, vm, ipSortString, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $q, $window, ContextMenuBase) {
+angular.module('essarch.controllers').controller('BaseCtrl', function(IP, Task, Step, vm, ipSortString, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $q, $window, ContextMenuBase) {
     // Initialize variables
     $scope.filebrowser = false;
     $scope.statusShow = false;

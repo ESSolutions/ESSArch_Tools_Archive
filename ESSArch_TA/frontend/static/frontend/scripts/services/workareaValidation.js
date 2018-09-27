@@ -1,4 +1,4 @@
-angular.module('myApp').factory('WorkareaValidation', function ($rootScope, $q, appConfig, $http, $sce, $filter, myService) {
+angular.module('essarch.services').factory('WorkareaValidation', function ($rootScope, $q, appConfig, $http, $sce, $filter, myService) {
     var service = {};
 
     /**

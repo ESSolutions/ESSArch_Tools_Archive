@@ -11,5 +11,5 @@ styles/styles.css
 styles/styles.css.map
 fonts
 images
-scripts/configs/myApp.config.js
+scripts/configs/essarch.config.js
 tests/core

@@ -1,4 +1,4 @@
-angular.module('myApp').controller('FilebrowserController', function ($scope, $window, $sce, $rootScope, appConfig, listViewService, $uibModal, $cookies, $state) {
+angular.module('essarch.controllers').controller('FilebrowserController', function ($scope, $window, $sce, $rootScope, appConfig, listViewService, $uibModal, $cookies, $state) {
     $scope.previousGridArrays = [];
     var vm = this;
     vm.$onInit = function() {
