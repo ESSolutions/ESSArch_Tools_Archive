@@ -95,8 +95,8 @@ var vendorFiles = [
         'node_modules/angular-filesize-filter/angular-filesize-filter.js',
         'node_modules/moment/min/moment-with-locales.js',
         'node_modules/angular-date-time-input/src/dateTimeInput.js',
-        'node_modules/angular-bootstrap-datetimepicker/src/js/datetimepicker.js',
-        'node_modules/angular-bootstrap-datetimepicker/src/js/datetimepicker.templates.js',
+        'node_modules/angularjs-bootstrap-datetimepicker/src/js/datetimepicker.js',
+        'node_modules/angularjs-bootstrap-datetimepicker/src/js/datetimepicker.templates.js',
         'node_modules/angular-clipboard/angular-clipboard.js',
         'node_modules/angular-resource/angular-resource.js',
         'node_modules/angular-pretty-xml/src/angular-pretty-xml.js'
