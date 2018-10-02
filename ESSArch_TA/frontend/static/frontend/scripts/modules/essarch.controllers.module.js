@@ -26,5 +26,6 @@ angular.module('essarch.controllers', [
     'permission.config',
     'ngWebSocket',
     'prettyXml',
-    'ui.bootstrap.contextMenu'
+    'ui.bootstrap.contextMenu',
+    'angularResizable'
 ]);
