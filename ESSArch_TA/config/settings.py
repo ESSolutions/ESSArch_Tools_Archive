@@ -334,5 +334,5 @@ OLD_PASSWORD_FIELD_ENABLED = True
 
 try:
     from local_eta_settings import *
-except ImportError, exp:
+except ImportError:
     pass
