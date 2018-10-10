@@ -72,7 +72,7 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
-CELERYBEAT_SCHEDULE = {
+CELERY_BEAT_SCHEDULE = {
     'RunWorkflowProfiles-every-10-seconds': {
         'task': 'ESSArch_Core.tasks.RunWorkflowProfiles',
         'schedule': timedelta(seconds=10),
@@ -320,10 +320,10 @@ DOCS_ROOT = os.path.join(BASE_DIR, 'docs/_build/{lang}/html')
 # rabbitmqctl set_permissions -p eta guest ".*" ".*" ".*"
 
 # Celery settings
-BROKER_URL = 'amqp://guest:guest@localhost:5672/eta'
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672/eta'
 CELERY_IMPORTS = ("ESSArch_Core.ip.tasks", "preingest.tasks", "ESSArch_Core.WorkflowEngine.tests.tasks")
 CELERY_RESULT_BACKEND = 'redis://'
-CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+CELERY_TASK_EAGER_PROPAGATES = True
 
 # Rest auth settings
 OLD_PASSWORD_FIELD_ENABLED = True
