@@ -22,226 +22,44 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller) {
-    $controller('BaseCtrl', { $scope: $scope });
+angular.module('essarch.controllers').controller('TransferSipCtrl', function(IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, Notifications) {
     var vm = this;
-    $scope.ip = null;
-    $rootScope.ip = null;
-    vm.itemsPerPage = $cookies.get('eta-ips-per-page') || 10;
-    $rootScope.$on('$translateChangeSuccess', function () {
-        $state.reload()
-    });
-    var ipSortString = "Received,Transferring,Transferred";
-    $scope.$watch(function(){return $rootScope.navigationFilter;}, function(newValue, oldValue) {
-        $scope.getListViewData();
-    }, true);
-    $scope.statusShow = false;
-    $scope.eventShow = false;
-    $scope.tree_data = [];
-    var stateInterval;
-    $scope.stateClicked = function (row) {
-        if ($scope.statusShow) {
-                $scope.tree_data = [];
-            if ($scope.ip == row) {
-                $scope.statusShow = false;
-                $scope.ip = null;
-                $rootScope.ip = null;
-            } else {
-                $scope.statusShow = true;
-                $scope.edit = false;
-                $scope.statusViewUpdate(row);
-                $scope.ip = row;
-                $rootScope.ip = row;
-            }
-        } else {
-            $scope.statusShow = true;
-            $scope.edit = false;
-            $scope.statusViewUpdate(row);
-            $scope.ip = row;
-            $rootScope.ip = row;
-        }
-        $scope.subSelect = false;
-        $scope.eventlog = false;
-        $scope.select = false;
-        $scope.eventShow = false;
+    var ipSortString = "Received,Transformed,Transferring,Transferred";
+    $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
+    vm.info = {
+        text: "",
+        values: null,
+        visible: false
     };
-    $scope.$watch(function(){return $scope.statusShow;}, function(newValue, oldValue) {
-        if(newValue) {
-            $interval.cancel(stateInterval);
-            stateInterval = $interval(function(){$scope.statusViewUpdate($scope.ip)}, appConfig.stateInterval);
-        } else {
-            $interval.cancel(stateInterval);
-        }
-    });
-    $rootScope.$on('$stateChangeStart', function() {
-        $interval.cancel(stateInterval);
-        $interval.cancel(listViewInterval);
-    });
-
-    /*
-     * EVENTS
-     */
-    $scope.eventsClick = function (row) {
-        if($scope.eventShow && $scope.ip == row){
-            $scope.eventShow = false;
-            $rootScope.stCtrl = null;
-            $scope.ip = null;
-            $rootScope.ip = null;
-        } else {
-            if($rootScope.stCtrl) {
-                $rootScope.stCtrl.pipe();
-            }
-            getEventlogData();
-            $scope.eventShow = true;
-            $scope.validateShow = false;
-            $scope.statusShow = false;
-            $scope.ip = row;
-            $rootScope.ip = row;
-        }
-    };
-    function getEventlogData() {
-        listViewService.getEventlogData().then(function(value){
-            $scope.eventTypeCollection = value;
-        });
-    };
-    //Creates and shows modal with task information
-    /*******************************************/
-    /*Piping and Pagination for List-view table*/
-    /*******************************************/
-    var ctrl = this;
-    this.displayedIps = [];
-
-    //Get data according to ip table settings and populates ip table
-    this.callServer = function callServer(tableState) {
-        $scope.ipLoading = true;
-        if(vm.displayedIps.length == 0) {
-            $scope.initLoad = true;
-        }
-        if(!angular.isUndefined(tableState)) {
-            $scope.tableState = tableState;
-            var search = "";
-            if(tableState.search.predicateObject) {
-                var search = tableState.search.predicateObject["$"];
-            }
-            var sorting = tableState.sort;
-            var pagination = tableState.pagination;
-            var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
-            var number = pagination.number || vm.itemsPerPage;  // Number of entries showed per page.
-            var pageNumber = start/number+1;
-
-            Resource.getIpPage(start, number, pageNumber, tableState, sorting, search, ipSortString).then(function (result) {
-                ctrl.displayedIps = result.data;
-                tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
-                $scope.ipLoading = false;
-                $scope.initLoad = false;
-            });
-        }
-    };
-    //Make ip selected and add class to visualize
-    vm.displayedIps=[];
-
-    $scope.ipRowClick = function(row) {
-        if($scope.ip == row){
-            $scope.ip = null;
-            $rootScope.ip = null;
-        }
-        if($scope.eventShow) {
-            $scope.eventsClick(row);
-        }
-        if($scope.statusShow) {
-            $scope.stateClicked(row);
-        }
-        if ($scope.select) {
-            $scope.ipTableClick(row);
-        }
-    }
+    $scope.transferDisabled = false;
     $scope.ipTableClick = function(row) {
         if($scope.select && $scope.ip.id== row.id){
+            vm.info.visible = false;
             $scope.select = false;
             $scope.ip = null;
             $rootScope.ip = null;
+            $scope.filebrowser = false;
         } else {
+            $scope.transferDisabled = false;
             $scope.ip = row;
             $rootScope.ip = row;
+            vm.info.visible = false;
             $scope.select = true;
-            $scope.transferDisabled = false;
+            if(row.state == "Transferred" || row.state == "Transferring") {
+                vm.info = {
+                    text: "IP_IS_ALREADY_" + row.state.toUpperCase(),
+                    values: {
+                        label: row.label
+                    },
+                    visible: true
+                };
+                $scope.transferDisabled = true;
+            }
         }
         $scope.eventShow = false;
         $scope.statusShow = false;
     };
-    $scope.filebrowser = false;
-    $scope.filebrowserClick = function (ip) {
-        if ($scope.filebrowser && $scope.ip == ip) {
-            $scope.filebrowser = false;
-            if(!$scope.select && !$scope.edit && !$scope.statusShow && !$scope.eventShow) {
-                $scope.ip = null;
-                $rootScope.ip = null;
-            }
-        } else {
-            if ($rootScope.auth.id == ip.responsible.id || !ip.responsible) {
-                $scope.filebrowser = true;
-                $scope.ip = ip;
-                $rootScope.ip = ip;
-            }
-        }
-    }
-    $scope.getListViewData = function() {
-        vm.callServer($scope.tableState);
-        $rootScope.loadNavigation(ipSortString);
-    };
-    var listViewInterval;
-    function updateListViewConditional() {
-        $interval.cancel(listViewInterval);
-        listViewInterval = $interval(function() {
-            var updateVar = false;
-            vm.displayedIps.forEach(function(ip, idx) {
-                if(ip.status < 100) {
-                    if(ip.step_state != "FAILURE") {
-                        updateVar = true;
-                    }
-                }
-            });
-            if(updateVar) {
-                $scope.getListViewData();
-            } else {
-                $interval.cancel(listViewInterval);
-                listViewInterval = $interval(function() {
-                    var updateVar = false;
-                    vm.displayedIps.forEach(function(ip, idx) {
-                        if(ip.status < 100) {
-                            if(ip.step_state != "FAILURE") {
-                                updateVar = true;
-                            }
-                        }
-                    });
-                    if(!updateVar) {
-                        $scope.getListViewData();
-                    } else {
-                        updateListViewConditional();
-                    }
 
-                }, appConfig.ipIdleInterval);
-            }
-        }, appConfig.ipInterval);
-    };
-    updateListViewConditional();
-    $scope.transferDisabled = false;
-    $scope.transferSip = function(ip) {
-        $scope.transferDisabled = true;
-        $http({
-            method: 'POST',
-            url: ip.url+"transfer/"
-        }).then(function(response) {
-            $scope.select = false;
-            $timeout(function() {
-                $scope.getListViewData();
-                updateListViewConditional();
-            }, 1000);
-            $scope.transferDisabled = false;
-        }, function(response) {
-            $scope.transferDisabled = false;
-        });
-    }
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
     $scope.submitDescription = $translate.instant('SUBMITDESCRIPTION');
     $scope.package = $translate.instant('PACKAGE');
@@ -255,22 +73,29 @@ angular.module('myApp').controller('TransferSipCtrl', function($http, $scope, $r
             templateUrl: "static/frontend/views/reception_delivery_description.html"
         },
     ];
-    $scope.colspan = 10;
-    //Remove and ip
-    $scope.removeIp = function (ipObject) {
-        $http({
-            method: 'DELETE',
-            url: ipObject.url
-        }).then(function() {
-            vm.displayedIps.splice(vm.displayedIps.indexOf(ipObject), 1);
-            $scope.edit = false;
+    vm.transferModal = function (ips) {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'static/frontend/views/transfer_sip_modal.html',
+            scope: $scope,
+            controller: 'DataModalInstanceCtrl',
+            controllerAs: '$ctrl',
+            resolve: {
+                data: {
+                    ip: $scope.ip
+                }
+            }
+        })
+        modalInstance.result.then(function (data) {
+            $scope.transferDisabled = true;
             $scope.select = false;
-            $scope.eventlog = false;
-            $scope.eventShow = false;
-            $scope.statusShow = false;
-            $scope.filebrowser = false;
-            $rootScope.loadNavigation(ipSortString);
-            $scope.getListViewData();
+            $timeout(function () {
+                $scope.getListViewData();
+                vm.updateListViewConditional();
+            }, 1000);
+            $scope.transferDisabled = false;
         });
     }
 });

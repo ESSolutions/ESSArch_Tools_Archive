@@ -22,33 +22,13 @@
     Email - essarch@essolutions.se
 """
 
-from django.db.models import Prefetch
-
-from ESSArch_Core.profiles.serializers import (
-    ProfileSerializer,
-    ProfileSASerializer,
-    ProfileIPSerializer,
-    SubmissionAgreementSerializer
-)
-
-from ESSArch_Core.profiles.models import (
-    SubmissionAgreement,
-    Profile,
-    ProfileSA,
-    ProfileIP,
-)
-
 from rest_framework import viewsets
-
-
-class SubmissionAgreementViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows submission agreements to be viewed or edited.
-    """
-    queryset = SubmissionAgreement.objects.all().prefetch_related(
-        Prefetch('profilesa_set', to_attr='profiles')
-    )
-    serializer_class = SubmissionAgreementSerializer
+from ESSArch_Core.profiles.models import Profile, ProfileIP, ProfileSA
+from ESSArch_Core.profiles.serializers import (ProfileDetailSerializer,
+                                               ProfileIPSerializer,
+                                               ProfileSASerializer,
+                                               ProfileSerializer,
+                                               ProfileWriteSerializer)
 
 
 class ProfileSAViewSet(viewsets.ModelViewSet):
@@ -66,7 +46,15 @@ class ProfileViewSet(viewsets.ModelViewSet):
     API endpoint that allows profiles to be viewed or edited.
     """
     queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ProfileSerializer
+
+        if self.action == 'retrieve':
+            return ProfileDetailSerializer
+
+        return ProfileWriteSerializer
 
     def get_queryset(self):
         queryset = Profile.objects.all()

@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').controller('QualityControlCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal) {
+angular.module('essarch.controllers').controller('QualityControlCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal) {
     /*
      * Status view data
      */
@@ -84,7 +84,7 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
             $interval.cancel(stateInterval);
         }
      });
-     $rootScope.$on('$stateChangeStart', function() {
+     $scope.$on('$stateChangeStart', function() {
          $interval.cancel(stateInterval);
         $interval.cancel(listViewInterval);
      });
@@ -137,38 +137,7 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
         });
     };
 
- $scope.currentStepTask = {id: ""}
-    //Click funciton for steps and tasks
-     $scope.stepTaskClick = function(branch) {
-         if(branch.isTask){
-             $http({
-                 method: 'GET',
-                 url: branch.url
-             }).then(function(response){
-                 console.log(response.data)
-                 $scope.currentStepTask = response.data;
-                 $scope.taskInfoModal();
-             }, function(response) {
-                 response.status;
-             });
-         }
-     };
-    //Creates and shows modal with task information
-    $scope.taskInfoModal = function () {
-        var modalInstance = $uibModal.open({
-            animation: true,
-            ariaLabelledBy: 'modal-title',
-            ariaDescribedBy: 'modal-body',
-            templateUrl: 'static/frontend/views/task_info_modal.html',
-            scope: $scope,
-            controller: 'ModalInstanceCtrl',
-            controllerAs: '$ctrl'
-        });
-        modalInstance.result.then(function (data, $ctrl) {
-        }, function () {
-            $log.info('modal-component dismissed at: ' + new Date());
-        });
-    }
+
     /*******************************************/
     /*Piping and Pagination for List-view table*/
     /*******************************************/
@@ -211,12 +180,11 @@ angular.module('myApp').controller('QualityControlCtrl', function($http, $scope,
         $scope.eventShow = false;
         $scope.validateShow = !$scope.validateShow;
     }
-    $scope.validateSip = function(ip) {
-        $http({
-            method: 'POST',
-            url: ip.url+"validate/",
-            data: {validators: vm.validatorModel}
-        }).then(function(response) {
+    $scope.validateSip = function (ip) {
+        IP.validate({
+            id: ip.id,
+            validators: vm.validatorModel
+        }).$promise.then(function (response) {
             $scope.getListViewData();
         });
     }

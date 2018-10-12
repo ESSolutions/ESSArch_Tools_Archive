@@ -57,7 +57,7 @@ class test_tasks(TestCase):
     def setUpTestData(cls):
         cls.root = os.path.dirname(os.path.realpath(__file__))
         cls.ingest_reception = os.path.join(cls.root, "ingest_reception")
-        cls.ingest_work = os.path.join(cls.root, "ingest_work")
+        cls.ingest_work = os.path.join(cls.root, "ingest_workarea")
         cls.gate_reception = os.path.join(cls.root, "gate_reception")
 
         for path in [cls.ingest_reception, cls.ingest_work, cls.gate_reception]:
@@ -72,7 +72,7 @@ class test_tasks(TestCase):
             value=cls.ingest_reception
         )
         Path.objects.create(
-            entity="path_ingest_work",
+            entity="ingest_workarea",
             value=cls.ingest_work
         )
         Path.objects.create(

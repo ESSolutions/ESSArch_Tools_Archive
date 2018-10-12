@@ -22,15 +22,22 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, listViewService, $rootScope) {
+angular.module('essarch.services').factory('Resource', function ($q, $filter, $timeout, listViewService, $rootScope) {
 
     //Get data for Events table
-	function getEventPage(start, number, pageNumber, params, selected, sort) {
+	function getEventPage(start, number, pageNumber, params, selected, sort, columnFilters, search) {
         var sortString = sort.predicate;
+        if(sort.predicate == "eventDateTime") {
+            if(sort.reverse) {
+                sortString = sortString + ",-id";
+            } else {
+                sortString = sortString + ",id";
+            }
+        }
         if(sort.reverse) {
             sortString = "-"+sortString;
         }
-        return listViewService.getEvents($rootScope.ip, pageNumber, number, sortString).then(function(value) {
+        return listViewService.getEvents($rootScope.ip, pageNumber, number, sortString, columnFilters, search).then(function(value) {
             var eventCollection = value.data;
             eventCollection.forEach(function(event) {
                 selected.forEach(function(item) {
@@ -46,12 +53,12 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
         });
 	}
     //Get data for IP table
-    function getIpPage(start, number, pageNumber, params, sort, search, state) {
+    function getIpPage(start, number, pageNumber, params, sort, search, state, columnFilters, workarea) {
         var sortString = sort.predicate;
         if(sort.reverse) {
             sortString = "-"+sortString;
         }
-        return listViewService.getListViewData(pageNumber, number, $rootScope.navigationFilter, sortString, search, state).then(function(value) {
+        return listViewService.getListViewData(pageNumber, number, $rootScope.navigationFilter, sortString, search, state, columnFilters, workarea).then(function(value) {
             var ipCollection = value.data;
             return {
                 data: ipCollection,
@@ -59,17 +66,29 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
             };
         });
 	}
-    function getReceptionIps(start, number, pageNumber, params, checked, sort, search, state) {
+    function getReceptionIps(start, number, pageNumber, params, checked, sort) {
         var sortString = sort.predicate;
         if(sort.reverse) {
             sortString = "-"+sortString;
         }
-        return listViewService.getReceptionIps(pageNumber, number, $rootScope.navigationFilter, sortString, search, state).then(function(value) {
+        var filter = {};
+        if($rootScope.navigationFilter) {
+            filter = $rootScope.navigationFilter;
+        } else {
+            filter = {
+                institution: null,
+                organization: null,
+                type: null,
+                location: null,
+                other: null
+            };
+        }
+        return listViewService.getReceptionIps(pageNumber, number, filter, sortString).then(function(value) {
             var ipCollection = value.data;
             ipCollection.forEach(function(ip) {
                 ip.checked = false;
                 checked.forEach(function(checkedIp) {
-                    if(ip.object_identifier_value === checkedIp.object_identifier_value) {
+                    if(ip.id == checkedIp.id) {
                         ip.checked = true;
                     }
                 });
@@ -81,10 +100,25 @@ angular.module('myApp').factory('Resource', function ($q, $filter, $timeout, lis
         });
 	}
 
+    function getWorkareaIps(workarea, start, number, pageNumber, params, sort, search, expandedAics, columnFilters) {
+        var sortString = sort.predicate;
+        if(sort.reverse) {
+            sortString = "-"+sortString;
+        }
+        return listViewService.getWorkareaData(workarea, pageNumber, number, $rootScope.navigationFilter, sortString, search, columnFilters).then(function(value) {
+            var ipCollection = value.data;
+            return {
+                data: ipCollection,
+                numberOfPages: Math.ceil(value.count / number)
+            };
+        });
+    }
+
 	return {
 		getEventPage: getEventPage,
         getIpPage: getIpPage,
         getReceptionIps: getReceptionIps,
+        getWorkareaIps: getWorkareaIps,
 	};
 
 });

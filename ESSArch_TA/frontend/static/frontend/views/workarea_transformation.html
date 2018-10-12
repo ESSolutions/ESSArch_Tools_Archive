@@ -1,0 +1,64 @@
+<div class="workarea-transformation">
+    <div class="content-wrapper">
+        <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'">
+        </div>
+        <div ng-if="statusShow || eventShow"class="events-status-wrapper" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
+            <event-table ng-if="eventShow" ip="ip"></event-table>
+            <div ng-if="statusShow" class="status-view">
+                <state-tree-view ip="ip"></state-tree-view>
+            </div>
+        </div>
+        <div ng-if="filebrowser" class="file-browser" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
+            <filebrowser ip="ip" workarea="vm.workarea"></filebrowser>
+        </div>
+        <div class="select-sub-edit-eventlog-wrapper" ng-if="select" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
+            <div class="select-view">
+                <div ng-if="ip.profile_validation" class="table-container" st-table="vm.validators" st-pipe="vm.validatorListPipe">
+                    <div class="search-prepare-wrapper transformation-refresh-header">
+                        <div class="refresh-icon">
+                            <span ng-click="vm.validatorListPipe(vm.validatorTableState)" class="clickable fa fa-refresh fa-lg"
+                            ng-class="{'fa-refresh-animate': validatorsLoading }" uib-popover="{{'REFRESHTABLEDESC' | translate}}" popover-placement="left"
+                            popover-popup-delay="500" popover-append-to-body="true"></span>
+                        </div>
+                    </div>
+                    <table class="table table-striped validator-table">
+                        <thead>
+                            <tr>
+                                <th>{{'VALIDATOR' | translate}}</th>
+                                <th>{{'STATUS' | translate}}</th>
+                                <th>{{'FAILED' | translate}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="validator in vm.validators track by $index">
+                                <td>{{validator.name}} <span style="color: red;">{{validator.required?'*':''}}</span></td>
+                                <td>
+                                    <i ng-if="ip.workarea.successfully_validated[validator.name] == true" class="fa fa-check" style="color: green;" uib-popover="{{'SUCCESS' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"></i>
+                                    <i ng-if="ip.workarea.successfully_validated[validator.name] == false" class="fa fa-times" style="color: red;" uib-popover="{{'FAILURE' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"></i>
+                                </td>
+                                <td>
+                                    {{validator.failed_count}} ({{validator.failed_required_count}} {{'REQUIRED_MULTIPLE' | translate | lowercase}})
+                                </td>
+                            </tr>
+                            <tr ng-if="!vm.validators.length && !validatorsLoading" class="empty-table-indicator">
+                                <td colspan="3">{{'NO_RESULTS_FOUND' | translate}}</td>
+                            </tr>
+                            <tr ng-if="!vm.validators.length && validatorsLoading" class="empty-table-indicator">
+                                <td class="loading-column" colspan="3">{{'LOADING' | translate}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <span style="color: red">*</span> {{'REQUIRED' | translate}}
+                </div>
+                <div class="transformation-button-wrapper">
+                    <div class="alert alert-danger" ng-show="ip.profile_transformation == null && error" translate="{{error}}" translate-values="{ label: ip.label}"></div>
+                    <select class="form-control" ng-model="vm.transformer" ng-options="x for x in transformers">{{x}}</select>
+                    <div>
+                        <button ng-disabled="!vm.transformer || (ip.profile_validation && !vm.validation_complete) || ip.state == 'Transforming' || ip.state == 'Transformed' || ip.state == 'Transferring' || ip.state == 'Transferred'"
+                        ng-click="vm.transform(ip, vm.transformer)" class="btn btn-info" style="float: right; margin-bottom: 10px;">{{'TRANSFORM' | translate}} <i ng-if="ip.state == 'Transforming'" class="fa fa-spinner fa-spin"/></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

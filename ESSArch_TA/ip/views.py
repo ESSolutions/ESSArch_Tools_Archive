@@ -22,185 +22,151 @@
     Email - essarch@essolutions.se
 """
 
-import datetime
-import errno
+import copy
 import glob
+import itertools
 import json
-import mimetypes
+import logging
 import os
-import shutil
-import tarfile
 import uuid
-import zipfile
 
 from celery import states as celery_states
-
 from django.conf import settings
-from django.db import IntegrityError
+from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.db.models import Prefetch
-from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
-
+from groups_manager.utils import get_permission_name
+from guardian.shortcuts import assign_perm
+from ip.filters import InformationPackageFilter
+from ip.serializers import InformationPackageSerializer, InformationPackageReadSerializer
 from lxml import etree
-
-from rest_framework import exceptions, filters, status
+from rest_framework import exceptions, filters, permissions, status, viewsets
 from rest_framework.decorators import detail_route, list_route
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from ESSArch_Core.configuration.models import (
-    EventType,
-    Path,
-)
-
-from ESSArch_Core.essxml.util import (
-    get_agent,
-    get_objectpath,
-    parse_submit_description,
-)
-
-from ESSArch_Core.ip.models import (
-    ArchivalInstitution,
-    ArchivistOrganization,
-    ArchivalType,
-    ArchivalLocation,
-    InformationPackage,
-    EventIP
-)
-
-from ESSArch_Core.ip.permissions import (
-    CanDeleteIP,
-    CanTransferSIP,
-)
-
-from ESSArch_Core.pagination import LinkHeaderPagination
-
-from ESSArch_Core.WorkflowEngine.models import (
-    ProcessStep,
-    ProcessTask
-)
-
-from ESSArch_Core.WorkflowEngine.serializers import (
-    ProcessStepSerializer,
-)
-
-from ESSArch_Core.util import (
-    creation_date,
-    get_files_and_dirs,
-    get_event_spec,
-    get_value_from_path,
-    in_directory,
-    parse_content_range_header,
-    timestamp_to_datetime,
-    remove_prefix
-)
-
-from ip.filters import (
-    ArchivalInstitutionFilter,
-    ArchivistOrganizationFilter,
-    ArchivalTypeFilter,
-    ArchivalLocationFilter,
-    InformationPackageFilter,
-)
-
-from ip.serializers import (
-    ArchivalInstitutionSerializer,
-    ArchivistOrganizationSerializer,
-    ArchivalTypeSerializer,
-    ArchivalLocationSerializer,
-    InformationPackageSerializer,
-    EventIPSerializer,
-)
-
-from rest_framework import viewsets
+from ESSArch_Core.auth.decorators import permission_required_or_403
+from ESSArch_Core.auth.models import Group, Member
+from ESSArch_Core.auth.serializers import ChangeOrganizationSerializer
+from ESSArch_Core.auth.util import get_organization_groups
+from ESSArch_Core.WorkflowEngine.models import (ProcessStep, ProcessTask)
+from ESSArch_Core.WorkflowEngine.serializers import ProcessStepChildrenSerializer
+from ESSArch_Core.WorkflowEngine.util import create_workflow
+from ESSArch_Core.configuration.models import (Path,)
+from ESSArch_Core.essxml.util import get_agents, get_objectpath, parse_submit_description
+from ESSArch_Core.filters import string_to_bool
+from ESSArch_Core.fixity.validation.backends.checksum import ChecksumValidator
+from ESSArch_Core.ip.models import Agent, InformationPackage, EventIP
+from ESSArch_Core.ip.permissions import CanDeleteIP, CanTransferSIP
+from ESSArch_Core.mixins import PaginatedViewMixin
+from ESSArch_Core.profiles.models import ProfileIP, SubmissionAgreement
+from ESSArch_Core.util import creation_date, flatten, get_immediate_subdirectories, get_value_from_path, in_directory, list_files, parse_content_range_header, timestamp_to_datetime, remove_prefix
 
 
-class ArchivalInstitutionViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows archival institutions to be viewed or edited.
-    """
-    queryset = ArchivalInstitution.objects.all()
-    serializer_class = ArchivalInstitutionSerializer
+class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
-    filter_backends = (DjangoFilterBackend,)
-    filter_class = ArchivalInstitutionFilter
+    def __init__(self, *args, **kwargs):
+        self.logger = logging.getLogger('essarch.reception')
+        self.reception = Path.objects.get(entity="path_ingest_reception").value
+        self.uip = Path.objects.get(entity="path_ingest_unidentified").value
+        super(InformationPackageReceptionViewSet, self).__init__(*args, **kwargs)
 
-class ArchivistOrganizationViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows archivist organizations to be viewed or edited.
-    """
-    queryset = ArchivistOrganization.objects.all()
-    serializer_class = ArchivistOrganizationSerializer
+    def get_queryset(self):
+        user = self.request.user
+        return InformationPackage.objects.visible_to_user(user).filter(state='Prepared')
 
-    filter_backends = (DjangoFilterBackend,)
-    filter_class = ArchivistOrganizationFilter
+    def parse_ip_with_xmlfile(self, xmlfile):
+        if xmlfile.startswith(self.uip):
+            srcdir = self.uip
+        else:
+            srcdir = self.reception
 
-class ArchivalTypeViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows archival types to be viewed or edited.
-    """
-    queryset = ArchivalType.objects.all()
-    serializer_class = ArchivalTypeSerializer
+        try:
+            ip = parse_submit_description(xmlfile, srcdir)
+        except (etree.LxmlError, ValueError) as e:
+            self.logger.warn('Failed to parse %s: %s' % (xmlfile, e.message))
+            raise
 
-    filter_backends = (DjangoFilterBackend,)
-    filter_class = ArchivalTypeFilter
+        ip['state'] = 'At reception'
+        ip['status'] = 100
+        ip['step_state'] = celery_states.SUCCESS
+        return ip
 
+    def parse_unidentified_ip(self, container_file):
+        ip = {
+            'object_identifier_value': os.path.basename(container_file),
+            'label': os.path.basename(container_file),
+            'create_date': str(timestamp_to_datetime(creation_date(container_file)).isoformat()),
+            'state': 'Unidentified',
+            'status': 0,
+            'step_state': celery_states.SUCCESS,
+        }
 
-class ArchivalLocationViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows archival locations to be viewed or edited.
-    """
-    queryset = ArchivalLocation.objects.all()
-    serializer_class = ArchivalLocationSerializer
+        for xmlfile in glob.glob(os.path.join(self.uip, "*.xml")):
+            if os.path.isfile(xmlfile):
+                doc = etree.parse(xmlfile)
+                root = doc.getroot()
 
-    filter_backends = (DjangoFilterBackend,)
-    filter_class = ArchivalLocationFilter
+                el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
+                if ip['label'] == get_value_from_path(el, "@href").split('file:///')[1]:
+                    raise exceptions.NotFound()
 
-class InformationPackageReceptionViewSet(viewsets.ViewSet):
+        return ip
+
+    def parse_directory_ip(self, directory):
+        ip = {
+            'id': directory.name,
+            'object_identifier_value': directory.name,
+            'label': directory.name,
+            'state': 'At reception',
+            'status': 100,
+            'step_state': celery_states.SUCCESS,
+            'object_path': directory.path,
+        }
+        return ip
+
+    def get_xml_files(self):
+        return glob.glob(os.path.join(self.reception, "*.xml")) + glob.glob(os.path.join(self.uip, "*.xml"))
+
+    def get_container_for_xml(self, xmlfile):
+        doc = etree.parse(xmlfile)
+        root = doc.getroot()
+        return get_objectpath(root)
+
+    def get_container_files(self):
+        return glob.glob(os.path.join(self.uip, "*.tar")) + glob.glob(os.path.join(self.uip, "*.zip"))
+
+    def get_directories(self):
+        return get_immediate_subdirectories(self.reception)
+
     def list(self, request):
-        reception = Path.objects.get(entity="path_ingest_reception").value
-        uip = Path.objects.get(entity="path_ingest_unidentified").value
         ips = []
 
-        for xmlfile in glob.glob(os.path.join(reception, "*.xml")) + glob.glob(os.path.join(uip, "*.xml")):
+        for xmlfile in self.get_xml_files():
             if os.path.isfile(xmlfile):
-                if xmlfile.startswith(uip):
-                    srcdir = uip
-                else:
-                    srcdir = reception
+                try:
+                    ip = self.parse_ip_with_xmlfile(xmlfile)
+                except (etree.LxmlError, ValueError) as e:
+                    continue
 
-                ip = parse_submit_description(xmlfile, srcdir)
-                ip['state'] = 'At reception'
-                ip['status'] = 100
-                ip['step_state'] = celery_states.SUCCESS
                 if not InformationPackage.objects.filter(object_identifier_value=ip['object_identifier_value']).exists():
                     ips.append(ip)
 
-        for container_file in glob.glob(os.path.join(uip, "*.tar")) + glob.glob(os.path.join(uip, "*.zip")):
-            ip = {
-                'object_identifier_value': os.path.basename(container_file),
-                'label': os.path.basename(container_file),
-                'create_date': str(timestamp_to_datetime(creation_date(container_file)).isoformat()),
-                'state': 'Unidentified',
-                'status': 0,
-                'step_state': celery_states.SUCCESS,
-            }
-
-            include = True
-
-            for xmlfile in glob.glob(os.path.join(uip, "*.xml")):
-                if os.path.isfile(xmlfile):
-                    doc = etree.parse(xmlfile)
-                    root = doc.getroot()
-
-                    el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
-                    if ip['label'] == get_value_from_path(el, "@href").split('file:///')[1]:
-                        include = False
-                        break
-
-            if include:
+        for container_file in self.get_container_files():
+            try:
+                ip = self.parse_unidentified_ip(container_file)
+            except exceptions.NotFound:
+                pass
+            else:
                 ips.append(ip)
 
-        from_db = InformationPackage.objects.filter(state='Receiving').prefetch_related(
+        for directory in self.get_directories():
+            ip = self.parse_directory_ip(directory)
+            if not InformationPackage.objects.filter(object_identifier_value=ip['object_identifier_value']).exists():
+                ips.append(ip)
+
+        from_db = InformationPackage.objects.visible_to_user(request.user).filter(state__in=['Prepared', 'Receiving']).prefetch_related(
             Prefetch('profileip_set', to_attr='profiles'),
         )
         serializer = InformationPackageSerializer(
@@ -217,35 +183,47 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         except KeyError:
             pass
 
-        paginator = LinkHeaderPagination()
-        page = paginator.paginate_queryset(ips, request)
-        if page is not None:
-            return paginator.get_paginated_response(page)
+        if self.paginator is not None:
+            paginated = self.paginator.paginate_queryset(ips, request)
+            return self.paginator.get_paginated_response(paginated)
 
         return Response(ips)
 
     def retrieve(self, request, pk=None):
-        path = Path.objects.get(entity="path_ingest_reception").value
-        fullpath = os.path.join(path, "%s.xml" % pk)
+        reception_path = os.path.join(self.reception, pk)
+        uip_path = os.path.join(self.uip, pk)
+        paths = [reception_path, uip_path]
 
-        if not os.path.exists(fullpath):
-            raise exceptions.NotFound
+        xml_paths = [p + '.xml' for p in paths]
+        container_paths = flatten([[p + '.tar', p + '.zip'] for p in paths])
 
-        return Response(parse_submit_description(fullpath, srcdir=path))
+        for xml in self.get_xml_files():
+            for path in xml_paths:
+                if path == xml:
+                    return Response(self.parse_ip_with_xmlfile(xml))
+
+        for container in self.get_container_files():
+            for path in container_paths:
+                if path + p == container:
+                    return Response(self.parse_unidentified_ip(container))
+
+        for directory in self.get_directories():
+            for path in paths:
+                if path == directory.path:
+                    return Response(self.parse_directory_ip(directory))
+
+        raise exceptions.NotFound()
 
     @detail_route(methods=['get'])
     def files(self, request, pk=None):
-        mimetypes.suffix_map = {}
-        mimetypes.encodings_map = {}
-        mimetypes.types_map = {}
-        mimetypes.common_types = {}
-        mimetypes_file = Path.objects.get(
-            entity="path_mimetypes_definitionfile"
-        ).value
-        mimetypes.init(files=[mimetypes_file])
-        mtypes = mimetypes.types_map
-
         reception = Path.objects.get(entity="path_ingest_reception").value
+        path = request.query_params.get('path', '').rstrip('/ ')
+        download = request.query_params.get('download', False)
+
+        if os.path.isdir(os.path.join(reception, pk)):
+            path = os.path.join(reception, pk, path)
+            return list_files(path, force_download=download, paginator=self.paginator, request=request)
+
         xml = os.path.join(reception, "%s.xml" % pk)
 
         if not os.path.exists(xml):
@@ -254,83 +232,9 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         ip = parse_submit_description(xml, srcdir=reception)
         container = ip['object_path']
 
-        path = request.query_params.get('path')
-
-        if path is not None:
-            path = path.rstrip('/ ')
-
-        if path is not None and path.startswith(os.path.basename(container)):
-            fullpath = os.path.join(os.path.dirname(container), path)
-            if tarfile.is_tarfile(container):
-                with tarfile.open(container) as tar:
-                    if fullpath == container:
-                        entries = []
-                        for member in tar.getmembers():
-                            if not member.isfile():
-                                continue
-
-                            entries.append({
-                                "name": member.name,
-                                "type": 'file',
-                                "size": member.size,
-                                "modified": timestamp_to_datetime(member.mtime),
-                            })
-                        return Response(entries)
-                    else:
-                        subpath = fullpath[len(container)+1:]
-                        try:
-                            member = tar.getmember(subpath)
-
-                            if not member.isfile():
-                                raise exceptions.NotFound
-
-                            f = tar.extractfile(member)
-                            content_type = mtypes.get(os.path.splitext(subpath)[1])
-                            response = HttpResponse(f.read(), content_type=content_type)
-                            response['Content-Disposition'] = 'inline; filename="%s"' % os.path.basename(f.name)
-                            if content_type is None:
-                                response['Content-Disposition'] = 'attachment; filename="%s"' % os.path.basename(f.name)
-                            return response
-                        except KeyError:
-                            raise exceptions.NotFound
-
-            elif zipfile.is_zipfile(container):
-                with zipfile.ZipFile(container) as zipf:
-                    if fullpath == container:
-                        entries = []
-                        for member in zipf.filelist:
-                            if member.filename.endswith('/'):
-                                continue
-
-                            entries.append({
-                                "name": member.filename,
-                                "type": 'file',
-                                "size": member.file_size,
-                                "modified": datetime.datetime(*member.date_time),
-                            })
-                        return Response(entries)
-                    else:
-                        subpath = fullpath[len(container)+1:]
-                        try:
-                            f = zipf.open(subpath)
-                            content_type = mtypes.get(os.path.splitext(subpath)[1])
-                            response = HttpResponse(f.read(), content_type=content_type)
-                            response['Content-Disposition'] = 'inline; filename="%s"' % os.path.basename(f.name)
-                            if content_type is None:
-                                response['Content-Disposition'] = 'attachment; filename="%s"' % os.path.basename(f.name)
-                            return response
-                        except KeyError:
-                            raise exceptions.NotFound
-        elif path in [os.path.basename(container), os.path.basename(xml)]:
-            fullpath = os.path.join(os.path.dirname(container), path)
-            content_type = mtypes.get(os.path.splitext(fullpath)[1])
-            response = HttpResponse(open(fullpath).read(), content_type=content_type)
-            response['Content-Disposition'] = 'inline; filename="%s"' % os.path.basename(fullpath)
-            if content_type is None:
-                response['Content-Disposition'] = 'attachment; filename="%s"' % os.path.basename(fullpath)
-            return response
-        elif path is not None:
-            raise exceptions.NotFound
+        if len(path):
+            path = os.path.join(os.path.dirname(container), path)
+            return list_files(path, force_download=download, paginator=self.paginator, request=request)
 
         entry = {
             "name": os.path.basename(container),
@@ -385,148 +289,178 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         filepath = request.data['path']
         filepath = os.path.join(path, filepath)
 
-        ProcessTask.objects.create(
-            name="ESSArch_Core.tasks.ValidateIntegrity",
-            params={
-                "filename": filepath,
-                "checksum": md5,
-                "algorithm": 'MD5'
-            },
-            responsible=self.request.user,
-        ).run().get()
+        options = {'expected': md5, 'algorithm': 'md5'}
+        validator = ChecksumValidator(context='checksum_str', options=options)
+        validator.validate(filepath)
 
         return Response('Upload of %s complete' % filepath)
 
-    @detail_route(methods=['post'], url_path='receive')
-    def receive(self, request, pk=None):
-        if InformationPackage.objects.filter(object_identifier_value=pk).exists():
-            raise exceptions.ParseError('IP with id "%s" already exist')
+    @transaction.atomic
+    @detail_route(methods=['post'])
+    def prepare(self, request, pk=None):
+        perms = copy.deepcopy(getattr(settings, 'IP_CREATION_PERMS_MAP', {}))
 
-        reception = Path.objects.get(entity="path_ingest_reception").value
-        uip = Path.objects.get(entity="path_ingest_unidentified").value
-        xmlfile = os.path.join(reception, "%s.xml" % pk)
-        srcdir = reception
-        if not os.path.isfile(xmlfile):
-            xmlfile = os.path.join(uip, "%s.xml" % pk)
-            srcdir = uip
+        organization = request.user.user_profile.current_organization
+        if organization is None:
+            raise exceptions.ParseError('You must be part of an organization to prepare an IP')
 
-        doc = etree.parse(xmlfile)
-        root = doc.getroot()
-        objpath = os.path.join(srcdir, get_objectpath(root))
+        member = Member.objects.get(django_user=request.user)
 
-        objid, container_type = os.path.splitext(os.path.basename(objpath))
-        parsed = parse_submit_description(xmlfile, srcdir=os.path.split(objpath)[0])
+        existing = InformationPackage.objects.filter(object_identifier_value=pk).first()
+        if existing is not None:
+            self.logger.warn('Tried to prepare IP with id %s which already exists' % (pk), extra={'user': request.user.pk})
+            raise exceptions.ParseError('IP with id %s already exists: %s' % (pk, str(existing.pk)))
+
+        reception = Path.objects.values_list('value', flat=True).get(entity="path_ingest_reception")
+        xmlfile = None
+
+        if os.path.isdir(os.path.join(reception, pk)):
+            # A directory with the given id exists, try to prepare it
+            sa = request.data.get('submission_agreement')
+            if sa is None:
+                raise exceptions.ParseError(detail='Missing parameter submission_agreement')
+
+            parsed = {'label': pk}
+            objpath = os.path.join(reception, pk)
+        else:
+            # No directory, look for files instead
+            xmlfile = os.path.join(reception, '%s.xml' % pk)
+
+            if not os.path.isfile(xmlfile):
+                self.logger.warn('Tried to prepare IP with missing XML file %s' % (xmlfile), extra={'user': request.user.pk})
+                raise exceptions.ParseError('%s does not exist' % xmlfile)
+
+            try:
+                container = os.path.join(reception, self.get_container_for_xml(xmlfile))
+                objpath = container
+            except etree.LxmlError:
+                self.logger.warn('Tried to prepare IP with invalid XML file %s' % (xmlfile), extra={'user': request.user.pk})
+                raise exceptions.ParseError('Invalid XML file, %s' % xmlfile)
+
+            if not os.path.isfile(container):
+                self.logger.warn('Tried to prepare IP with missing container file %s' % (container), extra={'user': request.user.pk})
+                raise exceptions.ParseError('%s does not exist' % container)
+
+            objid, _ = os.path.splitext(os.path.basename(container))
+            parsed = parse_submit_description(xmlfile, srcdir=os.path.split(container)[0])
+
+            provided_sa = request.data.get('submission_agreement')
+            parsed_sa = parsed.get('altrecordids', {}).get('SUBMISSIONAGREEMENT', [None])[0]
+
+            if parsed_sa is not None and provided_sa is not None:
+                if provided_sa == parsed_sa:
+                    sa = provided_sa
+                if provided_sa != parsed_sa:
+                    raise exceptions.ParseError(detail='Must use SA specified in XML')
+            elif parsed_sa and not provided_sa:
+                sa = parsed_sa
+            elif provided_sa and not parsed_sa:
+                sa = provided_sa
+            else:
+                raise exceptions.ParseError(detail='Missing parameter submission_agreement')
+
+        try:
+            sa = SubmissionAgreement.objects.get(pk=sa)
+        except (ValidationError, ValueError, SubmissionAgreement.DoesNotExist) as e:
+            raise exceptions.ParseError('Could not find SA "%s"' % sa)
 
         ip = InformationPackage.objects.create(
-            object_identifier_value=objid, label=parsed.get("label"), state="Receiving",
-            responsible=self.request.user, object_path=parsed['object_path'],
-            object_size=parsed['object_size'], create_date=parsed['create_date'],
+            object_identifier_value=pk,
+            package_type=InformationPackage.SIP,
+            state='Prepared',
+            responsible=request.user,
+            submission_agreement=sa,
+            submission_agreement_locked=True,
+            label=parsed.get('label'),
+            entry_date=parsed.get('entry_date'),
+            start_date=parsed.get('start_date'),
+            end_date=parsed.get('end_date'),
+            object_path=objpath,
         )
 
-        step = ProcessStep.objects.create(
-            name="Receive SIP",
-            information_package=ip,
-            eager=False,
-        )
+        # refresh date fields to convert them to datetime instances instead of
+        # strings to allow further datetime manipulation
+        ip.refresh_from_db(fields=['entry_date', 'start_date', 'end_date'])
 
-        validators = request.data.get('validators', {})
-        available_validators = [
-            'validate_xml_file', 'validate_file_format', 'validate_integrity',
-            'validate_logical_physical_representation',
-        ]
+        if xmlfile is not None:
+            for agent_el in get_agents(etree.parse(xmlfile)):
+                agent = Agent.objects.from_mets_element(agent_el)
+                ip.agents.add(agent)
 
-        if any(v is True and k in available_validators for k, v in validators.iteritems()):
-            validation_step = ProcessStep.objects.create(
-                name="Validate",
-                parent_step=step
-            )
+        user_perms = perms.pop('owner', [])
+        organization.assign_object(ip, custom_permissions=perms)
+        organization.add_object(ip)
 
-            if validators.get('validate_xml_file', False):
-                ProcessTask.objects.create(
-                    name="preingest.tasks.ValidateXMLFile",
-                    params={
-                        "xml_filename": xmlfile
+        for perm in user_perms:
+            perm_name = get_permission_name(perm, ip)
+            assign_perm(perm_name, member.django_user, ip)
+
+        p_types = ['transfer_project', 'sip', 'preservation_metadata', 'submit_description', 'validation']
+        ip.create_profile_rels(p_types, request.user)
+
+        data = InformationPackageReadSerializer(ip, context={'request': request}).data
+
+        self.logger.info('Prepared information package %s' % str(ip.pk), extra={'user': request.user.pk})
+        return Response(data, status=status.HTTP_201_CREATED)
+
+    @permission_required_or_403(['ip.receive'])
+    @detail_route(methods=['post'], url_path='receive')
+    def receive(self, request, pk=None):
+        try:
+            ip = get_object_or_404(self.get_queryset(), id=pk)
+        except (ValueError, ValidationError):
+            raise exceptions.NotFound('Information package with id="%s" not found' % pk)
+
+        if ip.state != 'Prepared':
+            self.logger.warn('Tried to receive IP %s from reception which is in state "%s"' % (pk, ip.state), extra={'user': request.user.pk})
+            raise exceptions.ParseError('Information package must be in state "Prepared"')
+
+        for profile_ip in ProfileIP.objects.filter(ip=ip).iterator():
+            try:
+                profile_ip.clean()
+            except ValidationError as e:
+                raise exceptions.ParseError('%s: %s' % (profile_ip.profile.name, e[0]))
+
+            profile_ip.LockedBy = request.user
+            profile_ip.save()
+
+        workflow_spec = [
+            {
+                "step": True,
+                "name": "Receive",
+                "children": [
+                    {
+                        "name": "ESSArch_Core.tasks.UpdateIPStatus",
+                        "label": "Set status to receiving",
+                        "args": ["Receiving"],
                     },
-                    log=EventIP,
-                    information_package=ip,
-                    responsible=self.request.user,
-                    processstep=validation_step
-                )
-
-            val_format = validators.get("validate_file_format", False)
-            val_integrity = validators.get("validate_integrity", False)
-
-            if val_format or val_integrity:
-                ProcessTask.objects.create(
-                    name="preingest.tasks.ValidateFiles",
-                    params={
-                        "rootdir": srcdir,
-                        "xmlfile": xmlfile,
-                        "validate_fileformat": val_format,
-                        "validate_integrity": val_integrity
+                    {
+                        "name": "preingest.tasks.ReceiveSIP",
+                        "label": "Receive SIP",
                     },
-                    log=EventIP,
-                    information_package=ip,
-                    responsible=self.request.user,
-                    processstep=validation_step
-                )
-
-            files = [objpath]
-
-            if validators.get('validate_logical_physical_representation'):
-                ProcessTask.objects.create(
-                    name="preingest.tasks.ValidateLogicalPhysicalRepresentation",
-                    params={
-                        "files": files,
-                        "files_reldir": srcdir,
-                        "xmlfile": xmlfile,
+                    {
+                        "name": "ESSArch_Core.ip.tasks.ParseEvents",
+                        "label": "Parse events",
                     },
-                    log=EventIP,
-                    information_package=ip,
-                    responsible=self.request.user,
-                    processstep=validation_step
-                )
-
-        receive_step = ProcessStep.objects.create(
-            name="Receive",
-        )
-
-        ProcessTask.objects.create(
-            name="preingest.tasks.ReceiveSIP",
-            args=[ip.pk, xmlfile, objpath],
-            processstep_pos=0,
-            log=EventIP,
-            information_package=ip,
-            responsible=self.request.user,
-            processstep=receive_step,
-        )
-        ProcessTask.objects.create(
-            name="ESSArch_Core.tasks.UpdateIPSizeAndCount",
-            args=[ip.pk],
-            processstep_pos=5,
-            log=EventIP,
-            information_package=ip,
-            responsible=self.request.user,
-            processstep=receive_step,
-        )
-        ProcessTask.objects.create(
-            name="preingest.tasks.UpdateIPStatus",
-            args=[ip.pk],
-            params={
-                "status": "Received",
+                    {
+                        "name": "ESSArch_Core.tasks.UpdateIPSizeAndCount",
+                        "label": "Update IP size and file count",
+                    },
+                    {
+                        "name": "ESSArch_Core.tasks.UpdateIPStatus",
+                        "label": "Set status to received",
+                        "args": ["Received"],
+                    },
+                ]
             },
-            processstep_pos=10,
-            log=EventIP,
-            information_package=ip,
-            responsible=self.request.user,
-            processstep=receive_step,
-        )
+        ]
+        workflow = create_workflow(workflow_spec, ip)
+        workflow.name = "Receive SIP"
+        workflow.information_package = ip
+        workflow.save()
+        workflow.run()
 
-        step.add_child_steps(receive_step)
-        step.save()
-        step.run()
-
-        return Response("IP Received")
+        return Response("receiving ip")
 
     @list_route(methods=['post'], url_path='identify-ip')
     def identify_ip(self, request):
@@ -558,14 +492,14 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet):
         infoxml = os.path.join(uip, infoxml)
 
         ProcessTask.objects.create(
-            name='preingest.tasks.GenerateXML',
+            name='ESSArch_Core.tasks.GenerateXML',
             params={
-                'info': spec_data,
                 'filesToCreate': {
-                    infoxml: spec
+                    infoxml: {'spec': spec, 'data': spec_data}
                 },
                 'folderToParse': container_file,
             },
+            responsible=request.user,
         ).run()
 
         return Response({'status': 'Identified IP, created %s' % infoxml})
@@ -575,19 +509,14 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows information packages to be viewed or edited.
     """
-    queryset = InformationPackage.objects.all().prefetch_related(
-        Prefetch('profileip_set', to_attr='profiles'), 'profiles__profile',
-        'archival_institution', 'archivist_organization', 'archival_type', 'archival_location',
-        'responsible__user_permissions', 'responsible__groups__permissions', 'steps',
-    ).select_related('submission_agreement')
+    queryset = InformationPackage.objects.none()
     serializer_class = InformationPackageSerializer
     filter_backends = (
         filters.OrderingFilter, DjangoFilterBackend, filters.SearchFilter,
     )
     ordering_fields = (
-        'label', 'responsible', 'create_date', 'state', 'eventDateTime',
-        'eventType', 'eventOutcomeDetailNote', 'eventOutcome',
-        'linkingAgentIdentifierValue', 'id', 'object_identifier_value',
+        'label', 'responsible', 'create_date', 'state',
+        'id', 'object_identifier_value',
     )
     search_fields = (
         'object_identifier_value', 'label', 'responsible__first_name',
@@ -596,231 +525,117 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
     )
     filter_class = InformationPackageFilter
 
+    def get_serializer_class(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return InformationPackageReadSerializer
+
+        return InformationPackageSerializer
+
     def get_permissions(self):
         if self.action == 'destroy':
             self.permission_classes = [CanDeleteIP]
 
         return super(InformationPackageViewSet, self).get_permissions()
 
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Perform the lookup filtering.
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+
+        assert lookup_url_kwarg in self.kwargs, (
+                'Expected view %s to be called with a URL keyword argument '
+                'named "%s". Fix your URL conf, or set the `.lookup_field` '
+                'attribute on the view correctly.' %
+                (self.__class__.__name__, lookup_url_kwarg)
+        )
+
+        lookup_field = self.lookup_field
+
+        objid = self.request.query_params.get('objid')
+        if objid is not None:
+            lookup_field = 'object_identifier_value'
+
+        filter_kwargs = {lookup_field: self.kwargs[lookup_url_kwarg]}
+        obj = get_object_or_404(queryset, **filter_kwargs)
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
     def get_queryset(self):
-        queryset = self.queryset
+        user = self.request.user
+        queryset = InformationPackage.objects.visible_to_user(user)
 
-        other = self.request.query_params.get('other')
-
-        if other is not None:
-            queryset = queryset.filter(
-                archival_institution=None,
-                archivist_organization=None,
-                archival_type=None,
-                archival_location=None
-            )
-
+        queryset = queryset.prefetch_related(
+            Prefetch('profileip_set', to_attr='profiles'), 'profiles__profile', 'agents',
+            'responsible__user_permissions', 'responsible__groups__permissions', 'steps',
+        ).select_related('submission_agreement')
         return queryset
+
+    @detail_route(methods=['post'], url_path='change-organization')
+    def change_organization(self, request, pk=None):
+        ip = self.get_object()
+
+        serializer = ChangeOrganizationSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        org = serializer.validated_data['organization']
+
+        ip.change_organization(org)
+        return Response()
 
     @detail_route(methods=['post'], url_path='transfer', permission_classes=[CanTransferSIP])
     def transfer(self, request, pk=None):
         ip = self.get_object()
-        dstdir = Path.objects.get(entity="path_gate_reception").value
 
-        info = {
-            "_OBJID": ip.object_identifier_value,
-            "_OBJLABEL": ip.label
-        }
+        workflow_spec = [
+            {
+                "name": "ESSArch_Core.tasks.UpdateIPStatus",
+                "label": "Set status to transferring",
+                "args": ["Transferring"],
+            },
+            {
+                "step": True,
+                "name": "Create Log File",
+                "children": [
+                    {
+                        "name": "ESSArch_Core.ip.tasks.GenerateEventsXML",
+                        "label": "Generate events xml file",
+                    },
+                    {
+                        "name": "ESSArch_Core.tasks.AppendEvents",
+                        "label": "Add events to xml file",
+                    },
+                    {
+                        "name": "ESSArch_Core.ip.tasks.AddPremisIPObjectElementToEventsFile",
+                        "label": "Add premis IP object to xml file",
+                    },
 
-        events_path = os.path.join(dstdir, "%s_ipevents.xml" % ip.object_identifier_value)
-        filesToCreate = {
-            events_path: get_event_spec()
-        }
-
-        step = ProcessStep.objects.create(
-            name="Transfer SIP",
-            information_package=ip,
-            eager=False,
-        )
-
-        step.add_tasks(
-            ProcessTask.objects.create(
-                name="preingest.tasks.UpdateIPStatus",
-                params={
-                    "ip": ip.pk,
-                    "status": "Transferring",
-                },
-                processstep_pos=10,
-                log=EventIP,
-                information_package=ip,
-                responsible=self.request.user,
-            )
-        )
-
-        step.add_tasks(
-            ProcessTask.objects.create(
-                name="preingest.tasks.TransferSIP",
-                params={
-                    "ip": ip.pk,
-                },
-                processstep_pos=15,
-                log=EventIP,
-                information_package=ip,
-                responsible=self.request.user,
-            )
-        )
-
-        step.add_tasks(
-            ProcessTask.objects.create(
-                name="preingest.tasks.GenerateXML",
-                params={
-                    "info": info,
-                    "filesToCreate": filesToCreate,
-                },
-                processstep_pos=20,
-                log=EventIP,
-                information_package=ip,
-                responsible=self.request.user,
-            )
-        )
-
-        step.add_tasks(
-            ProcessTask.objects.create(
-                name="preingest.tasks.AppendEvents",
-                params={
-                    "filename": events_path,
-                    "events": ip.events.all(),
-                },
-                processstep_pos=30,
-                log=EventIP,
-                information_package=ip,
-                responsible=self.request.user,
-            )
-        )
-
-        spec = {
-            "-name": "object",
-            "-namespace": "premis",
-            "-children": [
-                {
-                    "-name": "objectIdentifier",
-                    "-namespace": "premis",
-                    "-children": [
-                        {
-                            "-name": "objectIdentifierType",
-                            "-namespace": "premis",
-                            "#content": [{"var": "FIDType"}],
-                            "-children": []
-                        },
-                        {
-                            "-name": "objectIdentifierValue",
-                            "-namespace": "premis",
-                            "#content": [{"var": "FID"}],
-                            "-children": []
-                        }
-                    ]
-                },
-                {
-                    "-name": "objectCharacteristics",
-                    "-namespace": "premis",
-                    "-children": [
-                        {
-                            "-name": "format",
-                            "-namespace": "premis",
-                            "-children": [
-                                {
-                                    "-name": "formatDesignation",
-                                    "-namespace": "premis",
-                                    "-children": [
-                                        {
-                                            "-name": "formatName",
-                                            "-namespace": "premis",
-                                            "#content": [{"var": "FFormatName"}],
-                                            "-children": []
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "-name": "storage",
-                    "-namespace": "premis",
-                    "-children": [
-                        {
-                            "-name": "contentLocation",
-                            "-namespace": "premis",
-                            "-children": [
-                                {
-                                    "-name": "contentLocationType",
-                                    "-namespace": "premis",
-                                    "#content": [{"var": "FLocationType"}],
-                                    "-children": []
-                                },
-                                {
-                                    "-name": "contentLocationValue",
-                                    "-namespace": "premis",
-                                    "#content": [{"text": "file:///%s.tar" % ip.object_identifier_value}],
-                                    "-children": []
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ],
-            "-attr": [
-                {
-                  "-name": "type",
-                  '-namespace': 'xsi',
-                  "-req": "1",
-                  "#content": [{"text": "premis:file"}]
-                }
-            ],
-        }
-
-        info = {
-            'FIDType': "UUID",
-            'FID': "%s" % str(ip.object_identifier_value),
-            'FFormatName': 'TAR',
-            'FLocationType': 'URI',
-            'FName': ip.object_path,
-        }
-
-        step.add_tasks(
-            ProcessTask.objects.create(
-                name="ESSArch_Core.tasks.InsertXML",
-                params={
-                    "filename": events_path,
-                    "elementToAppendTo": "premis",
-                    "spec": spec,
-                    "info": info,
-                    "index": 0
-                },
-                processstep_pos=40,
-                information_package=ip,
-                responsible=self.request.user,
-            )
-        )
-
-        step.add_tasks(
-            ProcessTask.objects.create(
-                name="preingest.tasks.UpdateIPStatus",
-                params={
-                    "ip": ip.pk,
-                    "status": "Transferred",
-                },
-                processstep_pos=50,
-                log=EventIP,
-                information_package=ip,
-                responsible=self.request.user,
-            )
-        )
-
-        step.run()
-
-        return Response("IP Transferred")
+                ]
+            },
+            {
+                "name": "preingest.tasks.TransferSIP",
+                "label": "Transfer SIP",
+            },
+            {
+                "name": "ESSArch_Core.tasks.UpdateIPStatus",
+                "label": "Set status to transferred",
+                "args": ["Transferred"],
+            },
+        ]
+        workflow = create_workflow(workflow_spec, ip)
+        workflow.name = "Transfer SIP"
+        workflow.information_package = ip
+        workflow.save()
+        workflow.run()
+        return Response({'status': 'transferring ip'})
 
     @detail_route(methods=['post'], url_path='validate')
     def validate(self, request, pk=None):
         ip = self.get_object()
 
-        prepare = Path.objects.get(entity="path_ingest_work").value
+        prepare = Path.objects.get(entity="ingest_workarea").value
         xmlfile = os.path.join(prepare, "%s.xml" % pk)
 
         step = ProcessStep.objects.create(
@@ -830,7 +645,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
 
         step.add_tasks(
             ProcessTask.objects.create(
-                name="preingest.tasks.ValidateXMLFile",
+                name="ESSArch_Core.tasks.ValidateXMLFile",
                 params={
                     "xml_filename": xmlfile
                 },
@@ -839,7 +654,7 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
                 responsible=self.request.user,
             ),
             ProcessTask.objects.create(
-                name="preingest.tasks.ValidateFiles",
+                name="ESSArch_Core.tasks.ValidateFiles",
                 params={
                     "ip": ip.pk,
                     "mets_path": xmlfile,
@@ -858,101 +673,130 @@ class InformationPackageViewSet(viewsets.ModelViewSet):
         return Response("Validating IP")
 
     def destroy(self, request, pk=None):
-        reception = Path.objects.get(entity="path_ingest_reception").value
-        uip = Path.objects.get(entity="path_ingest_unidentified").value
 
-        xmlfile = os.path.join(reception, "%s.xml" % pk)
-        srcdir = reception
+        delete_from_reception = request.data.get('reception', True)
+        delete_from_workarea = request.data.get('workarea', False)
 
-        if not os.path.isfile(xmlfile):
-            xmlfile = os.path.join(uip, "%s.xml" % pk)
-            srcdir = uip
+        objid = self.get_object().object_identifier_value
+        paths = []
 
-        if os.path.isfile(xmlfile):
-            doc = etree.parse(xmlfile)
-            root = doc.getroot()
+        if delete_from_reception:
+            reception = Path.objects.get(entity="path_ingest_reception").value
+            uip = Path.objects.get(entity="path_ingest_unidentified").value
 
-            el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
-            objpath = get_value_from_path(el, "@href").split('file:///')[1]
-            path = os.path.join(srcdir, objpath)
+            xmlfile = os.path.join(reception, "%s.xml" % objid)
+            srcdir = reception
 
-            try:
-                shutil.rmtree(path)
-            except OSError as e:
-                if e.errno == errno.ENOTDIR:
-                    os.remove(path)
-                elif e.errno == errno.ENOENT:
-                    pass
-                else:
-                    raise
-            finally:
-                for fl in glob.glob(os.path.splitext(xmlfile)[0] + "*"):
-                    try:
-                        os.remove(fl)
-                    except:
-                        raise
+            if os.path.isdir(os.path.join(srcdir, objid)):
+                paths.append(os.path.join(srcdir, objid))
 
-        if InformationPackage.objects.filter(pk=pk).exists():
-            return super(InformationPackageViewSet, self).destroy(request, pk=pk)
-        else:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            if not os.path.isfile(xmlfile):
+                xmlfile = os.path.join(uip, "%s.xml" % objid)
+                srcdir = uip
 
-    @detail_route()
-    def events(self, request, pk=None):
-        ip = self.get_object()
-        events = filters.OrderingFilter().filter_queryset(request, ip.events.all(), self)
-        page = self.paginate_queryset(events)
-        if page is not None:
-            serializers = EventIPSerializer(page, many=True, context={'request': request})
-            return self.get_paginated_response(serializers.data)
-        serializers = EventIPSerializer(events, many=True, context={'request': request})
-        return Response(serializers.data)
+            if os.path.isfile(xmlfile):
+                doc = etree.parse(xmlfile)
+                root = doc.getroot()
 
-    @detail_route()
-    def steps(self, request, pk=None):
-        ip = self.get_object()
-        steps = ip.steps.all()
-        serializer = ProcessStepSerializer(
-            data=steps, many=True, context={'request': request}
+                el = root.xpath('.//*[local-name()="%s"]' % "FLocat")[0]
+                objpath = get_value_from_path(el, "@href").split('file:///')[1]
+                path = os.path.join(srcdir, objpath)
+                no_ext = os.path.splitext(path)[0]
+
+                paths.append(path)
+                paths += [no_ext + '.' + ext for ext in ['xml', 'tar', 'zip']]
+
+        if delete_from_workarea:
+            workarea = Path.objects.get(entity="ingest_workarea").value
+            path = os.path.join(workarea, objid)
+            no_ext = os.path.splitext(path)[0]
+
+            paths.append(path)
+            paths += [no_ext + '.' + ext for ext in ['xml', 'tar', 'zip']]
+
+
+        step = ProcessStep.objects.create(
+            name="Delete files",
+            eager=False,
+            parallel=True,
         )
+
+        for path in paths:
+            t = ProcessTask.objects.create(
+                name='ESSArch_Core.tasks.DeleteFiles',
+                params={'path': path},
+                processstep=step,
+                responsible=request.user,
+            )
+
+        step.run()
+
+        return super(InformationPackageViewSet, self).destroy(request, pk=pk)
+
+    @detail_route()
+    def workflow(self, request, pk=None):
+        ip = self.get_object()
+        hidden = request.query_params.get('hidden')
+
+        steps = ip.steps.filter(parent_step__information_package__isnull=True)
+        tasks = ip.processtask_set.filter(processstep__information_package__isnull=True)
+
+        if hidden is not None:
+            steps = steps.filter(hidden=string_to_bool(hidden))
+            tasks = tasks.filter(hidden=string_to_bool(hidden))
+
+        flow = sorted(itertools.chain(steps, tasks), key=lambda x: (x.get_pos(), x.time_created))
+
+        serializer = ProcessStepChildrenSerializer(data=flow, many=True, context={'request': request})
         serializer.is_valid()
         return Response(serializer.data)
 
     @detail_route(methods=['get'])
     def files(self, request, pk=None):
         ip = self.get_object()
-        return ip.files(request.query_params.get('path', '').rstrip('/'))
+        path = request.query_params.get('path', '').rstrip('/')
+        download = request.query_params.get('download', False)
+        return ip.get_path_response(path, request, force_download=download, paginator=self.paginator)
 
-class EventIPViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows events to be viewed or edited.
-    """
-    queryset = EventIP.objects.all()
-    serializer_class = EventIPSerializer
-    filter_backends = (
-        filters.OrderingFilter, DjangoFilterBackend,
-    )
-    ordering_fields = (
-        'id', 'eventType', 'eventOutcomeDetailNote', 'eventOutcome',
-        'linkingAgentIdentifierValue', 'eventDateTime',
-    )
 
-    def create(self, request):
-        """
-        """
+class WorkareaViewSet(InformationPackageViewSet):
+    def get_queryset(self):
+        user = self.request.user
+        see_all = self.request.user.has_perm('ip.see_all_in_workspaces')
+        qs = super(WorkareaViewSet, self).get_queryset()
 
-        outcomeDetailNote = request.data.get('eventOutcomeDetailNote', None)
-        outcome = request.data.get('eventOutcome', 0)
-        type_id = request.data.get('eventType', None)
-        ip_id = request.data.get('information_package', None)
+        if not see_all:
+            qs = qs.filter(workareas__user=user)
 
-        eventType = EventType.objects.get(pk=type_id)
-        ip = InformationPackage.objects.get(pk=ip_id)
-        agent = request.user
+        return qs
 
-        EventIP.objects.create(
-            eventOutcome=outcome, eventOutcomeDetailNote=outcomeDetailNote,
-            eventType=eventType, linkingObjectIdentifierValue=ip,
-            linkingAgentIdentifierValue=agent,
-        )
-        return Response({"status": "Created event"})
+
+class WorkareaFilesViewSet(viewsets.ViewSet, PaginatedViewMixin):
+    def validate_path(self, path, root, existence=True):
+        relpath = os.path.relpath(path, root)
+
+        if not in_directory(path, root):
+            raise exceptions.ParseError('Illegal path %s' % relpath)
+
+        if existence and not os.path.exists(path):
+            raise exceptions.NotFound('Path "%s" does not exist' % relpath)
+
+    def list(self, request):
+        root = os.path.join(Path.objects.get(entity='ingest_workarea').value, request.user.username)
+
+        path = request.query_params.get('path', '').strip('/ ')
+        force_download = request.query_params.get('download', False)
+        fullpath = os.path.join(root, path)
+
+        try:
+            self.validate_path(fullpath, root)
+        except exceptions.NotFound:
+            if len(fullpath.split('.tar/')) == 2:
+                tar_path, tar_subpath = fullpath.split('.tar/')
+                tar_path += '.tar'
+                if not os.path.isfile(tar_path):
+                    raise
+            else:
+                raise
+
+        return list_files(fullpath, force_download, paginator=self.paginator, request=request)

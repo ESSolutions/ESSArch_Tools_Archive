@@ -35,13 +35,23 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+PROJECT_SHORTNAME = 'ETA'
+PROJECT_NAME = 'ESSArch Tools Archive'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
+
+ESSARCH_WORKFLOW_POLLERS = {
+    'dir': {
+        'class': 'workflow.polling.backends.directory.DirectoryWorkflowPoller',
+        'path': '/ESSArch/data/eta/reception/eft',
+    }
+}
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '#-f#k7@7eyaez26p-)5$7#+58m79t)yz1@d-s8wn2_downta8*'
@@ -53,7 +63,8 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'ESSArch_Core.pagination.LinkHeaderPagination',
+    'DEFAULT_METADATA_CLASS': 'ESSArch_Core.metadata.CustomMetadata',
+    'DEFAULT_PAGINATION_CLASS': 'proxy_pagination.ProxyPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_PERMISSION_CLASSES': (
       'rest_framework.permissions.IsAuthenticated',
@@ -61,12 +72,24 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
+CELERY_BEAT_SCHEDULE = {
+    'RunWorkflowProfiles-every-10-seconds': {
+        'task': 'ESSArch_Core.tasks.RunWorkflowProfiles',
+        'schedule': timedelta(seconds=10),
+    },
+}
+
+PROXY_PAGINATION_PARAM = 'pager'
+PROXY_PAGINATION_DEFAULT = 'ESSArch_Core.pagination.LinkHeaderPagination'
+PROXY_PAGINATION_MAPPING = {'none': 'ESSArch_Core.pagination.NoPagination'}
+
 
 # Application definition
 
 INSTALLED_APPS = [
     'allauth',
     'allauth.account',
+    'channels',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -75,33 +98,71 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.sites',
     'django_filters',
+    'groups_manager',
+    'nested_inline',
     'rest_auth',
     'rest_auth.registration',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
     'frontend',
+    'ESSArch_Core.admin',
     'ESSArch_Core.auth',
+    'ESSArch_Core.docs',
     'ESSArch_Core.configuration',
+    'ESSArch_Core.frontend',
     'ESSArch_Core.ip',
     'ESSArch_Core.profiles',
     'ESSArch_Core.essxml.Generator',
     'ESSArch_Core.essxml.ProfileMaker',
+    'ESSArch_Core.fixity',
     'ESSArch_Core.storage',
+    'ESSArch_Core.tags',
     'ESSArch_Core.WorkflowEngine',
+    'guardian',
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'ESSArch_Core.auth.backends.GroupRoleBackend',
+    'guardian.backends.ObjectPermissionBackend',
+]
+
+GROUPS_MANAGER = {
+    'AUTH_MODELS_SYNC': True,
+    'PERMISSIONS': {
+        'owner': [],
+        'group': [],
+        'groups_upstream': [],
+        'groups_downstream': [],
+        'groups_siblings': [],
+    },
+    'GROUP_NAME_PREFIX': '',
+    'GROUP_NAME_SUFFIX': '',
+    'USER_USERNAME_PREFIX': '',
+    'USER_USERNAME_SUFFIX': '',
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "ROUTING": "ESSArch_Core.routing.channel_routing",
+        "CONFIG": {
+            "hosts": ["redis://localhost/2"],
+        },
+    },
+}
 
 SITE_ID = 1
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -133,12 +194,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'eta',                    # Or path to database file if using sqlite3.
-        'USER': 'arkiv',                      # Not used with sqlite3.
-        'PASSWORD': 'password',               # Not used with sqlite3.
-        'HOST': '',                           # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                           # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite',
+        'OPTIONS': {
+            'isolation_level': 'read committed',
+        }
     }
 }
 
@@ -147,11 +207,57 @@ CACHES = {
     'default': {
         'TIMEOUT': None,
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/0',
+        'LOCATION': 'redis://127.0.0.1:6379/2',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
     }
+}
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s %(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'core': {
+            'level': 'DEBUG',
+            'class': 'ESSArch_Core.log.dbhandler.DBHandler',
+            'application': 'ESSArch Tools for Archive',
+            'agent_role': 'Archivist',
+        },
+        'file_eta': {
+            'level': 'DEBUG',
+            'formatter': 'verbose',
+            'class' : 'logging.handlers.RotatingFileHandler',
+            'filename': '/ESSArch/log/eta.log',
+            'maxBytes': 1024*1024*100, # 100MB
+            'backupCount': 5,
+        },
+        'log_file_auth': {
+            'level': 'DEBUG',
+            'class' : 'logging.handlers.RotatingFileHandler',
+            'formatter': 'verbose',
+            'filename': '/ESSArch/log/auth_eta.log',
+            'maxBytes': 1024*1024*100, # 100MB
+            'backupCount': 5,
+        },
+    },
+    'loggers': {
+        'essarch': {
+            'handlers': ['core', 'file_eta'],
+            'level': 'DEBUG',
+        },
+        'essarch.auth': {
+            'level': 'DEBUG',
+            'handlers': ['log_file_auth'],
+            'propagate': False,
+        },
+    },
 }
 
 # Password validation
@@ -179,29 +285,8 @@ REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'ESSArch_Core.auth.serializers.UserLoggedInSerializer'
 }
 
-# File elements in different metadata standards
-
-FILE_ELEMENTS = {
-    "file": {
-        "path": "FLocat@href",
-        "pathprefix": "file:///",
-        "checksum": "@CHECKSUM",
-        "checksumtype": "@CHECKSUMTYPE",
-    },
-    "mdRef": {
-        "path": "@href",
-        "pathprefix": "file:///",
-        "checksum": "@CHECKSUM",
-        "checksumtype": "@CHECKSUMTYPE",
-    },
-    "object": {
-        "path": "storage/contentLocation/contentLocationValue",
-        "pathprefix": "file:///",
-        "checksum": "objectCharacteristics/fixity/messageDigest",
-        "checksumtype": "objectCharacteristics/fixity/messageDigestAlgorithm",
-        "format": "objectCharacteristics/format/formatDesignation/formatName",
-    },
-}
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/?ref=logout'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -226,21 +311,24 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 
+# Documentation
+DOCS_ROOT = os.path.join(BASE_DIR, 'docs/_build/{lang}/html')
+
 # Add etp vhost to rabbitmq:
 # rabbitmqctl add_user guest guest
 # rabbitmqctl add_vhost eta
 # rabbitmqctl set_permissions -p eta guest ".*" ".*" ".*"
 
 # Celery settings
-BROKER_URL = 'amqp://guest:guest@localhost:5672/eta'
-CELERY_IMPORTS = ("preingest.tasks", "ESSArch_Core.WorkflowEngine.tests.tasks")
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672/eta'
+CELERY_IMPORTS = ("ESSArch_Core.ip.tasks", "preingest.tasks", "ESSArch_Core.WorkflowEngine.tests.tasks")
 CELERY_RESULT_BACKEND = 'redis://'
-CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+CELERY_TASK_EAGER_PROPAGATES = True
 
 # Rest auth settings
 OLD_PASSWORD_FIELD_ENABLED = True
 
 try:
     from local_eta_settings import *
-except ImportError, exp:
+except ImportError:
     pass

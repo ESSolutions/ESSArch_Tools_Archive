@@ -1,20 +1,28 @@
-@import 'colors';
-@import 'mixins';
-
 a {
     cursor: pointer;
+}
+html {
+    height: 100%;
 }
 body {
     background-color: $body-background;
     margin: 0px auto;
-    min-width: 680px;
     overflow: auto;
+    -ms-overflow-style: scrollbar;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    height: 100%;
 }
 body.modal-open {
     overflow: auto;
 }
 body.modal-open[style] {
     padding-right: 0px !important;
+}
+main {
+  display: block;
 }
 .st-sort-ascent:before {
     content: '\25B2';
@@ -81,172 +89,23 @@ body.modal-open[style] {
     font-size: 13px;
 }
 .body-wrapper {
+    flex: 1 0 auto;
     display: flex;
     flex-direction: column;
     width: 100%;
     border-radius: 1px;
     min-height: 1131px;
-    height: 100%;
 }
-.header {
-    background-color: $header-color;
-    color: white;
-    padding: 10px;
-    box-shadow: 0px 5px 2px $shadow-color;
-}
-.logo-search-user-admin-wrapper {
-    display: flex;
-    align-items:center;
-    width: 100%;
-    height: 50px;
-}
-.step-task-pagination {
-    user-select: none;
-    min-width: 60px;
-}
-.logo {
-    width: 85%;
-    height: 100%;
-    margin: 0 auto;
-}
-.logo h3 {
-    display: inline-block;
-    margin-top: 12px;
-    margin-bottom: 12px;
-    cursor: pointer;
-}
-.search {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20%;
-    height: 100%;
-}
-.search > .search-input {
-    border-radius: 10px;
-    margin-right: 5px;
-}
-.user-admin {
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-    width: 15%;
-    height: 100%;
-    float: right;
-    margin-right: 15px;
-}
-.user-dropdown {
-    display: flex;
-    flex-direction: row;
-    cursor: pointer;
-    user-select: none;
-}
-.user-dropdown > h4 {
-    margin-right: 5px;
-}
-.user-dropdown > .fa-user-circle-o {
-    font-size: 30px;
-}
-.user-dropdown > .fa-triangle-bottom {
-    font-size: 10px;
-}
-.menu-task-wrapper {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    height: 45px;
-}
-.menu {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-}
-.tasks-icons {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 200px;
-    height: 100%;
-}
-.tasks-icons > .fa {
-    margin-right: 2px;
-    margin-left: 2px;
-    cursor: pointer;
-}
-.shortcut-nav-calendar-wrapper {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    width: 200px;
-    float: left;
-    overflow: hidden;
-    margin: 5px 0 0 0;
-    height: 600px;
-    background-color: transparent;
-}
-.shortcut-list {
-    width: 100%;
-    float: left;
-    height: 40px;
-}
-.shortcut-list button {
-    border-radius: 20px;
-}
-.navigation {
-    @include container(5px);
-    height: 100%;
-    width: 100%;
-    margin-top: 5px;
-}
-.hamburger {
-    display: none;
-}
-.language-select {
-    min-width: 100px!important;
-}
-@media screen and (max-width: 1200px) {
-    .active-hamburger {
-        display: block!important;        
-        min-width:180px;
-    }
-    .shortcut-nav-calendar-wrapper {
-        cursor: pointer;
-        height: 100%;
-        max-width: 0;
-        overflow: visible !important;
-        padding: 0 !important;
-        display: none;
-        position: fixed;
-        left: -10px;
-        top: 105px;
-        z-index: 100;
-        .calendar {
-            display: none;
-        }
-        .navigation {
-            background-color: white;
+
+.dynamic-part {
+    @include medium-screen-down {
+            width: 100%!important;
+        &:focus {
+            outline: 0;
         }
     }
-    .hamburger {
-        margin-right: 5px;
-        display: inline;
-        cursor: pointer;
-    }
-    .dynamic-part {
-        width: 100%!important;
-    }
 }
-.calendar {
-    display: flex;
-    flex-direction: column;
-    display: -webkit-flex;
-    -webkit-flex-direction: column;
-    height: 40%;
-    width: 100%;
-    margin-top: 10px;
-    border-style: solid;
-    border-color: #AAA;
-}
+
 .datepicker {
     width: 100%;
     position: relative;
@@ -287,64 +146,33 @@ body.modal-open[style] {
 .nav-dynamic-wrapper {
     width:100%;
     padding: 0 10px 0 10px;
+    height: 100%;
 }
 .dynamic-part {
-    height: 100%;
+    min-height: 100%;
     overflow: hidden;
+    &:focus {
+        outline: 0;
+    }
 }
 .fa.fa-refresh {
-    font-size: 20px;
+    font-size: 21px;
 }
-.fa.fa-pencil {
-    font-size: 20px;
+.fa.fa-bell {
+    font-size: 21px;
 }
 .fa.fa-print {
-    font-size: 20px;
+    font-size: 21px;
 }
 .fa.fa-cog {
-    font-size: 20px;
+    font-size: 21px;
 }
 .fa.fa-envelope {
-    font-size: 20px;
+    font-size: 21px;
 }
 .fa.fa-question-circle {
-    font-size: 20px;
+    font-size: 21px;
 }
-.status-tree-grid {
-    padding: 5px;
-    margin: 5px;
-}
-.tree-grid {
-    td {
-        span {
-            text-overflow: ellipsis;
-        }
-        max-width: 350px;
-    }
-}
-.list-view {
-    @include container(10px);
-    display: flex;
-    flex-direction: column;
-    margin-top: 10px;
-    .list-view-table {
-        position: relative;
-        overflow-x: auto;
-        thead, tbody {
-            border: 1px solid $border-color;
-        }
-    }
-}
-.list-view-buttons {
-    display: flex;
-    flex-direction: row;
-    justify-content: left;
-    margin-bottom: 5px;
-}
-.list-view-buttons .btn {
-    margin-left: 10px;
-}
-
 .well-sm {
     padding: 0px;
 }
@@ -353,81 +181,8 @@ body.modal-open[style] {
     width: 100%;
     margin-top: 10px;
 }
-.param-value {
-    word-break: break-word;
-}
-.global-search {
-    width: 400px;
-}
 #items-per-page {
     width: 100px;
-}
-.fa-refresh-animate {
-    -animation: spin 0.7s infinite linear;
-    -ms-animation: spin 0.7s infinite linear;
-    -webkit-animation: spinw 0.7s infinite linear;
-    -moz-animation: spinm 0.7s infinite linear;
-}
-.fa-refresh-animate-once {
-    -animation: spin 0.7s;
-    -ms-animation: spin 0.7s;
-    -webkit-animation: spinw 0.7s;
-    -moz-animation: spinm 0.7s;
-}
-@keyframes spin {
-    from { transform: scale(1) rotate(0deg);}
-    to { transform: scale(1) rotate(360deg);}
-}
-@-webkit-keyframes spinw {
-    from { -webkit-transform: rotate(0deg);}
-    to { -webkit-transform: rotate(360deg);}
-}
-@-moz-keyframes spinm {
-    from { -moz-transform: rotate(0deg);}
-    to { -moz-transform: rotate(360deg);}
-}
-.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-    vertical-align: middle;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    line-height: 1;
-}
-.step-state {
-    padding-top: 0 !important;
-    text-align: center;
-}
-.step-state-success {
-    color: white;
-    display: inline-block;
-    min-width: 55px;
-    text-align: center;
-    background-color: $step-success;
-    padding: 3px 10px;
-    font-size: 9px;
-    border-radius: 5px;
-    box-shadow: 0px 1px 0px rgba(0,0,0,.15);
-}
-.step-state-failure {
-    color: white;
-    display: inline-block;
-    min-width: 55px;
-    text-align: center;
-    background-color: $step-fail;
-    padding: 3px 10px;
-    font-size: 9px;
-    border-radius: 5px;
-    box-shadow: 0px 1px 0px rgba(0,0,0,.15);
-}
-.step-state-in-progress {
-    color: white;
-    display: inline-block;
-    min-width: 55px;
-    text-align: center;
-    background-color: $step-in-progress;
-    padding: 3px 10px;
-    font-size: 9px;
-    border-radius: 5px;
-    box-shadow: 0px 1px 0px rgba(0,0,0,.15);
 }
 .pagination {
     margin: 5px 0;
@@ -443,8 +198,7 @@ body.modal-open[style] {
 .user-settings {
     @include container(10px);
     margin-top: 10px;
-    width:50%;
-    min-width: 400px;
+    width:100%;
     .ip-view-type {
         margin-bottom: 10px;
     }
@@ -460,6 +214,29 @@ body.modal-open[style] {
             width: 150px;
         }
     }
+    .main-page-selects {
+        display: none;
+        @include medium-screen {
+            display: flex;
+        }
+        @include small-screen {
+            display: flex;
+        }
+    }
+    .main-view-options {
+        display: none;
+        margin-bottom: 10px;
+        .fa {
+            cursor: pointer;
+            color: #000;
+            &:hover, &:focus {
+                text-decoration: none;
+            }
+        }
+        @include small-screen {
+            display: flex;
+        }
+    }
 }
 .table-container {
     position: relative;
@@ -467,129 +244,15 @@ body.modal-open[style] {
         border: 1px solid $border-color;
     }
 }
-.nav {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    width: 100%;
-    font-size: 12pt;
-    .sliding-middle-out {
-        display: inline-block;
-        position: relative;
-        padding-bottom: 3px;
-    }
-    .sliding-middle-out:after {
-        content: '';
-        display: block;
-        margin: auto;
-        height: 1px;
-        width: 0px;
-        background: transparent;
-    }
-    .chosen:hover:after {
-        width: 100%;
-        height: 1px;
-        background: #fff;
-    }
-    .chosen:after {
-        width: 100%;
-        height: 1px;
-        background: #fff;
-    }
-}
-.nav-item {
-    cursor: pointer;
-    margin: 0 15px 0 0 !important;
-}
 
 .enter-profile-name {
+    padding: 15px;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: stretch;
     position: relative;
-    width: 100%;
-    .fa-refresh {
-        position: absolute;
-        top: 10px;
-        right: 5px;
-    }
-}
-.file-browser {
-    @include container(10px);
-}
-.file-explorer {
-    margin-top: 10px;
-    width: 100%;
-    user-select: none;
-}
-.file-explorer-nav {
-    display: flex;
-    flex-direction: row;
-    vertical-align: middle;
-    width: 100%;
-}
-.dir-path {
-    margin-left: 10px;
-    vertical-align: middle !important;
-}
-.card-selected {
-    color: rgba(0, 50, 255, .9);
-}
-.arrow-disabled {
-    color: #bcbcbc;
-    cursor: auto;
-}
-.deckgrid {
-    margin-top:10px;
-    padding: 15px;
-    width: 100%;
-    min-width: 520px;
-    min-height: 100px;
-    max-height: 400px;
-    overflow-y: scroll;
-    border-style: solid;
-    border-color: #bbb;
-}
-.flex-grid {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-.card {
-    background:#fff center 30px no-repeat;
-    margin:0 2px 2px 0;
-    position:relative;
-    display: flex;
-    flex-direction: column;
-    width: 84px;
-    margin: 5px;
-    p {
-        word-wrap: break-word;
-        font-size: 9pt;
-        text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .file {
-        text-align: center;
-    }
-    .dir {
-        text-align: center;
-    }
-    .file-extension {
-        text-align: center;
-        position: absolute;
-        display: block;
-        word-break: break-all;
-        width: 30px;
-        left: 27px;
-        top: 15px;
-        font-size: 12px;
-        line-height: 1;
-    }
+    justify-content: space-between;
 }
 
 .traceback-copied {
@@ -598,4 +261,98 @@ body.modal-open[style] {
 
 .popover {
     word-break: break-all;
+}
+
+.restricted {
+    @include container(5px);
+    margin-top: 5px;
+    padding: 10px;
+    .restricted-text {
+        color: $step-fail;
+    }
+    a {
+        color: rgb(206, 0, 0);
+    }
+    display: flex;
+    flex-direction: row;
+}
+.no-select {
+    user-select: none;
+}
+
+.import {
+    @include container(10px);
+    margin-top: 10px;
+    width:100%;
+    min-width: 400px;
+    input {
+        width: 33%;
+    }
+    .alert {
+        width: 33%;
+        margin-top: 10px;
+    }
+    .btn-info {
+        margin-top: 5px;
+    }
+}
+
+.sa-select {
+    width: 100% !important;
+}
+
+.workarea-validation, .workarea-transformation {
+    .content-wrapper > div {
+        margin-left: 0px;
+    }
+}
+
+.fullscreen-modal {
+    .modal-dialog {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .modal-content {
+        height: auto;
+        min-height: 100%;
+        border-radius: 0;
+      }
+      .modal-footer {
+          max-height: 100px;
+      }
+}
+
+// Remove scroll on main page when modal is open
+body.modal-open {
+    overflow: hidden;
+}
+.keyboard-button {
+    display: inline-block;
+    margin: 0 .1em;
+    padding: .1em .6em;
+    font-family: Arial,"Helvetica Neue",Helvetica,sans-serif;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #242729;
+    text-shadow: 0 1px 0 #FFF;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid #adb3b9;
+    border-radius: 3px;
+    box-shadow: 0 1px 0 rgba(12,13,14,0.2), 0 0 0 2px #FFF inset;
+    white-space: nowrap;
+}
+
+.docs-page {
+    margin-top: 10px;
+    padding: 5px;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    * {
+        margin-right: 3px;
+    }
 }

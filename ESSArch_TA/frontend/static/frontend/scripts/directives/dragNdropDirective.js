@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('myApp').directive('treednd', function () {
+angular.module('essarch.directives').directive('treednd', function () {
     return {
         restrict: 'EA',
         link: function (scope, elt, attrs) {

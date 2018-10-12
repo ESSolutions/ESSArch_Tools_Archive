@@ -1,0 +1,28 @@
+{
+    "permissionConfig": {
+        "home": {
+            "reception": {
+                "_permissions": []
+            },
+            "workarea": {
+                "validation": {
+                    "_permissions": []
+                },
+                "conversion": {
+                    "_permissions": []
+                },
+                "transformation": {
+                    "_permissions": []
+                }
+            },
+            "transferSip": {
+                "_permissions": []
+            },
+            "administration": {
+                "import": {
+                    "_permissions": []
+                }
+            }
+        }
+    }
+}

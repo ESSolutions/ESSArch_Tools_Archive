@@ -2,21 +2,21 @@
     <div class="content-wrapper">
         <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'">
         </div>
-        <div ng-if="statusShow || eventShow"class="events-status-wrapper">
-            <div ng-include src="'static/frontend/views/event_table.html'"></div>
-            <div ng-if="statusShow" class="status-view" ng-include src="'static/frontend/views/status_tree_view.html'"></div>
+        <div ng-if="statusShow || eventShow"class="events-status-wrapper" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
+            <event-table ng-if="eventShow" ip="ip"></event-table>
+            <div ng-if="statusShow" class="status-view">
+                <state-tree-view ip="ip"></state-tree-view>
+            </div>
         </div>
-        <div ng-if="filebrowser" class="file-browser" ng-controller="FilebrowserController" ng-include src="'static/frontend/views/filebrowser.html'"></div>
-        <div class="select-sub-edit-eventlog-wrapper" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
+        <div ng-if="filebrowser" class="file-browser" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
+            <filebrowser ip="ip"></filebrowser>
+        </div>
+        <div class="select-sub-edit-eventlog-wrapper" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
             <div class="select-view" id="select-view" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring' && select">
                 <p style="margin: 5px;">IP: {{ip.label}}</p>
-                <form class="receive-sip-eventlog-form" ng-submit="transferSip(ip)">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" ng-disabled="!checkPermission('ip.transfer_sip')" ng-model="approvedToTransfer">{{'APPROVEDTOTRANSFER' | translate}}</input>
-                        </label>
-                    </div>
-                    <button type="submit" ng-dblClick="" ng-disabled="transferDisabled || !approvedToTransfer || !checkPermission('ip.transfer_sip')" class="btn btn-info submit-button">{{'TRANSFERSIP' | translate}}</button>
+                <form class="receive-sip-eventlog-form" ng-submit="vm.transferModal(ip)">
+                    <span ng-if="vm.info.visible && transferDisabled" translate="{{vm.info.text}}" translate-values="vm.info.values" class="transfer-info-text"></span>
+                    <button type="submit" ng-dblClick="" ng-disabled="transferDisabled || !checkPermission('ip.transfer_sip')" class="btn btn-info submit-button">{{'TRANSFERSIP' | translate}}</button>
                 </form>
             </div>
         </div>

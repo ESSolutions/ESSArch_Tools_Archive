@@ -1,0 +1,157 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2017, ES Solutions
+# This file is distributed under the same license as the ESSArch Tools
+# Archive package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: ESSArch Tools Archive 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-02-25 20:56+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.5.3\n"
+
+#: ../../user_guide/workspace.rst:5
+msgid "Workspace"
+msgstr "Arbetsyta"
+
+#: ../../user_guide/workspace.rst:10
+msgid "Validation"
+msgstr "Validering"
+
+#: ../../user_guide/workspace.rst:12
+msgid ""
+"If an IP is related to a submission agreement that has a validation "
+"profile, the IP can be validated. Click and IP in the list view to see "
+"the validation options."
+msgstr ""
+"Om ett IP är relaterat till en lerevansöverenskommelse som har en "
+"valideringsprofil, så kan det bli validerat. Klicka på ett IP för att "
+"välja validatorer."
+
+#: ../../user_guide/workspace.rst:16
+msgid ""
+"There is a list of validations to choose from that is defined by the "
+"validation profile. Validators defined as required in the profile are "
+"marked with a \\*. Required validators must pass before the IP can be "
+":ref:`transformed <workspace_transformation>`."
+msgstr ""
+"Det finns en lista av olika valideringar som kan genomföras som är "
+"definerade i valideringsprofilen. "
+"Valideringar definerade som obligatoriska är markerade med en \*. "
+"Obligatoriska valideringar måste genomföras innan ett IP kan bli "
+":ref:`transformerat <workspace_transformation>`. "
+
+#: ../../user_guide/workspace.rst:24
+msgid ""
+"Check the **Stop at failure**-checkbox to make the validation process "
+"stop at the first failure."
+msgstr ""
+"Markera **Stoppa vid fel** för att stoppa validering när första felet "
+"uppstår."
+
+#: ../../user_guide/workspace.rst:29
+msgid ""
+"When validators are chosen click the **validate**-button and the "
+"validation process will begin."
+msgstr ""
+"När önskade valideringar är valda, klicka på **Validera**. "
+"Då börjar valideringsprocessen."
+
+#: ../../user_guide/workspace.rst:34
+msgid ""
+"The validation results are shown in the table and will automatically "
+"refresh when all validations are done. Successfull validations are marked"
+" with a green color and unsuccessful validations are marked with red. "
+"Files with only successful validations are marked with green and files "
+"that has at least one failed validation are marked with red. The "
+"validations are shown in the following structure:"
+msgstr ""
+"Valideringsresultaten visas i tabellen och uppdateras automatiskt "
+"när alla valideringar är färdiga. "
+"Lyckade valideringar markeras med grön färg och misslyckade med röd färg. "
+"Filer med enbart lyckade valideringar markeras med grön färg och "
+"filer med minst en misslyckad validering markeras med röd färg. "
+"Valideringarna visas med följande struktur i tabellen:"
+
+#: ../../user_guide/workspace.rst:43
+msgid "File"
+msgstr "Fil"
+
+#: ../../user_guide/workspace.rst:42
+msgid "Validator 1"
+msgstr "Validator 1"
+
+#: ../../user_guide/workspace.rst:43
+msgid "Validator 2"
+msgstr "Validator 2"
+
+#: ../../user_guide/workspace.rst:44 ../../user_guide/workspace.rst:45
+msgid "..."
+msgstr "..."
+
+#: ../../user_guide/workspace.rst:46
+msgid ""
+"Click on a row to expand the file to see the validators and click again "
+"to collapse and hide validators."
+msgstr ""
+"Klicka på en rad för att expandera en fil och se alla valideringar för "
+"filen. Klicka igen så kommer fil-raden minimeras och valideringarna" 
+"kommer försvinna."
+
+#: ../../user_guide/workspace.rst:51
+msgid ""
+"The rows representing validators can be clicked to view the validation "
+"results."
+msgstr ""
+"Raderna som representerar en validering kan klickas för att se "
+"detaljerat resultat."
+
+#: ../../user_guide/workspace.rst:55
+msgid "The results of the validation is showed in a new window."
+msgstr "Valideringsresultatet visas i ett nytt fönster."
+
+#: ../../user_guide/workspace.rst:59
+msgid ""
+"To view the results in fullscreen click the **Fullscreen**-link, and "
+"press **Esc** to exit fullscreen mode."
+msgstr ""
+"För att se resultatet i fullskärmsläge klicka på **Fullskärm**-länken. "
+"Klicka **Esc** för att gå ur fullskärmsläget."
+
+#: ../../user_guide/workspace.rst:67
+msgid "Transformation"
+msgstr "Transformering"
+
+#: ../../user_guide/workspace.rst:69
+msgid ""
+"If an IP is related to a submission agreement that ha a transformation "
+"profile and all required validations have passed, an IP can be "
+"transformed. When clicking an IP in the transformation list view, there "
+"is a table showing the outcome of each validator. If a validator has "
+"passed in all cases it is marked with a green check, and if not, it is "
+"marked with a red cross."
+msgstr ""
+"Om ett IP är relaterat till en leveransöverenskommelse som har en "
+"transformeringsprofil och alla obligatoriska valideringar är lyckade, "
+"kan ett IP bli transformerat. "
+"När man klickar på ett IP i listvyn under transformering får man se "
+"en tabell med valideringsresultat. "
+"Om en validator har klarat alla filer den har validerat är den markerad "
+"med en grön bock, om inte, är validatorn markerad med ett rött kryss."
+
+#: ../../user_guide/workspace.rst:77
+msgid ""
+"If all required validators are successfull, It can be transformed by "
+"clicking the **Transform**-button."
+msgstr ""
+"Om alla obligatoriska valideringar har lyckats kan IPt transformeras "
+"genom att klicka på **Transformera**."
+

@@ -27,175 +27,129 @@ from __future__ import absolute_import
 import os
 import shutil
 
-from ESSArch_Core.configuration.models import Path
-from ESSArch_Core.essxml.util import parse_submit_description
-from ESSArch_Core.ip.models import (
-    ArchivalInstitution,
-    ArchivistOrganization,
-    ArchivalLocation,
-    ArchivalType,
-    InformationPackage,
-)
-from ESSArch_Core.WorkflowEngine.dbtask import DBTask
-from ESSArch_Core.WorkflowEngine.models import ProcessTask, ProcessStep
+import requests
+from django.contrib.auth import get_user_model
+from django.db import transaction
+
+# noinspection PyUnresolvedReferences
 from ESSArch_Core import tasks
+from ESSArch_Core.WorkflowEngine.dbtask import DBTask
+from ESSArch_Core.configuration.models import Path
+from ESSArch_Core.fixity.checksum import calculate_checksum
+from ESSArch_Core.ip.models import InformationPackage, Workarea, MESSAGE_DIGEST_ALGORITHM_CHOICES_DICT
+from ESSArch_Core.storage.copy import copy_file
+from ESSArch_Core.util import creation_date, mkdir_p, timestamp_to_datetime
+
+User = get_user_model()
 
 
 class ReceiveSIP(DBTask):
     event_type = 20100
 
-    def run(self, ip, xml, container):
-        ip = InformationPackage.objects.get(pk=ip)
-        objid, container_type = os.path.splitext(os.path.basename(container))
-        parsed = parse_submit_description(xml, srcdir=os.path.split(container)[0])
+    def get_workarea_path(self, ip):
+        workarea = Path.objects.get(entity='ingest_workarea').value
+        username = User.objects.get(pk=self.responsible).username
+        workarea_user = os.path.join(workarea, username)
+        return os.path.join(workarea_user, ip.object_identifier_value)
 
-        archival_institution = parsed.get('archival_institution')
-        archivist_organization = parsed.get('archivist_organization')
-        archival_type = parsed.get('archival_type')
-        archival_location = parsed.get('archival_location')
+    @transaction.atomic
+    def run(self):
+        ip = InformationPackage.objects.get(pk=self.ip)
+        dst_dir = self.get_workarea_path(ip)
+        mkdir_p(dst_dir)
+        try:
+            if not os.path.isdir(ip.object_path):
+                xmlfile = os.path.splitext(ip.object_path)[0] + '.xml'
+                algorithm = ip.get_checksum_algorithm()
+                ip.package_mets_path = xmlfile
+                ip.package_mets_create_date = timestamp_to_datetime(creation_date(xmlfile)).isoformat()
+                ip.package_mets_size = os.path.getsize(xmlfile)
+                ip.package_mets_digest_algorithm = MESSAGE_DIGEST_ALGORITHM_CHOICES_DICT[algorithm.upper()]
+                ip.package_mets_digest = calculate_checksum(xmlfile, algorithm=algorithm)
+                ip.save()
+                shutil.copy(ip.object_path, dst_dir)
+                shutil.copy(ip.package_mets_path, dst_dir)
+            else:
+                shutil.copytree(ip.object_path, dst_dir)
+        except Exception:
+            shutil.rmtree(dst_dir)
+            raise
 
-        if archival_institution:
-            arch, _ = ArchivalInstitution.objects.get_or_create(
-                name=archival_institution['name']
-            )
-            ip.archival_institution = arch
+        Workarea.objects.create(ip=ip, user_id=self.responsible, type=Workarea.INGEST, read_only=False)
 
-        if archivist_organization:
-            arch, _ = ArchivistOrganization.objects.get_or_create(
-                name=archivist_organization['name']
-            )
-            ip.archivist_organization = arch
+    def undo(self):
+        pass
 
-        if archival_type:
-            arch, _ = ArchivalType.objects.get_or_create(
-                name=archival_type['name']
-            )
-            ip.archival_type = arch
-
-        if archival_location:
-            arch, _ = ArchivalLocation.objects.get_or_create(
-                name=archival_location['name']
-            )
-            ip.archival_location = arch
-
-        ip.save(update_fields=[
-            'archival_institution', 'archivist_organization', 'archival_type',
-            'archival_location',
-        ])
-
-        prepare = Path.objects.get(entity="path_ingest_work").value
-
-        srcdir, srcfile = os.path.split(ip.object_path)
-        dst = os.path.join(prepare, srcfile)
-
-        shutil.copy(ip.object_path, dst)
-
-        src = os.path.join(srcdir, "%s.xml" % objid)
-        dst = os.path.join(prepare, "%s.xml" % objid)
-        shutil.copy(src, dst)
-
-    def undo(self, ip, xml, container):
-        objid, container_type = os.path.splitext(os.path.basename(container))
-        ip = InformationPackage.objects.get(object_identifier_value=objid)
-
-        ipdir, ipfile = os.path.split(ip.object_path)
-        ingest_work = Path.objects.get(entity="path_ingest_work").value
-
-        os.remove(os.path.join(ingest_work, ipfile))
-        os.remove(os.path.join(ingest_work, "%s.xml" % objid))
-
-        InformationPackage.objects.filter(pk=ip).delete()
-
-    def event_outcome_success(self, ip, xml, container):
-        return "Received IP '%s'" % str(ip)
+    def event_outcome_success(self):
+        return "Received IP"
 
 
 class TransferSIP(DBTask):
-    event_type = 20900
+    event_type = 20600
 
-    def run(self, ip=None):
-        objectpath = InformationPackage.objects.values_list('object_path', flat=True).get(pk=ip)
-
-        srcdir, srcfile = os.path.split(objectpath)
+    def run(self):
+        ip = InformationPackage.objects.get(pk=self.ip)
+        src = ip.object_path
+        srcdir, srcfile = os.path.split(src)
         epp = Path.objects.get(entity="path_gate_reception").value
-        dst = os.path.join(epp, srcfile)
 
-        shutil.copy(objectpath, dst)
+        try:
+            remote = ip.get_profile_data('transfer_project').get(
+                'preservation_organization_receiver_url_epp'
+            )
+        except AttributeError:
+            remote = None
 
-        InformationPackage.objects.filter(pk=ip).update(object_path=dst)
+        session = None
+
+        if remote:
+            try:
+                dst, remote_user, remote_pass = remote.split(',')
+
+                session = requests.Session()
+                session.verify = False
+                session.auth = (remote_user, remote_pass)
+            except ValueError:
+                remote = None
+        else:
+            dst = os.path.join(epp, srcfile)
+
+        block_size = 8 * 1000000 # 8MB
+
+        copy_file(src, dst, requests_session=session, block_size=block_size)
 
         self.set_progress(50, total=100)
 
-        objid = InformationPackage.objects.values_list(
-            'object_identifier_value', flat=True
-        ).get(pk=ip)
+        objid = ip.object_identifier_value
+        src = ip.get_events_file_path()
+        if os.path.isfile(src):
+            if not remote:
+                dst = os.path.join(epp, "%s_ipevents.xml" % objid)
+            copy_file(src, dst, requests_session=session, block_size=block_size)
+
+        self.set_progress(75, total=100)
 
         src = os.path.join(srcdir, "%s.xml" % objid)
-        dst = os.path.join(epp, "%s.xml" % objid)
-        shutil.copy(src, dst)
+        if not remote:
+            dst = os.path.join(epp, "%s.xml" % objid)
+        copy_file(src, dst, requests_session=session, block_size=block_size)
 
         self.set_progress(100, total=100)
 
         return dst
 
-    def undo(self, ip=None):
-        objectpath = InformationPackage.objects.values_list('object_path', flat=True).get(pk=ip)
+    def undo(self):
+        objectpath = InformationPackage.objects.values_list('object_path', flat=True).get(pk=self.ip)
 
         ipdir, ipfile = os.path.split(objectpath)
         gate_reception = Path.objects.get(entity="path_gate_reception").value
 
         objid = InformationPackage.objects.values_list(
             'object_identifier_value', flat=True
-        ).get(pk=ip)
+        ).get(pk=self.ip)
 
         os.remove(os.path.join(gate_reception, ipfile))
         os.remove(os.path.join(gate_reception, "%s.xml" % objid))
 
-    def event_outcome_success(self, ip=None):
-        label = InformationPackage.objects.values_list('label', flat=True).get(pk=ip)
-        return "Transferred IP '%s' with label '%s'" % (ip, label)
-
-
-class CalculateChecksum(tasks.CalculateChecksum):
-    event_type = 20210
-
-
-class IdentifyFileFormat(tasks.IdentifyFileFormat):
-    event_type = 20220
-
-
-class GenerateXML(tasks.GenerateXML):
-    event_type = 20230
-
-
-class AppendEvents(tasks.AppendEvents):
-    event_type = 20240
-
-
-class CopySchemas(tasks.CopySchemas):
-    event_type = 20250
-
-
-class ValidateFileFormat(tasks.ValidateFileFormat):
-    event_type = 20260
-
-
-class ValidateXMLFile(tasks.ValidateXMLFile):
-    event_type = 20261
-
-
-class ValidateLogicalPhysicalRepresentation(tasks.ValidateLogicalPhysicalRepresentation):
-    event_type = 20262
-
-
-class ValidateIntegrity(tasks.ValidateIntegrity):
-    event_type = 20263
-
-
-class ValidateFiles(tasks.ValidateFiles):
-    fileformat_task = "preingest.tasks.ValidateFileFormat"
-    checksum_task = "preingest.tasks.ValidateIntegrity"
-
-
-class UpdateIPStatus(tasks.UpdateIPStatus):
-    event_type = 20280
+    def event_outcome_success(self):
+        return "Transferred IP"

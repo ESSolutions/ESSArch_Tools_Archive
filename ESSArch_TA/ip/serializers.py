@@ -24,78 +24,37 @@
 
 from rest_framework import serializers
 
-from ESSArch_Core.ip.models import (
-    ArchivalInstitution,
-    ArchivistOrganization,
-    ArchivalType,
-    ArchivalLocation,
-    EventIP,
-    InformationPackage
-)
-
-from ESSArch_Core.serializers import DynamicHyperlinkedModelSerializer
-
-from ESSArch_Core.auth.serializers import UserSerializer
-
-from ESSArch_Core.profiles.serializers import (
-    ProfileIPSerializer,
-)
+from ESSArch_Core.ip.serializers import InformationPackageSerializer as CoreInformationPackageSerializer, WorkareaSerializer
+from ESSArch_Core.profiles.serializers import ProfileIPSerializer
+from ESSArch_Core.profiles.utils import profile_types
 
 
-class ArchivalInstitutionSerializer(DynamicHyperlinkedModelSerializer):
-    class Meta:
-        model = ArchivalInstitution
-        fields = ('url', 'id', 'name', 'information_packages',)
+class InformationPackageSerializer(CoreInformationPackageSerializer):
+    profiles = serializers.SerializerMethodField()
+    workarea = serializers.SerializerMethodField()
+
+    def get_profiles(self, obj):
+        profiles = getattr(obj, 'profiles', obj.profileip_set)
+        return ProfileIPSerializer(profiles, many=True, context=self.context).data
+
+    def get_workarea(self, obj):
+        workarea = obj.workareas.first()
+
+        if workarea is not None:
+            return WorkareaSerializer(workarea, context=self.context).data
+
+    class Meta(CoreInformationPackageSerializer.Meta):
+        fields = CoreInformationPackageSerializer.Meta.fields + ('profiles', 'workarea')
 
 
-class ArchivistOrganizationSerializer(DynamicHyperlinkedModelSerializer):
-    class Meta:
-        model = ArchivistOrganization
-        fields = ('url', 'id', 'name', 'information_packages',)
-
-
-class ArchivalTypeSerializer(DynamicHyperlinkedModelSerializer):
-    class Meta:
-        model = ArchivalType
-        fields = ('url', 'id', 'name', 'information_packages',)
-
-
-class ArchivalLocationSerializer(DynamicHyperlinkedModelSerializer):
-    class Meta:
-        model = ArchivalLocation
-        fields = ('url', 'id', 'name', 'information_packages',)
-
-
-class InformationPackageSerializer(serializers.HyperlinkedModelSerializer):
-    responsible = UserSerializer()
-    profiles = ProfileIPSerializer(many=True)
-    archival_institution = ArchivalInstitutionSerializer(
-        fields=['url', 'id', 'name']
-    )
-    archivist_organization = ArchivistOrganizationSerializer(
-        fields=['url', 'id', 'name']
-    )
-    archival_type = ArchivalTypeSerializer(
-        fields=['url', 'id', 'name']
-    )
-    archival_location = ArchivalLocationSerializer(
-        fields=['url', 'id', 'name']
-    )
-
+class InformationPackageReadSerializer(InformationPackageSerializer):
     def to_representation(self, obj):
-        data = super(InformationPackageSerializer, self).to_representation(obj)
+        data = super(InformationPackageReadSerializer, self).to_representation(obj)
         profiles = data['profiles']
         data['profiles'] = {}
 
-        types = [
-            'transfer_project', 'content_type', 'data_selection',
-            'authority_information', 'archival_description',
-            'import', 'submit_description', 'sip', 'aip',
-            'dip', 'workflow', 'preservation_metadata', 'event',
-        ]
-
-        for ptype in types:
-            data['profile_%s' % ptype] = None
+        for ptype in profile_types:
+            data['profile_%s' % ptype.lower().replace(' ', '_')] = None
 
         for p in profiles:
             data['profile_%s' % p['profile_type']] = p
@@ -103,28 +62,3 @@ class InformationPackageSerializer(serializers.HyperlinkedModelSerializer):
         data.pop('profiles', None)
 
         return data
-
-    class Meta:
-        model = InformationPackage
-        fields = (
-            'url', 'id', 'object_identifier_value', 'label', 'content', 'responsible', 'create_date',
-            'state', 'status', 'step_state', 'object_path', 'object_size',
-            'object_num_items', 'start_date', 'end_date', 'package_type',
-            'submission_agreement', 'archival_institution',
-            'archivist_organization', 'archival_type', 'archival_location',
-            'submission_agreement_locked', 'profiles'
-        )
-
-
-class EventIPSerializer(serializers.HyperlinkedModelSerializer):
-    linkingAgentIdentifierValue = UserSerializer()
-    eventDetail = serializers.SlugRelatedField(slug_field='eventDetail', source='eventType', read_only=True)
-
-    class Meta:
-        model = EventIP
-        fields = (
-                'url', 'id', 'eventType', 'eventDateTime', 'eventDetail',
-                'eventApplication', 'eventVersion', 'eventOutcome',
-                'eventOutcomeDetailNote', 'linkingAgentIdentifierValue',
-                'linkingObjectIdentifierValue',
-        )
