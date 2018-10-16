@@ -36,11 +36,11 @@
                         <input id="search-input" st-search="" class="form-control" ng-attr-placeholder="{{'GLOBALSEARCH' | translate}}" type="text"
                             uib-popover="{{'GLOBALSEARCHDESC_VALIDATION' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"
                         />
-                            <span ng-if="vm.validationTableState.search.predicateObject && vm.validationTableState.search.predicateObject['$']" class="input-group-addon clickable" ng-click="clearSearch(); getListViewData();"><i class="fa fa-lg fa-times" style="color: red;"></i></span>
+                            <span ng-if="vm.validationTableState.search.predicateObject && vm.validationTableState.search.predicateObject['$']" class="input-group-addon clickable" ng-click="clearSearch(); getListViewData();"><i class="fas fa-lg fa-times" style="color: red;"></i></span>
                         </div>
                         <div class="refresh-icon">
-                            <span ng-click="vm.validationPipe(vm.validationTableState)" class="clickable fa fa-refresh fa-lg"
-                            ng-class="{'fa-refresh-animate': validationLoading }" uib-popover="{{'REFRESHTABLEDESC' | translate}}" popover-placement="left"
+                            <span ng-click="vm.validationPipe(vm.validationTableState)" class="clickable fas fa-sync-alt fa-lg"
+                            ng-class="{'fa-sync-alt-animate': validationLoading }" uib-popover="{{'REFRESHTABLEDESC' | translate}}" popover-placement="left"
                             popover-popup-delay="500" popover-append-to-body="true"></span>
                         </div>
                     </div>
@@ -57,8 +57,8 @@
                             <tr ng-repeat-start="row in vm.validations" class="clickable" ng-click="vm.collapseExpandRow(row)"
                                 tabindex="0" ng-keydown="vm.vaildationListKeydownListener($event, row)" ng-class="{'validation-success': row.passed, 'validation-failure': row.passed == false}">
                                 <td>
-                                    <i ng-if="row.collapsed" class="fa fa-plus"></i>
-                                    <i ng-if="!row.collapsed" class="fa fa-minus"></i>
+                                    <i ng-if="row.collapsed" class="fas fa-plus"></i>
+                                    <i ng-if="!row.collapsed" class="fas fa-minus"></i>
                                 </td>
                                 <td>{{row.filename}}</td>
                                 <td>

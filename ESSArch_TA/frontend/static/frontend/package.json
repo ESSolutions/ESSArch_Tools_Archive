@@ -57,7 +57,7 @@
     "api-check": "^7.5.5",
     "bootstrap-sass": "~3.3.7",
     "console-polyfill": "^0.3.0",
-    "font-awesome": "~4.7.0",
+    "@fortawesome/fontawesome-free": "~5.4.1",
     "gulp-autoprefixer": "^6.0.0",
     "ie-array-find-polyfill": "^1.1.0",
     "jasmine-core": "^3.2.1",
