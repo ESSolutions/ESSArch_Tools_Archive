@@ -3,7 +3,7 @@
      tabindex="-1"
      ng-if="row.state != 'At reception' && (row.permissions.includes('delete_informationpackage'))"
      ng-click="removeIpModal(row)"
-     class="fa fa-trash"
+     class="fas fa-trash-alt btn btn-default btn-sm"
      uib-popover="{{'REMOVEIP' | translate}}: {{row.label}}"
      popover-placement="top-left"
      popover-popup-delay="500"

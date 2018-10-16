@@ -23,7 +23,9 @@
 */
 @import '../node_modules/normalize-scss/sass/normalize';
 @import '../node_modules/bootstrap-sass/assets/stylesheets/bootstrap';
-@import '../node_modules/font-awesome/scss/font-awesome';
+@import '../node_modules/@fortawesome/fontawesome-free/scss/solid';
+@import '../node_modules/@fortawesome/fontawesome-free/scss/regular';
+@import '../node_modules/@fortawesome/fontawesome-free/scss/fontawesome';
 @import '../node_modules/angularjs-bootstrap-datetimepicker/src/scss/datetimepicker';
 @import '../node_modules/angular-bootstrap-grid-tree/src/treeGrid';
 @import '../node_modules/angular-tree-control/css/tree-control-attribute';
@@ -43,6 +45,7 @@
 @import 'core/modules/filebrowser';
 @import 'core/modules/events';
 @import 'core/modules/footer';
+@import 'core/modules/buttons';
 @import 'modules/receive_sip';
 @import 'modules/my_page';
 @import 'modules/tree_control';
