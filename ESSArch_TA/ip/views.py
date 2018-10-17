@@ -80,7 +80,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         try:
             ip = parse_submit_description(xmlfile, srcdir)
         except (etree.LxmlError, ValueError) as e:
-            self.logger.warn('Failed to parse %s: %s' % (xmlfile, e.message))
+            self.logger.exception(u'Failed to parse {}'.format(xmlfile))
             raise
 
         ip['state'] = 'At reception'
