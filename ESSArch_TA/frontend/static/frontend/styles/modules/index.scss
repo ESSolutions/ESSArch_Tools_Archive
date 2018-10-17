@@ -15,12 +15,7 @@ body {
     min-height: 100vh;
     height: 100%;
 }
-body.modal-open {
-    overflow: auto;
-}
-body.modal-open[style] {
-    padding-right: 0px !important;
-}
+
 main {
   display: block;
 }
@@ -227,16 +222,6 @@ main {
     }
 }
 
-.enter-profile-name {
-    padding: 15px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    position: relative;
-    justify-content: space-between;
-}
-
 .traceback-copied {
     color: $step-success;
 }
@@ -306,10 +291,6 @@ main {
       }
 }
 
-// Remove scroll on main page when modal is open
-body.modal-open {
-    overflow: hidden;
-}
 .keyboard-button {
     display: inline-block;
     margin: 0 .1em;
@@ -329,12 +310,4 @@ body.modal-open {
 .docs-page {
     margin-top: 10px;
     padding: 5px;
-}
-
-.flex-row {
-    display: flex;
-    flex-direction: row;
-    * {
-        margin-right: 3px;
-    }
 }
