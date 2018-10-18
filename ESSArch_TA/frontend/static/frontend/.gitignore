@@ -1,5 +1,4 @@
-bower_components/
-node_modules/
+node_modules
 scripts/core
 scripts/scripts.min.js
 scripts/scripts.min.js.map
@@ -9,7 +8,8 @@ scripts/vendors.min.js.map
 scripts/polyfills.min.js.map
 styles/styles.css
 styles/styles.css.map
-fonts
+webfonts
 images
 scripts/configs/essarch.config.js
+scripts/configs/permission.config.js
 tests/core
