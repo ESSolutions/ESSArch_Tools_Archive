@@ -242,7 +242,7 @@
     "INFO": "Info",
     "LIST_VIEW": "List",
     "GRID_VIEW": "Grid",
-    "RECEIVE_SIP_DESC": "Receive SIP: ",
+    "RECEIVE_SIP_DESC": "Do you want to receive SIP {{object_identifier_value}}?",
     "TRANSFER_SIP_DESC": "Do you want to transfer SIP {{label}}?",
     "FILES_PER_PAGE": "Files per page",
     "VALIDATION": "Validation",
@@ -319,5 +319,6 @@
     "VALIDATIONS": "Validations",
     "RUNNING": "Running",
     "OR": "Or",
-    "DATABASE": "Database"
+    "DATABASE": "Database",
+    "RECEIVE": "Receive"
 }
