@@ -8,7 +8,7 @@
     <div class="modal-footer">
         <button class="btn btn-default" type="button" ng-click="$ctrl.skip()">{{'SKIP' | translate}} <i class=" fas fa-angle-double-right"></i></button>
         <div class="receive-footer">
-            <button class="btn btn-primary" ng-click="$ctrl.confirmReceiveModal($ctrl.data.ip)" ng-disabled="receiveDisabled || !$ctrl.approvedToReceive() || $ctrl.receiving" focused="true">{{'RECEIVESIP' | translate}} <i ng-if="$ctrl.receiving" class="fas fa-spinner fa-spin"/></button>
+            <button class="btn btn-primary" ng-click="$ctrl.confirmReceiveModal($ctrl.data.ip)" ng-disabled="receiveDisabled || !$ctrl.approvedToReceive() || $ctrl.receiving" focused="true">{{'RECEIVESIP' | translate}}</button>
             <button class="btn btn-warning" type="button" ng-click="$ctrl.cancel()" ng-disabled="$ctrl.receiving">{{'CANCEL' | translate}}</button>
         </div>
     </div>
