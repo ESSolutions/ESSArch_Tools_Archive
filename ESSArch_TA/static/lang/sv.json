@@ -239,7 +239,7 @@
     "INFO": "Info",
     "LIST_VIEW": "Lista",
     "GRID_VIEW": "Rutnät",
-    "RECEIVE_SIP_DESC": "Ta emot SIP: ",
+    "RECEIVE_SIP_DESC": "Vill du ta emot SIP {{object_identifier_value}}?",
     "TRANSFER_SIP_DESC": "Vill du överföra SIP {{label}}?",
     "FILES_PER_PAGE": "Filer per sida",
     "VALIDATION": "Validering",
@@ -316,5 +316,6 @@
     "VALIDATIONS": "Valideringar",
     "RUNNING": "Körs",
     "OR": "Eller",
-    "DATABASE": "Databas"
+    "DATABASE": "Databas",
+    "RECEIVE": "Ta emot"
 }

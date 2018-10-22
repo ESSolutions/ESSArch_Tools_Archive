@@ -1,5 +1,5 @@
 <div class="modal-heading">
-    <h3 class="modal-title" id="modal-title">{{'RECEIVE_SIP_DESC' | translate}}<b>{{$ctrl.data.ip.label}}</b></h3>
+    <h3 class="modal-title" id="modal-title">{{'RECEIVE' | translate}}: {{$ctrl.data.ip.object_identifier_value}}</h3>
 </div>
 <form name="$ctrl.form">
     <div class="modal-body" id="modal-body">
@@ -8,12 +8,7 @@
     <div class="modal-footer">
         <button class="btn btn-default" type="button" ng-click="$ctrl.skip()">{{'SKIP' | translate}} <i class=" fas fa-angle-double-right"></i></button>
         <div class="receive-footer">
-            <div class="checkbox">
-                <label>
-                    <input type="checkBox" ng-disabled="receiveDisabled || !$ctrl.approvedToReceive() || $ctrl.receiving" ng-model="receiveApproved">{{'APPROVEDTORECEIVE' | translate}}</input>
-                </label>
-            </div>
-            <button class="btn btn-primary" ng-click="$ctrl.receive()" ng-disabled="!$ctrl.approvedToReceive() || receiveDisabled || !receiveApproved || $ctrl.receiving" focused="true">{{'RECEIVESIP' | translate}} <i ng-if="$ctrl.receiving" class="fas fa-spinner fa-spin"/></button>
+            <button class="btn btn-primary" ng-click="$ctrl.confirmReceiveModal($ctrl.data.ip)" ng-disabled="receiveDisabled || !$ctrl.approvedToReceive() || $ctrl.receiving" focused="true">{{'RECEIVESIP' | translate}}</button>
             <button class="btn btn-warning" type="button" ng-click="$ctrl.cancel()" ng-disabled="$ctrl.receiving">{{'CANCEL' | translate}}</button>
         </div>
     </div>

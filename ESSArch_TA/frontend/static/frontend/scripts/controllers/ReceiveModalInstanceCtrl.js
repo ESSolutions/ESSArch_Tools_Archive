@@ -1,4 +1,4 @@
-angular.module('essarch.controllers').controller('ReceiveModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, $scope, IPReception, $translate, Notifications) {
+angular.module('essarch.controllers').controller('ReceiveModalInstanceCtrl', function ($uibModalInstance, djangoAuth, data, $scope, IPReception, $translate, Notifications, $uibModal, $log) {
     var $ctrl = this;
     var vm = data.vm;
     $scope.profileEditor = true;
@@ -51,32 +51,29 @@ angular.module('essarch.controllers').controller('ReceiveModalInstanceCtrl', fun
     }
     $ctrl.getProfileData = function ($event) {
     }
-    $ctrl.receive = function () {
-        var payload = {
-            id: $scope.ip.id,
-        }
-        if($ctrl.sa && $ctrl.sa != null) {
-            payload.submission_agreement = $ctrl.sa.id;
-        }
-        $ctrl.receiving = true;
-        IPReception.receive(payload).$promise.then(function(response) {
-            $ctrl.data = {
-                status: "receive",
-                ip: $ctrl.data.ip.id,
-                sa: $ctrl.sa,
-            };
-            $ctrl.receiving = false;
-            $uibModalInstance.close($ctrl.data);
-        }).catch(function(response) {
-            $ctrl.receiving = false;
-            $scope.receiveDisabled = false;
-            if(response.status == 404) {
-                Notifications.add('IP could not be found', 'error');
-            } else {
-                Notifications.add(response.data.detail, 'error');
+
+    $ctrl.confirmReceiveModal = function(ip) {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            ariaLabelledBy: 'modal-title',
+            ariaDescribedBy: 'modal-body',
+            templateUrl: 'static/frontend/views/confirm_receive_modal.html',
+            controller: 'ConfirmReceiveCtrl',
+            controllerAs: '$ctrl',
+            resolve: {
+                data: {
+                    ip: ip,
+                    sa: $ctrl.sa
+                }
             }
+        })
+        modalInstance.result.then(function (data) {
+            $uibModalInstance.close({status: 'received'});
+        }).catch(function () {
+            $log.info('modal-component dismissed at: ' + new Date());
         });
     }
+
     $ctrl.skip = function () {
         $ctrl.data = {
             status: "skip"
