@@ -23,12 +23,8 @@
 """
 
 from rest_framework import viewsets
-from ESSArch_Core.profiles.models import Profile, ProfileIP, ProfileSA
-from ESSArch_Core.profiles.serializers import (ProfileDetailSerializer,
-                                               ProfileIPSerializer,
-                                               ProfileSASerializer,
-                                               ProfileSerializer,
-                                               ProfileWriteSerializer)
+from ESSArch_Core.profiles.models import ProfileIP, ProfileSA
+from ESSArch_Core.profiles.serializers import ProfileIPSerializer, ProfileSASerializer
 
 
 class ProfileSAViewSet(viewsets.ModelViewSet):
@@ -39,28 +35,3 @@ class ProfileSAViewSet(viewsets.ModelViewSet):
 class ProfileIPViewSet(viewsets.ModelViewSet):
     queryset = ProfileIP.objects.all()
     serializer_class = ProfileIPSerializer
-
-
-class ProfileViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows profiles to be viewed or edited.
-    """
-    queryset = Profile.objects.all()
-
-    def get_serializer_class(self):
-        if self.action == 'list':
-            return ProfileSerializer
-
-        if self.action == 'retrieve':
-            return ProfileDetailSerializer
-
-        return ProfileWriteSerializer
-
-    def get_queryset(self):
-        queryset = Profile.objects.all()
-        profile_type = self.request.query_params.get('type', None)
-
-        if profile_type is not None:
-            queryset = queryset.filter(profile_type=profile_type)
-
-        return queryset

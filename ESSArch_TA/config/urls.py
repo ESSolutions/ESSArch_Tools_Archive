@@ -47,11 +47,11 @@ from ESSArch_Core.auth.views import GroupViewSet, PermissionViewSet, MeView, Not
 from ESSArch_Core.configuration.views import ParameterViewSet, PathViewSet, SysInfoView
 from ESSArch_Core.fixity.views import ValidationViewSet, ValidationFilesViewSet
 from ESSArch_Core.ip.views import AgentViewSet, EventIPViewSet, WorkareaEntryViewSet
-from ESSArch_Core.profiles.views import ProfileIPViewSet, ProfileIPDataViewSet, SubmissionAgreementViewSet
+from ESSArch_Core.profiles.views import ProfileViewSet, ProfileIPViewSet, ProfileIPDataViewSet, SubmissionAgreementViewSet
 from ESSArch_Core.routers import ESSArchRouter
 from configuration.views import EventTypeViewSet
 from ip.views import InformationPackageViewSet, InformationPackageReceptionViewSet, WorkareaFilesViewSet, WorkareaViewSet
-from profiles.views import ProfileViewSet, ProfileSAViewSet
+from profiles.views import ProfileSAViewSet
 
 admin.site.site_header = 'ESSArch Tools Archive Administration'
 admin.site.site_title = 'ESSArch Tools Archive Administration'
