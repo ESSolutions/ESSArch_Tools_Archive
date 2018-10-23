@@ -99,6 +99,7 @@ main {
     &:focus {
         outline: 0;
     }
+    display: flex;
 }
 
 .datepicker {
