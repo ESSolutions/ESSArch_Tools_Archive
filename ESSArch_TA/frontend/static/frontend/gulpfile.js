@@ -185,7 +185,7 @@ var buildScripts = function() {
 };
 
 var buildVendors = function() {
-    return gulp.src(vendorFiles)
+    return gulp.src(jsVendorFiles)
         .pipe(plumber(function(error) {
           // output an error message
 
