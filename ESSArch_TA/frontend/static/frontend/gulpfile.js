@@ -59,7 +59,7 @@ var jsPolyfillFiles = [
     'node_modules/console-polyfill/index.js',
     'scripts/polyfills/*.js',
 ]
-var vendorFiles = [
+var jsVendorFiles = [
         'node_modules/api-check/dist/api-check.js',
         'node_modules/jquery/dist/jquery.js',
         'node_modules/lodash/lodash.js',
