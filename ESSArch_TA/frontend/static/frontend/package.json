@@ -77,7 +77,7 @@
     "pretest": "gulp",
     "test": "karma start karma.conf.js --single-run --reporters spec",
     "test-single-run-junit": "karma start karma.conf.js --single-run --reporters junit",
-    "test-watch": "karma start karma.conf.js",
+    "test-watch": "karma start karma.conf.js --reporters spec",
     "preupdate-webdriver": "yarn",
     "update-webdriver": "webdriver-manager update",
     "pree2e": "yarn run update-webdriver",
