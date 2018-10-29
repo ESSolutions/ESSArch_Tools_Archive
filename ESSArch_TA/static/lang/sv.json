@@ -317,5 +317,6 @@
     "RUNNING": "Körs",
     "OR": "Eller",
     "DATABASE": "Databas",
-    "RECEIVE": "Ta emot"
+    "RECEIVE": "Ta emot",
+    "PLATFORM": "Plattform"
 }
