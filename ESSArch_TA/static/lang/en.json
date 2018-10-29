@@ -320,5 +320,6 @@
     "RUNNING": "Running",
     "OR": "Or",
     "DATABASE": "Database",
-    "RECEIVE": "Receive"
+    "RECEIVE": "Receive",
+    "PLATFORM": "Platform"
 }
