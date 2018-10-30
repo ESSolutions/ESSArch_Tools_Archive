@@ -75,7 +75,12 @@ def installDefaultUsers():
         role_user.permissions.add(p_obj)
 
     role_admin, _ = GroupMemberRole.objects.get_or_create(codename='admin')
-    permission_list_admin = []
+    permission_list_admin = [
+        ## ---- app: profiles ---- model: submissionagreement
+        ['add_submissionagreement','profiles','submissionagreement'], # Can add Submission Agreement (Import)
+        ## ---- app: profiles ---- model: profile
+        ['add_profile','profiles','profile'], # Can add Profile (Import)
+    ]
 
     for p in permission_list_admin:
         p_obj = Permission.objects.get(
