@@ -54,7 +54,7 @@ from ESSArch_Core.ip.permissions import CanTransferSIP
 from ESSArch_Core.ip.views import InformationPackageViewSet as InformationPackageViewSetCore
 from ESSArch_Core.mixins import PaginatedViewMixin
 from ESSArch_Core.profiles.models import ProfileIP, SubmissionAgreement
-from ESSArch_Core.util import creation_date, flatten, get_immediate_subdirectories, get_value_from_path, in_directory, list_files, parse_content_range_header, timestamp_to_datetime, remove_prefix
+from ESSArch_Core.util import creation_date, flatten, get_immediate_subdirectories, get_value_from_path, in_directory, list_files, normalize_path, parse_content_range_header, timestamp_to_datetime, remove_prefix
 
 from .filters import InformationPackageFilter
 from .serializers import InformationPackageSerializer, InformationPackageReadSerializer
@@ -370,7 +370,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             entry_date=parsed.get('entry_date'),
             start_date=parsed.get('start_date'),
             end_date=parsed.get('end_date'),
-            object_path=objpath,
+            object_path=normalize_path(objpath),
         )
 
         # refresh date fields to convert them to datetime instances instead of
