@@ -1,4 +1,4 @@
-angular.module('essarch.controllers').controller('FilebrowserController', function ($scope, $window, $sce, $rootScope, appConfig, listViewService, $uibModal, $cookies, $state) {
+angular.module('essarch.controllers').controller('FilebrowserController', function ($scope, $window, $sce, $rootScope, appConfig, listViewService, $uibModal, $cookies, $state, ErrorResponse) {
     $scope.previousGridArrays = [];
     var vm = this;
     vm.$onInit = function() {
@@ -176,12 +176,16 @@ angular.module('essarch.controllers').controller('FilebrowserController', functi
                 listViewService.addNewWorkareaFolder(vm.workarea, $scope.previousGridArraysString(), folder)
                     .then(function (response) {
                         $scope.updateGridArray();
-                    });
+                    }).catch(function (response) {
+                        ErrorResponse.default(response);
+                    })
             } else {
                 listViewService.addNewFolder($scope.ip, $scope.previousGridArraysString(), folder)
                     .then(function (response) {
                         $scope.updateGridArray();
-                    });
+                    }).catch(function (response) {
+                        ErrorResponse.default(response);
+                    })
             }
         }
     }
@@ -211,7 +215,9 @@ angular.module('essarch.controllers').controller('FilebrowserController', functi
                         listViewService.addNewFolder($scope.ip, $scope.previousGridArraysString(), folder)
                             .then(function () {
                                 $scope.updateGridArray();
-                            });
+                            }).catch(function (response) {
+                                ErrorResponse.default(response);
+                            })
                     })
             } else {
                 listViewService.deleteFile($scope.ip, $scope.previousGridArraysString(), fileToOverwrite)
@@ -219,7 +225,9 @@ angular.module('essarch.controllers').controller('FilebrowserController', functi
                         listViewService.addNewFolder($scope.ip, $scope.previousGridArraysString(), folder)
                         .then(function () {
                             $scope.updateGridArray();
-                        });
+                        }).catch(function (response) {
+                            ErrorResponse.default(response);
+                        })
                     })
             }
         });
@@ -245,12 +253,16 @@ angular.module('essarch.controllers').controller('FilebrowserController', functi
                 listViewService.deleteWorkareaFile(vm.workarea, $scope.previousGridArraysString(), file)
                     .then(function () {
                         $scope.updateGridArray();
-                    });
+                    }).catch(function (response) {
+                        ErrorResponse.default(response);
+                    })
             } else {
                 listViewService.deleteFile($scope.ip, $scope.previousGridArraysString(), file)
                     .then(function () {
                         $scope.updateGridArray();
-                    });
+                    }).catch(function (response) {
+                        ErrorResponse.default(response);
+                    })
             }
         });
         $scope.selectedCards = [];

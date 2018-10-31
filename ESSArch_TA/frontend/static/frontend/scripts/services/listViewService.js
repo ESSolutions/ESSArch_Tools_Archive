@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('essarch.services').factory('listViewService', function (IP, SA, Profile, Workarea, WorkareaFiles, IPReception, Event, Step, Task, EventType, $q, $http, $state, $log, appConfig, $rootScope, $filter, linkHeaderParser) {
+angular.module('essarch.services').factory('listViewService', function (IP, SA, Profile, Workarea, WorkareaFiles, IPReception, Event, Step, Task, EventType, $q, $http, $state, $log, appConfig, $rootScope, $filter, linkHeaderParser, $translate) {
     //Go to Given state
     function changePath(state) {
         $state.go(state);
@@ -227,6 +227,9 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
                     numberOfPages: Math.ceil(count/pageSize),
                     data: data
                 };
+            }).catch(function (response) {
+                ErrorResponse.default(response);
+                return response;
             });
         } else {
             return IP.files(sendData).$promise.then(function(data) {
@@ -238,6 +241,9 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
                     numberOfPages: Math.ceil(count/pageSize),
                     data: data
                 };
+            }).catch(function (response) {
+                ErrorResponse.default(response);
+                return response;
             });
         }
     }
@@ -342,7 +348,7 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
                             .$promise.then(function (resource) {
                                 saProfile.profile.profile_aip = resource;
                             }).catch(function(response){
-                                Notifications.add(response.data.detail, 'error');
+                                ErrorResponse.default(response);
                             }));
                     }
                     if (saProfile.profile.profile_dip) {
@@ -350,7 +356,7 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
                             .$promise.then(function (resource) {
                                 saProfile.profile.profile_dip = resource;
                             }).catch(function(response){
-                                Notifications.add(response.data.detail, 'error');
+                                ErrorResponse.default(response);
                             }));
                     }
                 }
@@ -359,7 +365,7 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
                 return saProfile;
             })
         }).catch(function(response){
-            Notifications.add(response.data.detail, 'error');
+            ErrorResponse.default(response);
         });
     }
 

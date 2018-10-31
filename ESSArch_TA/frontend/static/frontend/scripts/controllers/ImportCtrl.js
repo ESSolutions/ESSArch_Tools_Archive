@@ -34,7 +34,7 @@ angular.module('essarch.controllers').controller('ImportCtrl', function($q, $win
             if(response.status == -1) {
                 console.log("You must accept SSL certificate, go to: ", vm.url);
                 acceptCertModal(vm.url);
-            } else {
+            } else if(response.data && response.data.detail) {
                 $scope.error = response.data;
             }
         })

@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notifications, IPReception, IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, ContextMenuBase) {
+angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notifications, IPReception, IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, ContextMenuBase, ErrorResponse) {
     var vm = this;
     var ipSortString = "Receiving";
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
@@ -117,8 +117,9 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
                 $scope.filebrowser = false;
                 $scope.receiveDisabled = false;
                 $anchorScroll();
-            }, function(response) {
+            }).catch(function(response) {
                 $scope.receiveDisabled = false;
+                ErrorResponse.default(response);
             });
         });
     };
@@ -672,11 +673,7 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
                     })
                         .catch(function (response) {
                             vm.receiveModalLoading = false;
-                            if(response.data && response.data.detail) {
-                                Notifications.add(response.data.detail, 'error');
-                            } else if(response.status !== 500) {
-                                Notifications.add('Could not prepare IP', 'error');
-                            }
+                            ErrorResponse.default(response);
                         })
                 } else {
                     vm.receiveModalLoading = false;
