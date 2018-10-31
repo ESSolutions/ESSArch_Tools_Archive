@@ -228,13 +228,7 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
                     data: data
                 };
             }).catch(function (response) {
-                if(![401, 403, 500, 503].includes(response.status)) {
-                    if(response.data && response.data.detail) {
-                        Notifications.add(response.data.detail, "error");
-                    } else {
-                        Notifications.add($translate('UNKNOWN_ERROR'), 'error')
-                    }
-                }
+                ErrorResponse.default(response);
                 return response;
             });
         } else {
@@ -248,13 +242,7 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
                     data: data
                 };
             }).catch(function (response) {
-                if(![401, 403, 500, 503].includes(response.status)) {
-                    if(response.data && response.data.detail) {
-                        Notifications.add(response.data.detail, "error");
-                    } else {
-                        Notifications.add($translate('UNKNOWN_ERROR'), 'error')
-                    }
-                }
+                ErrorResponse.default(response);
                 return response;
             });
         }
@@ -360,13 +348,7 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
                             .$promise.then(function (resource) {
                                 saProfile.profile.profile_aip = resource;
                             }).catch(function(response){
-                                if(![401, 403, 500, 503].includes(response.status)) {
-                                    if(response.data && response.data.detail) {
-                                        Notifications.add(response.data.detail, "error");
-                                    } else {
-                                        Notifications.add($translate('UNKNOWN_ERROR'), 'error')
-                                    }
-                                }
+                                ErrorResponse.default(response);
                             }));
                     }
                     if (saProfile.profile.profile_dip) {
@@ -374,13 +356,7 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
                             .$promise.then(function (resource) {
                                 saProfile.profile.profile_dip = resource;
                             }).catch(function(response){
-                                if(![401, 403, 500, 503].includes(response.status)) {
-                                    if(response.data && response.data.detail) {
-                                        Notifications.add(response.data.detail, "error");
-                                    } else {
-                                        Notifications.add($translate('UNKNOWN_ERROR'), 'error')
-                                    }
-                                }
+                                ErrorResponse.default(response);
                             }));
                     }
                 }
@@ -389,13 +365,7 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
                 return saProfile;
             })
         }).catch(function(response){
-            if(![401, 403, 500, 503].includes(response.status)) {
-                if(response.data && response.data.detail) {
-                    Notifications.add(response.data.detail, "error");
-                } else {
-                    Notifications.add($translate('UNKNOWN_ERROR'), 'error')
-                }
-            }
+            ErrorResponse.default(response);
         });
     }
 

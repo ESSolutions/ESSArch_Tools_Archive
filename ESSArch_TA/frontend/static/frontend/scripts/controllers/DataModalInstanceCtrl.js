@@ -1,4 +1,4 @@
-angular.module('essarch.controllers').controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, IP, $scope, data, $http, appConfig, Notifications, $uibModal, $log, $translate) {
+angular.module('essarch.controllers').controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, IP, $scope, data, $http, appConfig, Notifications, $uibModal, $log, ErrorResponse) {
     var $ctrl = this;
     $ctrl.data = data;
     if(data.vm) {
@@ -44,13 +44,7 @@ angular.module('essarch.controllers').controller('DataModalInstanceCtrl', functi
             Notifications.add(response.data, "success");
             $uibModalInstance.close(response.data);
         }).catch(function(response) {
-            if(![401, 403, 500, 503].includes(response.status)) {
-                if(response.data && response.data.detail) {
-                    Notifications.add(response.data.detail, "error");
-                } else {
-                    Notifications.add($translate('UNKNOWN_ERROR'), 'error')
-                }
-            }
+            ErrorResponse.default(response);
         })
     }
 
@@ -64,13 +58,7 @@ angular.module('essarch.controllers').controller('DataModalInstanceCtrl', functi
             $uibModalInstance.close();
         }).catch(function(response) {
             $ctrl.transferring = false;
-            if(![401, 403, 500, 503].includes(response.status)) {
-                if(response.data && response.data.detail) {
-                    Notifications.add(response.data.detail, "error");
-                } else {
-                    Notifications.add($translate('UNKNOWN_ERROR'), 'error')
-                }
-            }
+            ErrorResponse.default(response);
         });
     }
 
@@ -87,13 +75,7 @@ angular.module('essarch.controllers').controller('DataModalInstanceCtrl', functi
             $uibModalInstance.close();
     }).catch(function(response) {
             $ctrl.removing = false;
-            if(![401, 403, 500, 503].includes(response.status)) {
-                if(response.data && response.data.detail) {
-                    Notifications.add(response.data.detail, "error");
-                } else {
-                    Notifications.add($translate('UNKNOWN_ERROR'), 'error')
-                }
-            }
+            ErrorResponse.default(response);
         })
     };
 });
