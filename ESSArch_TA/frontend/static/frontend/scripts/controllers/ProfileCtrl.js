@@ -79,7 +79,13 @@ angular.module('essarch.controllers').controller('ProfileCtrl', function($q, SA,
             $scope.selectRowCollection = $scope.selectRowCollapse;
             return $scope.selectRowCollection;
         }).catch(function (response) {
-            Notifications.add(response.data.detail, 'error');
+            if(![401, 403, 500, 503].includes(response.status)) {
+                if(response.data && response.data.detail) {
+                    Notifications.add(response.data.detail, "error");
+                } else {
+                    Notifications.add($translate('UNKNOWN_ERROR'), 'error')
+                }
+            }
         })
     }
 
@@ -91,7 +97,13 @@ angular.module('essarch.controllers').controller('ProfileCtrl', function($q, SA,
                 vm.getAndShowProfile(vm.profileIp, {});
             })
         }).catch(function (response) {
-            Notifications.add(response.data.detail, 'error');
+            if(![401, 403, 500, 503].includes(response.status)) {
+                if(response.data && response.data.detail) {
+                    Notifications.add(response.data.detail, "error");
+                } else {
+                    Notifications.add($translate('UNKNOWN_ERROR'), 'error')
+                }
+            }
         })
     }
 
@@ -116,12 +128,24 @@ angular.module('essarch.controllers').controller('ProfileCtrl', function($q, SA,
             }).catch(function (response) {
                 vm.savingProfileModel = false;
                 vm.savingProfileModel = false;
-                Notifications.add(response.data.detail, 'error');
+                if(![401, 403, 500, 503].includes(response.status)) {
+                    if(response.data && response.data.detail) {
+                        Notifications.add(response.data.detail, "error");
+                    } else {
+                        Notifications.add($translate('UNKNOWN_ERROR'), 'error')
+                    }
+                }
             })
         }).catch(function (response) {
             vm.savingProfileModel = false;
             vm.savingProfileModel = false;
-            Notifications.add(response.data.detail, 'error');
+            if(![401, 403, 500, 503].includes(response.status)) {
+                if(response.data && response.data.detail) {
+                    Notifications.add(response.data.detail, "error");
+                } else {
+                    Notifications.add($translate('UNKNOWN_ERROR'), 'error')
+                }
+            }
         })
     }
 
@@ -256,7 +280,13 @@ angular.module('essarch.controllers').controller('ProfileCtrl', function($q, SA,
         }).catch(function(response) {
             vm.loadingProfileData[profileIp.profile_type] = false;
             vm.cancel();
-            Notifications.add(response.data.detail, 'error');
+            if(![401, 403, 500, 503].includes(response.status)) {
+                if(response.data && response.data.detail) {
+                    Notifications.add(response.data.detail, "error");
+                } else {
+                    Notifications.add($translate('UNKNOWN_ERROR'), 'error')
+                }
+            }
         })
     };
 
@@ -264,7 +294,13 @@ angular.module('essarch.controllers').controller('ProfileCtrl', function($q, SA,
         ProfileIpData.get({id: id}).$promise.then(function(resource) {
             vm.profileModel = angular.copy(resource.data);
         }).catch(function (response) {
-            Notifications.add(response.data.detail, 'error');
+            if(![401, 403, 500, 503].includes(response.status)) {
+                if(response.data && response.data.detail) {
+                    Notifications.add(response.data.detail, "error");
+                } else {
+                    Notifications.add($translate('UNKNOWN_ERROR'), 'error')
+                }
+            }
         })
     }
     //Gets all submission agreement profiles
@@ -643,7 +679,13 @@ angular.module('essarch.controllers').controller('ProfileCtrl', function($q, SA,
             return resource;
         }).catch(function (response) {
             vm.preparingIp = false;
-            Notifications.add(response.data.detail, 'error');
+            if(![401, 403, 500, 503].includes(response.status)) {
+                if(response.data && response.data.detail) {
+                    Notifications.add(response.data.detail, "error");
+                } else {
+                    Notifications.add($translate('UNKNOWN_ERROR'), 'error')
+                }
+            }
         })
     }
 });

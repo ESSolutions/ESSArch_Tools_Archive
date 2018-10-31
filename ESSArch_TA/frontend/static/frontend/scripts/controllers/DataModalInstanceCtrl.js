@@ -1,4 +1,4 @@
-angular.module('essarch.controllers').controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, IP, $scope, data, $http, appConfig, Notifications, $uibModal, $log) {
+angular.module('essarch.controllers').controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, IP, $scope, data, $http, appConfig, Notifications, $uibModal, $log, $translate) {
     var $ctrl = this;
     $ctrl.data = data;
     if(data.vm) {
@@ -44,7 +44,13 @@ angular.module('essarch.controllers').controller('DataModalInstanceCtrl', functi
             Notifications.add(response.data, "success");
             $uibModalInstance.close(response.data);
         }).catch(function(response) {
-            Notifications.add(response.data.detail, "error");
+            if(![401, 403, 500, 503].includes(response.status)) {
+                if(response.data && response.data.detail) {
+                    Notifications.add(response.data.detail, "error");
+                } else {
+                    Notifications.add($translate('UNKNOWN_ERROR'), 'error')
+                }
+            }
         })
     }
 
@@ -58,10 +64,12 @@ angular.module('essarch.controllers').controller('DataModalInstanceCtrl', functi
             $uibModalInstance.close();
         }).catch(function(response) {
             $ctrl.transferring = false;
-            if(response.status == 404) {
-                Notifications.add('IP could not be found', "error");
-            } else {
-                Notifications.add(response.data.detail, "error");
+            if(![401, 403, 500, 503].includes(response.status)) {
+                if(response.data && response.data.detail) {
+                    Notifications.add(response.data.detail, "error");
+                } else {
+                    Notifications.add($translate('UNKNOWN_ERROR'), 'error')
+                }
             }
         });
     }
@@ -79,10 +87,12 @@ angular.module('essarch.controllers').controller('DataModalInstanceCtrl', functi
             $uibModalInstance.close();
     }).catch(function(response) {
             $ctrl.removing = false;
-            if(response.status == 404) {
-                Notifications.add('IP could not be found', 'error');
-            } else {
-                Notifications.add(response.data.detail, 'error');
+            if(![401, 403, 500, 503].includes(response.status)) {
+                if(response.data && response.data.detail) {
+                    Notifications.add(response.data.detail, "error");
+                } else {
+                    Notifications.add($translate('UNKNOWN_ERROR'), 'error')
+                }
             }
         })
     };
