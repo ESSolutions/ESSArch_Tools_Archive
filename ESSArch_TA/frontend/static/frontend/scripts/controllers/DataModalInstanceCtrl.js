@@ -1,4 +1,4 @@
-angular.module('essarch.controllers').controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, IP, $scope, data, $http, appConfig, Notifications, $uibModal, $log, ErrorResponse) {
+angular.module('essarch.controllers').controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, IP, $scope, data, $http, appConfig, Notifications, $uibModal, $log, ErrorResponse, $translate) {
     var $ctrl = this;
     $ctrl.data = data;
     if(data.vm) {
@@ -70,7 +70,7 @@ angular.module('essarch.controllers').controller('DataModalInstanceCtrl', functi
     $ctrl.remove = function (ipObject, workarea, reception) {
         $ctrl.removing = true;
         IP.delete({ id: ipObject.id }, { workarea: workarea, reception: reception }).$promise.then(function() {
-            Notifications.add("IP " + ipObject.label + " Removed!", 'success');
+            Notifications.add($translate.instant('IP_REMOVED', {label: ipObject.label}), 'success');
             $ctrl.removing = false;
             $uibModalInstance.close();
     }).catch(function(response) {
