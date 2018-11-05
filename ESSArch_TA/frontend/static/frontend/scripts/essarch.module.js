@@ -243,8 +243,7 @@ angular.module('essarch', [
         })
         .state('home.administration.import', {
             url: '/import',
-            templateUrl: '/static/frontend/views/import.html',
-            controller: 'ImportCtrl as vm',
+            template: '<import types="[\'sip\', \'transfer_project\', \'submit_description\', \'preservation_metadata\', \'mediaconch\', \'workflow\']"></import>',
             resolve: {
                 authenticated: ['djangoAuth', function(djangoAuth){
                     return djangoAuth.authenticationStatus();
