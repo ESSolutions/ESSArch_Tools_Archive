@@ -337,5 +337,6 @@
     "LANGUAGE": "Language",
     "ORGANIZATION": "Organization",
     "VISIBLE_COLUMNS": "Visible columns",
-    "AVAILABLE_COLUMNS": "Available columns"
+    "AVAILABLE_COLUMNS": "Available columns",
+    "TABLE_COLUMNS": "Table columns"
 }

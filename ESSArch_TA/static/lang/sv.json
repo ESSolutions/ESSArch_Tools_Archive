@@ -334,5 +334,6 @@
     "LANGUAGE": "Språk",
     "ORGANIZATION": "Organisation",
     "VISIBLE_COLUMNS": "Synliga kolumner",
-    "AVAILABLE_COLUMNS": "Tillgängliga kolumner"
+    "AVAILABLE_COLUMNS": "Tillgängliga kolumner",
+    "TABLE_COLUMNS": "Tabellkolumner"
 }
