@@ -50,7 +50,7 @@ from ESSArch_Core.configuration.models import (Path,)
 from ESSArch_Core.essxml.util import get_agents, get_objectpath, parse_submit_description
 from ESSArch_Core.fixity.validation.backends.checksum import ChecksumValidator
 from ESSArch_Core.ip.models import Agent, InformationPackage, EventIP
-from ESSArch_Core.ip.permissions import CanTransferSIP
+from ESSArch_Core.ip.permissions import CanTransferSIP, IsResponsibleOrCanSeeAllFiles
 from ESSArch_Core.ip.views import InformationPackageViewSet as InformationPackageViewSetCore
 from ESSArch_Core.mixins import PaginatedViewMixin
 from ESSArch_Core.profiles.models import ProfileIP, SubmissionAgreement
@@ -660,7 +660,7 @@ class InformationPackageViewSet(InformationPackageViewSetCore):
 
         return super(InformationPackageViewSet, self).destroy(request, pk=pk)
 
-    @detail_route(methods=['get'])
+    @detail_route(methods=['get'], permission_classes=[IsResponsibleOrCanSeeAllFiles])
     def files(self, request, pk=None):
         ip = self.get_object()
         path = request.query_params.get('path', '').rstrip('/')
