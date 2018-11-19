@@ -504,7 +504,7 @@ class InformationPackageViewSet(InformationPackageViewSetCore):
     """
     API endpoint that allows information packages to be viewed or edited.
     """
-    filter_class = InformationPackageFilter
+    filterset_class = InformationPackageFilter
 
     def get_serializer_class(self):
         if self.request.method in permissions.SAFE_METHODS:

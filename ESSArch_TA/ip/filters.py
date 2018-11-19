@@ -7,7 +7,7 @@ from ESSArch_Core.ip.models import Workarea
 
 
 class InformationPackageFilter(InformationPackageFilterCore):
-    workarea = filters.CharFilter(name='workareas__type', method='filter_workarea')
+    workarea = filters.CharFilter(field_name='workareas__type', method='filter_workarea')
 
     def filter_workarea(self, queryset, name, value):
         workarea_type_reverse = dict((v.lower(), k) for k, v in Workarea.TYPE_CHOICES)
