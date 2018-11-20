@@ -199,7 +199,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
-DATABASES = {'default': dj_database_url.config(env='DATABASE_URL_ETA', default='sqlite://db.sqlite')}
+DATABASES = {'default': dj_database_url.config(env='DATABASE_URL_ETA', default='sqlite:///db.sqlite')}
 
 # Cache
 CACHES = {
