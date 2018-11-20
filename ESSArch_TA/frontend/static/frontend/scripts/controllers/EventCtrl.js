@@ -159,68 +159,68 @@ angular.module('essarch.controllers').controller('EventCtrl', ['Resource', '$sco
         })
     };
 
-      //advanced filter form data
-      $scope.columnFilters = {};
-      $scope.filterModel = {};
-      $scope.options = {};
-      $scope.fields = [];
-      vm.setupForm = function() {
-          $scope.fields = [];
-          $scope.filterModel = {};
-           for(var key in $scope.usedColumns) {
-               var column = $scope.usedColumns[key];
-               switch(column.type) {
-                   case "ModelChoiceFilter":
-                   case "ChoiceFilter":
-                      $scope.fields.push({
-                          "templateOptions": {
-                              "type": "text",
-                              "label": $translate.instant(key.toUpperCase()),
-                              "labelProp": "display_name",
-                              "valueProp": "value",
-                              "options": column.choices,
-                          },
-                          "type": "select",
-                          "key": key,
-                      })
-                   break;
-                   case "CharFilter":
-                      $scope.fields.push({
-                          "templateOptions": {
-                              "type": "text",
-                              "label": $translate.instant(key.toUpperCase()),
-                              "labelProp": key,
-                              "valueProp": key,
-                          },
-                          "type": "input",
-                          "key": key,
-                      })
-                   break;
-                   case "IsoDateTimeFromToRangeFilter":
-                   $scope.fields.push(
-                      {
-                          "templateOptions": {
-                              "type": "text",
-                              "label": $translate.instant(key.toUpperCase()+"_START"),
-                          },
-                          "type": "datepicker",
-                          "key": key + "_0"
-                      }
-                   )
-                   $scope.fields.push(
-                      {
-                          "templateOptions": {
-                              "type": "text",
-                              "label": $translate.instant(key.toUpperCase()+"_END"),
-                          },
-                          "type": "datepicker",
-                          "key": key + "_1"
-                      }
-                   )
-                   break;
-               }
-           }
-      }
+    //advanced filter form data
+    $scope.columnFilters = {};
+    $scope.filterModel = {};
+    $scope.options = {};
+    $scope.fields = [];
+    vm.setupForm = function() {
+        $scope.fields = [];
+        $scope.filterModel = {};
+        for(var key in $scope.usedColumns) {
+            var column = $scope.usedColumns[key];
+            switch(column.type) {
+                case "ModelChoiceFilter":
+                case "ChoiceFilter":
+                    $scope.fields.push({
+                        "templateOptions": {
+                            "type": "text",
+                            "label": $translate.instant(key.toUpperCase()),
+                            "labelProp": "display_name",
+                            "valueProp": "value",
+                            "options": column.choices,
+                        },
+                        "type": "select",
+                        "key": key,
+                    })
+                    break;
+                case "CharFilter":
+                    $scope.fields.push({
+                        "templateOptions": {
+                            "type": "text",
+                            "label": $translate.instant(key.toUpperCase()),
+                            "labelProp": key,
+                            "valueProp": key,
+                        },
+                        "type": "input",
+                        "key": key,
+                    })
+                    break;
+                case "IsoDateTimeFromToRangeFilter":
+                    $scope.fields.push(
+                        {
+                            "templateOptions": {
+                                "type": "text",
+                                "label": $translate.instant(key.toUpperCase()+"_START"),
+                            },
+                            "type": "datepicker",
+                            "key": key + "_after"
+                        }
+                    )
+                    $scope.fields.push(
+                        {
+                            "templateOptions": {
+                                "type": "text",
+                                "label": $translate.instant(key.toUpperCase()+"_END"),
+                            },
+                            "type": "datepicker",
+                            "key": key + "_before"
+                        }
+                    )
+                    break;
+            }
+        }
+    }
 
       //Toggle visibility of advanced filters
       $scope.toggleAdvancedFilters = function () {
