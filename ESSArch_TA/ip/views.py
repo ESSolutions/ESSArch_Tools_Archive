@@ -635,11 +635,10 @@ class InformationPackageViewSet(InformationPackageViewSetCore):
 
         if delete_from_workarea:
             workarea = Path.objects.get(entity="ingest_workarea").value
-            path = os.path.join(workarea, objid)
-            no_ext = os.path.splitext(path)[0]
+            path = os.path.join(workarea, request.user.username, objid)
 
             paths.append(path)
-            paths += [no_ext + '.' + ext for ext in ['xml', 'tar', 'zip']]
+            paths += [path + '.' + ext for ext in ['xml', 'tar', 'zip']]
 
 
         step = ProcessStep.objects.create(
@@ -649,6 +648,7 @@ class InformationPackageViewSet(InformationPackageViewSetCore):
         )
 
         for path in paths:
+            path = normalize_path(path)
             t = ProcessTask.objects.create(
                 name='ESSArch_Core.tasks.DeleteFiles',
                 params={'path': path},
