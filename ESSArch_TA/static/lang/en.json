@@ -172,7 +172,7 @@
     "REFRESH": "Refresh",
     "FILEBROWSER": "File browser",
     "CHANGED": "Changed",
-    "COPYID": "Copy ID",
+    "COPYID": "Copy",
     "EMPTY": "Empty",
     "REMOVE_FROM_WORKAREA": "Remove IP from workspace",
     "REMOVE_FROM_RECEPTION": "Remove IP from reception",
@@ -336,5 +336,9 @@
     "ORGANIZATION": "Organization",
     "VISIBLE_COLUMNS": "Visible columns",
     "AVAILABLE_COLUMNS": "Available columns",
-    "TABLE_COLUMNS": "Table columns"
+    "TABLE_COLUMNS": "Table columns",
+    "EVENT_SUCCESS": "Success",
+    "EVENT_FAILURE": "Failure",
+    "TASKS": "Tasks",
+    "IDENTIFICATION": "Identification"
 }
