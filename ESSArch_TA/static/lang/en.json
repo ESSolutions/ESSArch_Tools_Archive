@@ -257,7 +257,7 @@
     "PROFILE_EXISTS": "Profile exists",
     "PROFILE_EXISTS_DESC": "Profile with same ID already exists. Would you like to overwrite it?",
     "SUBMISSION_AGREEMENT": "Submission agreement",
-    "IMPORT_SA_FROM_FILE": "Import SA from file",
+    "IMPORT_SA_FROM_FILE": "Import submission agreement from file",
     "IMPORT_PROFILE_FROM_FILE": "Import profile from file",
     "IMPORT_PROFILE": "Import profile",
     "IMPORT": "Import",
