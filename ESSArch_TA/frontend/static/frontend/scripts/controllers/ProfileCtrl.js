@@ -18,7 +18,6 @@ angular.module('essarch.controllers').controller('ProfileCtrl', function($q, SA,
     $scope.sdAlert = $scope.alerts.sdError;
     $scope.sipAlert = $scope.alerts.sipError;
     $scope.pmAlert = $scope.alerts.pmError;
-    $scope.validationAlert = $scope.alerts.validationError;
     vm.dataVersion = null;
     // On init
     vm.$onInit = function() {
