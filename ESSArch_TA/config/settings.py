@@ -202,7 +202,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
-DATABASES = {'default': dj_database_url.config(env='DATABASE_URL_ETA', default='sqlite:///db.sqlite')}
+try:
+    from local_eta_settings import DATABASE_URL
+except ImportError as exp:
+    DATABASE_URL = os.environ.get('DATABASE_URL_ETA','sqlite:///db.sqlite')
+DATABASES = {'default': dj_database_url.parse(url=DATABASE_URL)}
 
 # Cache
 CACHES = {
