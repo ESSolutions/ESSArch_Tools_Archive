@@ -281,6 +281,7 @@
     "SEE_STEP_TASK_REPORT": "Se steg/jobb-rapport",
     "EXPAND_STEP": "Expandera steg",
     "EXPAND_ROW": "Expandera rad",
+    "NO_VALIDATION_PROFILE": "IP {{label}} har ingen valideringsprofil!",
     "IN_GENERAL_SELECTED_IP": "Generellt när ett IP är valt",
     "STEP_PAGINATION_NEXT": "Gå till nästa sida i paginering",
     "STEP_PAGINATION_PREVIOUS": "Gå till föregående sida i paginering",
