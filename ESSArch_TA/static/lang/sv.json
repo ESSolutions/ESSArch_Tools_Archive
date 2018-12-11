@@ -290,7 +290,6 @@
     "VALIDATION_TABLE": "Valideringslista",
     "NO_SUBMISSION_AGREEMENT_AVAILABLE": "Inga leveransöverenskommelser tillgängliga",
     "VERSIONINFO": "Version-info",
-    "NO_VALIDATION_PROFILE": "IP {{label}} har ingen valideringsprofil!",
     "IP_IS_ALREADY_TRANSFERRED": "IP {{label}} är redan överförd",
     "IP_IS_ALREADY_TRANSFERRING": "IP {{label}} överförs redan",
     "VIEW": "Visa",

@@ -293,7 +293,6 @@
     "VALIDATION_TABLE": "Validation table",
     "NO_SUBMISSION_AGREEMENT_AVAILABLE": "No Submission Agreement available",
     "VERSIONINFO": "Version info",
-    "NO_VALIDATION_PROFILE": "IP {{label}} has no validation profile!",
     "IP_IS_ALREADY_TRANSFERRED": "IP {{label}} is already transferred",
     "IP_IS_ALREADY_TRANSFERRING": "IP {{label}} is already transferring",
     "VIEW": "View",

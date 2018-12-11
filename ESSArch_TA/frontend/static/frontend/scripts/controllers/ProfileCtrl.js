@@ -8,7 +8,6 @@ angular.module('essarch.controllers').controller('ProfileCtrl', function($q, SA,
         sdError: { type: 'danger', msg: $translate.instant('MISSING_SUBMIT_DESCRIPTION') },
         sipError: { type: 'danger', msg: $translate.instant('MISSING_SIP') },
         pmError: { type: 'danger', msg: $translate.instant('MISSING_PRESERVATION_METADATA') },
-        validationError: { type: 'warning', msg: $translate.instant('MISSING_VALIDATION') },
         noSas: { type: 'danger', msg: $translate.instant('NO_SUBMISSION_AGREEMENT_AVAILABLE') },
         templateError: { type: 'warning', msg: $translate.instant('NO_FORM_TEMPLATE') },
     };
@@ -19,7 +18,6 @@ angular.module('essarch.controllers').controller('ProfileCtrl', function($q, SA,
     $scope.sdAlert = $scope.alerts.sdError;
     $scope.sipAlert = $scope.alerts.sipError;
     $scope.pmAlert = $scope.alerts.pmError;
-    $scope.validationAlert = $scope.alerts.validationError;
     vm.dataVersion = null;
     // On init
     vm.$onInit = function() {
