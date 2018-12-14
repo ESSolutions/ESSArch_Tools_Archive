@@ -52,7 +52,7 @@ from ESSArch_Core.fixity.validation.backends.checksum import ChecksumValidator
 from ESSArch_Core.ip.models import Agent, InformationPackage, EventIP
 from ESSArch_Core.ip.permissions import CanTransferSIP, IsResponsibleOrCanSeeAllFiles
 from ESSArch_Core.ip.views import InformationPackageViewSet as InformationPackageViewSetCore
-from ESSArch_Core.mixins import PaginatedViewMixin
+from ESSArch_Core.mixins import GetObjectForUpdateViewMixin, PaginatedViewMixin
 from ESSArch_Core.profiles.models import ProfileIP, SubmissionAgreement
 from ESSArch_Core.util import creation_date, flatten, get_immediate_subdirectories, get_value_from_path, in_directory, list_files, normalize_path, parse_content_range_header, timestamp_to_datetime, remove_prefix
 
@@ -500,7 +500,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         return Response({'status': 'Identified IP, created %s' % infoxml})
 
 
-class InformationPackageViewSet(InformationPackageViewSetCore):
+class InformationPackageViewSet(InformationPackageViewSetCore, GetObjectForUpdateViewMixin):
     """
     API endpoint that allows information packages to be viewed or edited.
     """
@@ -512,9 +512,10 @@ class InformationPackageViewSet(InformationPackageViewSetCore):
 
         return InformationPackageSerializer
 
+    @transaction.atomic
     @detail_route(methods=['post'], url_path='transfer', permission_classes=[CanTransferSIP])
     def transfer(self, request, pk=None):
-        ip = self.get_object()
+        ip = self.get_object_for_update()
 
         workflow_spec = [
             {
