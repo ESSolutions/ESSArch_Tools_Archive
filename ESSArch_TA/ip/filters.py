@@ -7,18 +7,8 @@ from ESSArch_Core.ip.models import Workarea
 
 
 class InformationPackageFilter(InformationPackageFilterCore):
-    workarea = filters.CharFilter(field_name='workareas__type', method='filter_workarea')
+    workarea = filters.ChoiceFilter(field_name='workareas__type', choices=Workarea.TYPE_CHOICES)
 
-    def filter_workarea(self, queryset, name, value):
-        workarea_type_reverse = dict((v.lower(), k) for k, v in Workarea.TYPE_CHOICES)
-
-        try:
-            workarea_type = workarea_type_reverse[value]
-        except KeyError:
-            raise exceptions.ParseError('Workarea of type "%s" does not exist' % value)
-
-        return queryset.filter(**{name: workarea_type})
-
-    class Meta:
+    class Meta(InformationPackageFilterCore.Meta):
         model = InformationPackageFilterCore.Meta.model
         fields = InformationPackageFilterCore.Meta.fields + ['workarea']
