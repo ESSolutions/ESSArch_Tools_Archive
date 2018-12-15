@@ -17,10 +17,10 @@
             <formly-form model="vm.treeEditModel" fields="vm.treeEditFields" options="vm.editTreeOptions">
             </formly-form>
             <div class="form-group">
-                <button ng-show="addMode.active" type="submit" class="btn btn-info">{{'ADD' | translate}}</button>
-                <button ng-show="updateMode.active" type="submit" class="btn btn-info">{{'UPDATE' | translate}}</button>
-                <button ng-show="updateMode.active" type="button" class="btn btn-info" ng-click="exitUpdateMode()">{{'CANCEL' | translate}}</button>
-            <button ng-show="addMode.active" type="button" class="btn btn-info" ng-click="exitAddMode()">{{'CANCEL' | translate}}</button>
+                <button ng-show="addMode.active" type="submit" class="btn btn-primary">{{'ADD' | translate}}</button>
+                <button ng-show="updateMode.active" type="submit" class="btn btn-primary">{{'UPDATE' | translate}}</button>
+                <button ng-show="updateMode.active" type="button" class="btn btn-primary" ng-click="exitUpdateMode()">{{'CANCEL' | translate}}</button>
+            <button ng-show="addMode.active" type="button" class="btn btn-primary" ng-click="exitAddMode()">{{'CANCEL' | translate}}</button>
             </div>
         </form>
     </div>
