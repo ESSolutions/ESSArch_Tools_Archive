@@ -1,5 +1,5 @@
-<div style="white-space: nowrap;" ng-if="row.state != 'Unidentified' && ('home.reception' | isState)" class="clickable" ng-click="ipTableClick(row)" context-menu="menuOptions('row', row)">{{row.label}}</div>
-<div style="white-space: nowrap;" ng-if="!('home.reception' | isState)" class="clickable" ng-click="ipTableClick(row)" context-menu="menuOptions('row', row)">{{row.label}}</div>
+<div style="white-space: nowrap;" ng-if="row.state != 'Unidentified' && ('home.reception' | isState)" class="clickable" ng-click="ipTableClick(row, $event)" context-menu="menuOptions('row', row)">{{row.label}}</div>
+<div style="white-space: nowrap;" ng-if="!('home.reception' | isState)" class="clickable" ng-click="ipTableClick(row, $event)" context-menu="menuOptions('row', row)">{{row.label}}</div>
 <div style="white-space: nowrap;" ng-if="row.state == 'Unidentified'" context-menu="menuOptions('row', row)">
     <a tabindex="-1" ng-click="identifyIpModal(row)" uib-popover="{{'RECEIVEUNIDENTIFIED' | translate}}: {{row.label}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true">{{row.label}}</a>
 </div>

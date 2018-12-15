@@ -58,7 +58,7 @@ angular.module('essarch.services').factory('Resource', function ($q, $filter, $t
         if(sort.reverse) {
             sortString = "-"+sortString;
         }
-        return listViewService.getListViewData(pageNumber, number, $rootScope.navigationFilter, sortString, search, state, columnFilters, workarea).then(function(value) {
+        return listViewService.getListViewData(pageNumber, number, sortString, search, state, columnFilters, workarea).then(function(value) {
             var ipCollection = value.data;
             return {
                 data: ipCollection,
@@ -66,33 +66,13 @@ angular.module('essarch.services').factory('Resource', function ($q, $filter, $t
             };
         });
 	}
-    function getReceptionIps(start, number, pageNumber, params, checked, sort) {
+    function getReceptionIps(start, number, pageNumber, params, sort) {
         var sortString = sort.predicate;
         if(sort.reverse) {
             sortString = "-"+sortString;
         }
-        var filter = {};
-        if($rootScope.navigationFilter) {
-            filter = $rootScope.navigationFilter;
-        } else {
-            filter = {
-                institution: null,
-                organization: null,
-                type: null,
-                location: null,
-                other: null
-            };
-        }
-        return listViewService.getReceptionIps(pageNumber, number, filter, sortString).then(function(value) {
+        return listViewService.getReceptionIps(pageNumber, number, sortString).then(function(value) {
             var ipCollection = value.data;
-            ipCollection.forEach(function(ip) {
-                ip.checked = false;
-                checked.forEach(function(checkedIp) {
-                    if(ip.id == checkedIp.id) {
-                        ip.checked = true;
-                    }
-                });
-            });
             return {
                 data: ipCollection,
                 numberOfPages: Math.ceil(value.count / number)
@@ -105,7 +85,7 @@ angular.module('essarch.services').factory('Resource', function ($q, $filter, $t
         if(sort.reverse) {
             sortString = "-"+sortString;
         }
-        return listViewService.getWorkareaData(workarea, pageNumber, number, $rootScope.navigationFilter, sortString, search, columnFilters).then(function(value) {
+        return listViewService.getWorkareaData(workarea, pageNumber, number, sortString, search, columnFilters).then(function(value) {
             var ipCollection = value.data;
             return {
                 data: ipCollection,

@@ -17,8 +17,9 @@ angular.module('essarch.controllers').controller('TransformationCtrl', function(
         }
     });
 
-    $scope.ipTableClick = function(row) {
-        if($scope.select && $scope.ip.id== row.id){
+    vm.selectSingleRow = function(row) {
+        $scope.ips = [];
+        if($scope.ip !== null && $scope.ip.id== row.id){
             $scope.select = false;
             $scope.ip = null;
             $rootScope.ip = null;

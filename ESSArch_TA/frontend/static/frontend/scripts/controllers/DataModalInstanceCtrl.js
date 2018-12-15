@@ -1,4 +1,4 @@
-angular.module('essarch.controllers').controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, IP, $scope, data, $http, appConfig, Notifications, $uibModal, $log, ErrorResponse, $translate) {
+angular.module('essarch.controllers').controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, IP, $scope, data, $http, appConfig, Notifications, $uibModal, $log, ErrorResponse, $translate, $q) {
     var $ctrl = this;
     $ctrl.data = data;
     if(data.vm) {
@@ -9,6 +9,12 @@ angular.module('essarch.controllers').controller('DataModalInstanceCtrl', functi
     $ctrl.file = data.file;
     $ctrl.type = data.type;
     $ctrl.fullscreenActive = false;
+
+    $ctrl.$onInit = function() {
+        if($ctrl.data.ips == null) {
+            $ctrl.data.ips = [$ctrl.data.ip];
+        }
+    }
 
     // Show fullscreen validation message
     $ctrl.showFullscreenMessage = function() {
@@ -49,17 +55,24 @@ angular.module('essarch.controllers').controller('DataModalInstanceCtrl', functi
     }
 
     // Transfer IP
-    $ctrl.transfer = function (ip) {
+    $ctrl.transfer = function () {
         $ctrl.transferring = true;
-        IP.transfer({
-            id: ip.id
-        }).$promise.then(function(response) {
+        var promises = [];
+        $ctrl.data.ips.forEach(function(ip) {
+            promises.push(IP.transfer({
+                    id: ip.id
+                }).$promise.then(function(response) {
+                    $ctrl.transferring = false;
+                    return response;
+            }).catch(function(response) {
+                ErrorResponse.default(response);
+                return response;
+            }));
+        })
+        $q.all(promises).then(function(responses) {
             $ctrl.transferring = false;
             $uibModalInstance.close();
-        }).catch(function(response) {
-            $ctrl.transferring = false;
-            ErrorResponse.default(response);
-        });
+        })
     }
 
     $ctrl.cancel = function () {

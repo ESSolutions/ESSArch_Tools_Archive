@@ -77,12 +77,10 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
         });
     }
     //Gets data for list view i.e information packages
-    function getListViewData(pageNumber, pageSize, filters, sortString, searchString, state, columnFilters, workarea) {
+    function getListViewData(pageNumber, pageSize, sortString, searchString, state, columnFilters, workarea) {
         var data = angular.extend({
             page: pageNumber,
             page_size: pageSize,
-            agents: filters.agents,
-            other: filters.other,
             ordering: sortString,
             search: searchString,
             state: state
@@ -104,11 +102,10 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
         });
     }
 
-    function getReceptionIps(pageNumber, pageSize, filters, sortString) {
+    function getReceptionIps(pageNumber, pageSize, sortString) {
         return IPReception.query({
             page: pageNumber,
             page_size: pageSize,
-            agents: filters.agents,
             ordering: sortString,
         }).$promise.then(function (resource) {
             count = resource.$httpHeaders('Count');
@@ -258,7 +255,7 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
     }
 
     //Fetches IP's for given workarea (ingest or access)
-    function getWorkareaData(workarea, pageNumber, pageSize, filters, sortString, searchString, columnFilters) {
+    function getWorkareaData(workarea, pageNumber, pageSize, sortString, searchString, columnFilters) {
         return Workarea.query(
             angular.extend({
                 type: workarea,

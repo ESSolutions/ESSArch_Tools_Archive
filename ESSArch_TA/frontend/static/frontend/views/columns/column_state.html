@@ -1,6 +1,3 @@
-<div ng-if="row.state != 'At reception' && row.state != 'Unidentified'" class="cursor-pointer" ng-click="stateClicked(row)" uib-popover="{{'IPSTATEDESC' | translate}}: {{row.label}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true" context-menu="menuOptions('row', row)">
-    <a tabindex="-1" class="no-select white-space-nowrap" href="">{{row.state}}</a>
-</div>
-<div ng-if="row.state == 'At reception' || row.state == 'Unidentified'" style="min-width: 80px;" context-menu="menuOptions('row', row)">
-    <span tabindex="-1" class="no-select white-space-nowrap" href="">{{row.state}}</span>
+<div class="cursor-pointer" uib-popover="{{'IPSTATEDESC' | translate}}: {{row.label}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true" context-menu="menuOptions('row', row)">
+    <span class="no-select white-space-nowrap">{{row.state}}</span>
 </div>

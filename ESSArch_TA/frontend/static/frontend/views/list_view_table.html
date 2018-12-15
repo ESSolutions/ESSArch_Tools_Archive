@@ -37,10 +37,10 @@
     </div>
     <div id="list-view" tabindex="0" ng-keydown="vm.ipListKeydownListener($event)" class="list-view-table">
         <table class="table table-striped" style="margin-bottom: 0px;">
-            <a ng-if="('home.reception' | isState) && includedIps.length" ng-click="vm.uncheckAll()" translate="CLEAR_ALL"></a>
+            <a ng-if="(ips.length || ip !== null)" ng-click="vm.deselectAll()" translate="CLEAR_ALL"></a>
+            <a ng-if="ips.length == 0 && ip === null && vm.displayedIps.length > 0" ng-click="vm.selectAll()" translate="SELECT_ALL"></a>
             <thead>
                 <tr>
-                    <th ng-if="'home.reception' | isState" class="clickable" class="column-label"></th>
                     <th class="clickable" class="column-label" st-sort="{{col.sortString}}"
                     st-sort-default="{{col.sortString == 'create_date'? 'reverse' : ''}}" ng-repeat="col in listViewColumns"
                     uib-popover="{{col.label.toUpperCase()+'_DESC' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true">
@@ -51,14 +51,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-class="{'selected': ip.object_identifier_value == row.object_identifier_value}" ng-repeat="row in vm.displayedIps" class="table-item">
-                    <td ng-if="'home.reception' | isState">
-                        <div ng-if="row.state == 'At reception' || row.state == 'Prepared'"class="checkbox table-col">
-                            <label>
-                                <input tabindex="-1" ng-disabled="row.state == 'Receiving'" type="checkbox" ng-model="row.checked" ng-change="includeIp(row)" uib-popover="{{'MARKFORRECEIVE' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true">
-                            </label>
-                        </div>
-                    </td>
+                <tr ng-class="{'selected': ip.object_identifier_value == row.object_identifier_value || selectedAmongOthers(row.id)}" ng-repeat="row in vm.displayedIps" class="table-item">
                     <td ng-repeat="col in listViewColumns">
                         <div ng-include src="col.template"></div>
                     </td>
