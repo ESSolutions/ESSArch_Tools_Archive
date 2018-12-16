@@ -129,15 +129,12 @@
     flex-direction: column;
     width: 33%;
 }
-.eventlog-view .btn-info {
+.eventlog-view .btn-primary {
     float: right;
     margin-top: 10px;
 }
 input[type="checkbox"] {
     transform:scale(1.2, 1.2);
-}
-.eventlog-view .submit-button {
-    height: 40px;
 }
 .edit-unidentified-ip .formly {
     display: flex;

@@ -1,6 +1,6 @@
 angular.module('essarch.controllers').controller('TransformationCtrl', function($scope, $controller, Resource, listViewService, Notifications, $http, $sce, $rootScope, $cookies, $timeout, appConfig, $uibModal, $window, Profile, $q, IP, $interval) {
     var vm = this;
-    var ipSortString = "";
+    var ipSortString = [];
     $controller('WorkareaCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
     var watchers=[];
     $scope.error = null;

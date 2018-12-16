@@ -1,6 +1,6 @@
 angular.module('essarch.controllers').controller("WorkareaValidationCtrl", function($scope, $controller, $interval, $http, appConfig, $rootScope, WorkareaValidation, $q, Notifications, $uibModal, $window, $log, Profile, ErrorResponse) {
     var vm = this;
-    var ipSortString = "";
+    var ipSortString = [];
     $controller('WorkareaCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
     $scope.error = null;
     var watchers=[];
