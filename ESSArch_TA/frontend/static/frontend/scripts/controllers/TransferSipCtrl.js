@@ -32,8 +32,9 @@ angular.module('essarch.controllers').controller('TransferSipCtrl', function(IP,
         visible: false
     };
     $scope.transferDisabled = false;
-    $scope.ipTableClick = function(row) {
-        if($scope.select && $scope.ip.id== row.id){
+    vm.selectSingleRow = function(row) {
+        $scope.ips = [];
+        if($scope.ip !== null && $scope.ip.id == row.id){
             vm.info.visible = false;
             $scope.select = false;
             $scope.ip = null;
@@ -56,8 +57,6 @@ angular.module('essarch.controllers').controller('TransferSipCtrl', function(IP,
                 $scope.transferDisabled = true;
             }
         }
-        $scope.eventShow = false;
-        $scope.statusShow = false;
     };
 
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
@@ -73,7 +72,8 @@ angular.module('essarch.controllers').controller('TransferSipCtrl', function(IP,
             templateUrl: "static/frontend/views/reception_delivery_description.html"
         },
     ];
-    vm.transferModal = function (ips) {
+    vm.transferModal = function (ip) {
+        var ips = $scope.ips.length > 0? $scope.ips:null;
         var modalInstance = $uibModal.open({
             animation: true,
             ariaLabelledBy: 'modal-title',
@@ -84,17 +84,21 @@ angular.module('essarch.controllers').controller('TransferSipCtrl', function(IP,
             controllerAs: '$ctrl',
             resolve: {
                 data: {
-                    ip: $scope.ip
+                    ip: ip,
+                    ips: ips
                 }
             }
         })
         modalInstance.result.then(function (data) {
+            $scope.ips = [];
+            $scope.ip = null;
+            $rootScope.ip = null;
             $scope.transferDisabled = true;
             $scope.select = false;
             $timeout(function () {
                 $scope.getListViewData();
                 vm.updateListViewConditional();
-            }, 1000);
+            });
             $scope.transferDisabled = false;
         });
     }

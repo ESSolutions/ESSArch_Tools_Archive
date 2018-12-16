@@ -1,18 +1,51 @@
-angular.module('essarch.controllers').controller('BaseCtrl', function(IP, Task, Step, vm, ipSortString, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $q, $window, ContextMenuBase) {
+angular.module('essarch.controllers').controller('BaseCtrl', function(IP, Task, Step, vm, ipSortString, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $q, $window, ContextMenuBase, ContentTabs) {
     // Initialize variables
     $scope.filebrowser = false;
     $scope.statusShow = false;
     $scope.eventShow = false;
     $scope.ip = null;
     $rootScope.ip = null;
+    $scope.ips = [];
+    vm.specificTabs = [];
 
     vm.itemsPerPage = $cookies.get('eta-ips-per-page') || 10;
     var watchers = [];
 
     // Watchers
-    watchers.push($scope.$watch(function(){return $rootScope.navigationFilter;}, function(newValue, oldValue) {
-        $scope.getListViewData();
+    watchers.push($scope.$watch(function() {
+        return $scope.ips.length;
+    }, function(newVal) {
+        $timeout(function(){
+            if($scope.ip !== null) {
+                vm.specificTabs = ContentTabs.visible([$scope.ip], $state.current.name)                ;
+            } else {
+                    vm.specificTabs = ContentTabs.visible($scope.ips, $state.current.name);
+            }
+            if(newVal > 0) {
+                vm.activeTab = vm.specificTabs[0];
+            } else {
+                vm.activeTab = 'no_tabs';
+            }
+        })
     }, true));
+
+    watchers.push($scope.$watch(function() {
+        return $scope.ip;
+    }, function(newVal) {
+        if(newVal !== null) {
+
+            $timeout(function(){
+                vm.specificTabs = ContentTabs.visible([$scope.ip], $state.current.name);
+                if(vm.specificTabs.length > 0) {
+                    vm.activeTab = vm.specificTabs[0];
+                } else {
+                    vm.activeTab = 'tasks';
+                }
+            })
+        }
+    }, true));
+
+
     $scope.$on('$translateChangeSuccess', function () {
         $state.reload()
     });
@@ -83,63 +116,144 @@ angular.module('essarch.controllers').controller('BaseCtrl', function(IP, Task, 
     vm.updateListViewConditional();
 
     // Click functions
+    //Click function for Ip table
+    $scope.ipTableClick = function(row, event) {
+        if( event && event.shiftKey) {
+            vm.shiftClickrow(row);
+        } else if(event && event.ctrlKey) {
+            vm.ctrlClickRow(row);
+        } else {
+            vm.selectSingleRow(row);
+        }
+    };
 
-    $scope.stateClicked = function (row) {
-        if ($scope.statusShow) {
-                $scope.tree_data = [];
-            if ($scope.ip == row) {
-                $scope.statusShow = false;
-                if(!$scope.select && !$scope.edit && !$scope.statusShow && !$scope.eventShow && !$scope.filebrowser) {
-                    $scope.ip = null;
-                    $rootScope.ip = null;
+    vm.shiftClickrow = function (row) {
+        var index = vm.displayedIps.map(function(ip) { return ip.id; }).indexOf(row.id);
+        var last;
+        if($scope.ips.length > 0) {
+            last = $scope.ips[$scope.ips.length-1].id;
+        } else if ($scope.ips.length <= 0 && $scope.ip != null) {
+            last = $scope.ip.id;
+        } else {
+            last = null;
+        }
+        var lastIndex = last != null?vm.displayedIps.map(function(ip) { return ip.id; }).indexOf(last):index;
+        if(lastIndex > index) {
+            for(i = lastIndex;i >= index;i--) {
+                if(!$scope.selectedAmongOthers(vm.displayedIps[i].id)) {
+                    $scope.ips.push(vm.displayedIps[i]);
                 }
-            } else {
-                $scope.statusShow = true;
-                $scope.edit = false;
-                $scope.ip = row;
-                $rootScope.ip = row;
+            }
+        } else if(lastIndex < index) {
+            for(i = lastIndex;i <= index;i++) {
+                if(!$scope.selectedAmongOthers(vm.displayedIps[i].id)) {
+                    $scope.ips.push(vm.displayedIps[i]);
+                }
             }
         } else {
-            $scope.statusShow = true;
-            $scope.edit = false;
-            $scope.ip = row;
-            $rootScope.ip = row;
+            vm.selectSingleRow(row);
         }
-        $scope.subSelect = false;
-        $scope.eventlog = false;
-        $scope.select = false;
-        $scope.eventShow = false;
-    };
+        $scope.statusShow = false;
+    }
 
-    $scope.eventsClick = function (row) {
-        if($scope.eventShow && $scope.ip == row){
+    vm.ctrlClickRow = function (row) {
+        if(row.package_type != 1) {
+            if($scope.ip != null) {
+                $scope.ips.push($scope.ip);
+            }
+            $scope.ip = null;
+            $rootScope.ip = null;
             $scope.eventShow = false;
-            $rootScope.stCtrl = null;
-            if(!$scope.select && !$scope.edit && !$scope.statusShow && !$scope.eventShow && !$scope.filebrowser) {
-                $scope.ip = null;
-                $rootScope.ip = null;
-            }
-        } else {
-            $scope.eventShow = true;
-            $scope.validateShow = false;
             $scope.statusShow = false;
-            $scope.ip = row;
-            $rootScope.ip = row;
-        }
-    };
-
-    $scope.filebrowserClick = function (ip) {
-        if ($scope.filebrowser && $scope.ip == ip) {
             $scope.filebrowser = false;
-            if(!$scope.select && !$scope.edit && !$scope.statusShow && !$scope.eventShow && !$scope.filebrowser) {
-                $scope.ip = null;
-                $rootScope.ip = null;
+            var deleted = false;
+            $scope.ips.forEach(function(ip, idx, array) {
+                if(!deleted && ip.object_identifier_value == row.object_identifier_value) {
+                    array.splice(idx, 1);
+                    deleted = true;
+                }
+            })
+            if(!deleted) {
+
+                $scope.select = true;
+                $scope.eventlog = true;
+                $scope.edit = true;
+                $scope.requestForm = true;
+                $scope.eventShow = false;
+                $scope.ips.push(row);
             }
-        } else {
-            $scope.filebrowser = true;
-            $scope.ip = ip;
-            $rootScope.ip = ip;
+            if($scope.ips.length == 1) {
+                $scope.ip = $scope.ips[0];
+                $rootScope.ip = $scope.ips[0];
+                $scope.ips = [];
+            }
         }
+        $scope.statusShow = false;
+    }
+
+    vm.selectSingleRow = function (row) {
+        $scope.ips = [];
+        if($scope.ip !== null && $scope.ip.id== row.id){
+            $scope.select = false;
+            $scope.eventlog = false;
+            $scope.ip = null;
+            $rootScope.ip = null;
+            $scope.filebrowser = false;
+        } else {
+            $scope.ip = row;
+            $rootScope.ip = $scope.ip;
+            $scope.eventlog = true;
+            $scope.select = true;
+        }
+        $scope.edit = false;
+        $scope.eventShow = false;
+        $scope.statusShow = false;
+    }
+
+    $scope.selectedAmongOthers = function(id) {
+        var exists = false;
+        $scope.ips.forEach(function(ip) {
+            if(ip.id == id) {
+                exists = true;
+            }
+        })
+        return exists;
+    }
+
+    vm.multipleIpResponsible = function() {
+        if($scope.ips.length > 0) {
+            var responsible = true;
+            $scope.ips.forEach(function(ip) {
+                if(ip.responsible.id !== $rootScope.auth.id) {
+                    responsible = false;
+                }
+            })
+            return responsible;
+        } else {
+            return false;
+        }
+    }
+
+    vm.selectAll = function() {
+        $scope.ips = [];
+        vm.displayedIps.forEach(function(ip) {
+            vm.ctrlClickRow(ip);
+            if(ip.information_packages && ip.information_packages.length > 0 && !ip.collapsed) {
+                ip.information_packages.forEach(function(subIp) {
+                    vm.ctrlClickRow(subIp);
+                });
+            }
+        });
+    }
+
+    vm.deselectAll = function() {
+        $scope.ips = [];
+        $scope.ip = null;
+        $rootScope.ip = null;
+    }
+
+    $scope.checkPermission = function(perm) {
+        return myService.checkPermission(perm);
     }
 
     // List view
@@ -213,9 +327,6 @@ angular.module('essarch.controllers').controller('BaseCtrl', function(IP, Task, 
 
     $scope.getListViewData = function() {
         vm.callServer($scope.tableState);
-        if(!$state.is('home.reception')) {
-            $rootScope.loadNavigation(ipSortString);
-        }
     };
 
     // Keyboard shortcuts
@@ -432,11 +543,9 @@ angular.module('essarch.controllers').controller('BaseCtrl', function(IP, Task, 
         vm.displayedIps.splice(vm.displayedIps.indexOf(ipObject), 1);
         $scope.edit = false;
         $scope.select = false;
-        $scope.eventlog = false;
-        $scope.eventShow = false;
-        $scope.statusShow = false;
-        $scope.filebrowser = false;
-        $rootScope.loadNavigation(ipSortString);
+        $scope.ips = [];
+        $scope.ip = null;
+        $rootScope.ip = null;
         if(vm.displayedIps.length == 0) {
             $state.reload();
         }

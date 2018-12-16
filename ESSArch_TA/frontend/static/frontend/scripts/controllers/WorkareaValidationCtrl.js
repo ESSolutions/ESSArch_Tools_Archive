@@ -16,8 +16,9 @@ angular.module('essarch.controllers').controller("WorkareaValidationCtrl", funct
         }
     });
 
-    $scope.ipTableClick = function(row) {
-        if($scope.select && $scope.ip.id== row.id){
+    vm.selectSingleRow = function(row) {
+        $scope.ips = [];
+        if($scope.ip !== null && $scope.ip.id== row.id){
             $scope.error = null;
             $scope.select = false;
             $scope.ip = null;

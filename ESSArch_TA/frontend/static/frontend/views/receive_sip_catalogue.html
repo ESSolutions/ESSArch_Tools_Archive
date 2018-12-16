@@ -22,7 +22,7 @@
             </thead>
             <tbody>
                 <tr ng-class="row.class" ng-repeat="row in vm.displayedIps" class="table-item">
-                    <td class="clickable" ng-click="ipTableClick(row);">{{row.label}}</td>
+                    <td class="clickable" ng-click="ipTableClick(row, $event);">{{row.label}}</td>
                     <td class="clickable" ng-click="ipRowClick(row)">{{row.responsible}}</td>
                     <td class="clickable" ng-click="ipRowClick(row)">{{row.create_date | date:"yyyy-MM-dd hh:mm:ss"}}</td>
                     <td class="clickable" ng-click="stateClicked(row);"><a href="">{{row.state}}</a></td>

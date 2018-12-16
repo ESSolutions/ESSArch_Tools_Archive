@@ -1,9 +1,6 @@
 <div class="body-wrapper">
     <div class="header">
         <div class="logo-search-user-admin-wrapper">
-            <div class="hamburger" ng-show="('home.transferSip' | includedByState) || ('home.workarea' | includedByState)">
-                <i class="fas fa-2x fa-bars" aria-hidden="true" ng-click="hamburgerActive = !hamburgerActive"></i>
-            </div>
             <div class="logo">
                 <h3 class="page-title" ui-sref="home.info">ESSArch Tools for Archive</h3>
                 <h3 class="page-title-small" ng-click="infoPage()">ETA</h3>
@@ -53,7 +50,7 @@
         </div>
     </div>
     <div class="nav-dynamic-wrapper">
-        <div class="shortcut-nav-calendar-wrapper" ng-if="('home.transferSip' | includedByState) || ('home.workarea' | includedByState)" ng-class="{'active-hamburger': hamburgerActive}">
+        <div class="shortcut-nav-calendar-wrapper" ng-if="false && (('home.transferSip' | includedByState) || ('home.workarea' | includedByState))" ng-class="{'active-hamburger': hamburgerActive}">
             <div ng-controller="AngularTreeCtrl" class="navigation">
                 <br/>
                 <p ng-if="Agent.length > 0" style="padding: 0 0 0 20px">{{'AGENTS' | translate}}</p>

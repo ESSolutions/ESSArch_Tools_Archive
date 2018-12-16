@@ -27,7 +27,7 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
     var ipSortString = ['Receiving'];
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
 
-    $scope.includedIps = [];
+    $scope.ips = [];
     $scope.receiveShow = false;
     $scope.validateShow = false;
 
@@ -49,7 +49,6 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
     /*******************************************/
     /*Piping and Pagination for List-view table*/
     /*******************************************/
-    var ctrl = this;
     vm.displayedIps = [];
 
     //Get data according to ip table settings and populates ip table
@@ -67,7 +66,7 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
             var number = pagination.number || vm.itemsPerPage;  // Number of entries showed per page.
             var pageNumber = start/number+1;
 
-            Resource.getReceptionIps(start, number, pageNumber, tableState, $scope.includedIps, sorting).then(function (result) {
+            Resource.getReceptionIps(start, number, pageNumber, tableState, sorting).then(function (result) {
                 vm.displayedIps = result.data;
                 tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
                 $scope.ipLoading = false;
@@ -105,7 +104,7 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
                 payload.submission_agreement = sa.id;
             }
             IPReception.receive(payload).$promise.then(function(response) {
-                $scope.includedIps = [];
+                $scope.ips = [];
                 $timeout(function() {
                     $scope.getListViewData();
                     vm.updateListViewConditional();
@@ -123,90 +122,24 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
             });
         });
     };
-    $scope.filebrowserClick = function (ip) {
-        if ($scope.filebrowser && $scope.ip == ip) {
-            $scope.filebrowser = false;
-            if(!$scope.select && !$scope.edit && !$scope.statusShow && !$scope.eventShow) {
-                $scope.ip = null;
-                $rootScope.ip = null;
-            }
-        } else {
-            $scope.filebrowser = true;
-            $scope.ip = ip;
-            $rootScope.ip = ip;
-        }
-    }
-    $scope.includeIp = function(row) {
-        $scope.statusShow = false;
-        $scope.eventShow = false;
-        var temp = true;
-        $scope.includedIps.forEach(function(included, index, array) {
 
-            if(included.id == row.id) {
-                $scope.includedIps.splice(index, 1);
-                temp = false;
-            }
-        });
-        if(temp) {
-            $scope.includedIps.push({ id: row.id, at_reception: row.state == "At reception" });
-        }
-        if($scope.includedIps == []) {
-            $scope.receiveShow = true;
-        } else {
-            $scope.receiveShow = false;
-        }
-    }
-
-    $scope.ipTableClick = function(row) {
-        $scope.statusShow = false;
-        $scope.eventShow = false;
-        if($scope.edit && $scope.ip == row) {
+    vm.selectSingleRow = function(row) {
+        if($scope.ip !== null && $scope.ip.id == row.id) {
             $scope.edit = false;
             $scope.ip = null;
             $rootScope.ip = null;
             $scope.filebrowser = false;
         } else {
+            vm.deselectAll();
             vm.sdModel = {};
-            if(row.state == "At reception") {
-                $scope.ip = row;
-                $rootScope.ip = row;
-                $scope.buildSdForm(row);
-                $scope.getFileList(row);
-                $scope.edit = true;
-                if($scope.filebrowser && !$scope.ip.url) {
-                    $scope.ip.url = appConfig.djangoUrl + "ip-reception/" + $scope.ip.id + "/";
-                }
-            } else {
-                $scope.edit = false;
-                $scope.ip = null;
-                $rootScope.ip = null;
+            $scope.ip = row;
+            $rootScope.ip = row;
+            if(!row.url) {
+                row.url = appConfig.djangoUrl + "ip-reception/" + $scope.ip.id + "/";
             }
+            $scope.buildSdForm(row);
+            $scope.getFileList(row);
         }
-    }
-
-    vm.uncheckAll = function() {
-        $scope.includedIps = [];
-        vm.displayedIps.forEach(function(row) {
-            row.checked = false;
-        });
-    }
-
-    vm.uncheckIp = function (ip) {
-        $scope.includedIps.forEach(function(x, i, array) {
-            if(x.id == ip.id) {
-                $scope.includedIps.splice(i, 1);
-            }
-        });
-        $scope.getListViewData();
-    }
-
-    vm.updateCheckedIp = function(ip, newIp) {
-        $scope.includedIps.forEach(function(inc_ip, index, array) {
-            if(inc_ip.id == ip.id) {
-                array[index] = { id: newIp.id, at_reception: newIp.state == "At reception" };
-            }
-        });
-        $scope.getListViewData();
     }
 
     // Executed after IP is removed
@@ -221,7 +154,6 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
         if(vm.displayedIps.length == 0) {
             $state.reload();
         }
-        vm.uncheckIp(ipObject);
         $scope.getListViewData();
     }
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
@@ -364,7 +296,7 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
         vm.sdModel = {
             "start_date": ip.start_date,
             "end_date": ip.end_date,
-            "archivist_organization": ip.archivist_organization,
+            "archivist_organization": ip.archivist_organization?ip.archivist_organization.name:null,
             "creator": ip.creator_organization,
             "submitter_organization": ip.submitter_organization,
             "submitter_individual": ip.submitter_individual,
@@ -591,51 +523,17 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
             }, 1000);
         });
     };
-    /*vm.receiveModal = function (ip) {
-        IPReception.get({id: ip.id }).$promise.then(function(resource) {
-            $http.get(appConfig.djangoUrl + "submission-agreements").then(function(response) {
-                var data = {
-                    ip: resource,
-                    validators: vm.validators(),
-                    submissionAgreements: response.data
-                }
-                if(resource.altrecordids && resource.altrecordids.SUBMISSIONAGREEMENT) {
-                    angular.extend(data, {sa: resource.altrecordids.SUBMISSIONAGREEMENT[0]})
-                }
-                var modalInstance = $uibModal.open({
-                    animation: true,
-                    ariaLabelledBy: 'modal-title',
-                    ariaDescribedBy: 'modal-body',
-                    templateUrl: 'static/frontend/views/receive_modal.html',
-                    scope: $scope,
-                    controller: 'ReceiveModalInstanceCtrl',
-                    controllerAs: '$ctrl',
-                    size: 'lg',
-                    resolve: {
-                        data: data
-                    }
-                })
-                modalInstance.result.then(function (data) {
-                    $scope.includedIps.shift();
-                    $scope.getListViewData();
-                    if($scope.includedIps.length > 0) {
-                        vm.receiveModal($scope.includedIps[0]);
-                    }
-                }, function () {
-                    $log.info('modal-component dismissed at: ' + new Date());
-                });
-            })
-        })
-    }*/
 
      //Create and show modal for remove ip
     vm.receiveModal = function (ip) {
         vm.receiveModalLoading = true;
-        if (ip.at_reception) {
+        if(angular.isUndefined(ip) && $scope.ip !== null) {
+            ip = $scope.ip;
+        }
+        if (ip.state == 'At reception') {
             IPReception.get({ id: ip.id }).$promise.then(function (resource) {
                 if (resource.altrecordids && resource.altrecordids.SUBMISSIONAGREEMENT) {
                     IPReception.prepare({ id: resource.id, submission_agreement: resource.altrecordids.SUBMISSIONAGREEMENT[0] }).$promise.then(function (prepared) {
-                        vm.updateCheckedIp(ip, prepared);
                         vm.receiveModalLoading = false;
                         var modalInstance = $uibModal.open({
                             animation: true,
@@ -662,10 +560,13 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
                                 $scope.edit = false;
                             }
                             $scope.filebrowser = false;
-                            $scope.includedIps.shift();
                             $scope.getListViewData();
-                            if ($scope.includedIps.length > 0) {
-                                vm.receiveModal($scope.includedIps[0]);
+                            if ($scope.ips.length > 0) {
+                                $scope.ips.shift();
+                                vm.receiveModal($scope.ips[0]);
+                            } else {
+                                $scope.ip = null;
+                                $rootScope.ip = null;
                             }
                         }, function () {
                             $log.info('modal-component dismissed at: ' + new Date());
@@ -702,10 +603,13 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
                             $scope.edit = false;
                         }
                         $scope.filebrowser = false;
-                        $scope.includedIps.shift();
                         $scope.getListViewData();
-                        if($scope.includedIps.length > 0) {
-                            vm.receiveModal($scope.includedIps[0]);
+                        if($scope.ips.length > 0) {
+                            $scope.ips.shift();
+                            vm.receiveModal($scope.ips[0]);
+                        } else {
+                            $scope.ip = null;
+                            $rootScope.ip = null;
                         }
                     }, function () {
                         $log.info('modal-component dismissed at: ' + new Date());
@@ -740,10 +644,13 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
                         $scope.edit = false;
                     }
                     $scope.filebrowser = false;
-                    $scope.includedIps.shift();
                     $scope.getListViewData();
-                    if($scope.includedIps.length > 0) {
-                        vm.receiveModal($scope.includedIps[0]);
+                    if($scope.ips.length > 0) {
+                        $scope.ips.shift();
+                        vm.receiveModal($scope.ips[0]);
+                    } else {
+                        $scope.ip = null;
+                        $rootScope.ip = null;
                     }
                 }, function () {
                     $log.info('modal-component dismissed at: ' + new Date());
