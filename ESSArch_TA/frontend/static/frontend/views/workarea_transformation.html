@@ -11,8 +11,8 @@
                                 <div class="search-prepare-wrapper transformation-refresh-header">
                                     <div class="refresh-icon">
                                         <span ng-click="vm.validatorListPipe(vm.validatorTableState)" class="clickable fas fa-sync-alt fa-lg"
-                                        ng-class="{'fa-sync-alt-animate': validatorsLoading }" uib-popover="{{'REFRESHTABLEDESC' | translate}}" popover-placement="left"
-                                        popover-popup-delay="500" popover-append-to-body="true"></span>
+                                        ng-class="{'fa-sync-alt-animate': validatorsLoading }" uib-tooltip="{{'REFRESHTABLEDESC' | translate}}" tooltip-placement="auto left"
+                                        tooltip-append-to-body="true"></span>
                                     </div>
                                 </div>
                                 <table class="table table-striped validator-table">
@@ -27,8 +27,8 @@
                                         <tr ng-repeat="validator in vm.validators track by $index">
                                             <td>{{validator.name}} <span style="color: red;">{{validator.required?'*':''}}</span></td>
                                             <td>
-                                                <i ng-if="ip.workarea.successfully_validated[validator.name] == true" class="fas fa-check" style="color: green;" uib-popover="{{'SUCCESS' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"></i>
-                                                <i ng-if="ip.workarea.successfully_validated[validator.name] == false" class="fas fa-times" style="color: red;" uib-popover="{{'FAILURE' | translate}}" popover-placement="top-left" popover-popup-delay="500" popover-append-to-body="true"></i>
+                                                <i ng-if="ip.workarea.successfully_validated[validator.name] == true" class="fas fa-check" style="color: green;" uib-tooltip="{{'SUCCESS' | translate}}" tooltip-placement="auto top" tooltip-append-to-body="true"></i>
+                                                <i ng-if="ip.workarea.successfully_validated[validator.name] == false" class="fas fa-times" style="color: red;" uib-tooltip="{{'FAILURE' | translate}}" tooltip-placement="auto top" tooltip-append-to-body="true"></i>
                                             </td>
                                             <td>
                                                 {{validator.failed_count}} ({{validator.failed_required_count}} {{'REQUIRED_MULTIPLE' | translate | lowercase}})
