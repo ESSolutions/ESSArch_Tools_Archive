@@ -348,5 +348,6 @@
     "NO_ACTIONS_FOR_SELECTED_IPS": "Det finns inga tillgängliga funktioner för valda objekt",
     "SELECTED": "Vald(a)",
     "START": "Start",
-    "END": "Slut"
+    "END": "Slut",
+    "VERSION": "Version"
 }

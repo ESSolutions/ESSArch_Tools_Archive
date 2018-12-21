@@ -351,5 +351,6 @@
     "NO_ACTIONS_FOR_SELECTED_IPS": "No actions available for selected object(s)",
     "SELECTED": "Selected",
     "START": "Start",
-    "END": "End"
+    "END": "End",
+    "VERSION": "Version"
 }
