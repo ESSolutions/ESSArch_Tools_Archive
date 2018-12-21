@@ -61,7 +61,7 @@ router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 router.register(r'agents', AgentViewSet)
 router.register(r'permissions', PermissionViewSet)
-router.register(r'information-packages', InformationPackageViewSet)
+router.register(r'information-packages', InformationPackageViewSet, base_name='informationpackage')
 router.register(r'information-packages', InformationPackageViewSet).register(
     r'events',
     EventIPViewSet,
