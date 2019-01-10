@@ -30,7 +30,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.utils import timezone
 
-import mock
+from unittest import mock
 
 from install.install_default_config_eta import installDefaultEventTypes
 
