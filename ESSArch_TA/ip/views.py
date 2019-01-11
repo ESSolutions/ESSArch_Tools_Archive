@@ -398,6 +398,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         self.logger.info('Prepared information package %s' % str(ip.pk), extra={'user': request.user.pk})
         return Response(data, status=status.HTTP_201_CREATED)
 
+    @transaction.atomic
     @permission_required_or_403(['ip.receive'])
     @detail_route(methods=['post'], url_path='receive')
     def receive(self, request, pk=None):
@@ -559,6 +560,7 @@ class InformationPackageViewSet(InformationPackageViewSetCore, GetObjectForUpdat
         workflow.run()
         return Response({'status': 'transferring ip'})
 
+    @transaction.atomic
     @detail_route(methods=['post'], url_path='validate')
     def validate(self, request, pk=None):
         ip = self.get_object()
@@ -600,6 +602,7 @@ class InformationPackageViewSet(InformationPackageViewSetCore, GetObjectForUpdat
 
         return Response("Validating IP")
 
+    @transaction.atomic
     def destroy(self, request, pk=None):
 
         delete_from_reception = request.data.get('reception', True)
