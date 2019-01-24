@@ -1,4 +1,4 @@
-angular.module('essarch.controllers').controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, IP, $scope, data, $http, appConfig, Notifications, $uibModal, $log, ErrorResponse, $translate, $q) {
+angular.module('essarch.controllers').controller('DataModalInstanceCtrl', function ($uibModalInstance, djangoAuth, IP, $scope, data, $http, appConfig, Notifications, $uibModal, $log, $translate, $q) {
     var $ctrl = this;
     $ctrl.data = data;
     if(data.vm) {
@@ -49,9 +49,7 @@ angular.module('essarch.controllers').controller('DataModalInstanceCtrl', functi
         $http.post(appConfig.djangoUrl + "workarea-entries/" + $ctrl.data.ip.workarea.id+"/transform/", {transformer: $ctrl.data.transformer}).then(function(response) {
             Notifications.add(response.data, "success");
             $uibModalInstance.close(response.data);
-        }).catch(function(response) {
-            ErrorResponse.default(response);
-        })
+        });
     }
 
     // Transfer IP
@@ -65,7 +63,6 @@ angular.module('essarch.controllers').controller('DataModalInstanceCtrl', functi
                     $ctrl.transferring = false;
                     return response;
             }).catch(function(response) {
-                ErrorResponse.default(response);
                 return response;
             }));
         })
@@ -83,12 +80,10 @@ angular.module('essarch.controllers').controller('DataModalInstanceCtrl', functi
     $ctrl.remove = function (ipObject, workarea, reception) {
         $ctrl.removing = true;
         IP.delete({ id: ipObject.id }, { workarea: workarea, reception: reception }).$promise.then(function() {
-            Notifications.add($translate.instant('IP_REMOVED', {label: ipObject.label}), 'success');
             $ctrl.removing = false;
             $uibModalInstance.close();
-    }).catch(function(response) {
-            $ctrl.removing = false;
-            ErrorResponse.default(response);
-        })
+        }).catch(function(response) {
+                $ctrl.removing = false;
+        });
     };
 });

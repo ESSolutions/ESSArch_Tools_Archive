@@ -1,4 +1,4 @@
-angular.module('essarch.controllers').controller("WorkareaValidationCtrl", function($scope, $controller, $interval, $http, appConfig, $rootScope, WorkareaValidation, $q, Notifications, $uibModal, $window, $log, Profile, ErrorResponse) {
+angular.module('essarch.controllers').controller("WorkareaValidationCtrl", function($scope, $controller, $interval, $http, appConfig, $rootScope, WorkareaValidation, $q, Notifications, $uibModal, $window, $log, Profile) {
     var vm = this;
     var ipSortString = [];
     $controller('WorkareaCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
@@ -117,9 +117,7 @@ angular.module('essarch.controllers').controller("WorkareaValidationCtrl", funct
         }).then(function(response) {
             Notifications.add(response.data, "success");
             vm.validationPipe(vm.validationTableState);
-        }).catch(function(response) {
-            ErrorResponse.default(response);
-        })
+        });
     }
 
     var validationInterval = $interval(function() {

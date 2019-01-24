@@ -225,7 +225,6 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
                     data: data
                 };
             }).catch(function (response) {
-                ErrorResponse.default(response);
                 return response;
             });
         } else {
@@ -239,7 +238,6 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
                     data: data
                 };
             }).catch(function (response) {
-                ErrorResponse.default(response);
                 return response;
             });
         }
@@ -344,16 +342,12 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
                         promises.push(Profile.get({ id: saProfile.profile.profile_aip })
                             .$promise.then(function (resource) {
                                 saProfile.profile.profile_aip = resource;
-                            }).catch(function(response){
-                                ErrorResponse.default(response);
                             }));
                     }
                     if (saProfile.profile.profile_dip) {
                         promises.push(Profile.get({ id: saProfile.profile.profile_dip })
                             .$promise.then(function (resource) {
                                 saProfile.profile.profile_dip = resource;
-                            }).catch(function(response){
-                                ErrorResponse.default(response);
                             }));
                     }
                 }
@@ -361,8 +355,6 @@ angular.module('essarch.services').factory('listViewService', function (IP, SA, 
             return $q.all(promises).then(function() {
                 return saProfile;
             })
-        }).catch(function(response){
-            ErrorResponse.default(response);
         });
     }
 

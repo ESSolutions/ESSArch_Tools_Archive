@@ -22,7 +22,7 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notifications, IPReception, IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, ContextMenuBase, ErrorResponse) {
+angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notifications, IPReception, IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, appConfig, $interval, $uibModal, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, ContextMenuBase) {
     var vm = this;
     var ipSortString = ['Receiving'];
     $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
@@ -118,7 +118,6 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
                 $anchorScroll();
             }).catch(function(response) {
                 $scope.receiveDisabled = false;
-                ErrorResponse.default(response);
             });
         });
     };
@@ -574,8 +573,7 @@ angular.module('essarch.controllers').controller('ReceptionCtrl', function(Notif
                     })
                         .catch(function (response) {
                             vm.receiveModalLoading = false;
-                            ErrorResponse.default(response);
-                        })
+                        });
                 } else {
                     vm.receiveModalLoading = false;
                     var modalInstance = $uibModal.open({
