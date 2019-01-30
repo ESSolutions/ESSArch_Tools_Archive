@@ -22,6 +22,11 @@
     Email - essarch@essolutions.se
 """
 
+import os
+from datetime import timedelta
+
+import dj_database_url
+
 """
 Django settings for ETA project.
 
@@ -33,11 +38,6 @@ https://docs.djangoproject.com/en/1.9/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
-
-import os
-from datetime import timedelta
-
-import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -57,8 +57,8 @@ ESSARCH_WORKFLOW_POLLERS = {
 
 try:
     from local_eta_settings import REDIS_URL
-except ImportError as exp:
-    REDIS_URL = os.environ.get('REDIS_URL_ETA','redis://localhost/2')
+except ImportError:
+    REDIS_URL = os.environ.get('REDIS_URL_ETA', 'redis://localhost/2')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '#-f#k7@7eyaez26p-)5$7#+58m79t)yz1@d-s8wn2_downta8*'
@@ -74,11 +74,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'proxy_pagination.ProxyPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-      'ESSArch_Core.auth.SessionAuthentication',
-      'rest_framework.authentication.BasicAuthentication',
+        'ESSArch_Core.auth.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-      'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticated',
     ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
@@ -204,8 +204,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 try:
     from local_eta_settings import DATABASE_URL
-except ImportError as exp:
-    DATABASE_URL = os.environ.get('DATABASE_URL_ETA','sqlite:///db.sqlite')
+except ImportError:
+    DATABASE_URL = os.environ.get('DATABASE_URL_ETA', 'sqlite:///db.sqlite')
 DATABASES = {'default': dj_database_url.parse(url=DATABASE_URL)}
 
 # Cache
@@ -239,17 +239,17 @@ LOGGING = {
         'file_eta': {
             'level': 'DEBUG',
             'formatter': 'verbose',
-            'class' : 'logging.handlers.RotatingFileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'filename': '/ESSArch/log/eta.log',
-            'maxBytes': 1024*1024*100, # 100MB
+            'maxBytes': 1024 * 1024 * 100,  # 100MB
             'backupCount': 5,
         },
         'log_file_auth': {
             'level': 'DEBUG',
-            'class' : 'logging.handlers.RotatingFileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'formatter': 'verbose',
             'filename': '/ESSArch/log/auth_eta.log',
-            'maxBytes': 1024*1024*100, # 100MB
+            'maxBytes': 1024 * 1024 * 100,  # 100MB
             'backupCount': 5,
         },
     },
@@ -334,7 +334,7 @@ DOCS_ROOT = os.path.join(BASE_DIR, 'docs/_build/{lang}/html')
 # Celery settings
 try:
     from local_eta_settings import RABBITMQ_URL
-except ImportError as exp:
+except ImportError:
     RABBITMQ_URL = os.environ.get('RABBITMQ_URL_ETA', 'amqp://guest:guest@localhost:5672/eta')
 CELERY_BROKER_URL = RABBITMQ_URL
 CELERY_IMPORTS = ("ESSArch_Core.ip.tasks", "preingest.tasks", "ESSArch_Core.WorkflowEngine.tests.tasks")
@@ -345,6 +345,6 @@ CELERY_TASK_EAGER_PROPAGATES = True
 OLD_PASSWORD_FIELD_ENABLED = True
 
 try:
-    from local_eta_settings import *
+    from local_eta_settings import *  # noqa
 except ImportError:
     pass

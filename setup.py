@@ -36,13 +36,15 @@ if __name__ == '__main__':
         version=versioneer.get_version(),
         description='ESSArch Tools Archive',
         long_description=open("README.md").read(),
-        long_description_content_type='text/markdown',        
+        long_description_content_type='text/markdown',
         author='Henrik Ek',
         author_email='henrik@essolutions.se',
         url='http://www.essolutions.se',
         project_urls={
             'Documentation': 'http://docs.essarch.org/',
-            'Source Code': 'https://github.com/ESSolutions/ESSArch_Tools_Archive/tree/%s' % versioneer.get_versions()['full'],
+            'Source Code': 'https://github.com/ESSolutions/ESSArch_Tools_Archive/tree/%s' % (
+                versioneer.get_versions()['full']
+            ),
             'Travis CI': 'https://travis-ci.org/ESSolutions/ESSArch_Tools_Archive',
         },
         classifiers=[
@@ -54,7 +56,7 @@ if __name__ == '__main__':
             "Programming Language :: Python",
             "Framework :: Django",
             "Topic :: System :: Archiving",
-        ],        
+        ],
         install_requires=[
             "ESSArch-Core>=1.1.0.*,<=1.1.1.*",
         ],
