@@ -45,7 +45,7 @@ var isProduction = (argv.production === undefined) ? false : true;
 
 var core = process.env.EC_FRONTEND;
 var coreHtmlFiles = [path.join(core, 'views/**/*.html')];
-var coreJsFiles = [path.join(core, 'scripts/**/*.js')];
+var coreJsFiles = [path.join(core, 'scripts/**/*.js'), path.join(core, 'lang/**/*.js')];
 var coreTestFiles = [path.join(core, 'tests/*.js')];
 var coreCssFiles = path.join(core, 'styles');
 
@@ -104,7 +104,7 @@ var jsVendorFiles = [
         'node_modules/angular-pretty-xml/src/angular-pretty-xml.js'
     ],
     jsFiles = [
-        'scripts/essarch.module.js', 'scripts/modules/*.module.js', 'scripts/core/*.js', 'scripts/controllers/*.js', 'scripts/components/*.js',
+        'scripts/essarch.module.js', 'scripts/modules/*.module.js', 'scripts/core/*.js', 'lang/**/*.js', 'scripts/controllers/*.js', 'scripts/components/*.js',
         'scripts/services/*.js', 'scripts/directives/*.js', 'scripts/configs/*.js'
     ],
     jsDest = 'scripts',

@@ -620,7 +620,7 @@ angular.module('essarch.controllers').controller('BaseCtrl', function(IP, Task, 
                             {
                                 "templateOptions": {
                                     "type": "text",
-                                    "label": column.label + " " + $translate.instant("START"),
+                                    "label": column.label + " " + $translate.instant('START'),
                                 },
                                 "type": "datepicker",
                                 "key": key + "_after"
@@ -630,7 +630,7 @@ angular.module('essarch.controllers').controller('BaseCtrl', function(IP, Task, 
                             {
                                 "templateOptions": {
                                     "type": "text",
-                                    "label": column.label + " " + $translate.instant("END"),
+                                    "label": column.label + " " + $translate.instant('END'),
                                 },
                                 "type": "datepicker",
                                 "key": key + "_before"
