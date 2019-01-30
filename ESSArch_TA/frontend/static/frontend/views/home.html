@@ -8,7 +8,7 @@
             <div class="user-admin">
                 <div ng-controller="UtilCtrl" class="mobile-notification">
                     <div class="notification-icon position-relative show-sm">
-                        <i ng-click="showAlert()" class="fas fa-lg fa-bell" uib-tooltip="{{'NOTIFICATIONS' | translate}}"  tooltip-placement="auto top" tooltip-append-to-body="true"></i>
+                        <i ng-click="showAlert()" class="fas fa-lg fa-bell" uib-tooltip="{{'NOTIFICATIONS.NOTIFICATIONS' | translate}}"  tooltip-placement="auto top" tooltip-append-to-body="true"></i>
                         <div ng-click="showAlert()" ng-if="unseenNotifications != 0 && unseenNotifications <= 999" class="unseen-text">{{unseenNotifications}}</div>
                         <div ng-click="showAlert()" ng-if="unseenNotifications > 999" class="unseen-text">{{999}}+</div>
                     </div>
@@ -21,7 +21,7 @@
                 <a tabindex="0" ng-keydown="navKeydownListener($event, 'home.reception')" class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.reception')}" ui-sref="home.reception" ng-if="checkPermissions('home.reception')">{{('RECEPTION' | translate)}}</a>
                 <a tabindex="0" ng-keydown="navKeydownListener($event, 'home.workarea')" class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.workarea')}" ui-sref="home.workarea" ng-if="checkPermissions('home.workarea')">{{('WORKAREA' | translate)}}</a>
                 <a tabindex="0" ng-keydown="navKeydownListener($event, 'home.transferSip')" class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.transferSip')}" ui-sref="home.transferSip" ng-if="checkPermissions('home.transferSip')">{{('TRANSFERSIP' | translate)}}</a>
-                <a tabindex="0" ng-keydown="navKeydownListener($event, 'home.administration.import')" class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.administration.import')}" ui-sref="home.administration.import" ng-if="checkPermissions('home.administration.import')">{{('IMPORT' | translate)}}</a>
+                <a tabindex="0" ng-keydown="navKeydownListener($event, 'home.administration.import')" class="nav-item sliding-middle-out" ng-class="{'chosen': $state.includes('home.administration.import')}" ui-sref="home.administration.import" ng-if="checkPermissions('home.administration.import')">{{('IMPORT.IMPORT' | translate)}}</a>
             </nav>
             <div ng-controller="UtilCtrl" class="tasks-icons">
                 <span ng-click="reloadPage()" class="fas fa-lg fa-sync-alt fa-sync-alt-animate-once" uib-tooltip="{{'REFRESHPAGE' | translate}}"
@@ -31,14 +31,14 @@
                 <a ui-sref="home.versionInfo" class="fas fa-lg fa-question-circle" uib-tooltip="{{'HELP' | translate}}" tooltip-placement="auto top"
                     tooltip-append-to-body="true"></a>
                 <div class="notification-icon">
-                    <i ng-click="showAlert()" class="fas fa-lg fa-bell" uib-tooltip="{{'NOTIFICATIONS' | translate}}"  tooltip-placement="auto top" tooltip-append-to-body="true"></i>
+                    <i ng-click="showAlert()" class="fas fa-lg fa-bell" uib-tooltip="{{'NOTIFICATIONS.NOTIFICATIONS' | translate}}"  tooltip-placement="auto top" tooltip-append-to-body="true"></i>
                     <div ng-click="showAlert()" ng-if="unseenNotifications != 0 && unseenNotifications <= 999" class="unseen-text">{{unseenNotifications}}</div>
                     <div ng-click="showAlert()" ng-if="unseenNotifications > 999" class="unseen-text">{{999}}+</div>
                     <notifications></notifications>
                 </div>
-                <div class="organization-select" ng-controller="OrganizationCtrl" uib-tooltip="{{'CHANGE_ORGANIZATION' | translate}}" tooltip-placement="auto top" tooltip-append-to-body="true">
+                <div class="organization-select" ng-controller="OrganizationCtrl" uib-tooltip="{{'ORGANIZATION.CHANGE_ORGANIZATION' | translate}}" tooltip-placement="auto top" tooltip-append-to-body="true">
                     <select tabindex="-1" style="width: auto; margin-left: 10px;" class="form-control" ng-model="currentOrganization" ng-disabled="availableOrganizations.length === 0" ng-change="changeOrganization(); updateListView()" ng-options="x as x.name for x in availableOrganizations track by x.id">
-                        <option ng-hide="availableOrganizations.length > 0" selected value="">{{'NO_ORGANIZATIONS' | translate}}</option>
+                        <option ng-hide="availableOrganizations.length > 0" selected value="">{{'ORGANIZATION.NO_ORGANIZATIONS' | translate}}</option>
                     </select>
                 </div>
                 <div ng-controller="LanguageCtrl" class="language-select" style="width: 100px; margin-left: 10px;">
