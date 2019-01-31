@@ -24,7 +24,10 @@
 
 from rest_framework import serializers
 
-from ESSArch_Core.ip.serializers import InformationPackageSerializer as CoreInformationPackageSerializer, WorkareaSerializer
+from ESSArch_Core.ip.serializers import (
+    InformationPackageSerializer as CoreInformationPackageSerializer,
+    WorkareaSerializer,
+)
 from ESSArch_Core.profiles.serializers import ProfileIPSerializer
 from ESSArch_Core.profiles.utils import profile_types
 

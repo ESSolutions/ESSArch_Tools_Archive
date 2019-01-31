@@ -22,21 +22,6 @@
     Email - essarch@essolutions.se
 """
 
-"""etp URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/1.9/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.conf.urls import url, include
-    2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
-"""
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
@@ -47,10 +32,20 @@ from ESSArch_Core.auth.views import GroupViewSet, PermissionViewSet, MeView, Not
 from ESSArch_Core.configuration.views import ParameterViewSet, PathViewSet, SysInfoView
 from ESSArch_Core.fixity.views import ValidationViewSet, ValidationFilesViewSet
 from ESSArch_Core.ip.views import AgentViewSet, EventIPViewSet, WorkareaEntryViewSet
-from ESSArch_Core.profiles.views import ProfileViewSet, ProfileIPViewSet, ProfileIPDataViewSet, SubmissionAgreementViewSet
+from ESSArch_Core.profiles.views import (
+    ProfileViewSet,
+    ProfileIPViewSet,
+    ProfileIPDataViewSet,
+    SubmissionAgreementViewSet,
+)
 from ESSArch_Core.routers import ESSArchRouter
 from configuration.views import EventTypeViewSet
-from ip.views import InformationPackageViewSet, InformationPackageReceptionViewSet, WorkareaFilesViewSet, WorkareaViewSet
+from ip.views import (
+    InformationPackageViewSet,
+    InformationPackageReceptionViewSet,
+    WorkareaFilesViewSet,
+    WorkareaViewSet,
+)
 from profiles.views import ProfileSAViewSet
 
 admin.site.site_header = 'ESSArch Tools Archive Administration'
@@ -123,7 +118,7 @@ urlpatterns = [
     url(r'^api/sysinfo/', SysInfoView.as_view()),
     url(r'^api/me/$', MeView.as_view(), name='me'),
     url(r'^api/', include(router.urls)),
-    url(r'^accounts/changepassword', auth_views.password_change, {'post_change_redirect': '/'} ),
+    url(r'^accounts/changepassword', auth_views.password_change, {'post_change_redirect': '/'}),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^docs/', include('ESSArch_Core.docs.urls')),
     url(r'^template/', include('ESSArch_Core.essxml.ProfileMaker.urls')),

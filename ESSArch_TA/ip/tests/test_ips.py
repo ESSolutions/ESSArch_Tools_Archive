@@ -50,7 +50,7 @@ class IdentifyIP(TransactionTestCase):
 
         try:
             os.mkdir(self.datadir)
-        except:
+        except BaseException:
             pass
 
         mimetypes = Path.objects.create(
@@ -78,7 +78,7 @@ class IdentifyIP(TransactionTestCase):
     def tearDown(self):
         try:
             shutil.rmtree(self.datadir)
-        except:
+        except BaseException:
             pass
 
     def test_identify_ip(self):

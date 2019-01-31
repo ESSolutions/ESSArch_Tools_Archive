@@ -123,7 +123,7 @@ class UndoStepTestCase(TestCase):
         self.client.force_authenticate(user=self.user)
 
         self.step = ProcessStep.objects.create()
-        task = ProcessTask.objects.create(
+        ProcessTask.objects.create(
             name='ESSArch_Core.WorkflowEngine.tests.tasks.First',
             processstep=self.step,
         )
@@ -152,7 +152,7 @@ class RetryStepTestCase(TestCase):
             name='ESSArch_Core.WorkflowEngine.tests.tasks.First',
             processstep=self.step,
         )
-        undo_task = ProcessTask.objects.create(
+        ProcessTask.objects.create(
             name='ESSArch_Core.WorkflowEngine.tests.tasks.First',
             processstep=self.step, undone_task=task, undo_type=True,
         )

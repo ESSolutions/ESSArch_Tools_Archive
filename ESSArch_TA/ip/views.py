@@ -54,10 +54,22 @@ from ESSArch_Core.ip.permissions import CanTransferSIP, IsResponsibleOrCanSeeAll
 from ESSArch_Core.ip.views import InformationPackageViewSet as InformationPackageViewSetCore
 from ESSArch_Core.mixins import GetObjectForUpdateViewMixin, PaginatedViewMixin
 from ESSArch_Core.profiles.models import ProfileIP, SubmissionAgreement
-from ESSArch_Core.util import creation_date, flatten, get_immediate_subdirectories, get_value_from_path, in_directory, list_files, normalize_path, parse_content_range_header, timestamp_to_datetime, remove_prefix
+from ESSArch_Core.util import (
+    creation_date,
+    flatten,
+    get_immediate_subdirectories,
+    get_value_from_path,
+    in_directory,
+    list_files,
+    normalize_path,
+    parse_content_range_header,
+    timestamp_to_datetime,
+    remove_prefix,
+)
 
 from .filters import InformationPackageFilter
 from .serializers import InformationPackageSerializer, InformationPackageReadSerializer
+
 
 class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
@@ -79,7 +91,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         try:
             ip = parse_submit_description(xmlfile, srcdir)
-        except (etree.LxmlError, ValueError) as e:
+        except (etree.LxmlError, ValueError):
             self.logger.exception(u'Failed to parse {}'.format(xmlfile))
             raise
 
@@ -142,10 +154,11 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             if os.path.isfile(xmlfile):
                 try:
                     ip = self.parse_ip_with_xmlfile(xmlfile)
-                except (etree.LxmlError, ValueError) as e:
+                except (etree.LxmlError, ValueError):
                     continue
 
-                if not InformationPackage.objects.filter(object_identifier_value=ip['object_identifier_value']).exists():
+                objid = ip['object_identifier_value']
+                if not InformationPackage.objects.filter(object_identifier_value=objid).exists():
                     ips.append(ip)
 
         for container_file in self.get_container_files():
@@ -158,10 +171,12 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         for directory in self.get_directories():
             ip = self.parse_directory_ip(directory)
-            if not InformationPackage.objects.filter(object_identifier_value=ip['object_identifier_value']).exists():
+            objid = ip['object_identifier_value']
+            if not InformationPackage.objects.filter(object_identifier_value=objid).exists():
                 ips.append(ip)
 
-        from_db = InformationPackage.objects.visible_to_user(request.user).filter(state__in=['Prepared', 'Receiving']).prefetch_related(
+        states = ['Prepared', 'Receiving']
+        from_db = InformationPackage.objects.visible_to_user(request.user).filter(state__in=states).prefetch_related(
             Prefetch('profileip_set', to_attr='profiles'),
         )
         serializer = InformationPackageSerializer(
@@ -199,7 +214,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         for container in self.get_container_files():
             for path in container_paths:
-                if path + p == container:
+                if path == container:
                     return Response(self.parse_unidentified_ip(container))
 
         for directory in self.get_directories():
@@ -303,7 +318,10 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         existing = InformationPackage.objects.filter(object_identifier_value=pk).first()
         if existing is not None:
-            self.logger.warn('Tried to prepare IP with id %s which already exists' % (pk), extra={'user': request.user.pk})
+            self.logger.warn(
+                'Tried to prepare IP with id %s which already exists' % (pk),
+                extra={'user': request.user.pk}
+            )
             raise exceptions.ParseError('IP with id %s already exists: %s' % (pk, str(existing.pk)))
 
         reception = Path.objects.values_list('value', flat=True).get(entity="path_ingest_reception")
@@ -322,18 +340,27 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             xmlfile = os.path.join(reception, '%s.xml' % pk)
 
             if not os.path.isfile(xmlfile):
-                self.logger.warn('Tried to prepare IP with missing XML file %s' % (xmlfile), extra={'user': request.user.pk})
+                self.logger.warn(
+                    'Tried to prepare IP with missing XML file %s' % (xmlfile),
+                    extra={'user': request.user.pk}
+                )
                 raise exceptions.ParseError('%s does not exist' % xmlfile)
 
             try:
                 container = os.path.join(reception, self.get_container_for_xml(xmlfile))
                 objpath = container
             except etree.LxmlError:
-                self.logger.warn('Tried to prepare IP with invalid XML file %s' % (xmlfile), extra={'user': request.user.pk})
+                self.logger.warn(
+                    'Tried to prepare IP with invalid XML file %s' % (xmlfile),
+                    extra={'user': request.user.pk}
+                )
                 raise exceptions.ParseError('Invalid XML file, %s' % xmlfile)
 
             if not os.path.isfile(container):
-                self.logger.warn('Tried to prepare IP with missing container file %s' % (container), extra={'user': request.user.pk})
+                self.logger.warn(
+                    'Tried to prepare IP with missing container file %s' % (container),
+                    extra={'user': request.user.pk}
+                )
                 raise exceptions.ParseError('%s does not exist' % container)
 
             objid, _ = os.path.splitext(os.path.basename(container))
@@ -356,7 +383,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         try:
             sa = SubmissionAgreement.objects.get(pk=sa)
-        except (ValidationError, ValueError, SubmissionAgreement.DoesNotExist) as e:
+        except (ValidationError, ValueError, SubmissionAgreement.DoesNotExist):
             raise exceptions.ParseError('Could not find SA "%s"' % sa)
 
         ip = InformationPackage.objects.create(
@@ -408,7 +435,10 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
             raise exceptions.NotFound('Information package with id="%s" not found' % pk)
 
         if ip.state != 'Prepared':
-            self.logger.warn('Tried to receive IP %s from reception which is in state "%s"' % (pk, ip.state), extra={'user': request.user.pk})
+            self.logger.warn(
+                'Tried to receive IP %s from reception which is in state "%s"' % (pk, ip.state),
+                extra={'user': request.user.pk}
+            )
             raise exceptions.ParseError('Information package must be in state "Prepared"')
 
         for profile_ip in ProfileIP.objects.filter(ip=ip).iterator():
@@ -644,7 +674,6 @@ class InformationPackageViewSet(InformationPackageViewSetCore, GetObjectForUpdat
             paths.append(path)
             paths += [path + '.' + ext for ext in ['xml', 'tar', 'zip']]
 
-
         step = ProcessStep.objects.create(
             name="Delete files",
             eager=False,
@@ -653,7 +682,7 @@ class InformationPackageViewSet(InformationPackageViewSetCore, GetObjectForUpdat
 
         for path in paths:
             path = normalize_path(path)
-            t = ProcessTask.objects.create(
+            ProcessTask.objects.create(
                 name='ESSArch_Core.tasks.DeleteFiles',
                 params={'path': path},
                 processstep=step,

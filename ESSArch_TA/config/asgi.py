@@ -22,15 +22,16 @@
     Email - essarch@essolutions.se
 """
 
-"""
-ASGI config for eta project.
-
-"""
 
 import os
 
 import django
 from channels.routing import get_default_application
+
+"""
+ASGI config for eta project.
+
+"""
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()

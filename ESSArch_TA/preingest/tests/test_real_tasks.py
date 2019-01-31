@@ -26,7 +26,6 @@ import os
 import shutil
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.test import TestCase
 from django.utils import timezone
 
@@ -39,7 +38,6 @@ from ESSArch_Core.configuration.models import (
 )
 
 from ESSArch_Core.ip.models import (
-    EventIP,
     InformationPackage,
 )
 
@@ -85,7 +83,7 @@ class test_tasks(TestCase):
         for path in [cls.ingest_reception, cls.ingest_work, cls.gate_reception]:
             try:
                 shutil.rmtree(path)
-            except:
+            except BaseException:
                 pass
 
         super(test_tasks, cls).tearDownClass()
