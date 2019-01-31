@@ -317,9 +317,6 @@ LOCALE_PATHS = [
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.environ.get('STATIC_ROOT_ETA', os.path.join(BASE_DIR, 'static_root'))
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
 
 DJANGO_GULP_REV_PATH = os.path.join(BASE_DIR, 'frontend/static/frontend/build/rev-manifest.json')
 
