@@ -1,42 +1,82 @@
 <div class="transfer-sip w-100">
-    <div class="content-wrapper">
-        <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'">
+  <div class="content-wrapper">
+    <div class="list-view" ng-include src="'static/frontend/views/list_view_table.html'"></div>
+    <uib-tabset
+      ng-if="(ip !== null || ips.length > 0) && !(vm.specificTabs.length == 0 && ips.length > 0)"
+      active="vm.activeTab"
+      class="tabs tabs-style-bar"
+    >
+      <uib-tab
+        index="'transfer_sip'"
+        ng-if="ip.state == 'Received' || vm.specificTabs.includes('transfer_sip')"
+        heading="{{'TRANSFERSIP' | translate}}"
+      >
+        <div ng-if="vm.activeTab === 'transfer_sip'">
+          <div
+            class="select-sub-edit-eventlog-wrapper"
+            ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring'"
+            tabindex="-1"
+            ng-keydown="vm.contentViewsKeydownListener($event)"
+          >
+            <div
+              class="select-view"
+              id="select-view"
+              ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring'"
+            >
+              <form class="receive-sip-eventlog-form" ng-submit="vm.transferModal(ip)">
+                <span
+                  ng-if="vm.info.visible && transferDisabled"
+                  translate="{{vm.info.text}}"
+                  translate-values="vm.info.values"
+                  class="transfer-info-text"
+                ></span>
+                <button
+                  type="submit"
+                  ng-dblClick=""
+                  ng-disabled="transferDisabled || !checkPermission('ip.transfer_sip')"
+                  class="btn btn-primary submit-button"
+                >
+                  {{'TRANSFERSIP' | translate}}
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
-        <uib-tabset ng-if="(ip !== null || ips.length > 0) && !(vm.specificTabs.length == 0 && ips.length > 0)" active="vm.activeTab" class="tabs tabs-style-bar">
-            <uib-tab index="'transfer_sip'" ng-if="ip.state == 'Received' || vm.specificTabs.includes('transfer_sip')" heading="{{'TRANSFERSIP' | translate}}">
-                <div ng-if="vm.activeTab === 'transfer_sip'">
-                    <div class="select-sub-edit-eventlog-wrapper" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring'" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
-                        <div class="select-view" id="select-view" ng-if="selectedIp.id != '' && selectedIp.state != 'Transferred' && selectedIp.state != 'Transferring'">
-                            <form class="receive-sip-eventlog-form" ng-submit="vm.transferModal(ip)">
-                                <span ng-if="vm.info.visible && transferDisabled" translate="{{vm.info.text}}" translate-values="vm.info.values" class="transfer-info-text"></span>
-                                <button type="submit" ng-dblClick="" ng-disabled="transferDisabled || !checkPermission('ip.transfer_sip')" class="btn btn-primary submit-button">{{'TRANSFERSIP' | translate}}</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </uib-tab>
-            <uib-tab ng-if="ip !== null && ips.length == 0" index="'tasks'" heading="{{'TASKS' | translate}}">
-                <div ng-if="vm.activeTab === 'tasks'" class="events-status-wrapper">
-                    <div class="status-view">
-                        <state-tree-view ip="ip"></state-tree-view>
-                    </div>
-                </div>
-            </uib-tab>
-            <uib-tab ng-if="ip !== null && ips.length == 0" index="'events'" heading="{{'EVENT.EVENTS' | translate}}">
-                <div ng-if="vm.activeTab === 'events'" class="events-status-wrapper">
-                    <event-table ip="ip"></event-table>
-                </div>
-            </uib-tab>
-            <uib-tab ng-if="ip !== null && ips.length == 0 && (ip.responsible.id == auth.id || ip.responsible == null || ip.permissions.includes('see_other_user_ip_files'))" index="'filebrowser'" heading="{{'FILEBROWSER.FILEBROWSER' | translate}}">
-                <div ng-if="vm.activeTab === 'filebrowser'" class="file-browser" tabindex="-1" ng-keydown="vm.contentViewsKeydownListener($event)">
-                    <filebrowser ip="ip"></filebrowser>
-                </div>
-            </uib-tab>
-        </uib-tabset>
-        <div class="no-tabs-available" ng-if="(ip !== null || ips.length > 0) && ((vm.specificTabs.length == 0 && ips.length > 0 ) || vm.activeTab === 'no_tabs')">
-            <h4>
-                {{'NO_ACTIONS_FOR_SELECTED_IPS' | translate}}
-            </h4>
+      </uib-tab>
+      <uib-tab ng-if="ip !== null && ips.length == 0" index="'tasks'" heading="{{'TASKS' | translate}}">
+        <div ng-if="vm.activeTab === 'tasks'" class="events-status-wrapper">
+          <div class="status-view">
+            <state-tree-view ip="ip"></state-tree-view>
+          </div>
         </div>
+      </uib-tab>
+      <uib-tab ng-if="ip !== null && ips.length == 0" index="'events'" heading="{{'EVENT.EVENTS' | translate}}">
+        <div ng-if="vm.activeTab === 'events'" class="events-status-wrapper">
+          <event-table ip="ip"></event-table>
+        </div>
+      </uib-tab>
+      <uib-tab
+        ng-if="ip !== null && ips.length == 0 && (ip.responsible.id == auth.id || ip.responsible == null || ip.permissions.includes('see_other_user_ip_files'))"
+        index="'filebrowser'"
+        heading="{{'FILEBROWSER.FILEBROWSER' | translate}}"
+      >
+        <div
+          ng-if="vm.activeTab === 'filebrowser'"
+          class="file-browser"
+          tabindex="-1"
+          ng-keydown="vm.contentViewsKeydownListener($event)"
+        >
+          <filebrowser ip="ip"></filebrowser>
+        </div>
+      </uib-tab>
+    </uib-tabset>
+    <div
+      class="no-tabs-available"
+      ng-if="(ip !== null || ips.length > 0) && ((vm.specificTabs.length == 0 && ips.length > 0 ) || vm.activeTab === 'no_tabs')"
+    >
+      <h4>
+        {{'NO_ACTIONS_FOR_SELECTED_IPS' | translate}}
+      </h4>
     </div>
+  </div>
 </div>

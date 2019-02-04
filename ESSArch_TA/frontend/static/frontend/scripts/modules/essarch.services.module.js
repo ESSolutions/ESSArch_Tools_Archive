@@ -1,3 +1,1 @@
-angular.module('essarch.services', [
-    'prettyXml',
-]);
+angular.module('essarch.services', ['prettyXml']);

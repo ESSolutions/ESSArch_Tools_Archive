@@ -22,83 +22,87 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('essarch.services').factory('Resource', function ($q, $filter, $timeout, listViewService, $rootScope) {
-
-    //Get data for Events table
-	function getEventPage(start, number, pageNumber, params, selected, sort, columnFilters, search) {
-        var sortString = sort.predicate;
-        if(sort.predicate == "eventDateTime") {
-            if(sort.reverse) {
-                sortString = sortString + ",-id";
-            } else {
-                sortString = sortString + ",id";
-            }
-        }
-        if(sort.reverse) {
-            sortString = "-"+sortString;
-        }
-        return listViewService.getEvents($rootScope.ip, pageNumber, number, sortString, columnFilters, search).then(function(value) {
-            var eventCollection = value.data;
-            eventCollection.forEach(function(event) {
-                selected.forEach(function(item) {
-                    if(item.id == event.id) {
-                        event.class = "selected";
-                    }
-                });
-            });
-            return {
-                data: eventCollection,
-                numberOfPages: Math.ceil(value.count / number)
-            };
-        });
-	}
-    //Get data for IP table
-    function getIpPage(start, number, pageNumber, params, sort, search, state, columnFilters, workarea) {
-        var sortString = sort.predicate;
-        if(sort.reverse) {
-            sortString = "-"+sortString;
-        }
-        return listViewService.getListViewData(pageNumber, number, sortString, search, state, columnFilters, workarea).then(function(value) {
-            var ipCollection = value.data;
-            return {
-                data: ipCollection,
-                numberOfPages: Math.ceil(value.count / number)
-            };
-        });
-	}
-    function getReceptionIps(start, number, pageNumber, params, sort) {
-        var sortString = sort.predicate;
-        if(sort.reverse) {
-            sortString = "-"+sortString;
-        }
-        return listViewService.getReceptionIps(pageNumber, number, sortString).then(function(value) {
-            var ipCollection = value.data;
-            return {
-                data: ipCollection,
-                numberOfPages: Math.ceil(value.count / number)
-            };
-        });
-	}
-
-    function getWorkareaIps(workarea, start, number, pageNumber, params, sort, search, expandedAics, columnFilters) {
-        var sortString = sort.predicate;
-        if(sort.reverse) {
-            sortString = "-"+sortString;
-        }
-        return listViewService.getWorkareaData(workarea, pageNumber, number, sortString, search, columnFilters).then(function(value) {
-            var ipCollection = value.data;
-            return {
-                data: ipCollection,
-                numberOfPages: Math.ceil(value.count / number)
-            };
-        });
+angular.module('essarch.services').factory('Resource', function($q, $filter, $timeout, listViewService, $rootScope) {
+  //Get data for Events table
+  function getEventPage(start, number, pageNumber, params, selected, sort, columnFilters, search) {
+    var sortString = sort.predicate;
+    if (sort.predicate == 'eventDateTime') {
+      if (sort.reverse) {
+        sortString = sortString + ',-id';
+      } else {
+        sortString = sortString + ',id';
+      }
     }
+    if (sort.reverse) {
+      sortString = '-' + sortString;
+    }
+    return listViewService
+      .getEvents($rootScope.ip, pageNumber, number, sortString, columnFilters, search)
+      .then(function(value) {
+        var eventCollection = value.data;
+        eventCollection.forEach(function(event) {
+          selected.forEach(function(item) {
+            if (item.id == event.id) {
+              event.class = 'selected';
+            }
+          });
+        });
+        return {
+          data: eventCollection,
+          numberOfPages: Math.ceil(value.count / number),
+        };
+      });
+  }
+  //Get data for IP table
+  function getIpPage(start, number, pageNumber, params, sort, search, state, columnFilters, workarea) {
+    var sortString = sort.predicate;
+    if (sort.reverse) {
+      sortString = '-' + sortString;
+    }
+    return listViewService
+      .getListViewData(pageNumber, number, sortString, search, state, columnFilters, workarea)
+      .then(function(value) {
+        var ipCollection = value.data;
+        return {
+          data: ipCollection,
+          numberOfPages: Math.ceil(value.count / number),
+        };
+      });
+  }
+  function getReceptionIps(start, number, pageNumber, params, sort) {
+    var sortString = sort.predicate;
+    if (sort.reverse) {
+      sortString = '-' + sortString;
+    }
+    return listViewService.getReceptionIps(pageNumber, number, sortString).then(function(value) {
+      var ipCollection = value.data;
+      return {
+        data: ipCollection,
+        numberOfPages: Math.ceil(value.count / number),
+      };
+    });
+  }
 
-	return {
-		getEventPage: getEventPage,
-        getIpPage: getIpPage,
-        getReceptionIps: getReceptionIps,
-        getWorkareaIps: getWorkareaIps,
-	};
+  function getWorkareaIps(workarea, start, number, pageNumber, params, sort, search, expandedAics, columnFilters) {
+    var sortString = sort.predicate;
+    if (sort.reverse) {
+      sortString = '-' + sortString;
+    }
+    return listViewService
+      .getWorkareaData(workarea, pageNumber, number, sortString, search, columnFilters)
+      .then(function(value) {
+        var ipCollection = value.data;
+        return {
+          data: ipCollection,
+          numberOfPages: Math.ceil(value.count / number),
+        };
+      });
+  }
 
+  return {
+    getEventPage: getEventPage,
+    getIpPage: getIpPage,
+    getReceptionIps: getReceptionIps,
+    getWorkareaIps: getWorkareaIps,
+  };
 });

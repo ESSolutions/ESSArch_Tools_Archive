@@ -22,8 +22,10 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('essarch.controllers').controller('TabsCtrl', function TabsCtrl($state, $scope, $location, $window, myService, $translate, $rootScope){
+angular
+  .module('essarch.controllers')
+  .controller('TabsCtrl', function TabsCtrl($state, $scope, $location, $window, myService, $translate, $rootScope) {
     $scope.go = function(tab) {
-        $state.go(tab.link);
-    }
-});
+      $state.go(tab.link);
+    };
+  });
