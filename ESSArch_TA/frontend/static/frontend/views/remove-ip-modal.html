@@ -1,21 +1,31 @@
 <div class="modal-heading">
-    <h3 class="modal-title" id="modal-title">{{'DOYOUWANTTOREMOVEIP' | translate}}</h3>
+  <h3 class="modal-title" id="modal-title">{{'DOYOUWANTTOREMOVEIP' | translate}}</h3>
 </div>
 <div class="modal-body" id="modal-body">
-    <b>IP: {{$ctrl.data.ip.object_identifier_value}}</b>
-    <form>
-        <label>
-            <input type="checkbox" ng-model="$ctrl.workareaRemove">
-            {{ 'REMOVE_FROM_WORKAREA' | translate }}
-        </label>
-        <br />
-        <label>
-            <input type="checkbox" ng-model="$ctrl.receptionRemove">
-            {{ 'REMOVE_FROM_RECEPTION' | translate }}
-        </label>
-    </form>
+  <b>IP: {{$ctrl.data.ip.object_identifier_value}}</b>
+  <form>
+    <label>
+      <input type="checkbox" ng-model="$ctrl.workareaRemove" />
+      {{ 'REMOVE_FROM_WORKAREA' | translate }}
+    </label>
+    <br />
+    <label>
+      <input type="checkbox" ng-model="$ctrl.receptionRemove" />
+      {{ 'REMOVE_FROM_RECEPTION' | translate }}
+    </label>
+  </form>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-danger" type="button" ng-click="$ctrl.remove($ctrl.data.ip, $ctrl.workareaRemove, $ctrl.receptionRemove)" focused="true" ng-disabled="$ctrl.removing">{{'REMOVE' | translate}} <i ng-if="$ctrl.removing" class="fas fa-spinner fa-spin"/></button>
-    <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()" ng-disabled="$ctrl.removing">{{'CANCEL' | translate}}</button>
+  <button
+    class="btn btn-danger"
+    type="button"
+    ng-click="$ctrl.remove($ctrl.data.ip, $ctrl.workareaRemove, $ctrl.receptionRemove)"
+    focused="true"
+    ng-disabled="$ctrl.removing"
+  >
+    {{'REMOVE' | translate}} <i ng-if="$ctrl.removing" class="fas fa-spinner fa-spin" />
+  </button>
+  <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()" ng-disabled="$ctrl.removing">
+    {{'CANCEL' | translate}}
+  </button>
 </div>

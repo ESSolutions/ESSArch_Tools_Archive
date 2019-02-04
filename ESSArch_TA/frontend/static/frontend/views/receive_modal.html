@@ -1,15 +1,26 @@
 <div class="modal-heading">
-    <h3 class="modal-title" id="modal-title">{{'RECEIVE' | translate}}: {{$ctrl.data.ip.object_identifier_value}}</h3>
+  <h3 class="modal-title" id="modal-title">{{'RECEIVE' | translate}}: {{$ctrl.data.ip.object_identifier_value}}</h3>
 </div>
 <form name="$ctrl.form">
-    <div class="modal-body" id="modal-body">
-        <profile-editor ip="ip" share-data="$ctrl.getProfileData($event)"></profile-editor>
+  <div class="modal-body" id="modal-body">
+    <profile-editor ip="ip" share-data="$ctrl.getProfileData($event)"></profile-editor>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" type="button" ng-click="$ctrl.skip()">
+      {{'SKIP' | translate}} <i class=" fas fa-angle-double-right"></i>
+    </button>
+    <div class="receive-footer">
+      <button
+        class="btn btn-primary"
+        ng-click="$ctrl.confirmReceiveModal($ctrl.data.ip)"
+        ng-disabled="receiveDisabled || !$ctrl.approvedToReceive() || $ctrl.receiving"
+        focused="true"
+      >
+        {{'RECEIVESIP' | translate}}
+      </button>
+      <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()" ng-disabled="$ctrl.receiving">
+        {{'CANCEL' | translate}}
+      </button>
     </div>
-    <div class="modal-footer">
-        <button class="btn btn-default" type="button" ng-click="$ctrl.skip()">{{'SKIP' | translate}} <i class=" fas fa-angle-double-right"></i></button>
-        <div class="receive-footer">
-            <button class="btn btn-primary" ng-click="$ctrl.confirmReceiveModal($ctrl.data.ip)" ng-disabled="receiveDisabled || !$ctrl.approvedToReceive() || $ctrl.receiving" focused="true">{{'RECEIVESIP' | translate}}</button>
-            <button class="btn btn-default" type="button" ng-click="$ctrl.cancel()" ng-disabled="$ctrl.receiving">{{'CANCEL' | translate}}</button>
-        </div>
-    </div>
+  </div>
 </form>

@@ -22,73 +22,78 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('essarch.controllers').controller('ModalInstanceCtrl', function ($uibModalInstance, djangoAuth, $scope, $http, appConfig, $translate) {
+angular
+  .module('essarch.controllers')
+  .controller('ModalInstanceCtrl', function($uibModalInstance, djangoAuth, $scope, $http, appConfig, $translate) {
     var $ctrl = this;
     $ctrl.error_messages_old = [];
     $ctrl.error_messages_pw1 = [];
     $ctrl.error_messages_pw2 = [];
     $ctrl.tracebackCopied = false;
     $ctrl.copied = function() {
-        $ctrl.tracebackCopied = true;
-    }
+      $ctrl.tracebackCopied = true;
+    };
     $ctrl.idCopied = false;
     $ctrl.idCopyDone = function() {
-        $ctrl.idCopied = true;
-    }
-    $ctrl.save = function () {
-        $ctrl.data = {
-            name: $ctrl.profileName
-        };
-        $uibModalInstance.close($ctrl.data);
+      $ctrl.idCopied = true;
     };
-    $ctrl.prepare = function () {
-        $ctrl.data = {
-            label: $ctrl.label
-        };
-        $uibModalInstance.close($ctrl.data);
+    $ctrl.save = function() {
+      $ctrl.data = {
+        name: $ctrl.profileName,
+      };
+      $uibModalInstance.close($ctrl.data);
     };
-    $ctrl.receive = function () {
-        $ctrl.data = {
-            ip: $scope.displayedIps,
-            sa: $ctrl.sa,
-        };
-        $uibModalInstance.close($ctrl.data);
-    }
-    $ctrl.lock = function () {
-        $ctrl.data = {
-            status: "locked"
-        }
-        $uibModalInstance.close($ctrl.data);
+    $ctrl.prepare = function() {
+      $ctrl.data = {
+        label: $ctrl.label,
+      };
+      $uibModalInstance.close($ctrl.data);
+    };
+    $ctrl.receive = function() {
+      $ctrl.data = {
+        ip: $scope.displayedIps,
+        sa: $ctrl.sa,
+      };
+      $uibModalInstance.close($ctrl.data);
+    };
+    $ctrl.lock = function() {
+      $ctrl.data = {
+        status: 'locked',
+      };
+      $uibModalInstance.close($ctrl.data);
     };
     $ctrl.lockSa = function() {
-        $ctrl.data = {
-            status: "locked"
+      $ctrl.data = {
+        status: 'locked',
+      };
+      $uibModalInstance.close($ctrl.data);
+    };
+    $ctrl.remove = function() {
+      $ctrl.data = {
+        workarea: $ctrl.workareaRemove,
+        reception: $ctrl.receptionRemove,
+      };
+      $uibModalInstance.close($ctrl.data);
+    };
+    $ctrl.prepareUnidentified = function() {
+      $ctrl.data = {
+        status: 'prepared',
+      };
+      $uibModalInstance.close($ctrl.data);
+    };
+    $ctrl.changePassword = function() {
+      djangoAuth.changePassword($ctrl.pw1, $ctrl.pw2, $ctrl.oldPw).then(
+        function(response) {
+          $uibModalInstance.close($ctrl.data);
+        },
+        function(error) {
+          $ctrl.error_messages_old = error.old_password || [];
+          $ctrl.error_messages_pw1 = error.new_password1 || [];
+          $ctrl.error_messages_pw2 = error.new_password2 || [];
         }
-        $uibModalInstance.close($ctrl.data);
+      );
     };
-    $ctrl.remove = function () {
-        $ctrl.data = {
-            workarea: $ctrl.workareaRemove,
-            reception: $ctrl.receptionRemove
-        }
-        $uibModalInstance.close($ctrl.data);
+    $ctrl.cancel = function() {
+      $uibModalInstance.dismiss('cancel');
     };
-    $ctrl.prepareUnidentified = function () {
-        $ctrl.data = {
-            status: "prepared"
-        }
-        $uibModalInstance.close($ctrl.data);
-    };
-    $ctrl.changePassword = function () {
-        djangoAuth.changePassword($ctrl.pw1, $ctrl.pw2, $ctrl.oldPw).then(function(response) {
-            $uibModalInstance.close($ctrl.data);
-        }, function(error) {
-            $ctrl.error_messages_old = error.old_password || [];
-            $ctrl.error_messages_pw1 = error.new_password1 || [];
-            $ctrl.error_messages_pw2 = error.new_password2 || [];
-        });
-    };
-    $ctrl.cancel = function () {
-        $uibModalInstance.dismiss('cancel');
-    };
-});
+  });

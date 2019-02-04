@@ -1,10 +1,11 @@
 <div ng-click="ipRowClick(row)" context-menu="menuOptions('row', row)">
-    <button
-     tabindex="-1"
-     ng-if="row.state != 'At reception' && (row.permissions.includes('delete_informationpackage'))"
-     ng-click="removeIpModal(row)"
-     class="fas fa-trash-alt btn btn-default btn-sm"
-     uib-tooltip="{{'REMOVEIP' | translate}}: {{row.label}}"
-     tooltip-placement="auto top"
-     tooltip-append-to-body="true"></button>
+  <button
+    tabindex="-1"
+    ng-if="row.state != 'At reception' && (row.permissions.includes('delete_informationpackage'))"
+    ng-click="removeIpModal(row)"
+    class="fas fa-trash-alt btn btn-default btn-sm"
+    uib-tooltip="{{'REMOVEIP' | translate}}: {{row.label}}"
+    tooltip-placement="auto top"
+    tooltip-append-to-body="true"
+  ></button>
 </div>

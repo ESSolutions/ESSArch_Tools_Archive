@@ -1,27 +1,32 @@
 <h3>{{'MAPSTRUCTURE' | translate}}</h3>
 <div class="edit-view-tree">
-    <br />
-    <div class="tree">
-        <treecontrol class="tree-classic"
-                     tree-model="treeElements"
-                     options="treeOptions"
-                     on-selection="showSelected(node, $parentNode)"
-                     selected-node="selectedNode"
-                     expanded-nodes="expandedNodes"
-                     style="float:left;">
-        <span class="tree-edit-item" context-menu="menuOptions(item)" treednd>{{node.name}}</span>
-        </treecontrol>
-    </div>
-    <div ng-show="addMode.active || updateMode.active" class="add-node-form-wrapper">
-        <form class="add-node-form" name="vm.treeEditForm" ng-submit="treeEditSubmit(currentNode)">
-            <formly-form model="vm.treeEditModel" fields="vm.treeEditFields" options="vm.editTreeOptions">
-            </formly-form>
-            <div class="form-group">
-                <button ng-show="addMode.active" type="submit" class="btn btn-primary">{{'ADD' | translate}}</button>
-                <button ng-show="updateMode.active" type="submit" class="btn btn-primary">{{'UPDATE' | translate}}</button>
-                <button ng-show="updateMode.active" type="button" class="btn btn-primary" ng-click="exitUpdateMode()">{{'CANCEL' | translate}}</button>
-            <button ng-show="addMode.active" type="button" class="btn btn-primary" ng-click="exitAddMode()">{{'CANCEL' | translate}}</button>
-            </div>
-        </form>
-    </div>
+  <br />
+  <div class="tree">
+    <treecontrol
+      class="tree-classic"
+      tree-model="treeElements"
+      options="treeOptions"
+      on-selection="showSelected(node, $parentNode)"
+      selected-node="selectedNode"
+      expanded-nodes="expandedNodes"
+      style="float:left;"
+    >
+      <span class="tree-edit-item" context-menu="menuOptions(item)" treednd>{{node.name}}</span>
+    </treecontrol>
+  </div>
+  <div ng-show="addMode.active || updateMode.active" class="add-node-form-wrapper">
+    <form class="add-node-form" name="vm.treeEditForm" ng-submit="treeEditSubmit(currentNode)">
+      <formly-form model="vm.treeEditModel" fields="vm.treeEditFields" options="vm.editTreeOptions"> </formly-form>
+      <div class="form-group">
+        <button ng-show="addMode.active" type="submit" class="btn btn-primary">{{'ADD' | translate}}</button>
+        <button ng-show="updateMode.active" type="submit" class="btn btn-primary">{{'UPDATE' | translate}}</button>
+        <button ng-show="updateMode.active" type="button" class="btn btn-primary" ng-click="exitUpdateMode()">
+          {{'CANCEL' | translate}}
+        </button>
+        <button ng-show="addMode.active" type="button" class="btn btn-primary" ng-click="exitAddMode()">
+          {{'CANCEL' | translate}}
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

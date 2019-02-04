@@ -22,84 +22,105 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('essarch.controllers').controller('TransferSipCtrl', function(IP, $http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate, $interval, $uibModal, appConfig, $timeout, $anchorScroll, PermPermissionStore, $cookies, $controller, Notifications) {
+angular
+  .module('essarch.controllers')
+  .controller('TransferSipCtrl', function(
+    IP,
+    $http,
+    $scope,
+    $rootScope,
+    $state,
+    $log,
+    listViewService,
+    Resource,
+    $translate,
+    $interval,
+    $uibModal,
+    appConfig,
+    $timeout,
+    $anchorScroll,
+    PermPermissionStore,
+    $cookies,
+    $controller,
+    Notifications
+  ) {
     var vm = this;
     var ipSortString = ['Received', 'Transformed', 'Transferring', 'Transferred'];
-    $controller('BaseCtrl', { $scope: $scope, vm: vm, ipSortString: ipSortString });
+    $controller('BaseCtrl', {$scope: $scope, vm: vm, ipSortString: ipSortString});
     vm.info = {
-        text: "",
-        values: null,
-        visible: false
+      text: '',
+      values: null,
+      visible: false,
     };
     $scope.transferDisabled = false;
     vm.selectSingleRow = function(row) {
-        $scope.ips = [];
-        if($scope.ip !== null && $scope.ip.id == row.id){
-            vm.info.visible = false;
-            $scope.select = false;
-            $scope.ip = null;
-            $rootScope.ip = null;
-            $scope.filebrowser = false;
-        } else {
-            $scope.transferDisabled = false;
-            $scope.ip = row;
-            $rootScope.ip = row;
-            vm.info.visible = false;
-            $scope.select = true;
-            if(row.state == "Transferred" || row.state == "Transferring") {
-                vm.info = {
-                    text: "IP_IS_ALREADY_" + row.state.toUpperCase(),
-                    values: {
-                        label: row.label
-                    },
-                    visible: true
-                };
-                $scope.transferDisabled = true;
-            }
+      $scope.ips = [];
+      if ($scope.ip !== null && $scope.ip.id == row.id) {
+        vm.info.visible = false;
+        $scope.select = false;
+        $scope.ip = null;
+        $rootScope.ip = null;
+        $scope.filebrowser = false;
+      } else {
+        $scope.transferDisabled = false;
+        $scope.ip = row;
+        $rootScope.ip = row;
+        vm.info.visible = false;
+        $scope.select = true;
+        if (row.state == 'Transferred' || row.state == 'Transferring') {
+          vm.info = {
+            text: 'IP_IS_ALREADY_' + row.state.toUpperCase(),
+            values: {
+              label: row.label,
+            },
+            visible: true,
+          };
+          $scope.transferDisabled = true;
         }
+      }
     };
 
     $scope.deliveryDescription = $translate.instant('DELIVERYDESCRIPTION');
     $scope.submitDescription = $translate.instant('SUBMITDESCRIPTION');
     $scope.package = $translate.instant('PACKAGE');
     $scope.tabsEditView = [
-        {
-            label: $scope.submitDescription,
-            templateUrl: "static/frontend/views/reception_delivery_description.html"
-        },
-        {
-            label: $scope.package,
-            templateUrl: "static/frontend/views/reception_delivery_description.html"
-        },
+      {
+        label: $scope.submitDescription,
+        templateUrl: 'static/frontend/views/reception_delivery_description.html',
+      },
+      {
+        label: $scope.package,
+        templateUrl: 'static/frontend/views/reception_delivery_description.html',
+      },
     ];
-    vm.transferModal = function (ip) {
-        var ips = $scope.ips.length > 0? $scope.ips:null;
-        var modalInstance = $uibModal.open({
-            animation: true,
-            ariaLabelledBy: 'modal-title',
-            ariaDescribedBy: 'modal-body',
-            templateUrl: 'static/frontend/views/transfer_sip_modal.html',
-            scope: $scope,
-            controller: 'DataModalInstanceCtrl',
-            controllerAs: '$ctrl',
-            resolve: {
-                data: {
-                    ip: ip,
-                    ips: ips
-                }
-            }
-        })
-        modalInstance.result.then(function (data) {
-            $scope.ips = [];
-            $scope.ip = null;
-            $rootScope.ip = null;
-            $scope.transferDisabled = true;
-            $scope.select = false;
-            $timeout(function () {
-                $scope.getListViewData();
-                vm.updateListViewConditional();
-            });
-            $scope.transferDisabled = false;
+    vm.transferModal = function(ip) {
+      var ips = $scope.ips.length > 0 ? $scope.ips : null;
+      var modalInstance = $uibModal.open({
+        animation: true,
+        ariaLabelledBy: 'modal-title',
+        ariaDescribedBy: 'modal-body',
+        templateUrl: 'static/frontend/views/transfer_sip_modal.html',
+        scope: $scope,
+        controller: 'DataModalInstanceCtrl',
+        controllerAs: '$ctrl',
+        resolve: {
+          data: {
+            ip: ip,
+            ips: ips,
+          },
+        },
+      });
+      modalInstance.result.then(function(data) {
+        $scope.ips = [];
+        $scope.ip = null;
+        $rootScope.ip = null;
+        $scope.transferDisabled = true;
+        $scope.select = false;
+        $timeout(function() {
+          $scope.getListViewData();
+          vm.updateListViewConditional();
         });
-    }
-});
+        $scope.transferDisabled = false;
+      });
+    };
+  });

@@ -22,43 +22,54 @@
     Email - essarch@essolutions.se
 */
 
-angular.module('essarch.controllers').controller('CatalogueCtrl', function($http, $scope, $rootScope, $state, $log, listViewService, Resource, $translate) {
+angular
+  .module('essarch.controllers')
+  .controller('CatalogueCtrl', function(
+    $http,
+    $scope,
+    $rootScope,
+    $state,
+    $log,
+    listViewService,
+    Resource,
+    $translate
+  ) {
     /*******************************************/
     /*Piping and Pagination for List-view table*/
     /*******************************************/
     var vm = this;
     var ctrl = this;
     this.itemsPerPage = 10;
-    $scope.selectedIp = {id: "", class: ""};
+    $scope.selectedIp = {id: '', class: ''};
     this.displayedIps = [];
 
     //Get data according to ip table settings and populates ip table
     this.callServer = function callServer(tableState) {
-    $scope.tableState = tableState;
+      $scope.tableState = tableState;
 
-        var pagination = tableState.pagination;
-        var start = pagination.start || 0;     // This is NOT the page number, but the index of item in the list that you want to use to display the table.
-        var number = pagination.number || ctrl.itemsPerPage;  // Number of entries showed per page.
-        var pageNumber = start/number+1;
+      var pagination = tableState.pagination;
+      var start = pagination.start || 0; // This is NOT the page number, but the index of item in the list that you want to use to display the table.
+      var number = pagination.number || ctrl.itemsPerPage; // Number of entries showed per page.
+      var pageNumber = start / number + 1;
 
-        Resource.getIpPage(start, number, pageNumber, tableState, $scope.selectedIp).then(function (result) {
-            ctrl.displayedIps = result.data;
-            tableState.pagination.numberOfPages = result.numberOfPages;//set the number of pages so the pagination can update
-        });
+      Resource.getIpPage(start, number, pageNumber, tableState, $scope.selectedIp).then(function(result) {
+        ctrl.displayedIps = result.data;
+        tableState.pagination.numberOfPages = result.numberOfPages; //set the number of pages so the pagination can update
+      });
     };
     //Make ip selected and add class to visualize
-    vm.displayedIps=[];
+    vm.displayedIps = [];
     $scope.ipTableClick = function(row) {
-        $scope.ip = row;
-        listViewService.getSa(row.submission_agreement).then(function(sa) {
-            $scope.currentSa = sa;
-        });
-    }
+      $scope.ip = row;
+      listViewService.getSa(row.submission_agreement).then(function(sa) {
+        $scope.currentSa = sa;
+      });
+    };
     $scope.package = $translate.instant('PACKAGE');
     $scope.tabsEditView = [
-        {
-            label: $scope.package,
-            templateUrl: "static/frontend/views/reception_delivery_description.html"
-        },
+      {
+        label: $scope.package,
+        templateUrl: 'static/frontend/views/reception_delivery_description.html',
+      },
     ];
-});
+  });

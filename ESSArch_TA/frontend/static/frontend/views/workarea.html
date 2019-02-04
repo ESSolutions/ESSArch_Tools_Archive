@@ -1,14 +1,34 @@
 <div class="workspace w-100">
-    <div class="content-wrapper">
-            <div class="workspace-sub-menu menu" ng-controller="UtilCtrl as vm">
-                <a tabindex="0" ng-keydown="navKeydownListener($event, 'home.workarea.validation')" ui-sref="home.workarea.validation" ng-class="{chosen: $state.current.name == 'home.workarea.validation'}"
-                    class="nav-item sliding-middle-out" ng-if="checkPermissions('home.workarea.validation')">{{'VALIDATION' | translate}}</a>
-                <a tabindex="0" ng-keydown="navKeydownListener($event, 'home.workarea.conversion')" ui-sref="home.workarea" ng-class="{chosen: $state.current.name == 'home.workarea.conversion'}"
-                class="nav-item sliding-middle-out" ng-if="checkPermissions('home.workarea.conversion')">{{'CONVERSION' | translate}}</a>
-                <a tabindex="0" ng-keydown="navKeydownListener($event, 'home.workarea.transformation')" ui-sref="home.workarea.transformation" ng-class="{chosen: $state.current.name == 'home.workarea.transformation'}"
-                class="nav-item sliding-middle-out" ng-if="checkPermissions('home.workarea.transformation')">{{'TRANSFORMATION' | translate}}</a>
-            </div>
-            <div tabindex="-1" class="workarea-route" ui-view>
-            </div>
+  <div class="content-wrapper">
+    <div class="workspace-sub-menu menu" ng-controller="UtilCtrl as vm">
+      <a
+        tabindex="0"
+        ng-keydown="navKeydownListener($event, 'home.workarea.validation')"
+        ui-sref="home.workarea.validation"
+        ng-class="{chosen: $state.current.name == 'home.workarea.validation'}"
+        class="nav-item sliding-middle-out"
+        ng-if="checkPermissions('home.workarea.validation')"
+        >{{'VALIDATION' | translate}}</a
+      >
+      <a
+        tabindex="0"
+        ng-keydown="navKeydownListener($event, 'home.workarea.conversion')"
+        ui-sref="home.workarea"
+        ng-class="{chosen: $state.current.name == 'home.workarea.conversion'}"
+        class="nav-item sliding-middle-out"
+        ng-if="checkPermissions('home.workarea.conversion')"
+        >{{'CONVERSION' | translate}}</a
+      >
+      <a
+        tabindex="0"
+        ng-keydown="navKeydownListener($event, 'home.workarea.transformation')"
+        ui-sref="home.workarea.transformation"
+        ng-class="{chosen: $state.current.name == 'home.workarea.transformation'}"
+        class="nav-item sliding-middle-out"
+        ng-if="checkPermissions('home.workarea.transformation')"
+        >{{'TRANSFORMATION' | translate}}</a
+      >
     </div>
+    <div tabindex="-1" class="workarea-route" ui-view></div>
+  </div>
 </div>
