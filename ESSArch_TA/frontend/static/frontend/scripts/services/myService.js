@@ -25,7 +25,6 @@
 angular
   .module('essarch.services')
   .factory('myService', function(
-    Sysinfo,
     $location,
     PermPermissionStore,
     $anchorScroll,
@@ -46,11 +45,6 @@ angular
         }
       );
       return permissions;
-    }
-    function getVersionInfo() {
-      return Sysinfo.get().$promise.then(function(data) {
-        return data;
-      });
     }
     function getActiveColumns() {
       return djangoAuth.profile().then(function(response) {
@@ -147,7 +141,6 @@ angular
     return {
       changePath: changePath,
       getPermissions: getPermissions,
-      getVersionInfo: getVersionInfo,
       getActiveColumns: getActiveColumns,
       generateColumns: generateColumns,
       checkPermission: checkPermission,
