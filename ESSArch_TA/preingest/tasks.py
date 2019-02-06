@@ -36,7 +36,7 @@ from ESSArch_Core.configuration.models import Path
 from ESSArch_Core.fixity.checksum import calculate_checksum
 from ESSArch_Core.ip.models import InformationPackage, Workarea, MESSAGE_DIGEST_ALGORITHM_CHOICES_DICT
 from ESSArch_Core.storage.copy import copy_file
-from ESSArch_Core.util import creation_date, mkdir_p, timestamp_to_datetime
+from ESSArch_Core.util import creation_date, timestamp_to_datetime
 
 User = get_user_model()
 
@@ -54,7 +54,7 @@ class ReceiveSIP(DBTask):
     def run(self):
         ip = InformationPackage.objects.get(pk=self.ip)
         dst_dir = self.get_workarea_path(ip)
-        mkdir_p(dst_dir)
+        os.makedirs(dst_dir, exist_ok=True)
         try:
             if not os.path.isdir(ip.object_path):
                 xmlfile = os.path.splitext(ip.object_path)[0] + '.xml'
