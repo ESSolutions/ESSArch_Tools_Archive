@@ -22,129 +22,115 @@
     Email - essarch@essolutions.se
 */
 
-angular
-  .module('essarch.services')
-  .factory('myService', function(
-    $location,
-    PermPermissionStore,
-    $anchorScroll,
-    $http,
-    appConfig,
-    djangoAuth,
-    permissionConfig
-  ) {
-    function changePath(state) {
-      $state.go(state);
-    }
-    function getPermissions(permissions) {
-      PermPermissionStore.clearStore();
-      PermPermissionStore.defineManyPermissions(
-        permissions,
-        /*@ngInject*/ function(permissionName) {
-          return permissions.includes(permissionName);
-        }
-      );
-      return permissions;
-    }
-    function getActiveColumns() {
-      return djangoAuth.profile().then(function(response) {
-        return generateColumns(response.data.ip_list_columns);
-      });
-    }
-    function checkPermissions(permissions) {
-      if (permissions.length == 0) {
-        return true;
+angular.module('essarch.services').factory('myService', function(PermPermissionStore, djangoAuth) {
+  function getPermissions(permissions) {
+    PermPermissionStore.clearStore();
+    PermPermissionStore.defineManyPermissions(
+      permissions,
+      /*@ngInject*/ function(permissionName) {
+        return permissions.includes(permissionName);
       }
+    );
+    return permissions;
+  }
+  function getActiveColumns() {
+    return djangoAuth.profile().then(function(response) {
+      return generateColumns(response.data.ip_list_columns);
+    });
+  }
+  function checkPermissions(permissions) {
+    if (permissions.length == 0) {
+      return true;
+    }
 
-      var hasPermissions = false;
-      permissions.forEach(function(permission) {
-        if (checkPermission(permission)) {
-          hasPermissions = true;
+    var hasPermissions = false;
+    permissions.forEach(function(permission) {
+      if (checkPermission(permission)) {
+        hasPermissions = true;
+      }
+    });
+    return hasPermissions;
+  }
+
+  function checkPermission(permission) {
+    return !angular.isUndefined(PermPermissionStore.getPermissionDefinition(permission));
+  }
+  function generateColumns(columns) {
+    var allColumns = [
+      {
+        label: 'object_identifier_value',
+        sortString: 'object_identifier_value',
+        template: 'static/frontend/views/columns/column_object_identifier_value.html',
+      },
+      {label: 'label', sortString: 'label', template: 'static/frontend/views/columns/column_label.html'},
+      {
+        label: 'responsible',
+        sortString: 'responsible',
+        template: 'static/frontend/views/columns/column_responsible.html',
+      },
+      {
+        label: 'create_date',
+        sortString: 'create_date',
+        template: 'static/frontend/views/columns/column_create_date.html',
+      },
+      {label: 'state', sortString: 'State', template: 'static/frontend/views/columns/column_state.html'},
+      {label: 'status', sortString: 'Status', template: 'static/frontend/views/columns/column_status.html'},
+      {label: 'delete', sortString: '', template: 'static/frontend/views/columns/column_delete.html'},
+      {
+        label: 'object_size',
+        sortString: 'object_size',
+        template: 'static/frontend/views/columns/column_object_size.html',
+      },
+      {
+        label: 'archival_institution',
+        sortString: 'archival_institution',
+        template: 'static/frontend/views/columns/column_archival_institution.html',
+      },
+      {
+        label: 'archivist_organization',
+        sortString: 'archivist_organization',
+        template: 'static/frontend/views/columns/column_archivist_organization.html',
+      },
+      {
+        label: 'start_date',
+        sortString: 'start_date',
+        template: 'static/frontend/views/columns/column_start_date.html',
+      },
+      {label: 'end_date', sortString: 'end_date', template: 'static/frontend/views/columns/column_end_date.html'},
+      {
+        label: 'entry_date',
+        sortString: 'entry_date',
+        template: 'static/frontend/views/columns/column_entry_date.html',
+      },
+    ];
+    var activeColumns = [];
+    var simpleColumns = allColumns.map(function(a) {
+      return a.label;
+    });
+    columns.forEach(function(column) {
+      for (i = 0; i < simpleColumns.length; i++) {
+        if (column === simpleColumns[i]) {
+          activeColumns.push(allColumns[i]);
         }
-      });
-      return hasPermissions;
-    }
+      }
+    });
+    return {activeColumns: activeColumns, allColumns: allColumns};
+  }
 
-    function checkPermission(permission) {
-      return !angular.isUndefined(PermPermissionStore.getPermissionDefinition(permission));
-    }
-    function generateColumns(columns) {
-      var allColumns = [
-        {
-          label: 'object_identifier_value',
-          sortString: 'object_identifier_value',
-          template: 'static/frontend/views/columns/column_object_identifier_value.html',
-        },
-        {label: 'label', sortString: 'label', template: 'static/frontend/views/columns/column_label.html'},
-        {
-          label: 'responsible',
-          sortString: 'responsible',
-          template: 'static/frontend/views/columns/column_responsible.html',
-        },
-        {
-          label: 'create_date',
-          sortString: 'create_date',
-          template: 'static/frontend/views/columns/column_create_date.html',
-        },
-        {label: 'state', sortString: 'State', template: 'static/frontend/views/columns/column_state.html'},
-        {label: 'status', sortString: 'Status', template: 'static/frontend/views/columns/column_status.html'},
-        {label: 'delete', sortString: '', template: 'static/frontend/views/columns/column_delete.html'},
-        {
-          label: 'object_size',
-          sortString: 'object_size',
-          template: 'static/frontend/views/columns/column_object_size.html',
-        },
-        {
-          label: 'archival_institution',
-          sortString: 'archival_institution',
-          template: 'static/frontend/views/columns/column_archival_institution.html',
-        },
-        {
-          label: 'archivist_organization',
-          sortString: 'archivist_organization',
-          template: 'static/frontend/views/columns/column_archivist_organization.html',
-        },
-        {
-          label: 'start_date',
-          sortString: 'start_date',
-          template: 'static/frontend/views/columns/column_start_date.html',
-        },
-        {label: 'end_date', sortString: 'end_date', template: 'static/frontend/views/columns/column_end_date.html'},
-        {
-          label: 'entry_date',
-          sortString: 'entry_date',
-          template: 'static/frontend/views/columns/column_entry_date.html',
-        },
-      ];
-      var activeColumns = [];
-      var simpleColumns = allColumns.map(function(a) {
-        return a.label;
-      });
-      columns.forEach(function(column) {
-        for (i = 0; i < simpleColumns.length; i++) {
-          if (column === simpleColumns[i]) {
-            activeColumns.push(allColumns[i]);
-          }
-        }
-      });
-      return {activeColumns: activeColumns, allColumns: allColumns};
-    }
+  function escapeRegExp(str) {
+    return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
+  }
 
-    function escapeRegExp(str) {
-      return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
-    }
+  function replaceAll(target, search, replacement) {
+    return target.replace(new RegExp(escapeRegExp(search), 'g'), replacement);
+  }
 
-    function replaceAll(target, search, replacement) {
-      return target.replace(new RegExp(escapeRegExp(search), 'g'), replacement);
-    }
-
-    return {
-      changePath: changePath,
-      getPermissions: getPermissions,
-      getActiveColumns: getActiveColumns,
-      generateColumns: generateColumns,
-      checkPermission: checkPermission,
-      checkPermissions: checkPermissions,
-      replaceAll: replaceAll,
-    };
-  });
+  return {
+    getPermissions: getPermissions,
+    getActiveColumns: getActiveColumns,
+    generateColumns: generateColumns,
+    checkPermission: checkPermission,
+    checkPermissions: checkPermissions,
+    replaceAll: replaceAll,
+  };
+});
