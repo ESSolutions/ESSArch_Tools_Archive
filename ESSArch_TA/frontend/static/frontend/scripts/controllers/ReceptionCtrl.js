@@ -44,7 +44,8 @@ angular
     PermPermissionStore,
     $cookies,
     $controller,
-    ContextMenuBase
+    ContextMenuBase,
+    SelectedIPUpdater
   ) {
     var vm = this;
     var ipSortString = ['Receiving'];
@@ -94,6 +95,7 @@ angular
             tableState.pagination.numberOfPages = result.numberOfPages; //set the number of pages so the pagination can update
             $scope.ipLoading = false;
             $scope.initLoad = false;
+            SelectedIPUpdater.update(vm.displayedIps, $scope.ips, $scope.ip);
           })
           .catch(function(response) {
             if (response.status == 404) {
