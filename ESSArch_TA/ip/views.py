@@ -77,7 +77,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         self.logger = logging.getLogger('essarch.reception')
         self.reception = Path.objects.get(entity="path_ingest_reception").value
         self.uip = Path.objects.get(entity="path_ingest_unidentified").value
-        super(InformationPackageReceptionViewSet, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_queryset(self):
         user = self.request.user
@@ -691,7 +691,7 @@ class InformationPackageViewSet(InformationPackageViewSetCore, GetObjectForUpdat
 
         step.run()
 
-        return super(InformationPackageViewSet, self).destroy(request, pk=pk)
+        return super().destroy(request, pk=pk)
 
     @detail_route(methods=['get'], permission_classes=[IsResponsibleOrCanSeeAllFiles])
     def files(self, request, pk=None):
@@ -705,7 +705,7 @@ class WorkareaViewSet(InformationPackageViewSet):
     def get_queryset(self):
         user = self.request.user
         see_all = self.request.user.has_perm('ip.see_all_in_workspaces')
-        qs = super(WorkareaViewSet, self).get_queryset()
+        qs = super().get_queryset()
 
         if not see_all:
             qs = qs.filter(workareas__user=user)
