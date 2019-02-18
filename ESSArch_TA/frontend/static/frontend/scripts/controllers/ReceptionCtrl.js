@@ -605,6 +605,7 @@ angular
                     }
                   },
                   function() {
+                    $scope.getListViewData();
                     $log.info('modal-component dismissed at: ' + new Date());
                   }
                 );
@@ -650,6 +651,7 @@ angular
                 }
               },
               function() {
+                $scope.getListViewData();
                 $log.info('modal-component dismissed at: ' + new Date());
               }
             );
@@ -694,6 +696,7 @@ angular
               }
             },
             function() {
+              $scope.getListViewData();
               $log.info('modal-component dismissed at: ' + new Date());
             }
           );
