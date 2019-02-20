@@ -224,7 +224,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         raise exceptions.NotFound()
 
-    action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get'])
     def files(self, request, pk=None):
         reception = Path.objects.get(entity="path_ingest_reception").value
         path = request.query_params.get('path', '').rstrip('/ ')
@@ -261,7 +261,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         }
         return Response([entry, xmlentry])
 
-    action(detail=False, methods=['post'])
+    @action(detail=False, methods=['post'])
     def upload(self, request):
         if not request.user.has_perm('ip.can_receive_remote_files'):
             raise exceptions.PermissionDenied
@@ -288,7 +288,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         upload_id = request.data.get('upload_id', uuid.uuid4().hex)
         return Response({'upload_id': upload_id})
 
-    action(detail=False, methods=['post'])
+    @action(detail=False, methods=['post'])
     def upload_complete(self, request):
         if not request.user.has_perm('ip.can_receive_remote_files'):
             raise exceptions.PermissionDenied
@@ -306,7 +306,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
         return Response('Upload of %s complete' % filepath)
 
     @transaction.atomic
-    action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'])
     def prepare(self, request, pk=None):
         perms = copy.deepcopy(getattr(settings, 'IP_CREATION_PERMS_MAP', {}))
 
@@ -427,7 +427,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
     @transaction.atomic
     @permission_required_or_403(['ip.receive'])
-    action(detail=True, methods=['post'], url_path='receive')
+    @action(detail=True, methods=['post'], url_path='receive')
     def receive(self, request, pk=None):
         try:
             ip = get_object_or_404(self.get_queryset(), id=pk)
@@ -488,7 +488,7 @@ class InformationPackageReceptionViewSet(viewsets.ViewSet, PaginatedViewMixin):
 
         return Response("receiving ip")
 
-    action(detail=False, methods=['post'], url_path='identify-ip')
+    @action(detail=False, methods=['post'], url_path='identify-ip')
     def identify_ip(self, request):
         fname = request.data.get('filename')
         spec_data = request.data.get('specification_data', {})
@@ -544,7 +544,7 @@ class InformationPackageViewSet(InformationPackageViewSetCore, GetObjectForUpdat
         return InformationPackageSerializer
 
     @transaction.atomic
-    action(detail=True, methods=['post'], url_path='transfer', permission_classes=[CanTransferSIP])
+    @action(detail=True, methods=['post'], url_path='transfer', permission_classes=[CanTransferSIP])
     def transfer(self, request, pk=None):
         ip = self.get_object_for_update()
 
@@ -591,7 +591,7 @@ class InformationPackageViewSet(InformationPackageViewSetCore, GetObjectForUpdat
         return Response({'status': 'transferring ip'})
 
     @transaction.atomic
-    action(detail=True, methods=['post'], url_path='validate')
+    @action(detail=True, methods=['post'], url_path='validate')
     def validate(self, request, pk=None):
         ip = self.get_object()
 
@@ -693,7 +693,7 @@ class InformationPackageViewSet(InformationPackageViewSetCore, GetObjectForUpdat
 
         return super().destroy(request, pk=pk)
 
-    action(detail=True, methods=['get'], permission_classes=[IsResponsibleOrCanSeeAllFiles])
+    @action(detail=True, methods=['get'], permission_classes=[IsResponsibleOrCanSeeAllFiles])
     def files(self, request, pk=None):
         ip = self.get_object()
         path = request.query_params.get('path', '').rstrip('/')
