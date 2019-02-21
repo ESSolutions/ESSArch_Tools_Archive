@@ -1,25 +1,10 @@
-<div
-  style="white-space: nowrap;"
-  ng-if="row.state != 'Unidentified' && ('home.reception' | isState)"
-  class="clickable"
-  ng-click="ipTableClick(row, $event)"
-  context-menu="menuOptions('row', row)"
->
+<div ng-if="row.state != 'Unidentified'" class="white-space-nowrap">
   {{row.object_identifier_value}}
 </div>
-<div
-  style="white-space: nowrap;"
-  ng-if="!('home.reception' | isState)"
-  class="clickable"
-  ng-click="ipTableClick(row, $event)"
-  context-menu="menuOptions('row', row)"
->
-  {{row.object_identifier_value}}
-</div>
-<div style="white-space: nowrap;" ng-if="row.state == 'Unidentified'" context-menu="menuOptions('row', row)">
+<div class="white-space-nowrap" ng-if="row.state == 'Unidentified'" context-menu="menuOptions('row', row)">
   <a
     tabindex="-1"
-    ng-click="identifyIpModal(row)"
+    ng-click="identifyIpModal(row); $event.stopPropagation();"
     uib-tooltip="{{'RECEIVEUNIDENTIFIED' | translate}}: {{row.object_identifier_value}}"
     tooltip-placement="auto top"
     tooltip-append-to-body="true"

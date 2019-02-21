@@ -110,7 +110,9 @@
         <tr
           ng-class="{'selected': ip.object_identifier_value == row.object_identifier_value || selectedAmongOthers(row.id)}"
           ng-repeat="row in vm.displayedIps"
-          class="table-item"
+          class="table-item selectable"
+          ng-click="ipTableClick(row, $event)"
+          context-menu="menuOptions('row', row)"
         >
           <td ng-repeat="col in listViewColumns">
             <div ng-include src="col.template"></div>

@@ -1,7 +1,6 @@
-<div context-menu="menuOptions('row', row)">
+<div>
   <uib-progressbar
     class="progress clickable"
-    ng-click="ipTableClick(row, $event)"
     ng-class="{'active progress-striped': row.step_state == 'STARTED'}"
     animate="true"
     ng-attr-value="row.status"
