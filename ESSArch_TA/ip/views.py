@@ -616,7 +616,6 @@ class InformationPackageViewSet(InformationPackageViewSetCore, GetObjectForUpdat
             ProcessTask.objects.create(
                 name="ESSArch_Core.tasks.ValidateFiles",
                 params={
-                    "ip": ip.pk,
                     "mets_path": xmlfile,
                     "validate_fileformat": True,
                     "validate_integrity": True,
