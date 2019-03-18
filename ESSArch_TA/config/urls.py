@@ -39,7 +39,7 @@ from ESSArch_Core.profiles.views import (
     SubmissionAgreementViewSet,
 )
 from ESSArch_Core.routers import ESSArchRouter
-from ESSArch_Core.stats.views import StatsView
+from ESSArch_Core.stats.views import stats, export as export_stats
 from configuration.views import EventTypeViewSet
 from ip.views import (
     InformationPackageViewSet,
@@ -116,7 +116,8 @@ router.register(r'workarea-files', WorkareaFilesViewSet, base_name='workarea-fil
 urlpatterns = [
     url(r'^', include('ESSArch_Core.frontend.urls'), name='home'),
     url(r'^admin/', admin.site.urls),
-    url(r'^api/stats/', StatsView.as_view()),
+    url(r'^api/stats/$', stats),
+    url(r'^api/stats/export/$', export_stats),
     url(r'^api/sysinfo/', SysInfoView.as_view()),
     url(r'^api/me/$', MeView.as_view(), name='me'),
     url(r'^api/', include(router.urls)),
