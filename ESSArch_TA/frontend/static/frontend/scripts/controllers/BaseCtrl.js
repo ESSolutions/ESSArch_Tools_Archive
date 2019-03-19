@@ -106,12 +106,12 @@ angular
       reception: 'reception.html',
       validation: 'workspace.html#validation',
       transformation: 'workspace.html#transformation',
-      transferSip: 'transfer-sip.html'
-    }
+      transferSip: 'transfer-sip.html',
+    };
     vm.getStateDocPage = function() {
       var page = $state.current.name.split('.').pop();
       return docStateMap[page];
-    }
+    };
 
     // Context menu
 
