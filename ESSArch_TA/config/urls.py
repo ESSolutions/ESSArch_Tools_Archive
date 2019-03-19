@@ -24,12 +24,13 @@
 
 from django.conf import settings
 from django.conf.urls import include, url
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
 from ESSArch_Core.WorkflowEngine.views import ProcessViewSet, ProcessStepViewSet, ProcessTaskViewSet
 from ESSArch_Core.auth.views import GroupViewSet, PermissionViewSet, MeView, NotificationViewSet, UserViewSet
-from ESSArch_Core.configuration.views import ParameterViewSet, PathViewSet, SysInfoView
+from ESSArch_Core.configuration.views import ParameterViewSet, PathViewSet, SiteView, SysInfoView
 from ESSArch_Core.fixity.views import ValidationViewSet, ValidationFilesViewSet
 from ESSArch_Core.ip.views import AgentViewSet, EventIPViewSet, WorkareaEntryViewSet
 from ESSArch_Core.profiles.views import (
@@ -116,6 +117,7 @@ router.register(r'workarea-files', WorkareaFilesViewSet, base_name='workarea-fil
 urlpatterns = [
     url(r'^', include('ESSArch_Core.frontend.urls'), name='home'),
     url(r'^admin/', admin.site.urls),
+    url(r'^api/site/', SiteView.as_view()),
     url(r'^api/stats/$', stats),
     url(r'^api/stats/export/$', export_stats),
     url(r'^api/sysinfo/', SysInfoView.as_view()),
@@ -129,6 +131,8 @@ urlpatterns = [
     url(r'^rest-auth/', include('ESSArch_Core.auth.urls')),
     url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if getattr(settings, 'ENABLE_ADFS_LOGIN', False):
     urlpatterns.append(url(r'^saml2/', include('djangosaml2.urls', namespace='saml2')))
