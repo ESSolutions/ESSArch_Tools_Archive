@@ -36,6 +36,8 @@ angular
     $scope.ips = [];
     vm.specificTabs = [];
 
+    $scope.$translate = $translate;
+
     vm.itemsPerPage = $cookies.get('eta-ips-per-page') || 10;
     var watchers = [];
 
@@ -99,6 +101,17 @@ angular
     $scope.$on('REFRESH_LIST_VIEW', function(event, data) {
       $scope.getListViewData();
     });
+
+    var docStateMap = {
+      reception: 'reception.html',
+      validation: 'workspace.html#validation',
+      transformation: 'workspace.html#transformation',
+      transferSip: 'transfer-sip.html',
+    };
+    vm.getStateDocPage = function() {
+      var page = $state.current.name.split('.').pop();
+      return docStateMap[page];
+    };
 
     // Context menu
 
