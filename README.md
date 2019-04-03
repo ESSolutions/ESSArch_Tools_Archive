@@ -1,4 +1,4 @@
-# ETA (ESSArch Tools Archive) [![Build Status](https://travis-ci.org/ESSolutions/ESSArch_Tools_Archive.svg?branch=master)](https://travis-ci.org/ESSolutions/ESSArch_Tools_Archive)
+# ETA (ESSArch Tools Archive) [![Build Status](https://travis-ci.org/ESSolutions/ESSArch_Tools_Archive.svg?branch=master)](https://travis-ci.org/ESSolutions/ESSArch_Tools_Archive)  [![codecov](https://codecov.io/gh/ESSolutions/ESSArch_Tools_Archive/branch/master/graph/badge.svg)](https://codecov.io/gh/ESSolutions/ESSArch_Tools_Archive)
 
 SIP receiving tools for archives.
 
