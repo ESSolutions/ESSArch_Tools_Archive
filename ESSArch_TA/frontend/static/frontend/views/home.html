@@ -1,8 +1,8 @@
 <div class="body-wrapper">
   <div class="header">
     <div class="logo-search-user-admin-wrapper">
-      <div class="logo">
-        <div ng-if="site !== null && site.logo !== null" class="custom-logo">
+      <div class="logo" ng-controller="UtilCtrl">
+        <div ng-if="!angular.isUndefined(site) && site !== null && site.logo !== null" class="custom-logo">
           <img src="{{site.logo}}" width="36" alt="logo" />
         </div>
         <h3 class="page-title" ui-sref="home.info">ESSArch Tools for Archive</h3>
