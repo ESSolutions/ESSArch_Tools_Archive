@@ -120,6 +120,7 @@ INSTALLED_APPS = [
     'mptt',
     'frontend',
     'ESSArch_Core.admin',
+    'ESSArch_Core.api',
     'ESSArch_Core.auth',
     'ESSArch_Core.docs',
     'ESSArch_Core.configuration',
