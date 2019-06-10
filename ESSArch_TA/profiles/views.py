@@ -23,15 +23,10 @@
 """
 
 from rest_framework import viewsets
-from ESSArch_Core.profiles.models import ProfileIP, ProfileSA
-from ESSArch_Core.profiles.serializers import ProfileIPSerializer, ProfileSASerializer
+from ESSArch_Core.profiles.models import ProfileSA
+from ESSArch_Core.profiles.serializers import ProfileSASerializer
 
 
 class ProfileSAViewSet(viewsets.ModelViewSet):
     queryset = ProfileSA.objects.all()
     serializer_class = ProfileSASerializer
-
-
-class ProfileIPViewSet(viewsets.ModelViewSet):
-    queryset = ProfileIP.objects.all()
-    serializer_class = ProfileIPSerializer
