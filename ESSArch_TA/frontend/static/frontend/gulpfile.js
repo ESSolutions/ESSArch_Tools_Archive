@@ -119,7 +119,6 @@ var jsVendorFiles = [
     coreCssFiles + '/**/*.scss',
     'styles/modules/index.scss',
     'styles/modules/login.scss',
-    'styles/modules/my_page.scss',
     'styles/modules/receive_sip.scss',
     'styles/modules/workspace.scss',
     'styles/modules/profile_editor.scss',
